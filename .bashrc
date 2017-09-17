@@ -48,8 +48,11 @@ alias la='ls -alF'
 alias ll='ls -A'
 alias l='ls -CF'
 
+# set PS1
+PS1="\u@\h: \w\n$ "
+
 # TMUX
-if [ `which tmux` ]; then
+if type tmux >/dev/null 2>&1; then
     function is_exists() { type "$1" >/dev/null 2>&1; return $?; }
     function is_osx() { [[ $OSTYPE == darwin* ]]; }
     function is_screen_running() { [ ! -z "$STY" ]; }
@@ -113,6 +116,6 @@ if [ `which tmux` ]; then
     tmux_automatically_attach_session
 fi
 
-if [ `which fish` ]; then
+if type fish >/dev/null 2>&1; then
     exec fish
 fi
