@@ -48,6 +48,17 @@ alias la='ls -alF'
 alias ll='ls -A'
 alias l='ls -CF'
 
+if type vim >/dev/null 2>&1; then
+    alias vi='vim'
+fi
+
+# prohibit Ctrl-s
+stty stop undef
+
+# Ctrl-w
+stty werase undef
+bind "\C-w":unix-filename-rubout
+
 # set PS1
 PS1="\u@\h: \w\n$ "
 
@@ -115,6 +126,7 @@ if type tmux >/dev/null 2>&1; then
     }
     tmux_automatically_attach_session
 fi
+
 
 if type fish >/dev/null 2>&1; then
     exec fish
