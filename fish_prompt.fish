@@ -1,5 +1,3 @@
-# https://github.com/sotayamashita/simple
-
 function __git_upstream_configured
     git rev-parse --abbrev-ref @"{u}" > /dev/null 2>&1
 end
@@ -16,32 +14,12 @@ end
 function fish_prompt -d "Simple Fish Prompt"
     echo -e ""
 
-    # User
-    #
-#    set -l user (id -un $USER)
-#    __print_color 3CB1FF "$user "
-
-
-    # Host 
-    #
-#    set -l host_name (hostname -s)
-#    set -l host_glyph " at "
-
-#    __print_color ffffff "$host_glyph"
-#    __print_color F6F49D "$host_name"
-
-
-    # Current working directory
-    #
-#    set -l pwd_glyph " in "
     set -l pwd_string (echo $PWD | sed 's|^'$HOME'\(.*\)$|~\1|')
 
-#    __print_color ffffff "$pwd_glyph"
     __print_color 5DAE8B "$pwd_string"
 
 
     # Git
-    #
     if git_is_repo
         set -l branch_name (git_branch_name)
         set -l git_glyph " on "
