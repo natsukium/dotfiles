@@ -118,9 +118,11 @@ if type tmux >/dev/null 2>&1; then
                     # to spawn a shell in the user's namespace
                     tmux_config=$(cat $HOME/.tmux.conf <(echo 'set-option -g default-command "reattach-to-user-namespace -l $SHELL"'))
                     tmux -f <(echo "$tmux_config") new-session && echo "$(tmux -V) created new session supported OS X"
-                else
-                    tmux new-session \; split-window -h -d && echo "tmux created new session"
-                fi
+               else
+#                    tmux new-session \; split-window -h -d && echo "tmux created new session"
+
+                   tmux new-session && echo "tmux created new session"
+               fi
             fi
         fi
     }
