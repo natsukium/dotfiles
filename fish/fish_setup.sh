@@ -1,6 +1,8 @@
 #!/usr/bin/env fish
 # Install plugin manager "fisherman"
-curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisherman
+if [ ! -f $HOME/.config/fish/functions/fisher.fish ]
+    curl -Lo ~/.config/fish/functions/fisher.fish --create-dirs git.io/fisherman
+end
 
 # Install plugins
 fisher z fzf edc/bass rafaelrinaldi/pure

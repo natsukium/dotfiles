@@ -1,3 +1,7 @@
 function rg
-    ranger
+    if [ -z "$RANGER_LEVEL" ]
+        ranger
+    else
+        exit
+    end
 end
