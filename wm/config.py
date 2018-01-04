@@ -26,7 +26,7 @@
 
 from libqtile.config import Key, Screen, Group, Drag, Click
 from libqtile.command import lazy
-from libqtile import layout, bar, widget
+from libqtile import layout, bar, widget, hook
 
 mod = "mod4"
 
@@ -53,13 +53,13 @@ keys = [
 
     # Switch window focus to other pane(s) of stack
     Key(
-        [mod], "space",
+        [mod], "h",
         lazy.layout.next()
     ),
 
     # Swap panes of split stack
     Key(
-        [mod, "shift"], "space",
+        [mod], "space",
         lazy.layout.rotate()
     ),
 
@@ -71,7 +71,11 @@ keys = [
         [mod, "shift"], "Return",
         lazy.layout.toggle_split()
     ),
-    Key([mod], "Return", lazy.spawn("urxvt")),
+    Key([mod], "Return", lazy.spawn("st")),
+    Key(
+        [mod, "shift"], "space",
+        lazy.spawn("google-chrome-stable")
+    ),
 
     # Toggle between different layouts as defined below
     Key([mod], "Tab", lazy.next_layout()),
@@ -84,6 +88,11 @@ keys = [
     # Backlight
     Key([mod], "b", lazy.spawn("xbacklight -10")),
     Key([mod, "shift"], "b", lazy.spawn("xbacklight +10")),
+
+    # Sound
+    Key([mod], "v", lazy.spawn("amixer set Master 5%-")),
+    Key([mod, "shift"], "v", lazy.spawn("amixer set Master 5%+")),
+    Key([mod], "m", lazy.spawn("amixer set Master toggle")),
 ]
 
 groups = [Group(i) for i in "asdfuiop"]
@@ -112,13 +121,13 @@ widget_defaults = dict(
 
 screens = [
     Screen(
-        # bottom=bar.Bar(
         top=bar.Bar(
             [
-                widget.GroupBox(),
+                # widget.GroupBox(),
                 widget.Prompt(),
-                widget.WindowName(),
-                widget.Systray(),
+                # widget.WindowName(),
+                # widget.Systray(),
+                widget.Spacer(),
                 widget.Battery(format='{percent:2.0%} {hour:d}:{min:02d}'),
                 widget.NetGraph(),
                 widget.Clock(format='%Y-%m-%d %a %I:%M %p'),
