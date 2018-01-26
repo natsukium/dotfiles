@@ -95,7 +95,7 @@ keys = [
     Key([mod], "m", lazy.spawn("amixer set Master toggle")),
 ]
 
-groups = [Group(i) for i in "asdfuiop"]
+groups = [Group(i) for i in "1234"]
 
 for i in groups:
     # mod1 + letter of group = switch to group
@@ -128,6 +128,7 @@ screens = [
                 # widget.WindowName(),
                 # widget.Systray(),
                 widget.Spacer(),
+                widget.Volume(emoji=True),
                 widget.Battery(format='{percent:2.0%} {hour:d}:{min:02d}'),
                 widget.NetGraph(),
                 widget.Clock(format='%Y-%m-%d %a %I:%M %p'),
@@ -136,6 +137,7 @@ screens = [
             background = ["#000000", "#424151"],
         ),
     ),
+    Screen(),
 ]
 
 # Drag floating layouts.
