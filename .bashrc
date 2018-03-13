@@ -35,9 +35,12 @@ colors() {
 
 [ -r /usr/share/bash-completion/bash_completion   ] && . /usr/share/bash-completion/bash_completion
 
-# alias
+# colors
 if [ -x /usr/bin/dircolors ]; then
-    test -r ~/.dircolors && eval "$(dircolors -b ~/.dircolors)" || eval "$(dircolors -b)"
+    if [ -f $HOME/.dircolors ]; then
+        eval $(dircolors ~/.dircolors)
+    fi
+
     alias ls='ls --color=auto'
     alias grep='grep --color=auto'
     alias fgrep='fgrep --color=auto'
@@ -78,11 +81,11 @@ if type tmux >/dev/null 2>&1; then
             ! is_exists 'tmux' && return 1
 
             if is_tmux_runnning; then
-                echo "${fg_bold[red]} _____ __  __ _   ___  __ ${reset_color}"
-                echo "${fg_bold[red]}|_   _|  \/  | | | \ \/ / ${reset_color}"
-                echo "${fg_bold[red]}  | | | |\/| | | | |\  /  ${reset_color}"
-                echo "${fg_bold[red]}  | | | |  | | |_| |/  \  ${reset_color}"
-                echo "${fg_bold[red]}  |_| |_|  |_|\___//_/\_\ ${reset_color}"
+                echo -e "\e[34;1m" "      _/_/      _/_/_/ _/_/_/_/_/                          " "\e[m"
+                echo -e "\e[34;1m" "   _/    _/      _/       _/    _/_/   _/  _/_/ _/_/_/ _/_/" "\e[m"
+                echo -e "\e[34;1m" "  _/_/_/_/      _/       _/  _/_/_/_/ _/_/     _/   _/   _/" "\e[m"
+                echo -e "\e[34;1m" " _/    _/      _/       _/  _/       _/       _/   _/   _/ " "\e[m"
+                echo -e "\e[34;1m" "_/    _/ _/ _/_/_/  _/ _/    _/_/_/ _/       _/   _/   _/  " "\e[m"
             elif is_screen_running; then
                 echo "This is on screen."
             fi
@@ -129,6 +132,7 @@ if type tmux >/dev/null 2>&1; then
     tmux_automatically_attach_session
 fi
 
+[[ -f ~/.bashenv ]] && . ~/.bashenv
 
 if type fish >/dev/null 2>&1; then
     exec fish
