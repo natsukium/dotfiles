@@ -81,13 +81,7 @@ if type tmux >/dev/null 2>&1; then
             ! is_exists 'tmux' && return 1
 
             if is_tmux_runnning; then
-                echo -e "\e[34;1m" "      _/_/      _/_/_/ _/_/_/_/_/                          " "\e[m"
-                echo -e "\e[34;1m" "   _/    _/      _/       _/    _/_/   _/  _/_/ _/_/_/ _/_/" "\e[m"
-                echo -e "\e[34;1m" "  _/_/_/_/      _/       _/  _/_/_/_/ _/_/     _/   _/   _/" "\e[m"
-                echo -e "\e[34;1m" " _/    _/      _/       _/  _/       _/       _/   _/   _/ " "\e[m"
-                echo -e "\e[34;1m" "_/    _/ _/ _/_/_/  _/ _/    _/_/_/ _/       _/   _/   _/  " "\e[m"
-            elif is_screen_running; then
-                echo "This is on screen."
+                echo "Siro is so cute!"
             fi
         else
             if shell_has_started_interactively && ! is_ssh_running; then
