@@ -43,6 +43,7 @@ Plug 'arcticicestudio/nord-vim'
 Plug 'vim-airline/vim-airline'
 Plug 'davidhalter/jedi-vim'
 Plug 'JuliaEditorSupport/julia-vim'
+Plug 'wakatime/vim-wakatime'
 call plug#end()
 colorscheme nord
 let g:airline_powerline_fonts = 1
