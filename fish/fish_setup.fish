@@ -5,7 +5,7 @@ if [ ! -f $HOME/.config/fish/functions/fisher.fish ]
 end
 
 # Install plugins
-fisher z fzf edc/bass rafaelrinaldi/pure
+fisher add z fzf edc/bass rafaelrinaldi/pure
 
 # Add my functions to user dir
 ln -sf ~/dotfiles/fish/alias/* ~/.config/fish/functions/
