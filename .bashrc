@@ -2,6 +2,9 @@
 # ~/.bashrc
 #
 
+export LANG=ja_JP.UTF-8
+export LC_TYPE=ja_JP.UTF-8
+
 [[ $- != *i* ]] && return
 
 colors() {
