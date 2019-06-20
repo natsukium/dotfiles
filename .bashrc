@@ -8,35 +8,36 @@ export LC_TYPE=ja_JP.UTF-8
 [[ $- != *i* ]] && return
 
 colors() {
-	local fgc bgc vals seq0
+    local fgc bgc vals seq0
 
-	printf "Color escapes are %s\n" '\e[${value};...;${value}m'
-	printf "Values 30..37 are \e[33mforeground colors\e[m\n"
-	printf "Values 40..47 are \e[43mbackground colors\e[m\n"
-	printf "Value  1 gives a  \e[1mbold-faced look\e[m\n\n"
+    printf "Color escapes are %s\n" '\e[${value};...;${value}m'
+    printf "Values 30..37 are \e[33mforeground colors\e[m\n"
+    printf "Values 40..47 are \e[43mbackground colors\e[m\n"
+    printf "Value  1 gives a  \e[1mbold-faced look\e[m\n\n"
 
-	# foreground colors
-	for fgc in {30..37}; do
-		# background colors
-		for bgc in {40..47}; do
-			fgc=${fgc#37} # white
-			bgc=${bgc#40} # black
+    # foreground colors
+    for fgc in {30..37}; do
+        # background colors
+        for bgc in {40..47}; do
+            fgc=${fgc#37} # white
+            bgc=${bgc#40} # black
 
-			vals="${fgc:+$fgc;}${bgc}"
-			vals=${vals%%;}
+            vals="${fgc:+$fgc;}${bgc}"
+            vals=${vals%%;}
 
-			seq0="${vals:+\e[${vals}m}"
-			printf "  %-9s" "${seq0:-(default)}"
-			printf " ${seq0}TEXT\e[m"
-			printf " \e[${vals:+${vals+$vals;}}1mBOLD\e[m"
-		done
-		echo; echo
-	done
+            seq0="${vals:+\e[${vals}m}"
+            printf "  %-9s" "${seq0:-(default)}"
+            printf " ${seq0}TEXT\e[m"
+            printf " \e[${vals:+${vals+$vals;}}1mBOLD\e[m"
+        done
+        echo
+        echo
+    done
 }
 
 [[ -f ~/.extend.bashrc ]] && . ~/.extend.bashrc
 
-[ -r /usr/share/bash-completion/bash_completion   ] && . /usr/share/bash-completion/bash_completion
+[ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
 # colors
 if [ -x /usr/bin/dircolors ]; then
@@ -70,7 +71,10 @@ PS1="\u@\h: \w\n$ "
 
 # TMUX
 if type tmux >/dev/null 2>&1; then
-    function is_exists() { type "$1" >/dev/null 2>&1; return $?; }
+    function is_exists() {
+        type "$1" >/dev/null 2>&1
+        return $?
+    }
     function is_osx() { [[ $OSTYPE == darwin* ]]; }
     function is_screen_running() { [ ! -z "$STY" ]; }
     function is_tmux_runnning() { [ ! -z "$TMUX" ]; }
@@ -78,8 +82,7 @@ if type tmux >/dev/null 2>&1; then
     function shell_has_started_interactively() { [ ! -z "$PS1" ]; }
     function is_ssh_running() { [ ! -z "$SSH_CONECTION" ]; }
 
-    function tmux_automatically_attach_session()
-    {
+    function tmux_automatically_attach_session() {
         if is_screen_or_tmux_running; then
             ! is_exists 'tmux' && return 1
 
@@ -118,11 +121,11 @@ if type tmux >/dev/null 2>&1; then
                     # to spawn a shell in the user's namespace
                     tmux_config=$(cat $HOME/.tmux.conf <(echo 'set-option -g default-command "reattach-to-user-namespace -l $SHELL"'))
                     tmux -f <(echo "$tmux_config") new-session && echo "$(tmux -V) created new session supported OS X"
-               else
-#                    tmux new-session \; split-window -h -d && echo "tmux created new session"
+                else
+                    #                    tmux new-session \; split-window -h -d && echo "tmux created new session"
 
-                   tmux new-session && echo "tmux created new session"
-               fi
+                    tmux new-session && echo "tmux created new session"
+                fi
             fi
         fi
     }
