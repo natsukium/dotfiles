@@ -35,8 +35,6 @@ colors() {
     done
 }
 
-[[ -f ~/.extend.bashrc ]] && . ~/.extend.bashrc
-
 [ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
 
 # colors
@@ -54,10 +52,6 @@ fi
 alias la='ls -alF'
 alias ll='ls -A'
 alias l='ls -CF'
-
-if type vim >/dev/null 2>&1; then
-    alias vi='vim'
-fi
 
 # prohibit Ctrl-s
 stty stop undef
