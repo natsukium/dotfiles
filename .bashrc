@@ -126,6 +126,10 @@ if type tmux >/dev/null 2>&1; then
     tmux_automatically_attach_session
 fi
 
+# Common Environment
+export XDG_CONFIG_HOME=$HOME/.config
+export PIPENV_VENV_IN_PROJECT=true
+
 [[ -f ~/.bashenv ]] && . ~/.bashenv
 
 if type fish >/dev/null 2>&1; then
