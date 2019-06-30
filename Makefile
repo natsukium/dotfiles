@@ -1,4 +1,4 @@
-.PHONY core init link local minimum
+.PHONY: core init link local minimum
 
 minimum: core link init
 
