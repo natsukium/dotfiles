@@ -1,22 +1,10 @@
 #!/bin/sh
 
-#################################################
-###     _    _______ ______          __       ###
-###    | |  / / ___// ____/___  ____/ /__     ###
-###    | | / /\__ \/ /   / __ \/ __  / _ \    ###
-###    | |/ /___/ / /___/ /_/ / /_/ /  __/    ###
-###    |___//____/\____/\____/\__,_/\___/     ###
-###                                           ###
-#################################################
-
-if [ "$(uname)" == 'Darwin' ]; then
-    VSCODE_SETTING_PATH=$HOME/Library/Application\ Support/Code/User
-elif [ "$(uname)" == 'Linux' ]; then
-    VSCODE_SETTING_PATH=$HOME/.config/Code/User
-fi
-
-[[ ! -f $VSCODE_SETTING_PATH/settings.json ]] &&
-    ln -sf "$PWD/vscode/settings.json" "$VSCODE_SETTING_PATH/settings.json"
+#  _    _______ ______          __
+# | |  / / ___// ____/___  ____/ /__
+# | | / /\__ \/ /   / __ \/ __  / _ \
+# | |/ /___/ / /___/ /_/ / /_/ /  __/
+# |___//____/\____/\____/\__,_/\___/
 
 extensions=(
     13xforever.language-x86-64-assembly
