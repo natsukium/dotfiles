@@ -1,4 +1,4 @@
-.PHONY: core init link local minimum
+.PHONY: brew-extra core init link local minimum
 
 minimum: core link init
 
@@ -13,3 +13,6 @@ core:
 
 local:
 	$(PWD)/bin/local.sh
+
+brew-extra:
+	brew bundle --file=$PWD/homebrew/Brewfile-extra
