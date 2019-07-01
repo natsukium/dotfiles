@@ -12,7 +12,14 @@ else
     tarball="https://github.com/natsukium/dotfiles/archive/master.tar.gz"
     curl -L "$tarball" | tar xvz
     mv -f dotfiles-master $HOME/.dotfiles
+
+    echo "Please install git."
+    exit
 fi
 
 cd $HOME/.dotfiles
 make minimum
+
+if [ $1 == "--local" ]; then
+    make local
+fi
