@@ -2,5 +2,5 @@
 
 ## Install
 ```sh
-bash -c "$(curl -L dot.natsukium.com)"
+sh -c "$(curl -L dot.natsukium.com)"
 ```
