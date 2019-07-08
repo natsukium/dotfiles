@@ -26,6 +26,8 @@ done
 for dir in xdg_config_home/*; do
     [[ ! -d $XDG_CONFIG_HOME/$(basename $dir) ]] && mkdir -p $XDG_CONFIG_HOME/$(basename $dir)
     for file in $dir/*; do
+        [[ $file == "xdg_config_home/fish/functions" ]] &&
+            ln -snfv $PWD/$file/* $XDG_CONFIG_HOME/fish/functions && continue
         ln -snfv $PWD/$file $XDG_CONFIG_HOME/$(basename $dir)/$(basename $file)
     done
 done
