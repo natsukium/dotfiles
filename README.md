@@ -2,5 +2,5 @@
 
 ## Install
 ```sh
-sh -c "$(curl -L dot.natsukium.com)"
+sh -c "$(curl -fsSL git.io/dotnatsukium)"
 ```
