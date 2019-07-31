@@ -36,6 +36,8 @@ bind "\C-w":unix-filename-rubout
 PS1="\u@\h: \w\n$ "
 
 # TMUX
+alias tmux='tmux -f $XDG_CONFIG_HOME/tmus/tmux.conf'
+
 if type tmux >/dev/null 2>&1; then
     function is_exists() {
         type "$1" >/dev/null 2>&1
