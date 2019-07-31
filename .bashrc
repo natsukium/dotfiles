@@ -5,6 +5,10 @@
 export LANG=ja_JP.UTF-8
 export LC_TYPE=ja_JP.UTF-8
 
+export XDG_CONFIG_HOME=$HOME/.config
+export XDG_CACHE_HOME=$HOME/.cache
+export XDG_DATA_HOME=$HOME/.local/share
+
 [[ $- != *i* ]] && return
 
 [ -r /usr/share/bash-completion/bash_completion ] && . /usr/share/bash-completion/bash_completion
@@ -36,6 +40,8 @@ bind "\C-w":unix-filename-rubout
 PS1="\u@\h: \w\n$ "
 
 # TMUX
+alias tmux='tmux -f $XDG_CONFIG_HOME/tmus/tmux.conf'
+
 if type tmux >/dev/null 2>&1; then
     function is_exists() {
         type "$1" >/dev/null 2>&1
@@ -99,9 +105,6 @@ if type tmux >/dev/null 2>&1; then
 fi
 
 # Common Environment
-export XDG_CONFIG_HOME=$HOME/.config
-export XDG_CACHE_HOME=$HOME/.cache
-export XDG_DATA_HOME=$HOME/.local/share
 export INPUTRC=$XDG_CONFIG_HOME/readline/inputrc
 export SCREENRC=$XDG_CONFIG_HOME/screen/screenrc
 export VIMINIT=":source $XDG_CONFIG_HOME"/vim/vimrc
