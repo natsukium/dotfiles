@@ -105,6 +105,7 @@ if type tmux >/dev/null 2>&1; then
 fi
 
 # Common Environment
+[[ -f $XDG_CONFIG_HOME/bash/environ ]] && . $XDG_CONFIG_HOME/bash/environ
 export INPUTRC=$XDG_CONFIG_HOME/readline/inputrc
 export SCREENRC=$XDG_CONFIG_HOME/screen/screenrc
 export VIMINIT=":source $XDG_CONFIG_HOME"/vim/vimrc

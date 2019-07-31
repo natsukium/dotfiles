@@ -17,3 +17,7 @@ elif [ "$(uname)" = 'Linux' ]; then
 fi
 
 brew bundle --file=$PWD/homebrew/Brewfile-core
+
+for file in installer/*.sh; do
+    ./$file
+done
