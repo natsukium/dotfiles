@@ -1,0 +1,23 @@
+name: setup test
+
+on:
+- pull_request:
+    branches:
+      - master
+- push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on:
+      ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
+    steps:
+    - uses: actions/checkout@v1
+    - name: setup
+      run: |
+        sh -c "$(curl -fsSL git.io/dotnatsukium)"
