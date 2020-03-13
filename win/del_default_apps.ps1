@@ -1,7 +1,12 @@
 function removeApp($appName) {
     Write-Output "Trying to remove $appName"
+    try
+    {
     Get-AppxPackage $appName -AllUsers | Remove-AppxPackage
     Get-AppXProvisionedPackage -Online | Where-Object DisplayName -like $appName | Remove-AppxProvisionedPackage -Online
+    }
+    catch
+    {}  # Prevent unexpected error
 }
 
 $removeApps = @(
