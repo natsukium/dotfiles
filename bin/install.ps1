@@ -1,4 +1,4 @@
-Update-ExecutionPolicy -Policy RemoteSigned
+Set-ExecutionPolicy -Policy RemoteSigned
 
 # Install Boxstarter
 . { Invoke-WebRequest -useb https://boxstarter.org/bootstrapper.ps1 } | Invoke-Expression; Get-Boxstarter -Force
