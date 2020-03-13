@@ -29,13 +29,13 @@ function excuteScript($url) {
 $baseUrl = "https://raw.githubusercontent.com/natsukium/dotfiles/master/win/"
 
 # Setup WSL
-excuteScript $baseUrl + "wsl.ps1"
+excuteScript ($baseUrl + "wsl.ps1")
 
 # Remove unnecessary apps
-excuteScript $baseUrl + "del_default_apps.ps1"
+excuteScript ($baseUrl + "del_default_apps.ps1")
 
 # Add apps
-excuteScript $baseUrl + "add_apps.ps1"
+excuteScript ($baseUrl + "add_apps.ps1")
 
 # Tear down
 Remove-Item .\Desktop\*
