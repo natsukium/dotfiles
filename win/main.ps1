@@ -39,6 +39,6 @@ excuteScript ($baseUrl + "add_apps.ps1")
 
 # Tear down
 Remove-Item .\Desktop\*
-Enable-MicrosofUpdate
+Enable-MicrosoftUpdate
 Install-WindowsUpdate -acceptEula
 Enable-UAC
