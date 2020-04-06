@@ -5,3 +5,5 @@ if not functions -q fisher
 end
 
 bind \cs 'fzfz'
+
+starship init fish | source
