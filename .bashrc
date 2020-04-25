@@ -8,6 +8,7 @@ export LC_TYPE=ja_JP.UTF-8
 export XDG_CONFIG_HOME=$HOME/.config
 export XDG_CACHE_HOME=$HOME/.cache
 export XDG_DATA_HOME=$HOME/.local/share
+export XDG_RUNTIME_DIR=$HOME/.run
 
 [[ $- != *i* ]] && return
 
@@ -105,10 +106,7 @@ if type tmux >/dev/null 2>&1; then
 fi
 
 # Common Environment
-export INPUTRC=$XDG_CONFIG_HOME/readline/inputrc
-export SCREENRC=$XDG_CONFIG_HOME/screen/screenrc
-export VIMINIT=":source $XDG_CONFIG_HOME"/vim/vimrc
-export PIPENV_VENV_IN_PROJECT=true
+[[ -f $XDG_CONFIG_HOME/bash/environ ]] && . $XDG_CONFIG_HOME/bash/environ
 
 [[ -f ~/.bashenv ]] && . ~/.bashenv
 

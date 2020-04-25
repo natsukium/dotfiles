@@ -1,0 +1,64 @@
+# Language
+## Go
+export GOPATH=$XDG_DATA_HOME/go
+export PATH=$GOPATH/bin:$PATH
+
+## Python
+export PYTHONSTARTUP=$XDG_CONFIG_HOME/python/pythonstartup
+[ ! -f $XDG_CACHE_HOME/python/history ] && mkdir -p $XDG_CACHE_HOME/python &&
+    touch $XDG_CACHE_HOME/python/history
+
+### pyenv
+export PYENV_ROOT=$XDG_DATA_HOME/.pyenv
+export PATH=$PYENV_ROOT/bin:$PATH
+if command -v pyenv 1>/dev/null 2>&1; then
+    eval "$(pyenv init -)"
+fi
+
+### pipenv
+export PIPENV_VENV_IN_PROJECT=true
+
+### ipython
+export IPYTHONDIR=$XDG_CONFIG_HOME/jupyter
+
+### jupyter
+export JUPYTER_CONFIG_DIR=$XDG_CONFIG_HOME/jupyter
+
+## Ruby
+export GEM_HOME=$XDG_DATA_HOME/gem
+export GEM_SPEC_CACHE=$XDG_CACHE_HOME/gem
+
+## Rust
+### cargo
+export CARGO_HOME=$XDG_DATA_HOME/cargo
+export PATH=$CARGO_HOME/bin:$PATH
+
+### rustup
+export RUSTUP_HOME=$XDG_DATA_HOME/rustup
+
+## Node.JS
+### nvm
+export NVM_DIR=$XDG_DATA_HOME/nvm
+
+### npm
+export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc
+
+[ ! -f $XDG_CONFIG_HOME/npm/npmrc ] &&
+    mkdir -p $XDG_CONFIG_HOME/npm &&
+    echo 'cache=$XDG_CACHE_HOME/npm' >>$XDG_CONFIG_HOME/npm/npmrc &&
+    echo 'tmp=$XDG_RUNTIME_DIR/npm' >>$XDG_CONFIG_HOME/npm/npmrc &&
+    echo 'init-module=$XDG_CONFIG_HOME/npm/config/npm-init.js' >>$XDG_CONFIG_HOME/npm/npmrc
+
+# Editor
+## vim
+export VIMINIT=":source $XDG_CONFIG_HOME"/vim/vimrc
+
+# Tools
+## less
+export LESSHISTFILE=-
+
+## readline
+export INPUTRC=$XDG_CONFIG_HOME/readline/inputrc
+
+## screen
+export SCREENRC=$XDG_CONFIG_HOME/screen/screenrc
