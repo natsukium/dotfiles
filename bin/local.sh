@@ -1,8 +1,8 @@
 #!/bin/sh
 
-if [ "$(uname)" == 'Darwin' ]; then
+if [ "$(uname)" = 'Darwin' ]; then
     $PWD/mac/setup.sh
-elif [ "$(uname)" == 'Linux' ]; then
+elif [ "$(uname)" = 'Linux' ]; then
     :
 fi
 

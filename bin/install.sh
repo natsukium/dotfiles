@@ -20,6 +20,6 @@ fi
 cd $HOME/.dotfiles
 make minimum
 
-if [ $1 == "--local" ]; then
+if [ $1 = "--local" ]; then
     make local
 fi
