@@ -10,6 +10,7 @@ XDG_CONFIG_HOME=$HOME/.config
 
 for file in .??*; do
     [ $file = ".git" ] && continue
+    [ $file = ".github" ] && continue
     ln -snfv $PWD/$file $HOME/$file
 done
 
