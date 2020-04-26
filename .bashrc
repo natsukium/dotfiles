@@ -105,6 +105,8 @@ if type tmux >/dev/null 2>&1; then
     tmux_automatically_attach_session
 fi
 
+export HISTFILE="$XDG_DATA_HOME"/bash/history
+
 # Common Environment
 [[ -f $XDG_CONFIG_HOME/bash/environ ]] && . $XDG_CONFIG_HOME/bash/environ
 
