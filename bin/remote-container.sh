@@ -5,6 +5,6 @@ sudo apt install -y \
   fzf \
   vim
 
-sh -c "$(curl -fsSL https://starship.rs/install.sh)"
+sh -c "$(curl -fsSL https://starship.rs/install.sh)" -s -f
 
 bin/link.sh
