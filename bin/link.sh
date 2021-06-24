@@ -25,6 +25,7 @@ for file in */link.sh; do
 done
 
 for dir in xdg_config_home/*; do
+    [ $dir = "xdg_config_home/starship.toml" ] && ln -snfv $PWD/$dir $XDG_CONFIG_HOME/$(basename $dir) && continue
     [ ! -d $XDG_CONFIG_HOME/$(basename $dir) ] && mkdir -p $XDG_CONFIG_HOME/$(basename $dir)
     for file in $dir/*; do
         if [ $file = "xdg_config_home/fish/functions" ]; then
