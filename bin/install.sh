@@ -17,9 +17,13 @@ else
     exit
 fi
 
-cd $HOME/.dotfiles
-make minimum
+if test $REMOTE_CONTAINERS; then
+    make container
+else
+    cd $HOME/.dotfiles
+    make minimum
 
-if [ $1 = "--local" ]; then
-    make local
+    if [ $1 = "--local" ]; then
+        make local
+    fi
 fi

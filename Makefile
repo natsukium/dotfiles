@@ -1,4 +1,4 @@
-.PHONY: brew-extra core init link local minimum
+.PHONY: brew-extra container core init link local minimum
 
 minimum: core link init
 
@@ -16,3 +16,6 @@ local:
 
 brew-extra:
 	brew bundle --file=$PWD/homebrew/Brewfile-extra
+
+container: bin/remote-container.sh
+	$(PWD)/bin/remote-container.sh
