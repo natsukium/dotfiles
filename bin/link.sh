@@ -8,33 +8,11 @@
 
 XDG_CONFIG_HOME=$HOME/.config
 
-for file in .??*; do
-    [ $file = ".git" ] && continue
-    [ $file = ".github" ] && continue
-    ln -snfv $PWD/$file $HOME/$file
-done
+echo .??* | tr " " "\n" | grep -v git | xargs -I{} ln -snfv $PWD/{} $HOME/{}
 
-for file in */.??*; do
-    [ $(dirname $file) = "X11" ] && continue
-    ln -snfv $PWD/$file $HOME/$(basename $file)
-done
+echo */.??* | tr " " "\n" | grep -v X11 | xargs -I{} ln -snfv $PWD/{} $HOME/{}
 
-for file in */link.sh; do
-    [ $(dirname $file) = "bin" ] && continue
-    XDG_CONFIG_HOME=$HOME/.config ./$file
-done
+echo */link.sh | tr " " "\n" | grep -v bin | xargs sh
 
-for dir in xdg_config_home/*; do
-    [ $dir = "xdg_config_home/starship.toml" ] && ln -snfv $PWD/$dir $XDG_CONFIG_HOME/$(basename $dir) && continue
-    [ ! -d $XDG_CONFIG_HOME/$(basename $dir) ] && mkdir -p $XDG_CONFIG_HOME/$(basename $dir)
-    for file in $dir/*; do
-        if [ $file = "xdg_config_home/fish/functions" ]; then
-            [ ! -d $XDG_CONFIG_HOME/fish/functions ] && mkdir -p $XDG_CONFIG_HOME/fish/functions
-            for function in $file/*; do
-                ln -snfv $PWD/$function $XDG_CONFIG_HOME/fish/functions/$(basename $function)
-            done
-            continue
-        fi
-        ln -snfv $PWD/$file $XDG_CONFIG_HOME/$(basename $dir)/$(basename $file)
-    done
-done
+find xdg_config_home -type d | sed -e "s|xdg_config_home|$XDG_CONFIG_HOME|g" | xargs mkdir -p
+find xdg_config_home -type f | sed -e "s|xdg_config_home/||g" | xargs -I{} ln -snfv $PWD/xdg_config_home/{} $XDG_CONFIG_HOME/{}
