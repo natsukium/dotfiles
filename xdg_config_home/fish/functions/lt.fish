@@ -1,3 +1,3 @@
 function lt --description "Tree view"
-    exa -T $argv
+    lsd --tree $argv
 end

@@ -1,6 +1,6 @@
 function la --description "List contents of directory, including hidden files in directory using long format"
-    if type exa >/dev/null ^/dev/null
-        exa -alh --git $argv
+    if type lsd >/dev/null 2>/dev/null
+        lsd -alh $argv
     else
         ls -alh $argv
     end
