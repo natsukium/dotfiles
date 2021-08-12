@@ -6,5 +6,5 @@
     stateVersion = "21.05";
   };
 
-  imports = [ ./git ];
+  imports = [ ./git ./bash ];
 }
