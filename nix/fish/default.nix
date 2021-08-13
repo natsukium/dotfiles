@@ -5,10 +5,10 @@ let
     value = { source = ./. + "/${path}"; };
   };
   cfgSources = paths: builtins.listToAttrs (map cfgSource paths);
-in {
+in
+{
   programs.fish = {
     enable = true;
-    promptInit = "starship init fish | source";
     interactiveShellInit = ''
       if not functions -q fisher
         set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME ~/.config
