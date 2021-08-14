@@ -19,6 +19,10 @@
         path = ./rust;
         description = "Rust develop environment";
       };
+      dotnet = {
+        path = ./dotnet;
+        description = ".NET develop environment";
+      };
     };
     defaultTemplate = self.templates.nix;
   };
