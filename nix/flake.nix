@@ -15,6 +15,10 @@
         path = ./nodejs;
         description = "NodeJS develop environment";
       };
+      rust = {
+        path = ./rust;
+        description = "Rust develop environment";
+      };
     };
     defaultTemplate = self.templates.nix;
   };
