@@ -11,6 +11,10 @@
         path = ./python;
         description = "Python develop environment";
       };
+      nodejs = {
+        path = ./nodejs;
+        description = "NodeJS develop environment";
+      };
     };
     defaultTemplate = self.templates.nix;
   };
