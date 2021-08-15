@@ -1,21 +1,22 @@
-.PHONY: brew-extra container core init link local minimum
+.PHONY: install_nix install_nix_unstable install_home_manager uninstall_nix
 
-minimum: core link init
+minimum: install_nix install_nix_unstable install_home_manager
 
-link:
-	$(PWD)/bin/link.sh
+install_nix:
+	. $(PWD)/bin/install_nix.sh
+	install_nix
 
-init:
-	$(PWD)/bin/init.sh
+install_nix_unstable:
+	. $(PWD)/bin/install_nix.sh
+	install_nix_unstable
 
-core:
-	$(PWD)/bin/core.sh
+install_home_manager:
+	. $(PWD)/bin/install_nix.sh
+	install_home_manager
 
-local:
-	$(PWD)/bin/local.sh
-
-brew-extra:
-	brew bundle --file=$PWD/homebrew/Brewfile-extra
+uninstall_nix:
+	. $(PWD)/bin/install_nix.sh
+	uninstall_nix
 
 container: bin/remote-container.sh
 	$(PWD)/bin/remote-container.sh
