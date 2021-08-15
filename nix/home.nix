@@ -6,5 +6,15 @@
     stateVersion = "21.05";
   };
 
-  imports = [ ./git ./bash ./tmux ./fish ./starship ./vim ./python ./alacritty ./misc ];
+  imports = [
+    ./alacritty
+    ./bash
+    ./fish
+    ./git
+    ./python
+    ./starship
+    ./tmux
+    ./vim
+    ./misc
+  ];
 }
