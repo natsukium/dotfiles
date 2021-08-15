@@ -2,7 +2,7 @@
   programs.home-manager.enable = true;
   home = {
     username = "$USER";
-    homeDirectory = "/Users/$USER";
+    homeDirectory = /. + "$HOME";
     stateVersion = "21.05";
   };
 
