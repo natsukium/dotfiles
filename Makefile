@@ -1,15 +1,19 @@
 .PHONY: install_nix install_nix_unstable install_home_manager uninstall_nix
 
+NIX_PROFILE := $(HOME)/.nix-profile/etc/profile.d/nix.sh
+
 minimum: install_nix install_nix_unstable install_home_manager
 
-install_nix:
+$(NIX_PROFILE):
 	. $(PWD)/bin/install_nix.sh && install_nix
 
-install_nix_unstable:
-	. $(PWD)/bin/install_nix.sh && install_nix_unstable
+install_nix: $(NIX_PROFILE)
 
-install_home_manager:
-	. $(PWD)/bin/install_nix.sh && install_home_manager
+install_nix_unstable: $(NIX_PROFILE)
+	. $^ && . $(PWD)/bin/install_nix.sh && install_nix_unstable
+
+install_home_manager: $(NIX_PROFILE)
+	. $^ && . $(PWD)/bin/install_nix.sh && install_home_manager
 
 uninstall_nix:
 	. $(PWD)/bin/install_nix.sh && uninstall_nix
