@@ -1,8 +1,10 @@
 #!/bin/sh
 
+XDG_CONFIG_HOME=$HOME/.config
+
 install_nix() {
   if [ "$(uname)" = 'Darwin' ]; then
-    sh <(curl -L https://nixos.org/nix/install) --darwin-use-unencrypted-nix-store-volume
+    curl -L https://nixos.org/nix/install | sh -s -- --darwin-use-unencrypted-nix-store-volume --no-daemon
   else
     curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
   fi
