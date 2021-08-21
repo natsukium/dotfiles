@@ -8,11 +8,18 @@
     clock24 = true;
     historyLimit = 5000;
     plugins = with pkgs.tmuxPlugins; [
+      {
+        plugin = continuum;
+        extraConfig = ''
+          set -g @continuum-restore 'on'
+        '';
+      }
       copycat
       nord
       open
       pain-control
       prefix-highlight
+      resurrect
       sensible
       yank
     ];
