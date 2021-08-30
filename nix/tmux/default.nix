@@ -24,7 +24,6 @@
       yank
     ];
     extraConfig = ''
-      bind-key r source-file $XDG_CONFIG_HOME/tmux/tmux.conf
       setw -g mouse on
       set -g status-position top
     '';
