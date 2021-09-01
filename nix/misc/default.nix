@@ -3,7 +3,10 @@
 {
   programs = {
     fzf.enable = true;
-    lsd.enable = true;
+    lsd = {
+      enable = true;
+      enableAliases = true;
+    };
     readline = {
       enable = true;
       variables = {

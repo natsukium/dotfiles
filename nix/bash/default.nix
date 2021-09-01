@@ -14,9 +14,6 @@
       XDG_RUNTIME_DIR = "$HOME/.run";
     };
     shellAliases = {
-      ls = "ls --color=auto";
-      la = "ls -alF";
-      ll = "ls -A";
       l = "ls -CF";
       grep = "grep --color=auto";
       fgrep = "fgrep --color=auto";

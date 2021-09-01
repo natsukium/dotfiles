@@ -42,11 +42,7 @@ in
   xdg.configFile = cfgSources [
     "functions/bash.fish"
     "functions/l.fish"
-    "functions/la.fish"
-    "functions/ll.fish"
     "functions/lld.fish"
-    "functions/ls.fish"
-    "functions/lt.fish"
     "functions/pskill.fish"
     "functions/rg.fish"
     "functions/su.fish"
