@@ -58,4 +58,7 @@ in
     "functions/su.fish"
     "fish_plugins"
   ];
+  home.packages = with pkgs.fishPlugins; [
+    fzf-fish
+  ];
 }
