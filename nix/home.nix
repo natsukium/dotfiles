@@ -11,6 +11,7 @@
     ./bash
     ./bat
     ./fish
+    ./ghq
     ./git
     ./python
     ./starship
