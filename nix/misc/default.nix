@@ -25,6 +25,7 @@
   home.packages = with pkgs; [
     bottom
     coreutils
+    fd
     ghq
     gnumake
     wget

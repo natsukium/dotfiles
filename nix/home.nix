@@ -9,6 +9,7 @@
   imports = [
     ./alacritty
     ./bash
+    ./bat
     ./fish
     ./git
     ./python
