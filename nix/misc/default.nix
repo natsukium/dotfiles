@@ -10,6 +10,7 @@
         completion-ignore-case = true;
       };
     };
+    zoxide.enable = true;
     bash.profileExtra = ''
       export LESSHISTFILE=-
 

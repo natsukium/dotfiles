@@ -15,7 +15,7 @@ in
         curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
       end
 
-      bind \cs 'fzfz'
+      bind \cs zi
       # Set color theme
       set -U fish_color_normal normal
       set -U fish_color_command 81a1c1
@@ -46,7 +46,6 @@ in
   };
   xdg.configFile = cfgSources [
     "functions/bash.fish"
-    "functions/fzfz.fish"
     "functions/l.fish"
     "functions/la.fish"
     "functions/ll.fish"
