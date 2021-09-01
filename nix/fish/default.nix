@@ -10,11 +10,6 @@ in
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
-      if not functions -q fisher
-        set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME ~/.config
-        curl -sL https://git.io/fisher | source && fisher install jorgebucaran/fisher
-      end
-
       bind \cs zi
       # Set color theme
       set -U fish_color_normal normal
@@ -55,7 +50,6 @@ in
     "functions/pskill.fish"
     "functions/rg.fish"
     "functions/su.fish"
-    "fish_plugins"
   ];
   home.packages = with pkgs.fishPlugins; [
     fzf-fish
