@@ -24,7 +24,6 @@
     };
     profileExtra = ''
       . $HOME/.nix-profile/etc/profile.d/nix.sh
-      [[ -f $XDG_CONFIG_HOME/bash/environ ]] && . $XDG_CONFIG_HOME/bash/environ
     '';
     initExtra = ''
       stty stop undef  # Ctrl-s
@@ -47,7 +46,7 @@
         done
       fi
 
-      if type fish >/dev/null 2>&1; then
+      if type fish >/dev/null 2>&1 && [[ ! $USEBASH ]]; then
         exec fish
       fi
     '';

@@ -5,7 +5,6 @@ function bash
     else if test $length -eq 1 >/dev/null
         command bash --norc $argv
     else
-        command bash --norc
+        USEBASH=true command bash
     end
-    
 end
