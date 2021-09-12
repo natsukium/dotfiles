@@ -10,6 +10,7 @@
     ./alacritty
     ./bash
     ./bat
+    ./direnv
     ./fish
     ./ghq
     ./git
