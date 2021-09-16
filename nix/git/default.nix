@@ -3,10 +3,16 @@
 {
   home.packages = with pkgs; [ git ];
 
+  programs.gpg.enable = true;
+
   programs.git = {
     enable = true;
     userName = "natsukium";
     userEmail = "tomoya.otabi@gmail.com";
+    signing = {
+      key = "9EA45A31DB994C53";
+      signByDefault = true;
+    };
     extraConfig = {
       core.editor = "vim";
       color = {
