@@ -29,10 +29,12 @@
       ci = "commit";
       co = "checkout";
     };
-    includes = [{
-      path = "~/src/work/.config/git/config";
-      condition = "gitdir:~/src/work";
-    }];
+    includes = [
+      {
+        path = "~/src/work/.config/git/config";
+        condition = "gitdir:~/src/work/";
+      }
+    ];
     ignores = [ ".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints" ];
   };
 }
