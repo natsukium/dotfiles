@@ -29,7 +29,7 @@ function excuteScript($url) {
 $baseUrl = "https://raw.githubusercontent.com/natsukium/dotfiles/master/win/"
 
 # Setup WSL
-excuteScript ($baseUrl + "wsl.ps1")
+wsl --install
 
 # Remove unnecessary apps
 excuteScript ($baseUrl + "del_default_apps.ps1")
