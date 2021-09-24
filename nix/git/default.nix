@@ -23,6 +23,7 @@
         grep = "auto";
       };
       init.defaultBranch = "main";
+      url."git@github.com:".pushInsteadOf = "https://github.com/";
     };
     aliases = {
       st = "status";
