@@ -2,6 +2,10 @@
 
 {
   programs = {
+    direnv = {
+      enable = true;
+      nix-direnv.enable = true;
+    };
     fzf.enable = true;
     lsd = {
       enable = true;
