@@ -5,7 +5,6 @@ let
     value = { source = ./. + "/${path}"; };
   };
   cfgSources = paths: builtins.listToAttrs (map cfgSource paths);
-  pkgsUnstable = import <nixpkgs> {};
 in
 {
   programs.fish = {
@@ -48,7 +47,7 @@ in
     "functions/rg.fish"
     "functions/su.fish"
   ];
-  home.packages = with pkgsUnstable.fishPlugins; [
+  home.packages = with pkgs.fishPlugins; [
     fzf-fish
   ];
 }
