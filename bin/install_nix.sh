@@ -22,5 +22,14 @@ install_home_manager() {
 }
 
 uninstall_nix() {
-  sudo rm -rf /nix
+  if [ "$(uname)" = 'Darwin' ]; then
+    sudo rm -rf /etc/nix /nix ~root/.nix-profile ~root/.nix-defexpr ~root/.nix-channels ~/.nix-profile ~/.nix-defexpr ~/.nix-channels
+    sudo mv /etc/bashrc.backup-before-nix /etc/bashrc
+    sudo mv /etc/bash.bashrc.backup-before-nix /etc/bash.bashrc
+    sudo mv /etc/zshrc.backup-before-nix /etc/zshrc
+    sudo launchctl unload /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+    sudo rm /Library/LaunchDaemons/org.nixos.nix-daemon.plist
+  else
+    sudo rm -rf /nix
+  fi
 }
