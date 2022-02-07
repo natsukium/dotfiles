@@ -14,10 +14,6 @@ install_nix() {
   nix-channel --update
 }
 
-install_nix_unstable() {
-  nix-env -iA nixpkgs.nixUnstable
-}
-
 install_home_manager() {
   nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
   nix-channel --update
