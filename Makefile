@@ -1,6 +1,11 @@
 .PHONY: install_nix install_nix_unstable install_home_manager uninstall_nix
 
-NIX_PROFILE := $(HOME)/.nix-profile/etc/profile.d/nix.sh
+UNAME := $(shell uname)
+ifeq ($(UNAME), Linux)
+	NIX_PROFILE := $(HOME)/.nix-profile/etc/profile.d/nix.sh
+else
+	NIX_PROFILE := /nix/var/nix/profiles/default/etc/profile.d/nix.sh
+endif
 
 minimum: install_nix install_nix_unstable install_home_manager
 
