@@ -4,11 +4,12 @@ XDG_CONFIG_HOME=$HOME/.config
 
 install_nix() {
   if [ "$(uname)" = 'Darwin' ]; then
-    curl -L https://nixos.org/nix/install | sh -s -- --darwin-use-unencrypted-nix-store-volume --no-daemon
+    curl -L https://nixos.org/nix/install | sh -s -- --daemon
+    . /nix/var/nix/profiles/default/etc/profile.d/nix.sh
   else
     curl -L https://nixos.org/nix/install | sh -s -- --no-daemon
+    . $HOME/.nix-profile/etc/profile.d/nix.sh
   fi
-  . $HOME/.nix-profile/etc/profile.d/nix.sh
   nix-channel --add https://nixos.org/channels/nixpkgs-unstable
   nix-channel --update
 }
