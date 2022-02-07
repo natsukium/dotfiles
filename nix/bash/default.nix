@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   home.packages = with pkgs; [ bashInteractive_5 ];
@@ -19,9 +19,11 @@
       fgrep = "fgrep --color=auto";
       egrep = "egrep --color=auto";
     };
-    profileExtra = ''
-      . $HOME/.nix-profile/etc/profile.d/nix.sh
-    '';
+    profileExtra =
+      lib.optionalString pkgs.stdenv.isLinux
+        ''
+          . $HOME/.nix-profile/etc/profild.d/nix.sh
+        '';
     initExtra = ''
       stty stop undef  # Ctrl-s
       stty werase undef
