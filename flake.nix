@@ -19,6 +19,22 @@
       forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
     in
     {
+      homeConfigurations = {
+        x64-vm = home-manager.lib.homeManagerConfiguration {
+          pkgs = import nixpkgs {
+            system = "x86_64-linux";
+          };
+          modules = [
+            ./nix/home.nix
+            {
+              home = {
+                username = "gazelle";
+                homeDirectory = "/home/gazelle";
+              };
+            }
+          ];
+        };
+      };
       darwinConfigurations = {
         macbook = nix-darwin.lib.darwinSystem
           {
