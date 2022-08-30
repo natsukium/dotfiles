@@ -12,6 +12,8 @@ in
     interactiveShellInit = ''
       bind \cs zi
       any-nix-shell fish --info-right | source
+      # set done's variable
+      set -U __done_min_cmd_duration 15000
       # Set color theme
       set -U fish_color_normal normal
       set -U fish_color_command 81a1c1
@@ -39,6 +41,9 @@ in
       set -U fish_pager_color_prefix white --bold --underline
       set -U fish_pager_color_progress brwhite --background=cyan
     '';
+    plugins = [
+      { name = "done"; src = pkgs.fishPlugins.done.src; }
+    ];
   };
   xdg.configFile = cfgSources [
     "functions/bash.fish"
