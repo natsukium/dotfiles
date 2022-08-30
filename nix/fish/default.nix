@@ -11,6 +11,7 @@ in
     enable = true;
     interactiveShellInit = ''
       bind \cs zi
+      any-nix-shell fish --info-right | source
       # Set color theme
       set -U fish_color_normal normal
       set -U fish_color_command 81a1c1
@@ -47,7 +48,8 @@ in
     "functions/rg.fish"
     "functions/su.fish"
   ];
-  home.packages = with pkgs.fishPlugins; [
-    fzf-fish
+  home.packages = with pkgs; [
+    any-nix-shell
+    fishPlugins.fzf-fish
   ];
 }
