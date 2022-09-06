@@ -3,21 +3,29 @@ name: setup test
 on:
   pull_request:
     branches:
-      - master
+      - main
   push:
     branches:
-      - master
+      - main
+  schedule:
+    - cron: "0 0 * * 0"
 
 jobs:
   build:
-    runs-on:
-      ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest]
 
     steps:
-    - uses: actions/checkout@v1
-    - name: setup
-      run: |
-        sh -c "$(curl -fsSL git.io/dotnatsukium)"
+      - uses: actions/checkout@v3
+      - uses: cachix/install-nix-action@v17
+      - name: Setup cachix
+        uses: cachix/cachix-action@v10
+        with:
+          name: natsukium
+          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: setup
+        run: |
+          sh -c "$(curl -fsSL git.io/dotnatsukium)"
