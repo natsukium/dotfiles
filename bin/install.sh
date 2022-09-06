@@ -1,5 +1,11 @@
 #!/bin/sh
 
+if [ "$0" = "CI" ]; then
+  . bin/install_nix.sh
+  install_home_manager
+	exit
+fi
+
 if type git >/dev/null 2>&1; then
   git clone https://github.com/natsukium/dotfiles $HOME/.dotfiles
 else
