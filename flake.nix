@@ -76,21 +76,23 @@
             {
               home-manager.users.runner = import ./nix/home.nix;
               users.users.runner.home = "/Users/runner";
+              services.nix-daemon.enable = true;
             }
           ];
         };
       };
     } //
-    flake-utils.lib.eachDefaultSystem (system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-      in
-      {
-        devShell = pkgs.mkShell
-          {
-            nativeBuildInputs = with pkgs; [ checkbashisms rnix-lsp shellcheck ];
-            shellHook = ''
+    flake-utils.lib.eachDefaultSystem
+      (system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+        in
+        {
+          devShell = pkgs.mkShell
+            {
+              nativeBuildInputs = with pkgs; [ checkbashisms rnix-lsp shellcheck shfmt ];
+              shellHook = ''
               '';
-          };
-      });
+            };
+        });
 }
