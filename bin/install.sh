@@ -1,8 +1,14 @@
 #!/bin/sh
 
 if [ "$0" = "CI" ]; then
-  . bin/install_nix.sh
-  install_home_manager
+  if [ "$(uname)" = "Darwin" ]; then
+    nix build .#darwinConfigurations.githubActions.system
+    export HOME_MANAGER_BACKUP_EXT=backup
+    ./result/sw/bin/darwin-rebuild switch --flake .#githubActions
+  else
+    nix build .#homeConfigurations.githubActions.activationPackage
+    HOME_MANAGER_BACKUP_EXT=backup ./result/activate --flake .#githubActions
+  fi
 	exit
 fi
 
