@@ -62,6 +62,7 @@
                   useGlobalPkgs = true;
                   useUserPackages = true;
                   users."tomoya.matsumoto" = import ./nix/home.nix;
+                  backupFileExtension = "backup";
                 };
                 users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
                 services.nix-daemon.enable = true;
@@ -74,7 +75,10 @@
           modules = [
             home-manager.darwinModules.home-manager
             {
-              home-manager.users.runner = import ./nix/home.nix;
+              home-manager = {
+                users.runner = import ./nix/home.nix;
+                backupFileExtension = "backup";
+              };
               users.users.runner.home = "/Users/runner";
               services.nix-daemon.enable = true;
             }
