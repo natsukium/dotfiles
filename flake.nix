@@ -34,6 +34,22 @@
             }
           ];
         };
+
+        githubActions = home-manager.lib.homeManagerConfiguration
+          {
+            pkgs = import nixpkgs {
+              system = "x86_64-linux";
+            };
+            modules = [
+              ./nix/home.nix
+              {
+                home = {
+                  username = "runner";
+                  homeDirectory = "/home/runner";
+                };
+              }
+            ];
+          };
       };
       darwinConfigurations = {
         macbook = nix-darwin.lib.darwinSystem
@@ -52,6 +68,17 @@
               }
             ];
           };
+
+        githubActions = nix-darwin.lib.darwinSystem {
+          system = "x86_64-darwin";
+          modules = [
+            home-manager.darwinModules.home-manager
+            {
+              home-manager.users.runner = import ./nix/home.nix;
+              users.users.runner.home = "/Users/runner";
+            }
+          ];
+        };
       };
     } //
     flake-utils.lib.eachDefaultSystem (system:
