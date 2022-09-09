@@ -1,8 +1,6 @@
 { pkgs, ... }:
 
 {
-  home.packages = with pkgs; [ git ];
-
   programs.gpg.enable = true;
 
   programs.git = {
