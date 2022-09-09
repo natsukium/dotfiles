@@ -37,5 +37,8 @@
       }
     ];
     ignores = [ ".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints" ];
+    delta = {
+      enable = true;
+    };
   };
 }
