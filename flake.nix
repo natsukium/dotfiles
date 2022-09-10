@@ -66,6 +66,18 @@
                 };
                 users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
                 services.nix-daemon.enable = true;
+                homebrew = {
+                  enable = true;
+                  brews = [
+                    "libomp"
+                  ];
+                  casks = [
+                    "clipy"
+                    "google-japanese-ime"
+                    "monitorcontrol"
+                    "vivaldi"
+                  ];
+                };
               }
             ];
           };
