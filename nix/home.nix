@@ -11,6 +11,7 @@
     ./fish
     ./ghq
     ./git
+    ./nix
     ./python
     ./starship
     ./tmux
