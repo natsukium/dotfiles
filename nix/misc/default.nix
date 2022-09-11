@@ -7,6 +7,8 @@
       nix-direnv.enable = true;
     };
     fzf.enable = true;
+    gh.enable = true;
+    jq.enable = true;
     lsd = {
       enable = true;
       enableAliases = true;
@@ -31,11 +33,18 @@
     '';
   };
   home.packages = with pkgs; [
+    bitwarden-cli
     bottom
+    cachix
     coreutils
     fd
     ghq
     gnumake
+    gnutar
+    nkf
+    podman
+    ripgrep
     wget
+    zstd
   ];
 }
