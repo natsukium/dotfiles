@@ -106,7 +106,7 @@
         {
           devShell = pkgs.mkShell
             {
-              nativeBuildInputs = with pkgs; [ checkbashisms rnix-lsp shellcheck shfmt ];
+              nativeBuildInputs = with pkgs; [ alejandra checkbashisms rnix-lsp shellcheck shfmt ];
               shellHook = ''
               '';
             };
