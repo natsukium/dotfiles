@@ -1,12 +1,10 @@
-{ pkgs, ... }:
-let
+{pkgs, ...}: let
   cfgSource = path: {
     name = "fish/" + path;
-    value = { source = ./. + "/${path}"; };
+    value = {source = ./. + "/${path}";};
   };
   cfgSources = paths: builtins.listToAttrs (map cfgSource paths);
-in
-{
+in {
   programs.fish = {
     enable = true;
     interactiveShellInit = ''
@@ -42,7 +40,10 @@ in
       set -U fish_pager_color_progress brwhite --background=cyan
     '';
     plugins = [
-      { name = "done"; src = pkgs.fishPlugins.done.src; }
+      {
+        name = "done";
+        src = pkgs.fishPlugins.done.src;
+      }
     ];
   };
   xdg.configFile = cfgSources [

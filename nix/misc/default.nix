@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   programs = {
     direnv = {
       enable = true;
@@ -32,19 +30,21 @@
       export MACHINE_STORAGE_PATH=$XDG_DATA_HOME/docker-machine
     '';
   };
-  home.packages = with pkgs; [
-    bitwarden-cli
-    bottom
-    cachix
-    coreutils
-    fd
-    ghq
-    gnumake
-    gnutar
-    nkf
-    podman
-    ripgrep
-    wget
-    zstd
-  ];
+  home.packages = with pkgs;
+    [
+      bitwarden-cli
+      bottom
+      cachix
+      coreutils
+      fd
+      ghq
+      gnumake
+      gnutar
+      nkf
+      podman
+      ripgrep
+      wget
+      zstd
+    ]
+    ++ lib.optional stdenv.isDarwin qemu;
 }

@@ -14,10 +14,16 @@
     flake-utils.url = github:numtide/flake-utils;
   };
 
-  outputs = { self, nixpkgs, home-manager, nix-darwin, flake-utils, ... }:
-    let
-      forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
-    in
+  outputs = {
+    self,
+    nixpkgs,
+    home-manager,
+    nix-darwin,
+    flake-utils,
+    ...
+  }: let
+    forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
+  in
     {
       homeConfigurations = {
         x64-vm = home-manager.lib.homeManagerConfiguration {
@@ -35,7 +41,8 @@
           ];
         };
 
-        githubActions = home-manager.lib.homeManagerConfiguration
+        githubActions =
+          home-manager.lib.homeManagerConfiguration
           {
             pkgs = import nixpkgs {
               system = "x86_64-linux";
@@ -52,7 +59,8 @@
           };
       };
       darwinConfigurations = {
-        macbook = nix-darwin.lib.darwinSystem
+        macbook =
+          nix-darwin.lib.darwinSystem
           {
             system = "x86_64-darwin";
             modules = [
@@ -97,18 +105,17 @@
           ];
         };
       };
-    } //
-    flake-utils.lib.eachDefaultSystem
-      (system:
-        let
-          pkgs = nixpkgs.legacyPackages.${system};
-        in
+    }
+    // flake-utils.lib.eachDefaultSystem
+    (system: let
+      pkgs = nixpkgs.legacyPackages.${system};
+    in {
+      devShell =
+        pkgs.mkShell
         {
-          devShell = pkgs.mkShell
-            {
-              nativeBuildInputs = with pkgs; [ alejandra checkbashisms rnix-lsp shellcheck shfmt ];
-              shellHook = ''
-              '';
-            };
-        });
+          nativeBuildInputs = with pkgs; [alejandra checkbashisms rnix-lsp shellcheck shfmt];
+          shellHook = ''
+          '';
+        };
+    });
 }

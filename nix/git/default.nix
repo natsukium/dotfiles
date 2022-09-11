@@ -1,6 +1,4 @@
-{ pkgs, ... }:
-
-{
+{pkgs, ...}: {
   programs.gpg.enable = true;
 
   programs.git = {
@@ -34,7 +32,7 @@
         condition = "gitdir:~/src/work/";
       }
     ];
-    ignores = [ ".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints" ];
+    ignores = [".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints"];
     delta = {
       enable = true;
     };

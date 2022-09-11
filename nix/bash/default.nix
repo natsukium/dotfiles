@@ -1,7 +1,9 @@
-{ pkgs, lib, ... }:
-
 {
-  home.packages = with pkgs; [ bashInteractive_5 ];
+  pkgs,
+  lib,
+  ...
+}: {
+  home.packages = with pkgs; [bashInteractive_5];
   programs.bash = {
     enable = true;
     historyFile = "$XDG_CONFIG_HOME/bash/history";
@@ -21,9 +23,9 @@
     };
     profileExtra =
       lib.optionalString pkgs.stdenv.isLinux
-        ''
-          . $HOME/.nix-profile/etc/profile.d/nix.sh
-        '';
+      ''
+        . $HOME/.nix-profile/etc/profile.d/nix.sh
+      '';
     initExtra = ''
       stty stop undef  # Ctrl-s
       stty werase undef
