@@ -31,6 +31,9 @@ jobs:
         run: |
           printf "run\tprivate/var/run\n" | sudo tee -a /etc/synthetic.conf
           /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
+      - name: Supress cachix conflict
+        run: |
+          nix-env --set-flag priority 1 cachix
       - name: setup
         run: |
           sh -c "$(cat bin/install.sh)" CI
