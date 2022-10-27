@@ -1,6 +1,8 @@
 {pkgs, ...}: {
   programs.gpg.enable = true;
 
+  imports = [./../modules/git-scalar.nix];
+
   programs.git = {
     enable = true;
     userName = "natsukium";
@@ -35,6 +37,10 @@
     ignores = [".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints"];
     delta = {
       enable = true;
+    };
+    scalar = {
+      enable = true;
+      repo = ["~/src/private/github.com/natsukium/nixpkgs"];
     };
   };
 }
