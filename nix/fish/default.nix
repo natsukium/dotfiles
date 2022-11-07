@@ -59,7 +59,6 @@ in {
     "functions/lld.fish"
     "functions/nix-shell.fish"
     "functions/pskill.fish"
-    "functions/rg.fish"
     "functions/su.fish"
   ];
   home.packages = with pkgs; [
