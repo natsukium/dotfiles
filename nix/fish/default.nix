@@ -54,6 +54,7 @@ in {
   };
   xdg.configFile = cfgSources [
     "functions/bash.fish"
+    "functions/bw-session-helper.fish"
     "functions/l.fish"
     "functions/lld.fish"
     "functions/nix-shell.fish"
