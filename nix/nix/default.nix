@@ -1,6 +1,5 @@
 {pkgs, ...}: {
   nix = {
-    package = pkgs.nix;
     settings = {
       auto-optimise-store = true;
       cores = 4;
