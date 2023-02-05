@@ -1,5 +1,6 @@
-{pkgs, ...}: {
+{pkgs, lib, ...}: {
   nix = {
+    package = lib.mkDefault pkgs.nix;
     settings = {
       auto-optimise-store = true;
       cores = 4;
