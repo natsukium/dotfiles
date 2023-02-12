@@ -9,6 +9,7 @@ on:
       - main
   schedule:
     - cron: "0 0 * * 0"
+  workflow_dispatch:
 
 jobs:
   build:
@@ -27,7 +28,7 @@ jobs:
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Update flake
-        if: ${{ github.event_name == 'schedule' }}
+        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
         run: |
           nix flake update
       - name: Create /run for darwin
@@ -42,7 +43,7 @@ jobs:
         run: |
           sh -c "$(cat bin/install.sh)" CI
       - name: Push updated flake.lock
-        if: ${{ github.event_name == 'schedule' && matrix.os == 'macOS-latest' && success()}}
+        if: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.os == 'macOS-latest' && success()}}
         run: |
           git add .
           git commit --no-gpg-sign -m "chore(flake.lock): update by GitHub Actions"
