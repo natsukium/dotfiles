@@ -11,6 +11,11 @@
       url = github:lnl7/nix-darwin;
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-wsl = {
+      url = github:nix-community/NixOS-WSL;
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     flake-utils.url = github:numtide/flake-utils;
   };
 
@@ -19,6 +24,7 @@
     nixpkgs,
     home-manager,
     nix-darwin,
+    nixos-wsl,
     flake-utils,
     ...
   }: let
