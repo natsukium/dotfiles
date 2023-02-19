@@ -10,57 +10,57 @@
     })
     .repos
     .natsukium;
-in
-  {
-    imports = [../modules/wsl/docker-enable-nvidia.nix];
+in {
+  imports = [../modules/wsl/docker-enable-nvidia.nix ../modules/wsl/vscode.nix];
 
-    system.stateVersion = "22.11";
+  system.stateVersion = "22.11";
 
-    wsl = {
+  wsl = {
+    enable = true;
+    defaultUser = "gazelle";
+    docker-native = {
       enable = true;
-      defaultUser = "gazelle";
-      docker-native = {
-        enable = true;
-        enableNvidia = true;
-      };
+      enableNvidia = true;
     };
-    hardware.opengl = {
-      enable = true;
-      driSupport32Bit = true;
-    };
+  };
+  hardware.opengl = {
+    enable = true;
+    driSupport32Bit = true;
+  };
 
-    fonts.fonts = with pkgs; [
-      noto-fonts-cjk
-      noto-fonts-emoji
-      nurpkgs.liga-hackgen-nf-font
-    ];
-    i18n = {
-      inputMethod = {
-        enabled = "fcitx";
-        fcitx.engines = with pkgs.fcitx-engines; [mozc];
-      };
-      defaultLocale = "ja_JP.UTF-8";
-      extraLocaleSettings = {
-        LC_CTYPE = "en_US.UTF-8";
-        LC_MESSAGES = "en_US.UTF-8";
-      };
+  fonts.fonts = with pkgs; [
+    noto-fonts-cjk
+    noto-fonts-emoji
+    nurpkgs.liga-hackgen-nf-font
+  ];
+  i18n = {
+    inputMethod = {
+      enabled = "fcitx";
+      fcitx.engines = with pkgs.fcitx-engines; [mozc];
     };
-    time.timeZone = "Asia/Tokyo";
+    defaultLocale = "ja_JP.UTF-8";
+    extraLocaleSettings = {
+      LC_CTYPE = "en_US.UTF-8";
+      LC_MESSAGES = "en_US.UTF-8";
+    };
+  };
+  time.timeZone = "Asia/Tokyo";
 
-    virtualisation.docker.rootless = {
-      enable = true;
-      setSocketVariable = true;
-    };
+  virtualisation.docker.rootless = {
+    enable = true;
+    setSocketVariable = true;
+  };
 
-    nixpkgs.config.allowUnfree = true;
-    environment.systemPackages = [pkgs.coreutils];
-    services.openssh = {
-      enable = true;
-      settings.passwordAuthentication = false;
-    };
-    programs.ssh.startAgent = true;
-    programs.gnupg.agent = {
-      enable = true;
-      pinentryFlavor = "curses";
-    };
-  }
+  nixpkgs.config.allowUnfree = true;
+  environment.systemPackages = [pkgs.coreutils];
+  services.openssh = {
+    enable = true;
+    settings.passwordAuthentication = false;
+  };
+  programs.ssh.startAgent = true;
+  programs.gnupg.agent = {
+    enable = true;
+    pinentryFlavor = "curses";
+  };
+  vscode-wsl.enable = true;
+}
