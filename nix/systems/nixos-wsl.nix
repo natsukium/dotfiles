@@ -1,11 +1,16 @@
 {pkgs, ...}:
 {
+  imports = [../modules/wsl/docker-enable-nvidia.nix];
+
   system.stateVersion = "22.11";
 
   wsl = {
     enable = true;
     defaultUser = "gazelle";
-    docker-native.enable = true;
+    docker-native = {
+      enable = true;
+      enableNvidia = true;
+    };
   };
   hardware.opengl = {
     enable = true;
