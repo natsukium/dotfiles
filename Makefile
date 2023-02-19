@@ -1,4 +1,4 @@
-.PHONY: install_nix install_home_manager uninstall_nix switch
+.PHONY: install_nix install_home_manager uninstall_nix switch setup
 
 UNAME := $(shell uname)
 ifeq ($(UNAME), Linux)
@@ -25,3 +25,8 @@ uninstall_nix:
 
 container: bin/remote-container.sh
 	$(PWD)/bin/remote-container.sh
+
+setup: $(PWD)/.git/hooks
+
+$(PWD)/.git/hooks: $(PWD)/.githooks/*
+	ln -sf $^ $@
