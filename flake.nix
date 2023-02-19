@@ -43,7 +43,7 @@
                 username = "gazelle";
                 homeDirectory = "/home/gazelle";
               };
-              nixpkgs.config.allowUnfreePredicate = (pkg: true);
+              nixpkgs.config.allowUnfreePredicate = pkg: true;
             }
           ];
         };
@@ -61,7 +61,7 @@
                   username = "runner";
                   homeDirectory = "/home/runner";
                 };
-                nixpkgs.config.allowUnfreePredicate = (pkg: true);
+                nixpkgs.config.allowUnfreePredicate = pkg: true;
               }
             ];
           };
@@ -116,6 +116,32 @@
               users.users.runner.home = "/Users/runner";
               services.nix-daemon.enable = true;
               nixpkgs.config.allowUnfree = true;
+            }
+          ];
+        };
+      };
+      nixosConfigurations = {
+        wsl = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            nixos-wsl.nixosModules.wsl
+            {imports = [./nix/systems/nixos-wsl.nix];}
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                users.gazelle = import ./nix/home.nix;
+              };
+              users.users.gazelle = {
+                home = "/home/gazelle";
+                isNormalUser = true;
+                initialPassword = "";
+                group = "wheel";
+                openssh.authorizedKeys.keys = [
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
+                ];
+              };
             }
           ];
         };
