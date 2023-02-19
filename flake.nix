@@ -17,6 +17,7 @@
       inputs.flake-utils.follows = "flake-utils";
     };
     flake-utils.url = github:numtide/flake-utils;
+    nur.url = github:nix-community/NUR;
   };
 
   outputs = {
@@ -27,7 +28,7 @@
     nixos-wsl,
     flake-utils,
     ...
-  }: let
+  } @ inputs: let
     forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
   in
     {
@@ -144,6 +145,7 @@
               };
             }
           ];
+          specialArgs = {inherit inputs;};
         };
       };
     }
