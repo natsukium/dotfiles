@@ -11,7 +11,13 @@
       url = github:lnl7/nix-darwin;
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-wsl = {
+      url = github:nix-community/NixOS-WSL;
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
+    };
     flake-utils.url = github:numtide/flake-utils;
+    nur.url = github:nix-community/NUR;
   };
 
   outputs = {
@@ -19,9 +25,10 @@
     nixpkgs,
     home-manager,
     nix-darwin,
+    nixos-wsl,
     flake-utils,
     ...
-  }: let
+  } @ inputs: let
     forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
   in
     {
@@ -33,13 +40,15 @@
           modules = [
             ./nix/home.nix
             {
+              targets.genericLinux.enable = true;
               home = {
                 username = "gazelle";
                 homeDirectory = "/home/gazelle";
               };
-              nixpkgs.config.allowUnfreePredicate = (pkg: true);
+              nixpkgs.config.allowUnfreePredicate = pkg: true;
             }
           ];
+          extraSpecialArgs = {isWsl = false;};
         };
 
         githubActions =
@@ -51,13 +60,15 @@
             modules = [
               ./nix/home.nix
               {
+                targets.genericLinux.enable = true;
                 home = {
                   username = "runner";
                   homeDirectory = "/home/runner";
                 };
-                nixpkgs.config.allowUnfreePredicate = (pkg: true);
+                nixpkgs.config.allowUnfreePredicate = pkg: true;
               }
             ];
+            extraSpecialArgs = {isWsl = false;};
           };
       };
       darwinConfigurations = {
@@ -73,6 +84,7 @@
                   useUserPackages = true;
                   users."tomoya.matsumoto" = import ./nix/home.nix;
                   backupFileExtension = "backup";
+                  extraSpecialArgs = {isWsl = false;};
                 };
                 users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
                 services.nix-daemon.enable = true;
@@ -106,12 +118,41 @@
               home-manager = {
                 users.runner = import ./nix/home.nix;
                 backupFileExtension = "backup";
+                extraSpecialArgs = {isWsl = false;};
               };
               users.users.runner.home = "/Users/runner";
               services.nix-daemon.enable = true;
               nixpkgs.config.allowUnfree = true;
             }
           ];
+        };
+      };
+      nixosConfigurations = {
+        wsl = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            nixos-wsl.nixosModules.wsl
+            {imports = [./nix/systems/nixos-wsl.nix];}
+
+            home-manager.nixosModules.home-manager
+            {
+              home-manager = {
+                useGlobalPkgs = true;
+                users.gazelle = import ./nix/home.nix;
+                extraSpecialArgs = {isWsl = true;};
+              };
+              users.users.gazelle = {
+                home = "/home/gazelle";
+                isNormalUser = true;
+                initialPassword = "";
+                group = "wheel";
+                openssh.authorizedKeys.keys = [
+                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
+                ];
+              };
+            }
+          ];
+          specialArgs = {inherit inputs;};
         };
       };
     }
