@@ -47,6 +47,7 @@
               nixpkgs.config.allowUnfreePredicate = pkg: true;
             }
           ];
+          extraSpecialArgs = {isWsl = false;};
         };
 
         githubActions =
@@ -65,6 +66,7 @@
                 nixpkgs.config.allowUnfreePredicate = pkg: true;
               }
             ];
+            extraSpecialArgs = {isWsl = false;};
           };
       };
       darwinConfigurations = {
@@ -80,6 +82,7 @@
                   useUserPackages = true;
                   users."tomoya.matsumoto" = import ./nix/home.nix;
                   backupFileExtension = "backup";
+                  extraSpecialArgs = {isWsl = false;};
                 };
                 users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
                 services.nix-daemon.enable = true;
@@ -113,6 +116,7 @@
               home-manager = {
                 users.runner = import ./nix/home.nix;
                 backupFileExtension = "backup";
+                extraSpecialArgs = {isWsl = false;};
               };
               users.users.runner.home = "/Users/runner";
               services.nix-daemon.enable = true;
@@ -133,6 +137,7 @@
               home-manager = {
                 useGlobalPkgs = true;
                 users.gazelle = import ./nix/home.nix;
+                extraSpecialArgs = {isWsl = true;};
               };
               users.users.gazelle = {
                 home = "/home/gazelle";
