@@ -22,11 +22,6 @@
       fgrep = "fgrep --color=auto";
       egrep = "egrep --color=auto";
     };
-    profileExtra =
-      lib.optionalString pkgs.stdenv.isLinux
-      ''
-        . $HOME/.nix-profile/etc/profile.d/nix.sh
-      '';
     initExtra = ''
       stty stop undef  # Ctrl-s
       stty werase undef

@@ -40,6 +40,7 @@
           modules = [
             ./nix/home.nix
             {
+              targets.genericLinux.enable = true;
               home = {
                 username = "gazelle";
                 homeDirectory = "/home/gazelle";
@@ -59,6 +60,7 @@
             modules = [
               ./nix/home.nix
               {
+                targets.genericLinux.enable = true;
                 home = {
                   username = "runner";
                   homeDirectory = "/home/runner";
