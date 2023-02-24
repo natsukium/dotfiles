@@ -7,7 +7,7 @@
       url = github:nix-community/home-manager;
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-darwin = {
+    darwin = {
       url = github:lnl7/nix-darwin;
       inputs.nixpkgs.follows = "nixpkgs";
     };
@@ -24,7 +24,7 @@
     self,
     nixpkgs,
     home-manager,
-    nix-darwin,
+    darwin,
     nixos-wsl,
     flake-utils,
     ...
@@ -73,7 +73,7 @@
       };
       darwinConfigurations = {
         macbook =
-          nix-darwin.lib.darwinSystem
+          darwin.lib.darwinSystem
           {
             system = "x86_64-darwin";
             modules = [
@@ -110,7 +110,7 @@
             ];
           };
 
-        githubActions = nix-darwin.lib.darwinSystem {
+        githubActions = darwin.lib.darwinSystem {
           system = "x86_64-darwin";
           modules = [
             home-manager.darwinModules.home-manager
