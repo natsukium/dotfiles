@@ -77,6 +77,7 @@
           {
             system = "x86_64-darwin";
             modules = [
+              ./nix/systems/darwin.nix
               home-manager.darwinModules.home-manager
               {
                 home-manager = {
@@ -108,6 +109,7 @@
                 };
               }
             ];
+            specialArgs = {inherit inputs;};
           };
 
         githubActions = darwin.lib.darwinSystem {
