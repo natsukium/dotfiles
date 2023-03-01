@@ -140,7 +140,7 @@
             {
               home-manager = {
                 useGlobalPkgs = true;
-                users.gazelle = import ./nix/homes/common.nix;
+                users.gazelle = import ./nix/homes/nixos-wsl.nix;
                 extraSpecialArgs = {isWsl = true;};
               };
               users.users.gazelle = {
