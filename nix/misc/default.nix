@@ -1,4 +1,5 @@
 {pkgs, ...}: {
+  imports = [../modules/pdm.nix];
   programs = {
     direnv = {
       enable = true;
@@ -10,6 +11,13 @@
     lsd = {
       enable = true;
       enableAliases = true;
+    };
+    pdm = {
+      enable = true;
+      enableFishIntegration = false;
+      settings = {
+        install.cache = true;
+      };
     };
     readline = {
       enable = true;
