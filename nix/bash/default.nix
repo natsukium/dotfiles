@@ -11,10 +11,6 @@
     sessionVariables = {
       LANG = "ja_JP.UTF-8";
       LC_TYPE = "ja_JP.UTF-8";
-      XDG_CONFIG_HOME = "$HOME/.config";
-      XDG_CACHE_HOME = "$HOME/.cache";
-      XDG_DATA_HOME = "$HOME/.local/share";
-      XDG_RUNTIME_DIR = "$HOME/.run";
     };
     shellAliases = {
       l = "ls -CF";

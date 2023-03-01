@@ -47,4 +47,5 @@
       zstd
     ]
     ++ lib.optional stdenv.isDarwin qemu;
+  xdg.enable = true;
 }
