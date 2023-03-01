@@ -38,7 +38,7 @@
             system = "x86_64-linux";
           };
           modules = [
-            ./nix/home.nix
+            ./nix/homes/common.nix
             {
               targets.genericLinux.enable = true;
               home = {
@@ -58,7 +58,7 @@
               system = "x86_64-linux";
             };
             modules = [
-              ./nix/home.nix
+              ./nix/homes/common.nix
               {
                 targets.genericLinux.enable = true;
                 home = {
@@ -83,7 +83,7 @@
                 home-manager = {
                   useGlobalPkgs = true;
                   useUserPackages = true;
-                  users."tomoya.matsumoto" = import ./nix/home.nix;
+                  users."tomoya.matsumoto" = import ./nix/homes/common.nix;
                   backupFileExtension = "backup";
                   extraSpecialArgs = {isWsl = false;};
                 };
@@ -118,7 +118,7 @@
             home-manager.darwinModules.home-manager
             {
               home-manager = {
-                users.runner = import ./nix/home.nix;
+                users.runner = import ./nix/homes/common.nix;
                 backupFileExtension = "backup";
                 extraSpecialArgs = {isWsl = false;};
               };
@@ -140,7 +140,7 @@
             {
               home-manager = {
                 useGlobalPkgs = true;
-                users.gazelle = import ./nix/home.nix;
+                users.gazelle = import ./nix/homes/common.nix;
                 extraSpecialArgs = {isWsl = true;};
               };
               users.users.gazelle = {
