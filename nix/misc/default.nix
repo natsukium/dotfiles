@@ -14,9 +14,9 @@
     };
     pdm = {
       enable = true;
-      enableFishIntegration = false;
       settings = {
         install.cache = true;
+        venv.in_project = true;
       };
     };
     readline = {
@@ -49,6 +49,7 @@
       gnumake
       gnutar
       nkf
+      pipx
       podman
       ripgrep
       wget
