@@ -48,42 +48,18 @@ in {
         }
       '';
     };
-    enableBashIntegration = mkOption {
-      default = true;
-      type = types.bool;
-      description = ''
-        Whether to enable Bash integration.
-      '';
-    };
-    enableZshIntegration = mkOption {
-      default = true;
-      type = types.bool;
-      description = ''
-        Whether to enable Zsh integration.
-      '';
-    };
-    enableFishIntegration = mkOption {
-      default = true;
-      type = types.bool;
-      description = ''
-        Whether to enable Fish integration.
-      '';
-    };
   };
 
-  config = mkIf cfg.enable {
-    home.packages = [cfg.package];
-    programs.bash.initExtra = mkIf (cfg.enableBashIntegration && cfg.enablePEP582) ''
-      eval "$(${pkgs.pdm}/bin/pdm --pep582)"
-    '';
-    programs.zsh.initExtra = mkIf (cfg.enableZshIntegration && cfg.enablePEP582) ''
-      eval "$(${pkgs.pdm}/bin/pdm --pep582)"
-    '';
-    programs.fish.interactiveShellInit = mkIf (cfg.enableFishIntegration && cfg.enablePEP582) ''
-      eval (${pkgs.pdm}/bin/pdm --pep582 | source)
-    '';
-    home.file."${configDir}/pdm/config.toml" = mkIf (cfg.settings != {}) {
-      source = tomlFormat.generate "config.toml" cfg.settings;
+  config = let
+    settings = cfg.settings // optionalAttrs (cfg.enablePEP582) {python.use_venv = false;};
+  in
+    mkIf cfg.enable {
+      home.packages = [cfg.package];
+      home.sessionVariables = mkIf cfg.enablePEP582 {
+        PYTHONPATH = "${pkgs.pdm}/${pkgs.python3.sitePackages}/pdm/pep582";
+      };
+      home.file."${configDir}/pdm/config.toml" = mkIf (settings != {}) {
+        source = tomlFormat.generate "config.toml" settings;
+      };
     };
-  };
 }
