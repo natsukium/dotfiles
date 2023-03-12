@@ -83,7 +83,7 @@
                 home-manager = {
                   useGlobalPkgs = true;
                   useUserPackages = true;
-                  users."tomoya.matsumoto" = import ./nix/homes/common.nix;
+                  users."tomoya.matsumoto" = import ./nix/homes/darwin.nix;
                   backupFileExtension = "backup";
                   extraSpecialArgs = {isWsl = false;};
                 };
