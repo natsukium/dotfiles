@@ -13,6 +13,7 @@ in {
 
   imports =
     [
+      ../applications/gitui
       ../alacritty
       ../bash
       ../bat
