@@ -1,6 +1,7 @@
 {pkgs, ...}: {
   programs.tmux = {
     enable = true;
+    terminal = "tmux-256color";
     keyMode = "vi";
     prefix = "C-j";
     clock24 = true;
@@ -24,6 +25,7 @@
     extraConfig = ''
       setw -g mouse on
       set -g status-position top
+      set -ag terminal-overrides ",$TERM:RGB"
       bind g popup -d '#{pane_current_path}' -w90% -h90% -E ${pkgs.gitui}/bin/gitui
     '';
   };
