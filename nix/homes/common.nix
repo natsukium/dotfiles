@@ -14,6 +14,7 @@ in {
   imports =
     [
       ../applications/gitui
+      ../applications/nvim
       ../alacritty
       ../bash
       ../bat
