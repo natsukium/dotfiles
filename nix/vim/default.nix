@@ -3,6 +3,6 @@
   home.packages = [pkgs.vim];
   xdg.configFile."vim/vimrc".source = ./vimrc; # vimrc is read by vscode of Windows too
   programs.bash.profileExtra = ''
-    export VIMINIT='source $XDG_CONFIG_HOME/vim/vimrc'
+    export VIMINIT='let $MYVIMRC = !has("nvim") ? "$XDG_CONFIG_HOME/vim/vimrc" : "$XDG_CONFIG_HOME/nvim/init.lua" | so $MYVIMRC'
   '';
 }
