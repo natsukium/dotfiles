@@ -1,47 +1,36 @@
 {pkgs, ...}: let
-  theme_nord = {
-    "foreground" = "#D8DEE9";
-    "background" = "#2E3440";
-    "selection_foreground" = "#000000";
-    "selection_background" = "#FFFACD";
-    "url_color" = "#0087BD";
-    "cursor" = "#81A1C1";
-    # black
-    "color0" = "#3B4252";
-    "color8" = "#4C566A";
-    # red
-    "color1" = "#BF616A";
-    "color9" = "#BF616A";
-    # green
-    "color2" = "#A3BE8C";
-    "color10" = "#A3BE8C";
-    # yellow
-    "color3" = "#EBCB8B";
-    "color11" = "#EBCB8B";
-    # blue
-    "color4" = "#81A1C1";
-    "color12" = "#81A1C1";
-    # magenta
-    "color5" = "#B48EAD";
-    "color13" = "#B48EAD";
-    # cyan
-    "color6" = "#88C0D0";
-    "color14" = "#8FBCBB";
-    # white
-    "color7" = "#E5E9F0";
-    "color15" = "#B48EAD";
+  tmux-prefix = "ctrl+j";
+  tmux-compat-keybindings = {
+    "${tmux-prefix}>c" = "new_tab";
+    "${tmux-prefix}>n" = "next_tab";
+    "${tmux-prefix}>p" = "previous_tab";
+    "${tmux-prefix}>," = "set_tab_title";
+    "${tmux-prefix}>|" = "launch --location=vsplit";
+    "${tmux-prefix}>-" = "launch --location=hsplit";
+    "${tmux-prefix}>h" = "move_window left";
+    "${tmux-prefix}>j" = "move_window down";
+    "${tmux-prefix}>k" = "move_window up";
+    "${tmux-prefix}>l" = "move_window right";
   };
 in {
   programs = {
     kitty = {
       enable = true;
-      settings =
-        {
-          "font_family" = "Liga HackGen Console NF";
-          "font_size" = 14;
-          "hide_window_decorations" = "yes";
-        }
-        // theme_nord;
+      theme = "Nord";
+      settings = {
+        "font_family" = "Liga HackGen Console NF";
+        "font_size" = 14;
+        "hide_window_decorations" = "yes";
+        "tab_bar_edge" = "top";
+        "tab_bar_style" = "powerline";
+        "scrollback_pager_history_size" = 50;
+        "enable_audio_bel" = "no";
+        "enabled_layouts" = "Splits,Stack,Tall";
+      };
+      keybindings = {} // tmux-compat-keybindings;
+      darwinLaunchOptions = [
+        "-o allow_remote_control=yes"
+      ];
     };
   };
 }
