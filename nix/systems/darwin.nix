@@ -12,6 +12,7 @@
     .repos
     .natsukium;
 in {
+  imports = [./darwin];
   system = {
     defaults = {
       NSGlobalDomain = {

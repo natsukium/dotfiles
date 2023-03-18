@@ -88,13 +88,11 @@
                   extraSpecialArgs = {isWsl = false;};
                 };
                 users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
-                services.nix-daemon.enable = true;
                 nix.settings = {
                   substituters = ["https://cache.nixos.org" "https://natsukium.cachix.org"];
                   trusted-public-keys = ["cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="];
                   trusted-users = ["root" "@wheel"];
                 };
-                nixpkgs.config.allowUnfree = true;
                 homebrew = {
                   enable = true;
                   brews = [
@@ -115,6 +113,7 @@
         githubActions = darwin.lib.darwinSystem {
           system = "x86_64-darwin";
           modules = [
+            ./nix/systems/darwin
             home-manager.darwinModules.home-manager
             {
               home-manager = {
@@ -123,8 +122,6 @@
                 extraSpecialArgs = {isWsl = false;};
               };
               users.users.runner.home = "/Users/runner";
-              services.nix-daemon.enable = true;
-              nixpkgs.config.allowUnfree = true;
             }
           ];
         };
