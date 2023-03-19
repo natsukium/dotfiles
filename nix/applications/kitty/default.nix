@@ -24,7 +24,7 @@ in {
         "tab_bar_edge" = "top";
         "tab_bar_style" = "powerline";
         "scrollback_pager_history_size" = 50;
-        "enable_audio_bel" = "no";
+        "enable_audio_bell" = "no";
         "enabled_layouts" = "Splits,Stack,Tall";
       };
       keybindings = {} // tmux-compat-keybindings;
