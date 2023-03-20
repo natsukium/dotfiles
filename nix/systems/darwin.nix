@@ -12,7 +12,7 @@
     .repos
     .natsukium;
 in {
-  imports = [./darwin ../applications/yabai];
+  imports = [./darwin ../applications/yabai ../applications/skhd];
   system = {
     defaults = {
       NSGlobalDomain = {
