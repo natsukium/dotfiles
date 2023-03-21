@@ -12,7 +12,8 @@
     .repos
     .natsukium;
 in {
-  imports = [./darwin ../applications/yabai ../applications/skhd];
+  imports = [./darwin ../applications/yabai ../applications/skhd ../modules/services/sketchybar.nix];
+
   system = {
     defaults = {
       NSGlobalDomain = {
@@ -50,4 +51,6 @@ in {
     fontDir.enable = true;
     fonts = [nurpkgs.liga-hackgen-nf-font];
   };
+
+  services.sketchybar.enable = true;
 }

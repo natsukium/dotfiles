@@ -159,10 +159,13 @@
     (system: let
       pkgs = nixpkgs.legacyPackages.${system};
     in {
-      devShell =
+      devShell = let
+        sketchybarrc = pkgs.python3Packages.callPackage ./nix/pkgs/sketchybarrc-py {};
+        python-env = pkgs.python3.withPackages (ps: [sketchybarrc]);
+      in
         pkgs.mkShell
         {
-          nativeBuildInputs = with pkgs; [alejandra checkbashisms rnix-lsp shellcheck shfmt];
+          nativeBuildInputs = with pkgs; [alejandra checkbashisms rnix-lsp shellcheck shfmt python-env];
           shellHook = ''
           '';
         };
