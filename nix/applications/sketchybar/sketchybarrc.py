@@ -39,13 +39,13 @@ def main():
 
     default = ItemProps(
         icon=IconProps(
-            font=f'"{font_familiy}:Bold:17.0"',
+            font=f"{font_familiy}:Bold:17.0",
             color=color.white,
             padding_left=4,
             padding_right=4,
         ),
         label=LabelProps(
-            font=f'"{font_familiy}:Bold:16.0"',
+            font=f"{font_familiy}:Bold:16.0",
             color=color.white,
             padding_left=4,
             padding_right=4,
