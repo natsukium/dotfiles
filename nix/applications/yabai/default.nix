@@ -3,7 +3,8 @@
     enable = true;
     enableScriptingAddition = true;
     config = {
-      "top_padding" = 52;
+      "external_bar" = "all:42:0";
+      "top_padding" = 10;
       "bottom_padding" = 10;
       "left_padding" = 10;
       "right_padding" = 10;
