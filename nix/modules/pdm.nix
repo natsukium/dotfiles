@@ -7,10 +7,6 @@
 with lib; let
   cfg = config.programs.pdm;
   tomlFormat = pkgs.formats.toml {};
-  configDir =
-    if pkgs.stdenv.isDarwin
-    then "Library/Preferences"
-    else config.xdg.configHome;
 in {
   options.programs.pdm = {
     enable = mkEnableOption ''
@@ -53,13 +49,22 @@ in {
   config = let
     settings = cfg.settings // optionalAttrs (cfg.enablePEP582) {python.use_venv = false;};
   in
-    mkIf cfg.enable {
-      home.packages = [cfg.package];
-      home.sessionVariables = mkIf cfg.enablePEP582 {
-        PYTHONPATH = "${pkgs.pdm}/${pkgs.python3.sitePackages}/pdm/pep582";
-      };
-      home.file."${configDir}/pdm/config.toml" = mkIf (settings != {}) {
-        source = tomlFormat.generate "config.toml" settings;
-      };
-    };
+    mkIf cfg.enable (mkMerge [
+      {
+        home.packages = [cfg.package];
+        home.sessionVariables = mkIf cfg.enablePEP582 {
+          PYTHONPATH = "${pkgs.pdm}/${pkgs.python3.sitePackages}/pdm/pep582";
+        };
+      }
+
+      (
+        mkIf (settings != {})
+        {
+          xdg.configFile."pdm/config.toml".source = tomlFormat.generate "config.toml" settings;
+          programs.bash.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";};
+          programs.zsh.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";};
+          programs.fish.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";};
+        }
+      )
+    ]);
 }
