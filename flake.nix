@@ -48,7 +48,10 @@
               nixpkgs.config.allowUnfreePredicate = pkg: true;
             }
           ];
-          extraSpecialArgs = {isWsl = false;};
+          extraSpecialArgs = {
+            isWsl = false;
+            inherit inputs;
+          };
         };
 
         githubActions =
@@ -68,7 +71,10 @@
                 nixpkgs.config.allowUnfreePredicate = pkg: true;
               }
             ];
-            extraSpecialArgs = {isWsl = false;};
+            extraSpecialArgs = {
+              isWsl = false;
+              inherit inputs;
+            };
           };
       };
       darwinConfigurations = {
@@ -85,7 +91,10 @@
                   useUserPackages = true;
                   users."tomoya.matsumoto" = import ./nix/homes/darwin.nix;
                   backupFileExtension = "backup";
-                  extraSpecialArgs = {isWsl = false;};
+                  extraSpecialArgs = {
+                    isWsl = false;
+                    inherit inputs;
+                  };
                 };
                 users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
                 nix.settings = {
@@ -119,7 +128,10 @@
               home-manager = {
                 users.runner = import ./nix/homes/common.nix;
                 backupFileExtension = "backup";
-                extraSpecialArgs = {isWsl = false;};
+                extraSpecialArgs = {
+                  isWsl = false;
+                  inherit inputs;
+                };
               };
               users.users.runner.home = "/Users/runner";
             }
@@ -138,7 +150,10 @@
               home-manager = {
                 useGlobalPkgs = true;
                 users.gazelle = import ./nix/homes/nixos-wsl.nix;
-                extraSpecialArgs = {isWsl = true;};
+                extraSpecialArgs = {
+                  isWsl = true;
+                  inherit inputs;
+                };
               };
               users.users.gazelle = {
                 home = "/home/gazelle";

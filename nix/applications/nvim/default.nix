@@ -1,4 +1,16 @@
-{pkgs, ...}: let
+{
+  pkgs,
+  specialArgs,
+  ...
+}: let
+  inherit (specialArgs.inputs) nur;
+  nurpkgs =
+    (import nur {
+      inherit pkgs;
+      nurpkgs = pkgs;
+    })
+    .repos
+    .natsukium;
   buildInputs = with pkgs; [
     gcc # for build treesitter parser
   ];
@@ -20,6 +32,7 @@
   plugins = with pkgs.vimPlugins; [
     lazy-nvim
     markdown-preview-nvim
+    nurpkgs.vimPlugins.vim-pydocstring
   ];
   lazynvimInit = pkgs.writeText "lazynvim-init.lua" ''
     local M = {}
@@ -44,6 +57,17 @@
       },
     }
   '';
+  vimPydocstring = pkgs.writeText "vim-pydocstring.lua" ''
+    return {
+      {
+        dir = "${nurpkgs.vimPlugins.vim-pydocstring}",
+        ft = "python",
+        config = function()
+          vim.g.pydocstring_formatter = "google"
+        end,
+      },
+    }
+  '';
 in {
   programs.neovim = {
     enable = true;
@@ -57,4 +81,5 @@ in {
   };
   xdg.configFile."nvim/lua/lazynvim-init.lua".source = lazynvimInit;
   xdg.configFile."nvim/lua/plugins/markdown-preview-nvim.lua".source = markdownPreviewNvim;
+  xdg.configFile."nvim/lua/plugins/vim-pydocstring.lua".source = vimPydocstring;
 }
