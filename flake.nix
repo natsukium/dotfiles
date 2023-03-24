@@ -110,7 +110,6 @@
                   casks = [
                     "clipy"
                     "google-japanese-ime"
-                    "monitorcontrol"
                     "vivaldi"
                   ];
                 };

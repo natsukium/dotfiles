@@ -4,4 +4,7 @@
     ./desktop.nix
     ../applications/sketchybar
   ];
+  home.packages = with pkgs; [
+    monitorcontrol
+  ];
 }
