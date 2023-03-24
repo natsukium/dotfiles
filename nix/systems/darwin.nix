@@ -40,7 +40,11 @@ in {
         FXPreferredViewStyle = "clmv";
         ShowStatusBar = true;
       };
-      CustomUserPreferences = {};
+      CustomUserPreferences = {
+        "com.apple.inputmethod.Kotoeri" = {
+          JIMPrefLiveConversionKey = 0;
+        };
+      };
     };
     keyboard = {
       enableKeyMapping = true;
