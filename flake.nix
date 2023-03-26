@@ -16,6 +16,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
+    nix-colors.url = "github:misterio77/nix-colors";
     flake-utils.url = github:numtide/flake-utils;
     nur.url = github:nix-community/NUR;
   };
