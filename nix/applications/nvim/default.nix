@@ -28,6 +28,7 @@
     # python
     black
     nodePackages.pyright
+    ruff
   ];
   plugins = with pkgs.vimPlugins; [
     lazy-nvim
