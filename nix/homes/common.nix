@@ -5,14 +5,20 @@
   ...
 }: let
   inherit (specialArgs) isWsl;
+  inherit (specialArgs.inputs) nix-colors;
 in {
   programs.home-manager.enable = true;
   home = {
     stateVersion = "22.11";
   };
 
+  colorScheme = nix-colors.colorSchemes.nord;
+  base16.enable = true;
+
   imports =
     [
+      nix-colors.homeManagerModule
+      ../modules/base16.nix
       ../applications/gitui
       ../applications/nvim
       ../alacritty

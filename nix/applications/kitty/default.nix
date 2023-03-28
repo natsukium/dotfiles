@@ -16,7 +16,6 @@ in {
   programs = {
     kitty = {
       enable = true;
-      theme = "Nord";
       settings = {
         "font_family" = "Liga HackGen Console NF";
         "font_size" = 14;
