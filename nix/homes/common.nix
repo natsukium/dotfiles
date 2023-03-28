@@ -13,10 +13,12 @@ in {
   };
 
   colorScheme = nix-colors.colorSchemes.nord;
+  base16.enable = true;
 
   imports =
     [
       nix-colors.homeManagerModule
+      ../modules/base16.nix
       ../applications/gitui
       ../applications/nvim
       ../alacritty
