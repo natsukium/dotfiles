@@ -38,11 +38,11 @@
       theme = ''
         (
             selected_tab: Reset,
-            command_fg: Rgb(229, 233, 240),
-            selection_bg: Blue,
-            selection_fg: Rgb(229, 233, 240),
-            cmdbar_bg: Blue,
-            cmdbar_extra_lines_bg: Blue,
+            command_fg: Blue,
+            selection_bg: DarkGray,
+            selection_fg: White,
+            cmdbar_bg: Black,
+            cmdbar_extra_lines_bg: DarkGray,
             disabled_fg: DarkGray,
             diff_line_add: Green,
             diff_line_delete: Red,
