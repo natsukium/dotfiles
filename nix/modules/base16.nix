@@ -45,6 +45,10 @@ in {
       type = types.bool;
       default = true;
     };
+    qutebrowser = mkOption {
+      type = types.bool;
+      default = true;
+    };
   };
   config = mkIf cfg.enable (mkMerge [
     (mkIf cfg.bat {programs.bat.config.theme = "base16-256";})
@@ -209,5 +213,192 @@ in {
         };
       }
     )
+    (mkIf cfg.qutebrowser
+      {
+        programs.qutebrowser.settings = {
+          colors = {
+            completion = {
+              fg = "#${base05}";
+              odd.bg = "#${base01}";
+              even.bg = "#${base00}";
+              category = {
+                fg = "#${base0A}";
+                bg = "#${base00}";
+                border = {
+                  top = "#${base00}";
+                  bottom = "#${base00}";
+                };
+              };
+              item = {
+                selected = {
+                  fg = "#${base05}";
+                  bg = "#${base02}";
+                  border = {
+                    top = "#${base02}";
+                    bottom = "#${base02}";
+                  };
+                  match.fg = "#${base0B}";
+                };
+              };
+              match.fg = "#${base0B}";
+              scrollbar = {
+                fg = "#${base05}";
+                bg = "#${base00}";
+              };
+            };
+            contextmenu = {
+              disabled = {
+                bg = "#${base01}";
+                fg = "#${base04}";
+              };
+              menu = {
+                bg = "#${base00}";
+                fg = "#${base05}";
+              };
+              selected = {
+                bg = "#${base02}";
+                fg = "#${base05}";
+              };
+            };
+            downloads = {
+              bar.bg = "#${base00}";
+              start = {
+                fg = "#${base00}";
+                bg = "#${base0D}";
+              };
+              stop = {
+                fg = "#${base00}";
+                bg = "#${base0C}";
+              };
+              error.fg = "#${base08}";
+            };
+            hints = {
+              fg = "#${base00}";
+              bg = "#${base0A}";
+              match.fg = "#${base05}";
+            };
+            keyhint = {
+              fg = "#${base05}";
+              suffix.fg = "#${base05}";
+              bg = "#${base00}";
+            };
+            messages = {
+              error = {
+                fg = "#${base00}";
+                bg = "#${base08}";
+                border = "#${base08}";
+              };
+              warning = {
+                fg = "#${base00}";
+                bg = "#${base0E}";
+                border = "#${base0E}";
+              };
+              info = {
+                fg = "#${base05}";
+                bg = "#${base00}";
+                border = "#${base00}";
+              };
+            };
+            prompts = {
+              fg = "#${base05}";
+              border = "#${base00}";
+              bg = "#${base00}";
+              selected = {
+                bg = "#${base02}";
+                fg = "#${base05}";
+              };
+            };
+            statusbar = {
+              normal = {
+                fg = "#${base0B}";
+                bg = "#${base00}";
+              };
+              insert = {
+                fg = "#${base00}";
+                bg = "#${base0D}";
+              };
+              passthrough = {
+                fg = "#${base00}";
+                bg = "#${base0C}";
+              };
+              private = {
+                fg = "#${base00}";
+                bg = "#${base01}";
+              };
+              command = {
+                fg = "#${base05}";
+                bg = "#${base00}";
+                private = {
+                  fg = "#${base05}";
+                  bg = "#${base00}";
+                };
+              };
+              caret = {
+                fg = "#${base00}";
+                bg = "#${base0E}";
+                selection = {
+                  fg = "#${base00}";
+                  bg = "#${base0D}";
+                };
+              };
+              progress.bg = "#${base0D}";
+              url = {
+                fg = "#${base05}";
+                error.fg = "#${base08}";
+                hover.fg = "#${base05}";
+                success.http.fg = "#${base0C}";
+                success.https.fg = "#${base0B}";
+                warn.fg = "#${base0E}";
+              };
+            };
+            tabs = {
+              bar.bg = "#${base00}";
+              indicator = {
+                start = "#${base0D}";
+                stop = "#${base0C}";
+                error = "#${base08}";
+              };
+              odd = {
+                fg = "#${base05}";
+                bg = "#${base01}";
+              };
+              even = {
+                fg = "#${base05}";
+                bg = "#${base00}";
+              };
+              pinned = {
+                even = {
+                  bg = "#${base0C}";
+                  fg = "#${base07}";
+                };
+                odd = {
+                  bg = "#${base0B}";
+                  fg = "#${base07}";
+                };
+                selected = {
+                  even = {
+                    bg = "#${base02}";
+                    fg = "#${base05}";
+                  };
+                  odd = {
+                    bg = "#${base02}";
+                    fg = "#${base05}";
+                  };
+                };
+              };
+              selected = {
+                odd = {
+                  fg = "#${base05}";
+                  bg = "#${base02}";
+                };
+                even = {
+                  fg = "#${base05}";
+                  bg = "#${base02}";
+                };
+              };
+            };
+          };
+        };
+      })
   ]);
 }
