@@ -11,5 +11,8 @@
       "window_gap" = 10;
       "layout" = "bsp";
     };
+    extraConfig = ''
+      yabai -m rule --add app=CopyQ manage=off
+    '';
   };
 }

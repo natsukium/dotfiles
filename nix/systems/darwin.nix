@@ -12,7 +12,13 @@
     .repos
     .natsukium;
 in {
-  imports = [./darwin ../applications/yabai ../applications/skhd ../modules/services/sketchybar.nix];
+  imports = [
+    ./darwin
+    ../applications/yabai
+    ../applications/skhd
+    ../modules/services/sketchybar.nix
+    ../modules/services/copyq.nix
+  ];
 
   system = {
     defaults = {
@@ -57,4 +63,5 @@ in {
   };
 
   services.sketchybar.enable = true;
+  services.copyq.enable = true;
 }
