@@ -10,9 +10,13 @@
       "right_padding" = 10;
       "window_gap" = 10;
       "layout" = "bsp";
+      "window_opacity" = "on";
+      "window_border" = "on";
+      "window_border_blur" = "on";
     };
     extraConfig = ''
       yabai -m rule --add app=CopyQ manage=off
+      yabai -m rule --add app=kitty opacity=0.9
     '';
   };
 }
