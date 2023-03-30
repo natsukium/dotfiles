@@ -25,6 +25,10 @@
     };
     flake-utils.url = github:numtide/flake-utils;
     nur.url = github:nix-community/NUR;
+    nixbins = {
+      url = "github:natsukium/nixbins";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs = {
