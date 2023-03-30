@@ -92,7 +92,7 @@
         macbook =
           darwin.lib.darwinSystem
           {
-            system = "x86_64-darwin";
+            system = "aarch64-darwin";
             modules = [
               ./nix/systems/darwin.nix
               home-manager.darwinModules.home-manager
