@@ -63,6 +63,11 @@ def main():
         update_freq=nat(10),
     )
 
+    weather = ScriptingProps(
+        script=plugins_dir + "weather.py",
+        update_freq=nat(3600),
+    )
+
     sketchybar = SketchyBar()
     sketchybar = (
         sketchybar.set_bar(bar)
@@ -72,6 +77,8 @@ def main():
         .add_item("battery", "right")
         .set_item("battery", battery)
         .set_subscribe("battery", [Event.system_woke, Event.power_source_change])
+        .add_item("weather", "right")
+        .set_item("weather", weather)
     )
     print(sketchybar.command)
     sketchybar.run()

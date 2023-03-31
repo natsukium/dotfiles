@@ -12,8 +12,12 @@
   clock = pkgs.writers.writePython3Bin "clock.py" {inherit flakeIgnore libraries;} (
     builtins.readFile ./plugins/clock.py
   );
+  weather = pkgs.writers.writePython3Bin "weather.py" {inherit flakeIgnore libraries;} (
+    builtins.readFile ./plugins/weather.py
+  );
 in {
   xdg.configFile."sketchybar/sketchybarrc".source = "${rc}/bin/sketchybarrc";
   xdg.configFile."sketchybar/plugins/battery.py".source = "${battery}/bin/battery.py";
   xdg.configFile."sketchybar/plugins/clock.py".source = "${clock}/bin/clock.py";
+  xdg.configFile."sketchybar/plugins/weather.py".source = "${weather}/bin/weather.py";
 }
