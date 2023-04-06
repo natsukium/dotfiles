@@ -62,7 +62,7 @@
         githubActions = conf "runner";
       };
       darwinConfigurations = {
-        macbook = darwin.lib.darwinSystem {
+        work = darwin.lib.darwinSystem {
           system = "aarch64-darwin";
           modules = [
             ./nix/systems/darwin/work.nix
@@ -87,7 +87,7 @@
         };
       };
       nixosConfigurations = {
-        wsl = nixpkgs.lib.nixosSystem {
+        arusha = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
             ./nix/homes/nixos/arusha.nix
