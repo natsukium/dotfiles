@@ -43,48 +43,23 @@
     forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
   in
     {
-      homeConfigurations = {
-        x64-vm = home-manager.lib.homeManagerConfiguration {
-          pkgs = import nixpkgs {
-            system = "x86_64-linux";
-          };
-          modules = [
-            ./nix/homes/common.nix
-            {
-              targets.genericLinux.enable = true;
-              home = {
-                username = "gazelle";
-                homeDirectory = "/home/gazelle";
-              };
-              nixpkgs.config.allowUnfreePredicate = pkg: true;
-            }
-          ];
-          extraSpecialArgs = {
-            inherit inputs;
-          };
-        };
-
-        githubActions =
-          home-manager.lib.homeManagerConfiguration
-          {
+      homeConfigurations = let
+        conf = username:
+          home-manager.lib.homeManagerConfiguration {
             pkgs = import nixpkgs {
               system = "x86_64-linux";
             };
             modules = [
-              ./nix/homes/common.nix
-              {
-                targets.genericLinux.enable = true;
-                home = {
-                  username = "runner";
-                  homeDirectory = "/home/runner";
-                };
-                nixpkgs.config.allowUnfreePredicate = pkg: true;
-              }
+              ./nix/homes/non-nixos/common.nix
             ];
             extraSpecialArgs = {
               inherit inputs;
+              username = username;
             };
           };
+      in {
+        x64-vm = conf "gazelle";
+        githubActions = conf "runner";
       };
       darwinConfigurations = {
         macbook = darwin.lib.darwinSystem {
