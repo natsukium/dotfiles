@@ -90,30 +90,13 @@
         wsl = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
-            nixos-wsl.nixosModules.wsl
-            {imports = [./nix/systems/nixos-wsl.nix];}
-
-            home-manager.nixosModules.home-manager
-            {
-              home-manager = {
-                useGlobalPkgs = true;
-                users.gazelle = import ./nix/homes/nixos-wsl.nix;
-                extraSpecialArgs = {
-                  inherit inputs;
-                };
-              };
-              users.users.gazelle = {
-                home = "/home/gazelle";
-                isNormalUser = true;
-                initialPassword = "";
-                group = "wheel";
-                openssh.authorizedKeys.keys = [
-                  "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
-                ];
-              };
-            }
+            ./nix/homes/nixos/arusha.nix
+            ./nix/systems/nixos/arusha.nix
           ];
-          specialArgs = {inherit inputs;};
+          specialArgs = {
+            inherit inputs;
+            username = "gazelle";
+          };
         };
       };
     }

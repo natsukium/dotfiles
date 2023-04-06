@@ -3,7 +3,7 @@
   specialArgs,
   ...
 }: let
-  inherit (specialArgs) inputs;
+  inherit (specialArgs) inputs username;
   nurpkgs =
     (import inputs.nur {
       inherit pkgs;
@@ -11,9 +11,23 @@
     .repos
     .natsukium;
 in {
-  imports = [../modules/wsl/docker-enable-nvidia.nix ../modules/wsl/vscode.nix];
+  imports = [
+    inputs.nixos-wsl.nixosModules.wsl
+    ../../modules/wsl/docker-enable-nvidia.nix
+    ../../modules/wsl/vscode.nix
+  ];
 
   system.stateVersion = "22.11";
+
+  users.users.${username} = {
+    home = "/home/${username}";
+    isNormalUser = true;
+    initialPassword = "";
+    group = "wheel";
+    openssh.authorizedKeys.keys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
+    ];
+  };
 
   wsl = {
     enable = true;
@@ -35,8 +49,8 @@ in {
   ];
   i18n = {
     inputMethod = {
-      enabled = "fcitx";
-      fcitx.engines = with pkgs.fcitx-engines; [mozc];
+      enabled = "fcitx5";
+      fcitx5.addons = with pkgs; [fcitx5-mozc];
     };
     defaultLocale = "ja_JP.UTF-8";
     extraLocaleSettings = {
