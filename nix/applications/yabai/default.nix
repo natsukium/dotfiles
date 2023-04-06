@@ -1,4 +1,6 @@
-{
+{specialArgs, ...}: let
+  inherit (specialArgs.colorScheme.colors) base02 base0D;
+in {
   services.yabai = {
     enable = true;
     enableScriptingAddition = true;
@@ -13,6 +15,9 @@
       "window_opacity" = "on";
       "window_border" = "on";
       "window_border_blur" = "on";
+      "active_window_border_color" = "0xFF${base0D}";
+      "normal_window_border_color" = "0xFF${base02}";
+      "window_animation_duration" = 0.05;
     };
     extraConfig = ''
       yabai -m rule --add app=CopyQ manage=off
