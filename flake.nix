@@ -2,17 +2,17 @@
   description = "dotfiles";
 
   inputs = {
-    nixpkgs.url = github:nixos/nixpkgs;
+    nixpkgs.url = "github:nixos/nixpkgs";
     home-manager = {
-      url = github:nix-community/home-manager;
+      url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     darwin = {
-      url = github:lnl7/nix-darwin;
+      url = "github:lnl7/nix-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     nixos-wsl = {
-      url = github:nix-community/NixOS-WSL;
+      url = "github:nix-community/nixos-wsl";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-utils.follows = "flake-utils";
     };
@@ -23,8 +23,8 @@
         flake = false;
       };
     };
-    flake-utils.url = github:numtide/flake-utils;
-    nur.url = github:nix-community/NUR;
+    flake-utils.url = "github:numtide/flake-utils";
+    nur.url = "github:nix-community/nur";
     nixbins = {
       url = "github:natsukium/nixbins";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -32,15 +32,12 @@
   };
 
   outputs = {
-    self,
     nixpkgs,
     home-manager,
     darwin,
-    nixos-wsl,
     flake-utils,
     ...
   } @ inputs: let
-    forAllSystems = f: nixpkgs.lib.genAttrs flake-utils.lib.defaultSystems (system: f system);
   in
     {
       homeConfigurations = let
