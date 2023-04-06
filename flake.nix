@@ -35,9 +35,11 @@
     nixpkgs,
     home-manager,
     darwin,
+    nix-colors,
     flake-utils,
     ...
   } @ inputs: let
+    colorScheme = nix-colors.colorSchemes.nord;
   in
     {
       homeConfigurations = let
@@ -50,7 +52,7 @@
               ./nix/homes/non-nixos/common.nix
             ];
             extraSpecialArgs = {
-              inherit inputs;
+              inherit inputs colorScheme;
               username = username;
             };
           };
@@ -66,7 +68,7 @@
             ./nix/homes/darwin/work.nix
           ];
           specialArgs = {
-            inherit inputs;
+            inherit inputs colorScheme;
             username = "tomoya.matsumoto";
           };
         };
@@ -78,7 +80,7 @@
             ./nix/homes/darwin/common.nix
           ];
           specialArgs = {
-            inherit inputs;
+            inherit inputs colorScheme;
             username = "runner";
           };
         };
@@ -91,7 +93,7 @@
             ./nix/systems/nixos/arusha.nix
           ];
           specialArgs = {
-            inherit inputs;
+            inherit inputs colorScheme;
             username = "gazelle";
           };
         };

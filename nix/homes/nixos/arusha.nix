@@ -3,7 +3,7 @@
   specialArgs,
   ...
 }: let
-  inherit (specialArgs) inputs username;
+  inherit (specialArgs) inputs username colorScheme;
 in {
   imports = [
     inputs.home-manager.nixosModules.home-manager
@@ -21,7 +21,7 @@ in {
     };
     backupFileExtension = "backup";
     extraSpecialArgs = {
-      inherit inputs;
+      inherit inputs colorScheme;
     };
   };
 }
