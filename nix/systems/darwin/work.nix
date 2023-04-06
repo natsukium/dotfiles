@@ -13,11 +13,11 @@
     .natsukium;
 in {
   imports = [
-    ./darwin
-    ../applications/yabai
-    ../applications/skhd
-    ../modules/services/sketchybar.nix
-    ../modules/services/copyq.nix
+    ./common.nix
+    ../../applications/yabai
+    ../../applications/skhd
+    ../../modules/services/sketchybar.nix
+    ../../modules/services/copyq.nix
   ];
 
   system = {
@@ -60,6 +60,17 @@ in {
   fonts = {
     fontDir.enable = true;
     fonts = [nurpkgs.liga-hackgen-nf-font];
+  };
+
+  homebrew = {
+    enable = true;
+    brews = [
+      "libomp"
+    ];
+    casks = [
+      "google-japanese-ime"
+      "vivaldi"
+    ];
   };
 
   services.sketchybar.enable = true;

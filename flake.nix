@@ -87,61 +87,28 @@
           };
       };
       darwinConfigurations = {
-        macbook =
-          darwin.lib.darwinSystem
-          {
-            system = "aarch64-darwin";
-            modules = [
-              ./nix/systems/darwin.nix
-              home-manager.darwinModules.home-manager
-              {
-                home-manager = {
-                  useGlobalPkgs = true;
-                  useUserPackages = true;
-                  users."tomoya.matsumoto" = import ./nix/homes/darwin.nix;
-                  backupFileExtension = "backup";
-                  extraSpecialArgs = {
-                    inherit inputs;
-                  };
-                };
-                users.users."tomoya.matsumoto".home = "/Users/tomoya.matsumoto";
-                nix.settings = {
-                  substituters = ["https://cache.nixos.org" "https://natsukium.cachix.org"];
-                  trusted-public-keys = ["cache.nixos.org-1:6NCHdD59X431o0gWypbMrAURkbJ16ZPMQFGspcDShjY=" "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="];
-                  trusted-users = ["root" "@wheel"];
-                };
-                homebrew = {
-                  enable = true;
-                  brews = [
-                    "libomp"
-                  ];
-                  casks = [
-                    "clipy"
-                    "google-japanese-ime"
-                    "vivaldi"
-                  ];
-                };
-              }
-            ];
-            specialArgs = {inherit inputs;};
+        macbook = darwin.lib.darwinSystem {
+          system = "aarch64-darwin";
+          modules = [
+            ./nix/systems/darwin/work.nix
+            ./nix/homes/darwin/work.nix
+          ];
+          specialArgs = {
+            inherit inputs;
+            username = "tomoya.matsumoto";
           };
+        };
 
         githubActions = darwin.lib.darwinSystem {
           system = "x86_64-darwin";
           modules = [
-            ./nix/systems/darwin
-            home-manager.darwinModules.home-manager
-            {
-              home-manager = {
-                users.runner = import ./nix/homes/common.nix;
-                backupFileExtension = "backup";
-                extraSpecialArgs = {
-                  inherit inputs;
-                };
-              };
-              users.users.runner.home = "/Users/runner";
-            }
+            ./nix/systems/darwin/common.nix
+            ./nix/homes/darwin/common.nix
           ];
+          specialArgs = {
+            inherit inputs;
+            username = "runner";
+          };
         };
       };
       nixosConfigurations = {
