@@ -4,7 +4,6 @@
   specialArgs,
   ...
 }: let
-  inherit (specialArgs) isWsl;
   inherit (specialArgs.inputs) nix-colors;
 in {
   programs.home-manager.enable = true;
@@ -33,6 +32,5 @@ in {
       ../tmux
       ../vim
       ../misc
-    ]
-    ++ lib.optional (! isWsl) ../vscode;
+    ];
 }

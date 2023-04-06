@@ -60,7 +60,6 @@
             }
           ];
           extraSpecialArgs = {
-            isWsl = false;
             inherit inputs;
           };
         };
@@ -83,7 +82,6 @@
               }
             ];
             extraSpecialArgs = {
-              isWsl = false;
               inherit inputs;
             };
           };
@@ -103,7 +101,6 @@
                   users."tomoya.matsumoto" = import ./nix/homes/darwin.nix;
                   backupFileExtension = "backup";
                   extraSpecialArgs = {
-                    isWsl = false;
                     inherit inputs;
                   };
                 };
@@ -139,7 +136,6 @@
                 users.runner = import ./nix/homes/common.nix;
                 backupFileExtension = "backup";
                 extraSpecialArgs = {
-                  isWsl = false;
                   inherit inputs;
                 };
               };
@@ -161,7 +157,6 @@
                 useGlobalPkgs = true;
                 users.gazelle = import ./nix/homes/nixos-wsl.nix;
                 extraSpecialArgs = {
-                  isWsl = true;
                   inherit inputs;
                 };
               };
