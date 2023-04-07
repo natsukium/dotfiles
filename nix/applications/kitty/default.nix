@@ -19,12 +19,17 @@ in {
       settings = {
         "font_family" = "Liga HackGen Console NF";
         "font_size" = 14;
-        "hide_window_decorations" = "yes";
+        "hide_window_decorations" =
+          if pkgs.stdenv.isLinux
+          then "yes"
+          else "titlebar-only";
         "tab_bar_edge" = "top";
         "tab_bar_style" = "powerline";
         "scrollback_pager_history_size" = 50;
         "enable_audio_bell" = "no";
         "enabled_layouts" = "Splits,Stack,Tall";
+        "macos_option_as_alt" = "yes";
+        "confirm_os_window_close" = 0;
       };
       keybindings = {} // tmux-compat-keybindings;
       darwinLaunchOptions = [
@@ -32,4 +37,9 @@ in {
       ];
     };
   };
+
+  programs.fish.interactiveShellInit = ''
+    source "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d/kitty-shell-integration.fish"
+    set --prepend fish_complete_path "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_completions.d"
+  '';
 }
