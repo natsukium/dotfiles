@@ -23,11 +23,6 @@
       init.defaultBranch = "main";
       url."git@github.com:".pushInsteadOf = "https://github.com/";
     };
-    aliases = {
-      st = "status";
-      ci = "commit";
-      co = "checkout";
-    };
     includes = [
       {
         path = "~/src/work/.config/git/config";
@@ -42,5 +37,17 @@
       enable = true;
       repo = ["~/src/private/github.com/natsukium/nixpkgs"];
     };
+  };
+
+  programs.fish.shellAbbrs = {
+    gpm = "git pull (git remote show origin | sed -n '/HEAD branch/s/.*: //p'";
+    gpu = "git pull upstream";
+    gci = "git commit ";
+    gca = "git commit --amend";
+    gs = "git status";
+    gst = "git stash";
+    gstp = "git stash pop";
+    gsw = "git switch";
+    gswc = "git switch -c";
   };
 }
