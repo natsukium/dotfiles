@@ -15,6 +15,8 @@
     gcc # for build treesitter parser
   ];
   lsp = with pkgs; [
+    # astro
+    nodePackages."@astrojs/language-server"
     # bash
     nodePackages.bash-language-server
     shellcheck
@@ -69,6 +71,13 @@
       },
     }
   '';
+  ftdetectAstro = ''
+    vim.filetype.add({
+      extension = {
+        astro = "astro"
+      }
+    })
+  '';
 in {
   programs.neovim = {
     enable = true;
@@ -83,4 +92,5 @@ in {
   xdg.configFile."nvim/lua/lazynvim-init.lua".text = lazynvimInit;
   xdg.configFile."nvim/lua/plugins/markdown-preview-nvim.lua".text = markdownPreviewNvim;
   xdg.configFile."nvim/lua/plugins/vim-pydocstring.lua".text = vimPydocstring;
+  xdg.configFile."nvim/ftdetect/astro.lua".text = ftdetectAstro;
 }

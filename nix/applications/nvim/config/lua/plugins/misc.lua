@@ -67,11 +67,14 @@ return {
     dependencies = {
       -- url = "https://gitlab.com/HiPhish/nvim-ts-rainbow2",
       "p00f/nvim-ts-rainbow",
+      "virchau13/tree-sitter-astro",
     },
     config = function()
       require("nvim-treesitter.configs").setup({
         ensure_installed = {
+          "astro",
           "bash",
+          "css",
           "dockerfile",
           "fish",
           "lua",

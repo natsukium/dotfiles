@@ -44,6 +44,7 @@ return {
       local lspconfig = require("lspconfig")
 
       for _, ls in pairs({
+        "astro",
         "bashls",
         "nil_ls",
         "pyright",
