@@ -35,7 +35,7 @@
     markdown-preview-nvim
     nurpkgs.vimPlugins.vim-pydocstring
   ];
-  lazynvimInit = pkgs.writeText "lazynvim-init.lua" ''
+  lazynvimInit = ''
     local M = {}
 
     function M.setup()
@@ -45,7 +45,7 @@
 
     return M
   '';
-  markdownPreviewNvim = pkgs.writeText "markdown-preview-nvim.lua" ''
+  markdownPreviewNvim = ''
     return {
       {
         dir = "${pkgs.vimPlugins.markdown-preview-nvim}",
@@ -58,7 +58,7 @@
       },
     }
   '';
-  vimPydocstring = pkgs.writeText "vim-pydocstring.lua" ''
+  vimPydocstring = ''
     return {
       {
         dir = "${nurpkgs.vimPlugins.vim-pydocstring}",
@@ -80,7 +80,7 @@ in {
     source = ./config;
     recursive = true;
   };
-  xdg.configFile."nvim/lua/lazynvim-init.lua".source = lazynvimInit;
-  xdg.configFile."nvim/lua/plugins/markdown-preview-nvim.lua".source = markdownPreviewNvim;
-  xdg.configFile."nvim/lua/plugins/vim-pydocstring.lua".source = vimPydocstring;
+  xdg.configFile."nvim/lua/lazynvim-init.lua".text = lazynvimInit;
+  xdg.configFile."nvim/lua/plugins/markdown-preview-nvim.lua".text = markdownPreviewNvim;
+  xdg.configFile."nvim/lua/plugins/vim-pydocstring.lua".text = vimPydocstring;
 }
