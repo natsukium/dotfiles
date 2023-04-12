@@ -65,8 +65,7 @@ return {
   {
     "nvim-treesitter/nvim-treesitter",
     dependencies = {
-      -- url = "https://gitlab.com/HiPhish/nvim-ts-rainbow2",
-      "p00f/nvim-ts-rainbow",
+      "hiphish/nvim-ts-rainbow2",
       "virchau13/tree-sitter-astro",
     },
     config = function()
@@ -95,8 +94,8 @@ return {
         },
         rainbow = {
           enable = true,
-          -- query = "rainbow-parens",
-          -- strategy = require("ts-rainbow.strategy.global"),
+          query = "rainbow-parens",
+          strategy = require("ts-rainbow").strategy.global,
         },
       })
       require("nvim-treesitter.install").compilers = { "gcc" }
