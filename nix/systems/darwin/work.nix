@@ -69,7 +69,6 @@ in {
     ];
     casks = [
       "google-japanese-ime"
-      "vivaldi"
     ];
   };
 
