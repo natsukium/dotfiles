@@ -31,6 +31,8 @@
     black
     nodePackages.pyright
     ruff
+    # terraform
+    terraform-ls
   ];
   plugins = with pkgs.vimPlugins; [
     lazy-nvim

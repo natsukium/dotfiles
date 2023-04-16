@@ -48,6 +48,7 @@ return {
         "bashls",
         "nil_ls",
         "pyright",
+        "terraformls",
       }) do
         lspconfig[ls].setup({
           on_attach = on_attach,
