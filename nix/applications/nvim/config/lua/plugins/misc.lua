@@ -228,4 +228,23 @@ return {
     cmd = { "OverseerRun", "OverseerToggle" },
     config = true,
   },
+  {
+    "jackmort/chatgpt.nvim",
+    dependencies = {
+      "MunifTanjim/nui.nvim",
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim",
+    },
+    event = "VeryLazy",
+    config = function()
+      require("chatgpt").setup({
+        openai_params = {
+          model = "gpt-4",
+        },
+        openai_edit_params = {
+          model = "gpt-4",
+        },
+      })
+    end,
+  },
 }
