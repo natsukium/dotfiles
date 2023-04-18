@@ -192,6 +192,20 @@ return {
     event = "VeryLazy",
   },
   {
+    "pwntester/octo.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-telescope/telescope.nvim",
+      "nvim-tree/nvim-web-devicons",
+    },
+    event = "VeryLazy",
+    config = function()
+      require("octo").setup({
+        ssh_aliases = { ["github.com-emu"] = "github.com" },
+      })
+    end,
+  },
+  {
     "lukas-reineke/indent-blankline.nvim",
     event = "VeryLazy",
     config = function()
