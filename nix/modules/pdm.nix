@@ -18,7 +18,7 @@ in {
       description = "Package providing <command>pdm<command>.";
     };
     enablePEP582 = mkOption {
-      default = true;
+      default = false;
       type = types.bool;
       description = ''
         Enable PEP582 globally.
