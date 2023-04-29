@@ -77,7 +77,7 @@
           system = "x86_64-darwin";
           modules = [
             ./nix/systems/darwin/common.nix
-            ./nix/homes/darwin/common.nix
+            ./nix/homes/darwin/github-actions.nix
           ];
           specialArgs = {
             inherit inputs colorScheme;

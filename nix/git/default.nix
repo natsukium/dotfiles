@@ -1,4 +1,8 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: {
   programs.gpg.enable = true;
 
   imports = [./../modules/git-scalar.nix];
@@ -11,18 +15,21 @@
       key = "9EA45A31DB994C53";
       signByDefault = true;
     };
-    extraConfig = {
-      core.editor = "vim";
-      color = {
-        status = "auto";
-        diff = "auto";
-        branch = "auto";
-        interactive = "auto";
-        grep = "auto";
+    extraConfig =
+      {
+        core.editor = "vim";
+        color = {
+          status = "auto";
+          diff = "auto";
+          branch = "auto";
+          interactive = "auto";
+          grep = "auto";
+        };
+        init.defaultBranch = "main";
+      }
+      // pkgs.lib.optionalAttrs (config.programs.git.userEmail != "action@github.com") {
+        url."git@github.com:".pushInsteadOf = "https://github.com/";
       };
-      init.defaultBranch = "main";
-      url."git@github.com:".pushInsteadOf = "https://github.com/";
-    };
     includes = [
       {
         path = "~/src/work/.config/git/config";
