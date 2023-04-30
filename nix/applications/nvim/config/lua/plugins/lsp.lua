@@ -55,6 +55,21 @@ return {
           capabilities = capabilities,
         })
       end
+      lspconfig.dockerls.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        root_dir = lspconfig.util.root_pattern("Dockerfile", "Containerfile"),
+      })
+      lspconfig.docker_compose_language_service.setup({
+        on_attach = on_attach,
+        capabilities = capabilities,
+        root_dir = lspconfig.util.root_pattern(
+          "docker-compose.yaml",
+          "docker-compose.yml",
+          "compose.yaml",
+          "compose.yml"
+        ),
+      })
       lspconfig.lua_ls.setup({
         on_attach = on_attach,
         capabilities = capabilities,
@@ -75,6 +90,7 @@ return {
       local null_ls = require("null-ls")
       null_ls.setup({
         sources = {
+          null_ls.builtins.diagnostics.hadolint,
           null_ls.builtins.diagnostics.ruff,
           null_ls.builtins.diagnostics.shellcheck,
           null_ls.builtins.formatting.ruff,
