@@ -45,6 +45,6 @@ jobs:
       - name: Push updated flake.lock
         if: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.os == 'macOS-latest' && success()}}
         run: |
-          git add .
+          git add flake.lock
           git commit --no-gpg-sign -m "chore(flake.lock): update by GitHub Actions"
           git push
