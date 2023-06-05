@@ -12,6 +12,10 @@ return {
 			},
 			"hrsh7th/cmp-cmdline",
 			"onsails/lspkind.nvim",
+			{
+				"zbirenbaum/copilot-cmp",
+				config = true,
+			},
 		},
 		opts = function()
 			vim.g.completeopt = "menu,menuone,noselect"
@@ -25,6 +29,7 @@ return {
 					end,
 				},
 				sources = cmp.config.sources({
+					{ name = "copilot" },
 					{ name = "nvim_lsp" },
 					{ name = "luasnip" },
 					{ name = "path" },
@@ -58,6 +63,16 @@ return {
 				}, {
 					{ name = "cmdline" },
 				}),
+			})
+		end,
+	},
+	{
+		"zbirenbaum/copilot.lua",
+		event = "InsertEnter",
+		config = function()
+			require("copilot").setup({
+				suggestion = { enabled = false },
+				panel = { enabled = false },
 			})
 		end,
 	},

@@ -13,6 +13,7 @@
     .natsukium;
   buildInputs = with pkgs; [
     gcc # for build treesitter parser
+    nodejs_18
   ];
   lsp = with pkgs; [
     # astro
