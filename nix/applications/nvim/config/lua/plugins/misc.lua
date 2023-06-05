@@ -244,6 +244,7 @@ return {
         openai_edit_params = {
           model = "gpt-4",
         },
+        api_key_cmd = "rbw get OPENAI_API_KEY",
       })
     end,
   },

@@ -49,8 +49,10 @@
       gnumake
       gnutar
       nkf
+      pinentry-curses
       pipx
       podman
+      rbw
       ripgrep
       wget
       zstd
