@@ -14,6 +14,7 @@ in {
     ../modules/base16.nix
     ../applications/gitui
     ../applications/nvim
+    ../applications/rbw
     ../alacritty
     ../bash
     ../bat

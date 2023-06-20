@@ -52,7 +52,6 @@
       pinentry-curses
       pipx
       podman
-      rbw
       ripgrep
       wget
       zstd
