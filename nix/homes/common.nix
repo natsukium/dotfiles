@@ -13,6 +13,7 @@ in {
     nix-colors.homeManagerModule
     ../modules/base16.nix
     ../applications/gitui
+    ../applications/lazygit
     ../applications/nvim
     ../applications/rbw
     ../alacritty
