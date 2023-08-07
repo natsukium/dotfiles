@@ -16,7 +16,6 @@ in {
     ./common.nix
     ../../applications/yabai
     ../../applications/skhd
-    ../../modules/services/sketchybar.nix
     ../../modules/services/copyq.nix
   ];
 
@@ -73,5 +72,6 @@ in {
   };
 
   services.sketchybar.enable = true;
+  system.defaults.NSGlobalDomain._HIHideMenuBar = true;
   services.copyq.enable = true;
 }
