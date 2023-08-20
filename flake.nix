@@ -97,6 +97,17 @@
             username = "gazelle";
           };
         };
+        serengeti = nixpkgs.lib.nixosSystem {
+          system = "aarch64-linux";
+          modules = [
+            ./nix/homes/nixos/serengeti
+            ./nix/systems/nixos/serengeti
+          ];
+          specialArgs = {
+            inherit inputs colorScheme;
+            username = "gazelle";
+          };
+        };
       };
     }
     // flake-utils.lib.eachDefaultSystem
