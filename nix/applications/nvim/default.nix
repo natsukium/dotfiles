@@ -24,7 +24,7 @@
     shfmt
     # docker
     nodePackages.dockerfile-language-server-nodejs
-    hadolint
+    # hadolint
     docker-compose-language-service
     # lua
     lua-language-server
