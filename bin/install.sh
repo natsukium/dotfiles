@@ -3,6 +3,7 @@
 if [ "$0" = "CI" ]; then
   if [ "$(uname)" = "Darwin" ]; then
     nix build .#darwinConfigurations.githubActions.system
+    sudo rm /etc/nix/nix.conf
     ./result/sw/bin/darwin-rebuild switch --flake .#githubActions
   else
     nix build .#homeConfigurations.githubActions.activationPackage
