@@ -16,9 +16,15 @@
   nix = {
     settings = {
       auto-optimise-store = true;
-      extra-substituters = ["https://natsukium.cachix.org"];
-      extra-trusted-public-keys = ["natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="];
-      extra-trusted-users = "@wheel";
+      substituters = [
+        "https://natsukium.cachix.org"
+        "https://cuda-maintainers.cachix.org"
+      ];
+      trusted-public-keys = [
+        "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
+        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+      ];
+      trusted-users = ["root @wheel"];
     };
     gc = {
       automatic = true;
