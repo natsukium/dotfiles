@@ -1,4 +1,8 @@
 {username, ...}: {
+  imports = [
+    ../../modules/nix
+  ];
+
   system.stateVersion = "23.05";
 
   nixpkgs.config.allowUnfree = true;
@@ -13,25 +17,7 @@
     };
   };
 
-  nix = {
-    settings = {
-      auto-optimise-store = true;
-      substituters = [
-        "https://natsukium.cachix.org"
-        "https://cuda-maintainers.cachix.org"
-      ];
-      trusted-public-keys = [
-        "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
-        "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-      ];
-      trusted-users = ["root @wheel"];
-    };
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
-    };
-  };
+  programs.nix.target.system = true;
 
   services.openssh = {
     enable = true;

@@ -23,6 +23,11 @@
         flake = false;
       };
     };
+    tsnsrv = {
+      url = "github:boinkor-net/tsnsrv";
+      # url = "/home/gazelle/src/private/github.com/boinkor-net/tsnsrv";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     nur.url = "github:nix-community/nur";
     nixbins = {
@@ -102,6 +107,17 @@
           modules = [
             ./nix/homes/nixos/serengeti
             ./nix/systems/nixos/serengeti
+          ];
+          specialArgs = {
+            inherit inputs colorScheme;
+            username = "gazelle";
+          };
+        };
+        manyara = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./nix/homes/nixos/manyara
+            ./nix/systems/nixos/manyara
           ];
           specialArgs = {
             inherit inputs colorScheme;
