@@ -1,4 +1,8 @@
 {username, ...}: {
+  imports = [
+    ../common.nix
+  ];
+
   system.stateVersion = "23.05";
 
   nixpkgs.config.allowUnfree = true;
@@ -10,20 +14,6 @@
     extraLocaleSettings = {
       LC_COLLATE = "C.UTF-8";
       LC_MESSAGES = "en_US.UTF-8";
-    };
-  };
-
-  nix = {
-    settings = {
-      auto-optimise-store = true;
-      extra-substituters = ["https://natsukium.cachix.org"];
-      extra-trusted-public-keys = ["natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="];
-      extra-trusted-users = "@wheel";
-    };
-    gc = {
-      automatic = true;
-      dates = "weekly";
-      options = "--delete-older-than 7d";
     };
   };
 

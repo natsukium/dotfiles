@@ -15,8 +15,11 @@ in {
     inputs.nixos-wsl.nixosModules.wsl
     ../../../modules/wsl/docker-enable-nvidia.nix
     ../../../modules/wsl/vscode.nix
+    ../../../modules/nix
     ../common.nix
   ];
+
+  programs.nix.target.nvidia = true;
 
   users.users.${username} = {
     home = "/home/${username}";

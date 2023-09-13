@@ -15,7 +15,9 @@ in {
     users.${username} = {
       imports = [
         ../common.nix
+        ../../modules/nix
       ];
+      programs.nix.target.user = true;
     };
     backupFileExtension = "backup";
     extraSpecialArgs = {
