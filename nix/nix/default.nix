@@ -9,5 +9,7 @@
     };
   };
   nixpkgs.config = import ./nixpkgs-config.nix;
+  # nixpkgs.overlays = import ./overlays.nix;
   xdg.configFile."nixpkgs/config.nix".source = ./nixpkgs-config.nix;
+  xdg.configFile."nixpkgs/overlays.nix".source = ./overlays.nix;
 }

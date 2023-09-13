@@ -238,6 +238,9 @@ return {
     event = "VeryLazy",
     config = function()
       require("chatgpt").setup({
+        popup_input = {
+          submit = "<C-s>",
+        },
         openai_params = {
           model = "gpt-4",
         },

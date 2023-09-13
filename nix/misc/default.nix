@@ -1,5 +1,8 @@
 {pkgs, ...}: {
-  imports = [../modules/pdm.nix];
+  imports = [
+    ../modules/pdm.nix
+    ../modules/applications/ranger
+  ];
   programs = {
     direnv = {
       enable = true;
@@ -17,8 +20,10 @@
       settings = {
         install.cache = true;
         venv.in_project = true;
+        venv.backend = "venv";
       };
     };
+    ranger.enable = true;
     readline = {
       enable = true;
       variables = {

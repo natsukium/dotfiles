@@ -25,7 +25,6 @@
     };
     tsnsrv = {
       url = "github:boinkor-net/tsnsrv";
-      # url = "/home/gazelle/src/private/github.com/boinkor-net/tsnsrv";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-utils.url = "github:numtide/flake-utils";
@@ -36,7 +35,13 @@
     };
   };
 
+  nixConfig = {
+    extra-substituters = ["https://cuda-maintainers.cachix.org"];
+    extra-trusted-public-keys = ["cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="];
+  };
+
   outputs = {
+    self,
     nixpkgs,
     home-manager,
     darwin,
@@ -91,6 +96,7 @@
         };
       };
       nixosConfigurations = {
+        # main machine on WSL
         arusha = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
@@ -102,6 +108,8 @@
             username = "gazelle";
           };
         };
+        # sub machinea on mini PC
+        # build server on Oracle Cloud Infrastructure
         serengeti = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
           modules = [

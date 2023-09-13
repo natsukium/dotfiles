@@ -24,6 +24,7 @@ in {
       abbr -a !! --position anywhere --function _abbr_last_history_item
       abbr -a extract_tar_gz --position command --regex ".+\.tar\.gz" --function _abbr_extract_tar_gz
       abbr -a dotdot --regex '^\.\.+$' --function _abbr_multicd
+      abbr -a fzf-ghq "cd (ghq list --full-path | fzf)"
     '';
 
     functions = {

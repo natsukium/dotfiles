@@ -32,6 +32,7 @@
     # nix
     alejandra
     nil
+    nixd
     # python
     black
     nodePackages.pyright
@@ -42,6 +43,7 @@
   plugins = with pkgs.vimPlugins; [
     lazy-nvim
     markdown-preview-nvim
+    rnvimr
     nurpkgs.vimPlugins.vim-pydocstring
   ];
   lazynvimInit = ''
@@ -64,6 +66,16 @@
           vim.g.mkdp_filetypes = { "markdown" }
           vim.keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
         end,
+      },
+    }
+  '';
+  rnvimr' = ''
+    return {
+      {
+        dir = "${pkgs.vimPlugins.rnvimr}",
+        name = "rnvimr",
+        event = "VeryLazy",
+        config = true,
       },
     }
   '';
@@ -98,6 +110,7 @@ in {
   };
   xdg.configFile."nvim/lua/lazynvim-init.lua".text = lazynvimInit;
   xdg.configFile."nvim/lua/plugins/markdown-preview-nvim.lua".text = markdownPreviewNvim;
+  xdg.configFile."nvim/lua/plugins/rnvimr.lua".text = rnvimr';
   xdg.configFile."nvim/lua/plugins/vim-pydocstring.lua".text = vimPydocstring;
   xdg.configFile."nvim/ftdetect/astro.lua".text = ftdetectAstro;
 }

@@ -25,7 +25,7 @@
         stty werase undef
         bind "\C-w":unix-filename-rubout  # Ctrl-w
       ''
-      + lib.optionalString (! config.programs.kitty.enable) ''
+      + lib.optionalString (false) ''
         # TMUX (from ArchWiki)
         if type tmux > /dev/null 2>&1; then
           # if no session is started, start a new session

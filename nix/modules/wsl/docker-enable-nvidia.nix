@@ -11,10 +11,20 @@
   }:
     stdenv.mkDerivation {
       name = "nvidia-wsl";
-      src = /usr/lib/wsl/lib; # Because of this, you must evaluate with --impure
+
+      __propagatedImpureHostDeps = [
+        "/usr/lib/wsl/lib"
+      ];
+
+      # src = /usr/lib/wsl/lib; # Because of this, you must evaluate with --impure
       installPhase = ''
-        install -Dm644 $src/lib* -t $out/lib
-        install -Dm755 $src/nvidia-smi -t $out/bin
+        runHook preInstall
+        
+        mkdir -p $out/{lib,bin}
+        ln -s /usr/lib/wsl/lib/lib* $out/lib/
+        ln -s /usr/lib/wsl/lib/nvidia-smi $out/bin/
+
+        runHook postInstall
       '';
       phases = ["installPhase"];
     };
@@ -30,6 +40,6 @@ in
     in
       mkIf (config.wsl.enable && cfg.enableNvidia) {
         virtualisation.docker.enableNvidia = true;
-        hardware.opengl.extraPackages = [(pkgs.callPackage nvidia-wsl {})];
+        hardware.opengl.extraPackages = [(pkgs.callPackage nvidia-wsl {stdenv = pkgs.stdenvNoCC;})];
       };
   }

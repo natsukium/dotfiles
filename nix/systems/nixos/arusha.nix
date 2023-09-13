@@ -15,9 +15,11 @@ in {
     inputs.nixos-wsl.nixosModules.wsl
     ../../modules/wsl/docker-enable-nvidia.nix
     ../../modules/wsl/vscode.nix
+    ../../modules/nix
+    ./common.nix
   ];
 
-  system.stateVersion = "22.11";
+  programs.nix.target.nvidia = true;
 
   users.users.${username} = {
     home = "/home/${username}";
@@ -69,7 +71,7 @@ in {
   environment.systemPackages = [pkgs.coreutils];
   services.openssh = {
     enable = true;
-    settings.passwordAuthentication = false;
+    settings.PasswordAuthentication = false;
   };
   programs.ssh.startAgent = true;
   programs.gnupg.agent = {
