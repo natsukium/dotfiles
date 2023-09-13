@@ -90,7 +90,7 @@
           system = "x86_64-linux";
           modules = [
             ./nix/homes/nixos/arusha.nix
-            ./nix/systems/nixos/arusha.nix
+            ./nix/systems/nixos/arusha
           ];
           specialArgs = {
             inherit inputs colorScheme;
