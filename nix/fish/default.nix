@@ -36,6 +36,10 @@ in {
         name = "done";
         src = pkgs.fishPlugins.done.src;
       }
+      {
+        name = "fzf-fish";
+        src = pkgs.fishPlugins.fzf-fish.src;
+      }
     ];
   };
   xdg.configFile = cfgSources [
@@ -46,8 +50,5 @@ in {
     "functions/nix-shell.fish"
     "functions/pskill.fish"
     "functions/su.fish"
-  ];
-  home.packages = with pkgs; [
-    fishPlugins.fzf-fish
   ];
 }
