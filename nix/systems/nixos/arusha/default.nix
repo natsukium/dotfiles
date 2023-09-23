@@ -35,6 +35,7 @@ in {
       enable = true;
       enableNvidia = true;
     };
+    nativeSystemd = true;
   };
   hardware.opengl = {
     enable = true;
