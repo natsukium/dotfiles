@@ -3,6 +3,7 @@
   services.tailscale = {
     enable = true;
     useRoutingFeatures = "server";
+    authKeyFile = config.sops.secrets.tailscale-authkey.path;
     extraUpFlags = [ "--ssh" ];
   };
   networking = {
@@ -16,4 +17,6 @@
     ];
     search = [ "tail4108.ts.net" ];
   };
+
+  sops.secrets.tailscale-authkey = { };
 }
