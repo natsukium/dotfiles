@@ -5,6 +5,7 @@
 }: {
   imports = [
     ../common.nix
+    ./services/tailscale
   ];
 
   system.stateVersion = "23.05";

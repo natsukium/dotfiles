@@ -26,18 +26,7 @@ in {
 
   networking = {
     hostName = "kilimanjaro";
-    firewall = {
-      trustedInterfaces = ["tailscale0"];
-      allowedUDPPorts = [config.services.tailscale.port];
     };
-  };
-
-  services.tailscale = {
-    enable = true;
-    useRoutingFeatures = "both";
-    extraUpFlags = [
-      "--ssh"
-    ];
   };
 
   nix.settings = {

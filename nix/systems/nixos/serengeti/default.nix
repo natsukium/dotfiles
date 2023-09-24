@@ -20,20 +20,8 @@ in {
     extraGroups = ["wheel"];
   };
 
-  services.tailscale = {
-    enable = true;
-    useRoutingFeatures = "server";
-    extraUpFlags = [
-      "--ssh"
-    ];
-  };
-
   networking = {
     hostName = "serengeti";
-    firewall = {
-      trustedInterfaces = ["tailscale0"];
-      allowedUDPPorts = [config.services.tailscale.port];
-    };
   };
 
   nix.settings = {
