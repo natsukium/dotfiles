@@ -28,7 +28,14 @@
 
   networking = {
     hostName = "kilimanjaro";
+    wireless = {
+      enable = true;
+      environmentFile = config.sops.secrets.wifi.path;
+      networks."82128927-5G".pskRaw = "@home@";
+    };
   };
+
+  sops.secrets.wifi = {};
 
   nix.settings = {
     max-jobs = 4;
