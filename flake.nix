@@ -28,6 +28,7 @@
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix.url = "github:Mic92/sops-nix";
     flake-utils.url = "github:numtide/flake-utils";
     nur.url = "github:nix-community/nur";
     nixbins = {

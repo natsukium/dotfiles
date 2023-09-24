@@ -9,7 +9,17 @@
     ../common.nix
     ./services/tailscale
     inputs.nur.nixosModules.nur
+    inputs.sops-nix.nixosModules.sops
   ];
+
+  sops = {
+    defaultSopsFile = ../../../secrets/default.yaml;
+    age = {
+      keyFile = "/var/lib/sops-nix/key.txt";
+      sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+      generateKey = true;
+    };
+  };
 
   system.stateVersion = "23.05";
 
