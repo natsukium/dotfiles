@@ -1,4 +1,8 @@
-{username, ...}: {
+{
+  config,
+  username,
+  ...
+}: {
   imports = [
     ../common.nix
   ];
@@ -34,7 +38,33 @@
     setSocketVariable = true;
   };
 
+  services.prometheus = {
+    enable = true;
+    port = 9001;
+    exporters = {
+      node = {
+        enable = true;
+        enabledCollectors = ["systemd"];
+        port = 9002;
+      };
+    };
+    scrapeConfigs = [
+      {
+        job_name = config.networking.hostName;
+        static_configs = [
+          {
+            targets = ["127.0.0.1:${toString config.services.prometheus.exporters.node.port}"];
+          }
+        ];
+      }
+    ];
+  };
+
   users.users.${username} = {
+    home = "/home/${username}";
+    isNormalUser = true;
+    initialPassword = "";
+    extraGroups = ["wheel"];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
     ];

@@ -23,12 +23,29 @@
         flake = false;
       };
     };
+    hyprland.url = "github:hyprwm/Hyprland";
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     flake-utils.url = "github:numtide/flake-utils";
     nur.url = "github:nix-community/nur";
     nixbins = {
       url = "github:natsukium/nixbins";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+  };
+
+  nixConfig = {
+    extra-substituters = [
+      "https://hyprland.cachix.org"
+      "https://cuda-maintainers.cachix.org"
+    ];
+
+    extra-trusted-public-keys = [
+      "hyprland.cachix.org-1:a7pgxzMz7+chwVL3/pzj6jIBMioiJM7ypFP8PwtkuGc="
+      "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
+    ];
   };
 
   outputs = {
@@ -86,6 +103,17 @@
         };
       };
       nixosConfigurations = {
+        kilimanjaro = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./nix/homes/nixos/kilimanjaro
+            ./nix/systems/nixos/kilimanjaro
+          ];
+          specialArgs = {
+            inherit inputs colorScheme;
+            username = "natsukium";
+          };
+        };
         arusha = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
           modules = [
