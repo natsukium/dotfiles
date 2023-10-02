@@ -1,6 +1,7 @@
 {
   config,
   lib,
+  pkgs,
   ...
 }:
 with lib; let
@@ -33,7 +34,9 @@ in {
             ++ lib.optionals cfg.target.nvidia [
               "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
             ];
-          trusted-users = ["root" "@wheel"];
+          trusted-users =
+            ["root" "@wheel"]
+            ++ optional pkgs.stdenv.isDarwin "@admin";
           sandbox = true;
           warn-dirty = false;
         };
