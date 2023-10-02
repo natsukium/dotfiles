@@ -15,7 +15,7 @@ in {
     users.${username} = {
       imports = [
         ../../common.nix
-        ../../desktop.nix
+        ../desktop.nix
       ];
     };
     backupFileExtension = "backup";
