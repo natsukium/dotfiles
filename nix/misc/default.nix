@@ -48,6 +48,11 @@
       ghq
       gnumake
       gnutar
+      hydra-check
+      nix-init
+      nix-output-monitor
+      nix-update
+      nixpkgs-review
       nkf
       pinentry-curses
       pipx
