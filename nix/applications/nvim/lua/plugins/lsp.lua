@@ -49,6 +49,7 @@ return {
         "bashls",
         "nil_ls",
         "pyright",
+        "rust_analyzer",
         "terraformls",
       }) do
         lspconfig[ls].setup({

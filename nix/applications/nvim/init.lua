@@ -58,7 +58,8 @@ vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
-require("lazynvim-init").setup()
+local lazypath = "@lazy_nvim@"
+vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
 	defaults = { lazy = true },
