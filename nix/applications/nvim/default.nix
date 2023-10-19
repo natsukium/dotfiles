@@ -39,11 +39,7 @@
     # terraform
     terraform-ls
   ];
-  plugins = with pkgs.vimPlugins; [
-    lazy-nvim
-    markdown-preview-nvim
-    nurpkgs.vimPlugins.vim-pydocstring
-  ];
+  plugins = import ./plugins.nix {inherit pkgs nurpkgs;};
   lazynvimInit = ''
     local M = {}
 
@@ -54,30 +50,6 @@
 
     return M
   '';
-  markdownPreviewNvim = ''
-    return {
-      {
-        dir = "${pkgs.vimPlugins.markdown-preview-nvim}",
-        ft = "markdown",
-        keys = { "<Leader>mp" },
-        config = function()
-          vim.g.mkdp_filetypes = { "markdown" }
-          vim.keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
-        end,
-      },
-    }
-  '';
-  vimPydocstring = ''
-    return {
-      {
-        dir = "${nurpkgs.vimPlugins.vim-pydocstring}",
-        ft = "python",
-        config = function()
-          vim.g.pydocstring_formatter = "google"
-        end,
-      },
-    }
-  '';
   ftdetectAstro = ''
     vim.filetype.add({
       extension = {
@@ -85,19 +57,26 @@
       }
     })
   '';
+  plugins-completion = pkgs.substituteAll ({src = ./config/lua/plugins/completion.lua;} // plugins);
+  plugins-dap = pkgs.substituteAll ({src = ./config/lua/plugins/dap.lua;} // plugins);
+  plugins-lsp = pkgs.substituteAll ({src = ./config/lua/plugins/lsp.lua;} // plugins);
+  plugins-misc = pkgs.substituteAll ({src = ./config/lua/plugins/misc.lua;} // plugins);
+  plugins-test-runner = pkgs.substituteAll ({src = ./config/lua/plugins/test_runner.lua;} // plugins);
+  plugins-ui = pkgs.substituteAll ({src = ./config/lua/plugins/ui.lua;} // plugins);
 in {
   programs.neovim = {
     enable = true;
     vimAlias = true;
     defaultEditor = true;
-    extraPackages = buildInputs ++ lsp ++ plugins;
+    extraPackages = buildInputs ++ lsp ++ pkgs.lib.attrValues plugins;
   };
-  home.file."./.config/nvim/" = {
-    source = ./config;
-    recursive = true;
-  };
+  xdg.configFile."nvim/init.lua".source = ./config/init.lua;
+  xdg.configFile."nvim/lua/plugins/completion.lua".source = plugins-completion;
+  xdg.configFile."nvim/lua/plugins/dap.lua".source = plugins-dap;
+  xdg.configFile."nvim/lua/plugins/lsp.lua".source = plugins-lsp;
+  xdg.configFile."nvim/lua/plugins/misc.lua".source = plugins-misc;
+  xdg.configFile."nvim/lua/plugins/test_runner.lua".source = plugins-test-runner;
+  xdg.configFile."nvim/lua/plugins/ui.lua".source = plugins-ui;
   xdg.configFile."nvim/lua/lazynvim-init.lua".text = lazynvimInit;
-  xdg.configFile."nvim/lua/plugins/markdown-preview-nvim.lua".text = markdownPreviewNvim;
-  xdg.configFile."nvim/lua/plugins/vim-pydocstring.lua".text = vimPydocstring;
   xdg.configFile."nvim/ftdetect/astro.lua".text = ftdetectAstro;
 }

@@ -1,6 +1,7 @@
 return {
   {
-    "shaunsingh/nord.nvim",
+    name = "nord.nvim",
+    dir = "@nord_nvim@",
     config = function()
       vim.g.nord_contrast = true
       vim.g.nord_italic = false
@@ -9,11 +10,12 @@ return {
     lazy = false,
   },
   {
-    "nvim-neo-tree/neo-tree.nvim",
+    name = "neo-tree.nvim",
+    dir = "@neo_tree_nvim@",
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-tree/nvim-web-devicons",
-      "MunifTanjim/nui.nvim",
+      { name = "nui.nvim",          dir = "@nui_nvim@" },
+      { name = "nvim-web-devicons", dir = "@nvim_web_devicons@" },
+      { name = "plenary.nvim",      dir = "@plenary_nvim@" },
     },
     cmd = { "Neotree" },
     init = function()
@@ -22,8 +24,9 @@ return {
     config = true,
   },
   {
-    "nvim-telescope/telescope.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    name = "telescope.nvim",
+    dir = "@telescope_nvim@",
+    dependencies = { name = "plenary.nvim", dir = "@plenary_nvim@" },
     cmd = "Telescope",
     keys = { "<leader>f" },
     config = function()
@@ -35,7 +38,8 @@ return {
     end,
   },
   {
-    "ggandor/flit.nvim",
+    name = "flit.nvim",
+    dir = "@flit_nvim@",
     keys = function()
       local ret = {}
       for _, key in ipairs({ "f", "f", "t", "t" }) do
@@ -46,7 +50,8 @@ return {
     opts = { labeled_modes = "nx" },
   },
   {
-    "ggandor/leap.nvim",
+    name = "leap.nvim",
+    dir = "@leap_nvim@",
     keys = {
       { "s",  mode = { "n", "x", "o" }, desc = "Leap forward to" },
       { "S",  mode = { "n", "x", "o" }, desc = "Leap backward to" },
@@ -63,9 +68,10 @@ return {
     end,
   },
   {
-    "nvim-treesitter/nvim-treesitter",
+    name = "nvim-treesitter",
+    dir = "@nvim_treesitter@",
     dependencies = {
-      "hiphish/nvim-ts-rainbow2",
+      { name = "nvim-ts-rainbow2", dir = "@nvim_ts_rainbow2@" },
       "virchau13/tree-sitter-astro",
     },
     config = function()
@@ -103,17 +109,20 @@ return {
     event = "BufRead",
   },
   {
-    "kylechui/nvim-surround",
+    name = "nvim-surround",
+    dir = "@nvim_surround@",
     config = true,
     event = "VeryLazy",
   },
   {
-    "folke/trouble.nvim",
+    name = "trouble.nvim",
+    dir = "@trouble_nvim@",
     config = true,
     cmd = "Trouble",
   },
   {
-    "folke/which-key.nvim",
+    name = "which-key.nvim",
+    dir = "@which_key_nvim@",
     config = function()
       vim.o.timeout = true
       vim.o.timeoutlen = 300
@@ -122,12 +131,14 @@ return {
     event = "VeryLazy",
   },
   {
-    "folke/todo-comments.nvim",
+    name = "todo-comments.nvim",
+    dir = "@todo_comments_nvim@",
     config = true,
     event = "BufRead",
   },
   {
-    "lewis6991/gitsigns.nvim",
+    name = "gitsigns.nvim",
+    dir = "@gitsigns_nvim@",
     config = function()
       require("gitsigns").setup({
         current_line_blame = true,
@@ -186,17 +197,19 @@ return {
     event = "BufRead",
   },
   {
-    "sindrets/diffview.nvim",
-    dependencies = { "nvim-lua/plenary.nvim" },
+    name = "diffview.nvim",
+    dir = "@diffview_nvim@",
+    dependencies = { { name = "plenary.nvim", dir = "@plenary_nvim@" } },
     config = true,
     event = "VeryLazy",
   },
   {
-    "pwntester/octo.nvim",
+    name = "octo.nvim",
+    dir = "@octo_nvim@",
     dependencies = {
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
-      "nvim-tree/nvim-web-devicons",
+      { name = "plenary.nvim",      dir = "@plenary_nvim@" },
+      { name = "telescope.nvim",    dir = "@telescope_nvim@" },
+      { name = "nvim-web-devicons", dir = "@nvim_web_devicons@" },
     },
     event = "VeryLazy",
     config = function()
@@ -206,7 +219,8 @@ return {
     end,
   },
   {
-    "lukas-reineke/indent-blankline.nvim",
+    name = "indent-blankline.nvim",
+    dir = "@indent_blankline_nvim@",
     event = "VeryLazy",
     config = function()
       require("indent_blankline").setup({
@@ -215,25 +229,29 @@ return {
     end,
   },
   {
-    "numToStr/Comment.nvim",
+    name = "Comment.nvim",
+    dir = "@comment_nvim@",
     event = "BufRead",
     config = true,
   },
   {
-    "RRethy/vim-illuminate",
+    name = "vim-illuminate",
+    dir = "@vim_illuminate@",
     event = "VeryLazy",
   },
   {
-    "stevearc/overseer.nvim",
+    name = "overseer.nvim",
+    dir = "@overseer_nvim@",
     cmd = { "OverseerRun", "OverseerToggle" },
     config = true,
   },
   {
-    "jackmort/chatgpt.nvim",
+    name = "ChatGPT.nvim",
+    dir = "@ChatGPT_nvim@",
     dependencies = {
-      "MunifTanjim/nui.nvim",
-      "nvim-lua/plenary.nvim",
-      "nvim-telescope/telescope.nvim",
+      { name = "nui.nvim",       dir = "@nui_nvim@" },
+      { name = "plenary.nvim",   dir = "@plenary_nvim@" },
+      { name = "telescope.nvim", dir = "@telescope_nvim@" },
     },
     event = "VeryLazy",
     config = function()
@@ -246,6 +264,24 @@ return {
         },
         api_key_cmd = "rbw get OPENAI_API_KEY",
       })
+    end,
+  },
+  {
+    name = "markdown-preview.nvim",
+    dir = "@markdown_preview_nvim@",
+    ft = "markdown",
+    keys = { "<Leader>mp" },
+    config = function()
+      vim.g.mkdp_filetypes = { "markdown" }
+      vim.keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
+    end,
+  },
+  {
+    name = "vim-pydocstring",
+    dir = "@vim_pydocstring@",
+    ft = "python",
+    config = function()
+      vim.g.pydocstring_formatter = "google"
     end,
   },
 }

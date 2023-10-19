@@ -1,33 +1,36 @@
 return {
-	{
-		"nvim-neotest/neotest",
-		dependencies = {
-			"nvim-lua/plenary.nvim",
-			"nvim-treesitter/nvim-treesitter",
-			"antoinemadec/FixCursorHold.nvim", --https://github.com/antoinemadec/FixCursorHold.nvim/issues/13
-		},
-		keys = { "<Leader>u" },
-		config = function()
-			require("neotest").setup({
-				adapters = {
-					require("neotest-python")({
-						dap = { justMyCode = false },
-						python = "python",
-					}),
-				},
-			})
-			vim.keymap.set("n", "<Leader>ur", ':lua require("neotest").run.run()<CR>')
-			vim.keymap.set("n", "<Leader>uf", ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>')
-			vim.keymap.set("n", "<Leader>ud", ':lua require("neotest").run.run({strategy = "dap"})<CR>')
-			vim.keymap.set("n", "<Leader>us", ':lua require("neotest").run.stop()<CR>')
-			vim.keymap.set("n", "<Leader>ua", ':lua require("neotest").run.attach()<CR>')
-		end,
-	},
-	{
-		"nvim-neotest/neotest-python",
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter",
-			"nvim-neotest/neotest",
-		},
-	},
+  {
+    name = "neotest",
+    dir = "@neotest@",
+    dependencies = {
+      --https://github.com/antoinemadec/FixCursorHold.nvim/issues/13
+      { name = "FixCursorHold.nvim", dir = "@FixCursorHold_nvim@" },
+      { name = "nvim-treesitter",    dir = "@nvim_treesitter@" },
+      { name = "plenary.nvim",       dir = "@plenary_nvim@" },
+    },
+    keys = { "<Leader>u" },
+    config = function()
+      require("neotest").setup({
+        adapters = {
+          require("neotest-python")({
+            dap = { justMyCode = false },
+            python = "python",
+          }),
+        },
+      })
+      vim.keymap.set("n", "<Leader>ur", ':lua require("neotest").run.run()<CR>')
+      vim.keymap.set("n", "<Leader>uf", ':lua require("neotest").run.run(vim.fn.expand("%"))<CR>')
+      vim.keymap.set("n", "<Leader>ud", ':lua require("neotest").run.run({strategy = "dap"})<CR>')
+      vim.keymap.set("n", "<Leader>us", ':lua require("neotest").run.stop()<CR>')
+      vim.keymap.set("n", "<Leader>ua", ':lua require("neotest").run.attach()<CR>')
+    end,
+  },
+  {
+    name = "neotest-python",
+    dir = "@neotest_python@",
+    dependencies = {
+      { name = "neotest",         dir = "@neotest@" },
+      { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
+    },
+  },
 }

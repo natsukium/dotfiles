@@ -1,6 +1,7 @@
 return {
   {
-    "mfussenegger/nvim-dap",
+    name = "nvim-dap",
+    dir = "@nvim_dap@",
     event = "VeryLazy",
     config = function()
       vim.api.nvim_set_keymap("n", "<F5>", ":DapContinue<CR>", { silent = true })
@@ -25,10 +26,9 @@ return {
     end,
   },
   {
-    "rcarriga/nvim-dap-ui",
-    dependencies = {
-      "mfussenegger/nvim-dap",
-    },
+    name = "nvim-dap-ui",
+    dir = "@nvim_dap_ui@",
+    dependencies = { { name = "nvim-dap", dir = "@nvim_dap@" } },
     event = "VeryLazy",
     config = function()
       require("dapui").setup()
@@ -45,10 +45,11 @@ return {
     end,
   },
   {
-    "theHamsta/nvim-dap-virtual-text",
+    name = "nvim-dap-virtual-text",
+    dir = "@nvim_dap_virtual_text@",
     dependencies = {
-      "mfussenegger/nvim-dap",
-      "nvim-treesitter/nvim-treesitter",
+      { name = "nvim-dap",        dir = "@nvim_dap@" },
+      { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
     },
     event = "VeryLazy",
     config = function()
@@ -56,19 +57,30 @@ return {
     end,
   },
   {
-    "mfussenegger/nvim-dap-python",
+    name = "nvim-dap-python",
+    dir = "@nvim_dap_python@",
     dependencies = {
-      "mfussenegger/nvim-dap",
-      "nvim-treesitter/nvim-treesitter",
+      { name = "nvim-dap",        dir = "@nvim_dap@" },
+      { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
     },
     ft = "python",
     config = function()
       local dap_python = require("dap-python")
       dap_python.setup("python")
       dap_python.test_runner = "pytest"
-      vim.api.nvim_set_keymap("n", "<Leader>dn", ':lua require("dap-python").test_method()<CR>', {silent = true})
-      vim.api.nvim_set_keymap("n", "<Leader>df", ':lua require("dap-python").test_class()<CR>', {silent = true})
-      vim.api.nvim_set_keymap("n", "<Leader>ds", '<Esc>:lua require("dap-python").debug_selection()<CR>', {silent = true})
+      vim.api.nvim_set_keymap(
+        "n",
+        "<Leader>dn",
+        ':lua require("dap-python").test_method()<CR>',
+        { silent = true }
+      )
+      vim.api.nvim_set_keymap("n", "<Leader>df", ':lua require("dap-python").test_class()<CR>', { silent = true })
+      vim.api.nvim_set_keymap(
+        "n",
+        "<Leader>ds",
+        '<Esc>:lua require("dap-python").debug_selection()<CR>',
+        { silent = true }
+      )
     end,
   },
 }

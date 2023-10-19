@@ -1,6 +1,7 @@
 return {
   {
-    "neovim/nvim-lspconfig",
+    name = "nvim-lspconfig",
+    dir = "@nvim_lspconfig@",
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       -- Mappings.
@@ -84,7 +85,8 @@ return {
     end,
   },
   {
-    "jose-elias-alvarez/null-ls.nvim",
+    name = "none-ls.nvim",
+    dir = "@none_ls_nvim@",
     event = { "BufReadPre", "BufNewFile" },
     config = function()
       local null_ls = require("null-ls")
@@ -104,7 +106,8 @@ return {
     end,
   },
   {
-    "glepnir/lspsaga.nvim",
+    name = "lspsaga.nvim",
+    dir = "@lspsaga_nvim@",
     event = "BufRead",
     config = true,
   },
