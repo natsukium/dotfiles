@@ -2,7 +2,7 @@
   pkgs,
   nurpkgs,
 }: let
-  normalizedPluginAttr = p: {"${builtins.replaceStrings ["-" "."] ["_" "_"] p.pname}" = p;};
+  normalizedPluginAttr = p: {"${builtins.replaceStrings ["-" "."] ["_" "_"] (pkgs.lib.toLower p.pname)}" = p;};
   plugins = p: builtins.foldl' (x: y: x // y) {} (map normalizedPluginAttr p);
 in
   with pkgs.vimPlugins;

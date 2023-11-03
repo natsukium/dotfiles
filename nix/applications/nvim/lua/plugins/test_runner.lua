@@ -4,7 +4,7 @@ return {
     dir = "@neotest@",
     dependencies = {
       --https://github.com/antoinemadec/FixCursorHold.nvim/issues/13
-      { name = "FixCursorHold.nvim", dir = "@FixCursorHold_nvim@" },
+      { name = "FixCursorHold.nvim", dir = "@fixcursorhold_nvim@" },
       { name = "nvim-treesitter",    dir = "@nvim_treesitter@" },
       { name = "plenary.nvim",       dir = "@plenary_nvim@" },
     },

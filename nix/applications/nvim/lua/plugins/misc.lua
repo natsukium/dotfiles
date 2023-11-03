@@ -256,7 +256,7 @@ return {
   },
   {
     name = "ChatGPT.nvim",
-    dir = "@ChatGPT_nvim@",
+    dir = "@chatgpt_nvim@",
     dependencies = {
       { name = "nui.nvim",       dir = "@nui_nvim@" },
       { name = "plenary.nvim",   dir = "@plenary_nvim@" },
