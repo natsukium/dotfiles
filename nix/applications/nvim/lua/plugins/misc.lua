@@ -234,11 +234,8 @@ return {
     name = "indent-blankline.nvim",
     dir = "@indent_blankline_nvim@",
     event = "VeryLazy",
-    config = function()
-      require("indent_blankline").setup({
-        space_char_blankline = " ",
-      })
-    end,
+    main = "ibl",
+    config = true,
   },
   {
     name = "Comment.nvim",
