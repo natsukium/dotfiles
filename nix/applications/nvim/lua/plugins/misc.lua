@@ -80,8 +80,7 @@ return {
     end,
   },
   {
-    name = "nvim-treesitter",
-    dir = "@nvim_treesitter@",
+    "nvim-treesitter/nvim-treesitter",
     dependencies = {
       { name = "nvim-ts-rainbow2", dir = "@nvim_ts_rainbow2@" },
       "virchau13/tree-sitter-astro",

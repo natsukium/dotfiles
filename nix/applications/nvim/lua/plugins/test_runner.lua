@@ -5,7 +5,7 @@ return {
     dependencies = {
       --https://github.com/antoinemadec/FixCursorHold.nvim/issues/13
       { name = "FixCursorHold.nvim", dir = "@fixcursorhold_nvim@" },
-      { name = "nvim-treesitter",    dir = "@nvim_treesitter@" },
+      { "nvim-treesitter/nvim-treesitter" },
       { name = "plenary.nvim",       dir = "@plenary_nvim@" },
     },
     keys = { "<Leader>u" },
@@ -30,7 +30,7 @@ return {
     dir = "@neotest_python@",
     dependencies = {
       { name = "neotest",         dir = "@neotest@" },
-      { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
+      { "nvim-treesitter/nvim-treesitter" },
     },
   },
 }

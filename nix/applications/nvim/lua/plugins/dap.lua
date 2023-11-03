@@ -49,7 +49,7 @@ return {
     dir = "@nvim_dap_virtual_text@",
     dependencies = {
       { name = "nvim-dap",        dir = "@nvim_dap@" },
-      { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
+      { "nvim-treesitter/nvim-treesitter" },
     },
     event = "VeryLazy",
     config = function()
@@ -61,7 +61,7 @@ return {
     dir = "@nvim_dap_python@",
     dependencies = {
       { name = "nvim-dap",        dir = "@nvim_dap@" },
-      { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
+      { "nvim-treesitter/nvim-treesitter" },
     },
     ft = "python",
     config = function()
