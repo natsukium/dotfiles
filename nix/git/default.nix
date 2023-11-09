@@ -36,7 +36,7 @@
         condition = "gitdir:~/src/work/";
       }
     ];
-    ignores = [".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints"];
+    ignores = [".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints" ".worktree"];
     delta = {
       enable = true;
     };
