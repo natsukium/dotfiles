@@ -5,6 +5,8 @@ in {
 
   users.users.${username}.home = "/Users/${username}";
 
+  security.pam.enableSudoTouchIdAuth = true;
+
   services.nix-daemon.enable = true;
 
   programs.gnupg.agent.enable = true;
