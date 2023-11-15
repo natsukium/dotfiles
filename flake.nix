@@ -77,31 +77,46 @@
         x64-vm = conf "gazelle";
         githubActions = conf "runner";
       };
-      darwinConfigurations = {
-        work = darwin.lib.darwinSystem {
-          system = "aarch64-darwin";
-          modules = [
-            ./nix/systems/darwin/work.nix
-            ./nix/homes/darwin/work.nix
-          ];
-          specialArgs = {
-            inherit inputs colorScheme;
-            username = "tomoya.matsumoto";
+      darwinConfigurations = let
+        conf = {
+          host,
+          username,
+          system ? "aarch64-darwin",
+        }: {
+          "${host}" = darwin.lib.darwinSystem {
+            inherit system;
+            modules = [
+              ./nix/systems/darwin/${host}.nix
+              ./nix/homes/darwin/${host}.nix
+            ];
+            specialArgs = {
+              inherit inputs colorScheme username;
+            };
           };
         };
-
-        githubActions = darwin.lib.darwinSystem {
-          system = "x86_64-darwin";
-          modules = [
-            ./nix/systems/darwin/common.nix
-            ./nix/homes/darwin/github-actions.nix
-          ];
-          specialArgs = {
-            inherit inputs colorScheme;
-            username = "runner";
+      in
+        conf {
+          host = "work";
+          username = "tomoya.matsumoto";
+        }
+        // conf {
+          # main laptop (m1 macbook air)
+          host = "katavi";
+          username = "gazelle";
+        }
+        // {
+          githubActions = darwin.lib.darwinSystem {
+            system = "x86_64-darwin";
+            modules = [
+              ./nix/systems/darwin/common.nix
+              ./nix/homes/darwin/github-actions.nix
+            ];
+            specialArgs = {
+              inherit inputs colorScheme;
+              username = "runner";
+            };
           };
         };
-      };
       nixosConfigurations = {
         kilimanjaro = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
