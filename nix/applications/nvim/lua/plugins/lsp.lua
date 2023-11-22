@@ -110,6 +110,12 @@ return {
     name = "lspsaga.nvim",
     dir = "@lspsaga_nvim@",
     event = "BufRead",
-    config = true,
+    config = function()
+      require("lspsaga").setup({
+        lightbulb = {
+          sign = false,
+        },
+      })
+    end,
   },
 }
