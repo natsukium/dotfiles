@@ -22,6 +22,9 @@ in {
       efi.canTouchEfiVariables = true;
     };
     kernelPackages = pkgs.linuxPackages_xanmod_latest;
+
+    # it is required to run `nixos-rebuild switch --target ${aarch64-linux machines}`
+    binfmt.emulatedSystems = ["aarch64-linux"];
   };
 
   networking = {
