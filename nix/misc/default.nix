@@ -42,6 +42,9 @@
       export MACHINE_STORAGE_PATH=$XDG_DATA_HOME/docker-machine
     '';
   };
+  services = {
+    pueue.enable = true;
+  };
   home.packages = with pkgs;
     [
       bitwarden-cli

@@ -17,6 +17,7 @@ in {
     nix-colors.homeManagerModule
     nur.hmModules.nur
     ../modules/base16.nix
+    ../modules/home-manager/pueue.nix
     ../applications/gh-dash
     ../applications/gitui
     ../applications/lazygit
