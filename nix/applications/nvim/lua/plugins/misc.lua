@@ -261,14 +261,19 @@ return {
       { name = "plenary.nvim",   dir = "@plenary_nvim@" },
       { name = "telescope.nvim", dir = "@telescope_nvim@" },
     },
-    event = "VeryLazy",
+    cmd = {
+      "ChatGPT",
+      "ChatGPTActAs",
+      "ChatGPTEditWithInstructions",
+      "ChatGPTRun",
+    },
     config = function()
       require("chatgpt").setup({
         openai_params = {
-          model = "gpt-4",
+          model = "gpt-4-1106-preview",
         },
         openai_edit_params = {
-          model = "gpt-4",
+          model = "gpt-4-1106-preview",
         },
         api_key_cmd = "rbw get OPENAI_API_KEY",
       })
