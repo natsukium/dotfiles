@@ -12,6 +12,7 @@ in {
   imports = [
     nix-colors.homeManagerModule
     ../modules/base16.nix
+    ../applications/gh-dash
     ../applications/gitui
     ../applications/lazygit
     ../applications/nvim
