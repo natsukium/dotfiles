@@ -3,7 +3,12 @@ return {
     name = "lualine.nvim",
     dir = "@lualine_nvim@",
     config = function()
-      require("lualine").setup({ options = { theme = "nord" } })
+      require("lualine").setup({
+        options = {
+          theme = "nord",
+          globalstatus = true,
+        },
+      })
     end,
     event = "VeryLazy",
   },
