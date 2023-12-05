@@ -195,7 +195,7 @@ return {
       { name = "telescope.nvim",    dir = "@telescope_nvim@" },
       { name = "nvim-web-devicons", dir = "@nvim_web_devicons@" },
     },
-    event = "VeryLazy",
+    cmd = { "Octo" },
     config = function()
       require("octo").setup({
         ssh_aliases = { ["github.com-emu"] = "github.com" },
