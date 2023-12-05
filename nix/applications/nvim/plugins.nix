@@ -50,6 +50,7 @@ in
       nvim-treesitter
       nvim-web-devicons
       octo-nvim
+      oil-nvim
       overseer-nvim
       plenary-nvim
       rainbow-delimiters-nvim

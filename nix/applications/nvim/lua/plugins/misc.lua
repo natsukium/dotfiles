@@ -280,4 +280,10 @@ return {
       npairs.setup({})
     end,
   },
+  {
+    name = "oil.nvim",
+    dir = "@oil_nvim@",
+    event = "syntax",
+    config = true,
+  },
 }
