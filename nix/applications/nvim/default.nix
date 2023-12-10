@@ -69,4 +69,8 @@ in {
       "./lua/plugins/test_runner.lua"
       "./lua/plugins/ui.lua"
     ];
+
+  home.packages = [
+    pkgs.neovim-remote
+  ];
 }
