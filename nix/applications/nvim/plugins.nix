@@ -38,6 +38,7 @@ in
       none-ls-nvim
       nord-nvim
       nui-nvim
+      nvim-autopairs
       nvim-cmp
       nvim-dap
       nvim-dap-python
