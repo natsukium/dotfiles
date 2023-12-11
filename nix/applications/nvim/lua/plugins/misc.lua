@@ -80,32 +80,15 @@ return {
     end,
   },
   {
-    "nvim-treesitter/nvim-treesitter",
+    name = "nvim-treesitter",
+    dir = "@nvim_treesitter@",
     dependencies = {
       { name = "nvim-ts-rainbow2", dir = "@nvim_ts_rainbow2@" },
       "virchau13/tree-sitter-astro",
     },
     config = function()
+      vim.opt.runtimepath:append("@ts_parser_dirs@")
       require("nvim-treesitter.configs").setup({
-        ensure_installed = {
-          "astro",
-          "bash",
-          "css",
-          "dockerfile",
-          "fish",
-          "lua",
-          "make",
-          "markdown",
-          "markdown_inline",
-          "nix",
-          "python",
-          "r",
-          "rust",
-          "toml",
-          "tsx",
-          "typescript",
-          "yaml",
-        },
         highlight = {
           enable = true,
         },
@@ -115,7 +98,6 @@ return {
           strategy = require("ts-rainbow").strategy.global,
         },
       })
-      require("nvim-treesitter.install").compilers = { "gcc" }
     end,
     event = "BufRead",
   },

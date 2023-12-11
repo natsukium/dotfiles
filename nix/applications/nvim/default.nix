@@ -12,7 +12,6 @@
     .repos
     .natsukium;
   buildInputs = with pkgs; [
-    gcc # for build treesitter parser
     nodejs_18
   ];
   lsp = with pkgs; [
@@ -39,6 +38,26 @@
     # terraform
     terraform-ls
   ];
+  parsers = p:
+    with p; [
+      astro
+      bash
+      css
+      dockerfile
+      fish
+      lua
+      make
+      markdown
+      markdown_inline
+      nix
+      python
+      r
+      rust
+      toml
+      tsx
+      typescript
+      yaml
+    ];
   plugins = import ./plugins.nix {inherit pkgs nurpkgs;};
   ftdetectAstro = ''
     vim.filetype.add({
@@ -47,7 +66,18 @@
       }
     })
   '';
-  configFile = file: {"nvim/${file}".source = pkgs.substituteAll ({src = ./. + "/${file}";} // plugins);};
+  configFile = file: {
+    "nvim/${file}".source = pkgs.substituteAll (
+      {
+        src = ./. + "/${file}";
+        ts_parser_dirs = pkgs.lib.pipe (pkgs.vimPlugins.nvim-treesitter.withPlugins parsers).dependencies [
+          (map toString)
+          (builtins.concatStringsSep ",")
+        ];
+      }
+      // plugins
+    );
+  };
   configFiles = files: builtins.foldl' (x: y: x // y) {} (map configFile files);
 in {
   programs.neovim = {
