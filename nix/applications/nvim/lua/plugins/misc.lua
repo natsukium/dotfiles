@@ -84,7 +84,6 @@ return {
     dir = "@nvim_treesitter@",
     dependencies = {
       { name = "nvim-ts-rainbow2", dir = "@nvim_ts_rainbow2@" },
-      "virchau13/tree-sitter-astro",
     },
     config = function()
       vim.opt.runtimepath:append("@ts_parser_dirs@")
