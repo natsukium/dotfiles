@@ -84,7 +84,7 @@ in {
     enable = true;
     vimAlias = true;
     defaultEditor = true;
-    extraPackages = buildInputs ++ lsp ++ pkgs.lib.attrValues plugins;
+    extraPackages = buildInputs ++ lsp;
   };
   xdg.configFile =
     {
