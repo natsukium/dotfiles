@@ -263,11 +263,15 @@ return {
     end,
   },
   {
-    name = "vim-pydocstring",
-    dir = "@vim_pydocstring@",
-    ft = "python",
+    name = "neogen",
+    dir = "@neogen@",
+    cmd = "Neogen",
     config = function()
-      vim.g.pydocstring_formatter = "google"
+      require("neogen").setup({
+        enable = true,
+        languages = {
+          python = { template = { annotation_convention = "google_docstrings" } } },
+      })
     end,
   },
   {

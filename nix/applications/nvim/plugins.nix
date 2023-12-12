@@ -32,6 +32,7 @@ in
       luasnip
       markdown-preview-nvim
       neo-tree-nvim
+      neogen
       neotest
       neotest-python
       noice-nvim
@@ -58,6 +59,5 @@ in
       todo-comments-nvim
       trouble-nvim
       vim-illuminate
-      # vim-pydocstring
       which-key-nvim
     ]
