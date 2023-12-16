@@ -50,6 +50,21 @@
         if config.programs.git.delta.enable
         then "delta"
         else "less";
+      keybindings = {
+        prs = [
+          {
+            key = "O";
+            command = ''
+              nvr -c ":Octo pr edit {{.PrNumber}}"
+            '';
+          }
+        ];
+      };
+      repoPaths = let
+        basePath = "${config.programs.git.extraConfig.ghq.root}/github.com";
+      in {
+        "NixOS/nixpkgs" = "${basePath}/natsukium/nixpkgs";
+      };
     };
   };
 }
