@@ -44,7 +44,6 @@
   };
   services = {
     ssh-agent.enable = pkgs.stdenv.isLinux;
-    gpg-agent.enable = pkgs.stdenv.isLinux;
   };
   home.packages = with pkgs;
     [

@@ -9,7 +9,5 @@ in {
 
   services.nix-daemon.enable = true;
 
-  programs.gnupg.agent.enable = true;
-
   nixpkgs.config.allowUnfree = true;
 }
