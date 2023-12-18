@@ -15,7 +15,6 @@ in {
   programs.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;
-    enableNvidiaPatches = true;
   };
   fonts.packages = with pkgs; [
     noto-fonts-cjk
