@@ -7,13 +7,14 @@
 }:
 let
   inherit (specialArgs) username;
-  inherit (inputs) disko;
+  inherit (inputs) disko tsnsrv;
 in
 {
   imports = [
     ../common.nix
     ./hardware-configuration.nix
     disko.nixosModules.disko
+    tsnsrv.nixosModules.default
   ];
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
@@ -38,4 +39,9 @@ in
   };
 
   environment.systemPackages = [ pkgs.coreutils ];
+
+  services.tsnsrv = {
+    enable = true;
+    defaults.authKeyPath = config.sops.secrets.tailscale-authkey.path;
+  };
 }
