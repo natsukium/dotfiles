@@ -48,11 +48,11 @@ in
       nvim-notify
       nvim-surround
       nvim-treesitter
-      nvim-ts-rainbow2
       nvim-web-devicons
       octo-nvim
       overseer-nvim
       plenary-nvim
+      rainbow-delimiters-nvim
       telescope-nvim
       todo-comments-nvim
       trouble-nvim

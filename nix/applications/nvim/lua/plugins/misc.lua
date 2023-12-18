@@ -82,23 +82,15 @@ return {
   {
     name = "nvim-treesitter",
     dir = "@nvim_treesitter@",
-    dependencies = {
-      { name = "nvim-ts-rainbow2", dir = "@nvim_ts_rainbow2@" },
-    },
     config = function()
       vim.opt.runtimepath:append("@ts_parser_dirs@")
-      require("nvim-treesitter.configs").setup({
-        highlight = {
-          enable = true,
-        },
-        rainbow = {
-          enable = true,
-          query = "rainbow-parens",
-          strategy = require("ts-rainbow").strategy.global,
-        },
-      })
     end,
     event = "BufRead",
+  },
+  {
+    name = "rainbow-delimiters.nvim",
+    dir = "@rainbow_delimiters_nvim@",
+    event = "VeryLazy",
   },
   {
     name = "nvim-surround",
