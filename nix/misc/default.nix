@@ -61,6 +61,7 @@
       pinentry-curses
       pipx
       podman
+      ranger
       ripgrep
       wget
       zstd
