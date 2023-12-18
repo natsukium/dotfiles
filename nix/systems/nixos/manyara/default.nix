@@ -12,6 +12,7 @@ in
 {
   imports = [
     ../common.nix
+    ../services/hydra
     ../services/miniflux
     ./hardware-configuration.nix
     disko.nixosModules.disko
