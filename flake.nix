@@ -151,6 +151,17 @@
             username = "gazelle";
           };
         };
+        # main server (mini pc)
+        manyara = nixpkgs.lib.nixosSystem {
+          system = "x86_64-linux";
+          modules = [
+            ./nix/systems/nixos/manyara
+          ];
+          specialArgs = {
+            inherit inputs;
+            username = "natsukium";
+          };
+        };
       };
     }
     // flake-utils.lib.eachDefaultSystem
