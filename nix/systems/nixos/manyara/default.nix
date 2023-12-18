@@ -12,6 +12,7 @@ in
 {
   imports = [
     ../common.nix
+    ../services/miniflux
     ./hardware-configuration.nix
     disko.nixosModules.disko
     tsnsrv.nixosModules.default
