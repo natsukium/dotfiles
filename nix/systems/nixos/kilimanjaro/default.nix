@@ -33,8 +33,7 @@ in {
   };
 
   nix.settings = {
-    cores = 4;
-    max-jobs = 3;
+    max-jobs = 4;
   };
 
   hardware.opengl = {
