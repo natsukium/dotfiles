@@ -15,9 +15,9 @@ fi
 if type git >/dev/null 2>&1; then
   git clone https://github.com/natsukium/dotfiles $HOME/.dotfiles
 else
-  tarball="https://github.com/natsukium/dotfiles/archive/master.tar.gz"
+  tarball="https://github.com/natsukium/dotfiles/archive/main.tar.gz"
   curl -L "$tarball" | tar xvz
-  mv -f dotfiles-master $HOME/.dotfiles
+  mv -f dotfiles-main $HOME/.dotfiles
 fi
 
 if test $REMOTE_CONTAINERS; then
