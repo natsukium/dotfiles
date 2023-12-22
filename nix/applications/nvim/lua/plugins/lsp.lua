@@ -51,7 +51,9 @@ return {
         "nil_ls",
         "pyright",
         "ruff_lsp",
+        "rubocop",
         "rust_analyzer",
+        "solargraph",
         "terraformls",
         "tsserver",
       }) do

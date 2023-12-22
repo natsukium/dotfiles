@@ -24,6 +24,9 @@ let
     # python
     nodePackages.pyright
     ruff-lsp
+    # ruby
+    solargraph
+    rubocop
     # terraform
     terraform-ls
     # typescript
@@ -46,6 +49,7 @@ let
       python
       query
       r
+      ruby
       rust
       toml
       tsx
