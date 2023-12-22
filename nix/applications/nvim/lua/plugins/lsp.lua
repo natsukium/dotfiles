@@ -51,6 +51,7 @@ return {
         "pyright",
         "rust_analyzer",
         "terraformls",
+        "tsserver",
       }) do
         lspconfig[ls].setup({
           on_attach = on_attach,

@@ -37,6 +37,8 @@
     ruff
     # terraform
     terraform-ls
+    # typescript
+    nodePackages.typescript-language-server
   ];
   parsers = p:
     with p; [
