@@ -42,9 +42,6 @@
       export MACHINE_STORAGE_PATH=$XDG_DATA_HOME/docker-machine
     '';
   };
-  services = {
-    ssh-agent.enable = pkgs.stdenv.isLinux;
-  };
   home.packages = with pkgs;
     [
       bitwarden-cli
