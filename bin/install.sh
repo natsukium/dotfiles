@@ -28,5 +28,4 @@ else
   . bin/install_nix.sh
   install_nix
   install_nix_unstable
-  install_home_manager
 fi

@@ -14,13 +14,6 @@ install_nix() {
   nix-channel --update
 }
 
-install_home_manager() {
-  nix-channel --add https://github.com/nix-community/home-manager/archive/master.tar.gz home-manager
-  nix-channel --update
-  export NIX_PATH="$HOME"/.nix-defexpr/channels${NIX_PATH:+:}"$NIX_PATH"
-  nix-shell '<home-manager>' -A install
-}
-
 uninstall_nix() {
   if [ "$(uname)" = 'Darwin' ]; then
     sudo rm -rf /etc/nix /nix ~root/.nix-profile ~root/.nix-defexpr ~root/.nix-channels ~/.nix-profile ~/.nix-defexpr ~/.nix-channels
