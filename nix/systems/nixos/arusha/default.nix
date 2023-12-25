@@ -13,7 +13,6 @@
 in {
   imports = [
     inputs.nixos-wsl.nixosModules.wsl
-    ../../../modules/wsl/docker-enable-nvidia.nix
     ../../../modules/wsl/vscode.nix
     ../../../modules/nix
     ../common.nix
@@ -31,15 +30,16 @@ in {
   wsl = {
     enable = true;
     defaultUser = "gazelle";
-    docker-native = {
-      enable = true;
-      enableNvidia = true;
-    };
     nativeSystemd = true;
   };
   hardware.opengl = {
     enable = true;
     driSupport32Bit = true;
+  };
+
+  virtualisation.docker = {
+    enable = true;
+    enableNvidia = true;
   };
 
   fonts.fonts = with pkgs; [
