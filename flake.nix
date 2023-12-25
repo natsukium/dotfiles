@@ -75,7 +75,6 @@
           };
       in {
         x64-vm = conf "gazelle";
-        githubActions = conf "runner";
       };
       darwinConfigurations = let
         conf = {
