@@ -29,7 +29,6 @@ in {
 
   networking = {
     hostName = "kilimanjaro";
-    };
   };
 
   nix.settings = {
