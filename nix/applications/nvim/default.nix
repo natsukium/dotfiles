@@ -25,6 +25,8 @@
     nodePackages.dockerfile-language-server-nodejs
     # hadolint
     docker-compose-language-service
+    # javascript
+    biome
     # lua
     lua-language-server
     stylua

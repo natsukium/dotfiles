@@ -47,6 +47,7 @@ return {
       for _, ls in pairs({
         "astro",
         "bashls",
+        "biome",
         "nil_ls",
         "pyright",
         "rust_analyzer",
