@@ -15,6 +15,11 @@
       url = "github:nix-community/nixos-wsl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-on-droid = {
+      url = "github:nix-community/nix-on-droid";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
     nix-colors = {
       url = "github:misterio77/nix-colors";
       inputs.base16-schemes = {
@@ -69,6 +74,7 @@
       nixpkgs,
       home-manager,
       darwin,
+      nix-on-droid,
       nix-colors,
       nur,
       ...
@@ -179,6 +185,19 @@
           specialArgs = {
             inherit inputs;
             username = "natsukium";
+          };
+        };
+      };
+
+      nixOnDroidConfigurations = {
+        default = nix-on-droid.lib.nixOnDroidConfiguration {
+          system = "aarch64-linux";
+          modules = [
+            ./nix/systems/nix-on-droid
+            ./nix/homes/nix-on-droid
+          ];
+          extraSpecialArgs = {
+            inherit inputs;
           };
         };
       };
