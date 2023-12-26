@@ -18,7 +18,9 @@ in {
     (mkIf (cfg.target.system or cfg.target.otherDistroUser) {
       nix = {
         settings = {
-          auto-optimise-store = true;
+          # error: cannot link '/nix/store/.tmp-link' to '/nix/store/.links/...': File exists
+          # https://github.com/NixOS/nix/issues/7273
+          auto-optimise-store = pkgs.stdenv.isLinux;
           experimental-features = ["nix-command" "flakes"];
           substituters =
             [
