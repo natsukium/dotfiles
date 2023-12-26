@@ -11,6 +11,11 @@ sh -c "$(curl -fsSL git.io/dotnatsukium)"
 . { iwr -useb git.io/winnatsukium } | iex
 ```
 
+### for nix-on-droid
+```sh
+nix-on-droid switch --flake github:natsukium/dotfiles/develop#default
+```
+
 ## Nix flake
 
 Build for macbook
