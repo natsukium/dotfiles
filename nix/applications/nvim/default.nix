@@ -46,6 +46,7 @@
     with p; [
       astro
       bash
+      c
       css
       dockerfile
       fish
@@ -55,11 +56,14 @@
       markdown_inline
       nix
       python
+      query
       r
       rust
       toml
       tsx
       typescript
+      vim
+      vimdoc
       yaml
     ];
   plugins = import ./plugins.nix {inherit pkgs nurpkgs;};
@@ -86,6 +90,9 @@
 in {
   programs.neovim = {
     enable = true;
+    package = pkgs.neovim-unwrapped.override {
+      treesitter-parsers = {};
+    };
     vimAlias = true;
     defaultEditor = true;
     extraPackages = buildInputs ++ lsp;
