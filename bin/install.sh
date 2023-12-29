@@ -25,7 +25,5 @@ if test $REMOTE_CONTAINERS; then
   make container
 else
   cd $HOME/.dotfiles
-  . bin/install_nix.sh
-  install_nix
-  install_nix_unstable
+  make install_nix
 fi
