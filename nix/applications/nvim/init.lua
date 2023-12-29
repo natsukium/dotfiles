@@ -35,7 +35,7 @@ local function float_term(cmd)
 	require("lazy.util").float_term(cmd, opts)
 end
 vim.keymap.set("n", "<Leader>gg", function()
-	float_term({ "gitui" })
+	float_term({ "lazygit" })
 end)
 
 -- buffers
