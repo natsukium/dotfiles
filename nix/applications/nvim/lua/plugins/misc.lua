@@ -288,6 +288,10 @@ return {
     name = "oil.nvim",
     dir = "@oil_nvim@",
     event = "syntax",
-    config = true,
+    config = function()
+      require("oil").setup({
+        skip_confirm_for_simple_edits = true,
+      })
+    end,
   },
 }
