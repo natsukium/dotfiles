@@ -1,15 +1,10 @@
 {
   inputs,
+  config,
   pkgs,
   ...
 }: let
-  nurpkgs =
-    (import inputs.nur {
-      inherit pkgs;
-      nurpkgs = pkgs;
-    })
-    .repos
-    .natsukium;
+  nurpkgs = config.nur.repos.natsukium;
 in {
   nixpkgs.overlays = [inputs.nur.overlay];
   programs.hyprland = {

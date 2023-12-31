@@ -1,11 +1,13 @@
 {
   config,
   username,
+  inputs,
   ...
 }: {
   imports = [
     ../common.nix
     ./services/tailscale
+    inputs.nur.nixosModules.nur
   ];
 
   system.stateVersion = "23.05";

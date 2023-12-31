@@ -1,5 +1,9 @@
-{specialArgs, ...}: let
-  inherit (specialArgs.inputs) nix-colors;
+{
+  pkgs,
+  specialArgs,
+  ...
+}: let
+  inherit (specialArgs.inputs) nix-colors nur;
 in {
   programs.home-manager.enable = true;
   home = {
@@ -11,6 +15,7 @@ in {
 
   imports = [
     nix-colors.homeManagerModule
+    nur.hmModules.nur
     ../modules/base16.nix
     ../applications/gh-dash
     ../applications/gitui

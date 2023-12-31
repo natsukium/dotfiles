@@ -1,16 +1,11 @@
 {
   pkgs,
+  config,
   specialArgs,
   ...
 }: let
-  inherit (specialArgs) inputs username;
-  nurpkgs =
-    (import inputs.nur {
-      inherit pkgs;
-      nurpkgs = pkgs;
-    })
-    .repos
-    .natsukium;
+  inherit (specialArgs) username;
+  nurpkgs = config.nur.repos.natsukium;
 in {
   imports = [
     ./common.nix

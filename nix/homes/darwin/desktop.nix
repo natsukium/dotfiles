@@ -1,16 +1,9 @@
 {
   pkgs,
-  specialArgs,
+  config,
   ...
 }: let
-  inherit (specialArgs) inputs;
-  nurpkgs =
-    (import inputs.nur {
-      inherit pkgs;
-      nurpkgs = pkgs;
-    })
-    .repos
-    .natsukium;
+  nurpkgs = config.nur.repos.natsukium;
 in {
   imports = [
     ../../applications/sketchybar

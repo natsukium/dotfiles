@@ -1,15 +1,11 @@
 {
   pkgs,
+  config,
   specialArgs,
   ...
 }: let
   inherit (specialArgs) inputs username;
-  nurpkgs =
-    (import inputs.nur {
-      inherit pkgs;
-    })
-    .repos
-    .natsukium;
+  nurpkgs = config.nur.repos.natsukium;
 in {
   imports = [
     inputs.nixos-wsl.nixosModules.wsl

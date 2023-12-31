@@ -1,16 +1,9 @@
 {
   pkgs,
-  specialArgs,
+  config,
   ...
 }: let
-  inherit (specialArgs.inputs) nur;
-  nurpkgs =
-    (import nur {
-      inherit pkgs;
-      nurpkgs = pkgs;
-    })
-    .repos
-    .natsukium;
+  nurpkgs = config.nur.repos.natsukium;
   buildInputs = with pkgs; [
     nodejs_18
   ];

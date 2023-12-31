@@ -4,9 +4,13 @@
   ...
 }: let
   inherit (pkgs) lib stdenv;
-  inherit (specialArgs) username;
+  inherit (specialArgs) username inputs;
 in {
-  imports = [../common.nix];
+  imports = [
+    # nixosModule, but it should be also available on nix-darwin
+    inputs.nur.nixosModules.nur
+    ../common.nix
+  ];
 
   users.users.${username}.home = "/Users/${username}";
 
