@@ -1,11 +1,13 @@
 {
   inputs,
+  config,
   pkgs,
   specialArgs,
   ...
 }:
 let
   inherit (specialArgs) username;
+  nurpkgs = config.nur.repos.natsukium;
 in
 {
   imports = [ inputs.home-manager.darwinModules.home-manager ];
@@ -16,8 +18,19 @@ in
     users.${username} = {
       imports = [
         ../common.nix
+        ../../modules/home-manager/colima.nix
         ../../modules/nix
       ];
+
+      programs.colima = {
+        enable = true;
+        package = nurpkgs.colima;
+        settings = {
+          cpu = 8;
+          memory = 8;
+        };
+      };
+
       programs.nix.target.user = true;
     };
     backupFileExtension = "backup";
