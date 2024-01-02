@@ -1,4 +1,15 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  inputs,
+  config,
+  ...
+}:
+let
+  wallpaper = pkgs.callPackage ../../pkgs/wallpaper {
+    wallpaper = inputs.nix-wallpaper.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    inherit (config.colorScheme) colors;
+  };
+in
 {
   imports = [
     ../../applications/hyprland
@@ -24,5 +35,10 @@
       [mode=do-not-disturb]
       invisible=1
     '';
+  };
+
+  services.wallpaper = {
+    enable = true;
+    imagePath = "${wallpaper}/share/wallpapers/nixos-wallpaper.png";
   };
 }
