@@ -49,6 +49,10 @@ in
       type = types.bool;
       default = true;
     };
+    mako = mkOption {
+      type = types.bool;
+      default = true;
+    };
     qutebrowser = mkOption {
       type = types.bool;
       default = true;
@@ -207,6 +211,26 @@ in
           color19 = "#${base02}";
           color20 = "#${base04}";
           color21 = "#${base06}";
+        };
+      })
+      (mkIf cfg.mako {
+        # https://github.com/stacyharper/base16-mako
+        services.mako = {
+          backgroundColor = "#${base00}";
+          textColor = "#${base05}";
+          borderColor = "#${base0D}";
+
+          extraConfig = ''
+            [urgency=low]
+            background-color=#${base00}
+            text-color=#${base0A}
+            border-color=#${base0D}
+
+            [urgency=high]
+            background-color=#${base00}
+            text-color=#${base08}
+            border-color=#${base0D}
+          '';
         };
       })
       (mkIf cfg.qutebrowser {
