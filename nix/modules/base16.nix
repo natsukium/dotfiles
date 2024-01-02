@@ -45,6 +45,10 @@ in
       type = types.bool;
       default = true;
     };
+    fuzzel = mkOption {
+      type = types.bool;
+      default = true;
+    };
     fzf = mkOption {
       type = types.bool;
       default = true;
@@ -199,6 +203,19 @@ in
           # clean up
           functions -e put_template put_template_var put_template_custom
         '';
+      })
+      (mkIf cfg.fuzzel {
+        programs.fuzzel.settings = {
+          colors = {
+            background = "${base00}e6";
+            text = "${base05}ff";
+            match = "${base0D}ff";
+            selection = "${base03}ff";
+            selection-text = "${base06}ff";
+            selection-match = "${base0D}ff";
+            border = "${base05}ff";
+          };
+        };
       })
       (mkIf cfg.fzf {
         programs.fzf.colors = {

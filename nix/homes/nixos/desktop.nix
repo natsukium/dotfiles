@@ -21,7 +21,13 @@ in
     fcitx5.addons = with pkgs; [ fcitx5-mozc ];
   };
 
-  home.packages = [ pkgs.wofi ];
+  programs.fuzzel = {
+    enable = true;
+    settings = {
+      main.terminal = "kitty";
+      main.width = 50;
+    };
+  };
 
   gtk = {
     enable = true;

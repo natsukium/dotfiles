@@ -119,7 +119,7 @@ in
       bind = $mainMod, M, exit,
       bind = $mainMod, E, exec, dolphin
       bind = $mainMod, V, togglefloating,
-      bind = $mainMod, R, exec, wofi --show drun
+      bind = $mainMod, R, exec, fuzzel
       bind = $mainMod, P, pseudo, # dwindle
       bind = $mainMod, J, togglesplit, # dwindle
 
