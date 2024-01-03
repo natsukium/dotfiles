@@ -16,6 +16,7 @@ in
     nur.hmModules.nur
     ../modules/base16.nix
     ../modules/home-manager/pueue.nix
+    ../modules/home-manager/xdg
     ../applications/gh-dash
     ../applications/gitui
     ../applications/lazygit
@@ -28,7 +29,6 @@ in
     ../ghq
     ../git
     ../nix
-    ../python
     ../starship
     ../tmux
     ../vim
