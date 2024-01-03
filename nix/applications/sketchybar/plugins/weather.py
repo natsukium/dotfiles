@@ -2,7 +2,7 @@ import urllib.request
 
 from sketchybarrc import IconProps, ItemProps, LabelProps, SketchyBar
 
-URL = "https://wttr.in?format=%c+%t+%w+%p"
+URL = "https://wttr.in?M&format=%c+%t+%w+%p"
 
 
 if __name__ == "__main__":
