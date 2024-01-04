@@ -1,9 +1,9 @@
 {
+  inputs,
   pkgs,
-  specialArgs,
   ...
 }: let
-  inherit (specialArgs.inputs) nixbins;
+  inherit (inputs) nixbins;
   bins = import nixbins {inherit pkgs;};
 in {
   home.packages =

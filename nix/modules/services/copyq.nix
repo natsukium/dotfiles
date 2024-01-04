@@ -1,12 +1,12 @@
 {
+  inputs,
   config,
   lib,
   pkgs,
-  specialArgs,
   ...
 }:
 with lib; let
-  inherit (specialArgs.inputs) nixbins;
+  inherit (inputs) nixbins;
   bins = nixbins.packages.${pkgs.stdenv.system};
   cfg = config.services.copyq;
 in {

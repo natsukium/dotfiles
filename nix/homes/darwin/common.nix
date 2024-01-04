@@ -1,9 +1,10 @@
 {
+  inputs,
   pkgs,
   specialArgs,
   ...
 }: let
-  inherit (specialArgs) inputs username;
+  inherit (specialArgs) username;
 in {
   imports = [
     inputs.home-manager.darwinModules.home-manager

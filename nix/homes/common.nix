@@ -1,9 +1,9 @@
 {
+  inputs,
   pkgs,
-  specialArgs,
   ...
 }: let
-  inherit (specialArgs.inputs) nix-colors nur;
+  inherit (inputs) nix-colors nur;
 in {
   programs.home-manager.enable = true;
   home = {

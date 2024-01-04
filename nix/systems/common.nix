@@ -1,10 +1,10 @@
 {
+  inputs,
   lib,
   pkgs,
-  specialArgs,
   ...
 }: let
-  inherit (specialArgs.inputs) neovim-nightly-overlay;
+  inherit (inputs) neovim-nightly-overlay;
 in {
   imports = [
     ../modules/nix

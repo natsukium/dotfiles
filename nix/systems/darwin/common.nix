@@ -1,10 +1,11 @@
 {
+  inputs,
   pkgs,
   specialArgs,
   ...
 }: let
   inherit (pkgs) lib stdenv;
-  inherit (specialArgs) username inputs;
+  inherit (specialArgs) username;
 in {
   imports = [
     # nixosModule, but it should be also available on nix-darwin

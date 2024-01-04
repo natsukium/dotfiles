@@ -1,10 +1,11 @@
 {
+  inputs,
   config,
   pkgs,
   specialArgs,
   ...
 }: let
-  inherit (specialArgs) inputs username;
+  inherit (specialArgs) username;
   inherit (inputs) disko;
 in {
   imports = [

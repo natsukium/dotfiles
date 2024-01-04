@@ -1,9 +1,9 @@
 {
+  inputs,
   pkgs,
-  specialArgs,
   ...
 }: let
-  inherit (specialArgs.inputs) hyprland;
+  inherit (inputs) hyprland;
 in {
   imports = [
     hyprland.homeManagerModules.default

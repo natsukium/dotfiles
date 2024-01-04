@@ -1,11 +1,9 @@
 {
+  inputs,
   config,
   pkgs,
-  specialArgs,
   ...
-}: let
-  inherit (specialArgs) inputs;
-in {
+}: {
   imports = [
     ../../../modules/nix
     ../common.nix

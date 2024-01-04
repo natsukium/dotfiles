@@ -1,9 +1,9 @@
 {
+  inputs,
   pkgs,
-  specialArgs,
   ...
 }: let
-  inherit (specialArgs.inputs) nixbins;
+  inherit (inputs) nixbins;
   bins = nixbins.packages.${pkgs.stdenv.system};
 in {
   programs.qutebrowser = {
