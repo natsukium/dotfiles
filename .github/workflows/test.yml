@@ -27,10 +27,6 @@ jobs:
           name: natsukium
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: Update flake
-        if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
-        run: |
-          nix flake update
       - name: Create /run for darwin
         if: matrix.os == 'macOS-latest'
         run: |
@@ -42,9 +38,3 @@ jobs:
       - name: setup
         run: |
           sh -c "$(cat bin/install.sh)" CI
-      - name: Push updated flake.lock
-        if: ${{ (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch') && matrix.os == 'macOS-latest' && success()}}
-        run: |
-          git add flake.lock
-          git commit --no-gpg-sign -m "chore(flake.lock): update by GitHub Actions"
-          git push
