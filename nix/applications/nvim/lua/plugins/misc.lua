@@ -125,6 +125,8 @@ return {
     dir = "@gitsigns_nvim@",
     config = function()
       require("gitsigns").setup({
+        signcolumn = false,
+        numhl = true,
         current_line_blame = true,
         on_attach = function(bufnr)
           local gs = package.loaded.gitsigns
