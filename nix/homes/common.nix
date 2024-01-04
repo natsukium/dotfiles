@@ -10,7 +10,7 @@ in {
     stateVersion = "22.11";
   };
 
-  inherit (specialArgs) colorScheme;
+  colorScheme = nix-colors.colorSchemes.nord;
   base16.enable = true;
 
   imports = [

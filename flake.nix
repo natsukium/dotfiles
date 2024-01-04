@@ -58,9 +58,7 @@
     nix-colors,
     flake-utils,
     ...
-  } @ inputs: let
-    colorScheme = nix-colors.colorSchemes.nord;
-  in
+  } @ inputs:
     {
       homeConfigurations = let
         conf = username:
@@ -72,7 +70,7 @@
               ./nix/homes/non-nixos/common.nix
             ];
             extraSpecialArgs = {
-              inherit inputs colorScheme;
+              inherit inputs;
               username = username;
             };
           };
@@ -92,7 +90,7 @@
               ./nix/homes/darwin/${host}.nix
             ];
             specialArgs = {
-              inherit inputs colorScheme username;
+              inherit inputs username;
             };
           };
         };
@@ -114,7 +112,7 @@
               ./nix/homes/darwin/github-actions.nix
             ];
             specialArgs = {
-              inherit inputs colorScheme;
+              inherit inputs;
               username = "runner";
             };
           };
@@ -127,7 +125,7 @@
             ./nix/systems/nixos/kilimanjaro
           ];
           specialArgs = {
-            inherit inputs colorScheme;
+            inherit inputs;
             username = "natsukium";
           };
         };
@@ -138,7 +136,7 @@
             ./nix/systems/nixos/arusha
           ];
           specialArgs = {
-            inherit inputs colorScheme;
+            inherit inputs;
             username = "gazelle";
           };
         };
@@ -149,7 +147,7 @@
             ./nix/systems/nixos/serengeti
           ];
           specialArgs = {
-            inherit inputs colorScheme;
+            inherit inputs;
             username = "gazelle";
           };
         };
