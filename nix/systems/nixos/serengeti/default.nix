@@ -1,10 +1,8 @@
-{
-  config,
-  specialArgs,
-  ...
-}: let
+{ config, specialArgs, ... }:
+let
   inherit (specialArgs) username;
-in {
+in
+{
   imports = [
     ./hardware-configuration.nix
     ../common.nix
@@ -17,7 +15,7 @@ in {
     home = "/home/${username}";
     isNormalUser = true;
     initialPassword = "";
-    extraGroups = ["wheel"];
+    extraGroups = [ "wheel" ];
   };
 
   networking = {

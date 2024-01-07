@@ -1,3 +1,1 @@
-{pkgs, ...}: {
-  xdg.configFile."alacritty/alacritty.yml".source = ./alacritty.yml;
-}
+{ pkgs, ... }: { xdg.configFile."alacritty/alacritty.yml".source = ./alacritty.yml; }

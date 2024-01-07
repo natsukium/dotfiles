@@ -1,4 +1,5 @@
-{...}: {
+{ ... }:
+{
   services.yabai = {
     enable = true;
     enableScriptingAddition = true;
@@ -11,7 +12,7 @@
       "window_gap" = 10;
       "layout" = "bsp";
       "window_opacity" = "on";
-      "window_animation_duration" = 0.05;
+      "window_animation_duration" = 5.0e-2;
     };
     extraConfig = ''
       yabai -m rule --add app=CopyQ manage=off

@@ -1,10 +1,14 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   cfgSource = path: {
     name = "fish/" + path;
-    value = {source = ./. + "/${path}";};
+    value = {
+      source = ./. + "/${path}";
+    };
   };
   cfgSources = paths: builtins.listToAttrs (map cfgSource paths);
-in {
+in
+{
   programs.fish = {
     enable = true;
     shellInit = pkgs.lib.mkIf pkgs.stdenv.isDarwin ''

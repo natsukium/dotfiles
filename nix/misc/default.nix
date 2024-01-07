@@ -1,11 +1,9 @@
-{
-  pkgs,
-  config,
-  ...
-}: let
+{ pkgs, config, ... }:
+let
   nurpkgs = config.nur.repos.natsukium;
-in {
-  imports = [../modules/pdm.nix];
+in
+{
+  imports = [ ../modules/pdm.nix ];
   programs = {
     direnv = {
       enable = true;
@@ -51,7 +49,8 @@ in {
   services = {
     pueue.enable = true;
   };
-  home.packages = with pkgs;
+  home.packages =
+    with pkgs;
     [
       bitwarden-cli
       bottom

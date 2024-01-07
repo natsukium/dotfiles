@@ -1,11 +1,7 @@
-{
-  lib,
-  config,
-  ...
-}:
-with lib; let
-  inherit
-    (config.colorScheme.colors)
+{ lib, config, ... }:
+with lib;
+let
+  inherit (config.colorScheme.colors)
     base00
     base01
     base02
@@ -23,10 +19,18 @@ with lib; let
     base0E
     base0F
     ;
-  splitRGB = with builtins; s: map (x: substring x 2 s) [0 2 4];
+  splitRGB =
+    with builtins;
+    s:
+    map (x: substring x 2 s) [
+      0
+      2
+      4
+    ];
   shellRGB = color: concatStringsSep "/" (splitRGB color);
   cfg = config.base16;
-in {
+in
+{
   options.base16 = {
     enable = mkEnableOption "";
     bat = mkOption {
@@ -50,11 +54,10 @@ in {
       default = true;
     };
   };
-  config = mkIf cfg.enable (mkMerge [
-    (mkIf cfg.bat {programs.bat.config.theme = "base16-256";})
-    (
-      mkIf cfg.fish
-      {
+  config = mkIf cfg.enable (
+    mkMerge [
+      (mkIf cfg.bat { programs.bat.config.theme = "base16-256"; })
+      (mkIf cfg.fish {
         programs.fish.interactiveShellInit = ''
           if test -n "$TMUX"
             # Tell tmux to pass the escape sequences through
@@ -144,11 +147,8 @@ in {
           # clean up
           functions -e put_template put_template_var put_template_custom
         '';
-      }
-    )
-    (
-      mkIf cfg.fzf
-      {
+      })
+      (mkIf cfg.fzf {
         programs.fzf.colors = {
           bg = "#${base00}";
           "bg+" = "#${base01}";
@@ -163,11 +163,8 @@ in {
           marker = "#${base0C}";
           prompt = "#${base0A}";
         };
-      }
-    )
-    (
-      mkIf cfg.kitty
-      {
+      })
+      (mkIf cfg.kitty {
         programs.kitty.settings = {
           background = "#${base00}";
           foreground = "#${base05}";
@@ -211,10 +208,8 @@ in {
           color20 = "#${base04}";
           color21 = "#${base06}";
         };
-      }
-    )
-    (mkIf cfg.qutebrowser
-      {
+      })
+      (mkIf cfg.qutebrowser {
         programs.qutebrowser.settings = {
           colors = {
             completion = {
@@ -400,5 +395,6 @@ in {
           };
         };
       })
-  ]);
+    ]
+  );
 }

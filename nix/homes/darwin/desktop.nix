@@ -1,10 +1,8 @@
-{
-  pkgs,
-  config,
-  ...
-}: let
+{ pkgs, config, ... }:
+let
   nurpkgs = config.nur.repos.natsukium;
-in {
+in
+{
   imports = [
     ../../applications/sketchybar
     ../desktop.nix

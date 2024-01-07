@@ -1,4 +1,5 @@
-{pkgs, ...}: let
+{ pkgs, ... }:
+let
   tmux-prefix = "ctrl+j";
   tmux-compat-keybindings = {
     "${tmux-prefix}>c" = "new_tab";
@@ -12,17 +13,15 @@
     "${tmux-prefix}>k" = "move_window up";
     "${tmux-prefix}>l" = "move_window right";
   };
-in {
+in
+{
   programs = {
     kitty = {
       enable = true;
       settings = {
         "font_family" = "Liga HackGen Console NF";
         "font_size" = 14;
-        "hide_window_decorations" =
-          if pkgs.stdenv.isLinux
-          then "yes"
-          else "titlebar-only";
+        "hide_window_decorations" = if pkgs.stdenv.isLinux then "yes" else "titlebar-only";
         "tab_bar_edge" = "top";
         "tab_bar_style" = "powerline";
         "scrollback_pager_history_size" = 50;
@@ -31,10 +30,8 @@ in {
         "macos_option_as_alt" = "yes";
         "confirm_os_window_close" = 0;
       };
-      keybindings = {} // tmux-compat-keybindings;
-      darwinLaunchOptions = [
-        "-o allow_remote_control=yes"
-      ];
+      keybindings = { } // tmux-compat-keybindings;
+      darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
     };
   };
 

@@ -1,11 +1,8 @@
+{ pkgs, config, ... }:
 {
-  pkgs,
-  config,
-  ...
-}: {
   programs.gpg.enable = true;
 
-  imports = [./../modules/git-scalar.nix];
+  imports = [ ./../modules/git-scalar.nix ];
 
   programs.git = {
     enable = true;
@@ -36,13 +33,19 @@
         condition = "gitdir:~/src/work/";
       }
     ];
-    ignores = [".DS_Store" ".vscode/" "__pycache__/" ".ipynb_checkpoints" ".worktree"];
+    ignores = [
+      ".DS_Store"
+      ".vscode/"
+      "__pycache__/"
+      ".ipynb_checkpoints"
+      ".worktree"
+    ];
     delta = {
       enable = true;
     };
     scalar = {
       enable = true;
-      repo = ["~/src/private/github.com/natsukium/nixpkgs"];
+      repo = [ "~/src/private/github.com/natsukium/nixpkgs" ];
     };
   };
 

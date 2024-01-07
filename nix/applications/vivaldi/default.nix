@@ -1,15 +1,10 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: let
+{ inputs, pkgs, ... }:
+let
   inherit (inputs) nixbins;
-  bins = import nixbins {inherit pkgs;};
-in {
-  home.packages =
-    if pkgs.stdenv.isLinux
-    then [pkgs.vivaldi]
-    else [bins.vivaldi];
+  bins = import nixbins { inherit pkgs; };
+in
+{
+  home.packages = if pkgs.stdenv.isLinux then [ pkgs.vivaldi ] else [ bins.vivaldi ];
 
   xdg.configFile."vivaldi/mod.css".text = ''
     #header {

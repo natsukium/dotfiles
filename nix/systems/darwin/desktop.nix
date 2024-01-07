@@ -1,10 +1,8 @@
-{
-  pkgs,
-  config,
-  ...
-}: let
+{ pkgs, config, ... }:
+let
   nurpkgs = config.nur.repos.natsukium;
-in {
+in
+{
   imports = [
     ../../applications/yabai
     ../../applications/skhd
@@ -50,12 +48,10 @@ in {
   };
   fonts = {
     fontDir.enable = true;
-    fonts = [nurpkgs.liga-hackgen-nf-font];
+    fonts = [ nurpkgs.liga-hackgen-nf-font ];
   };
 
-  homebrew.casks = [
-    "google-japanese-ime"
-  ];
+  homebrew.casks = [ "google-japanese-ime" ];
 
   services.sketchybar.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;

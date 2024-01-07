@@ -3,12 +3,12 @@
   pkgs,
   specialArgs,
   ...
-}: let
+}:
+let
   inherit (specialArgs) username;
-in {
-  imports = [
-    inputs.home-manager.darwinModules.home-manager
-  ];
+in
+{
+  imports = [ inputs.home-manager.darwinModules.home-manager ];
 
   home-manager = {
     useGlobalPkgs = true;

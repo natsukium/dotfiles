@@ -1,4 +1,5 @@
-{pkgs, ...}: {
+{ pkgs, ... }:
+{
   xdg.configFile."python/pythonstartup".source = ./pythonstartup;
   programs.bash.profileExtra = ''
     export PYTHONSTARTUP=$XDG_CONFIG_HOME/python/pythonstartup

@@ -3,10 +3,12 @@
   pkgs,
   specialArgs,
   ...
-}: let
+}:
+let
   inherit (pkgs) lib stdenv;
   inherit (specialArgs) username;
-in {
+in
+{
   imports = [
     # nixosModule, but it should be also available on nix-darwin
     inputs.nur.nixosModules.nur

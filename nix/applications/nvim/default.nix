@@ -1,12 +1,7 @@
-{
-  pkgs,
-  config,
-  ...
-}: let
+{ pkgs, config, ... }:
+let
   nurpkgs = config.nur.repos.natsukium;
-  buildInputs = with pkgs; [
-    nodejs_18
-  ];
+  buildInputs = with pkgs; [ nodejs_18 ];
   lsp = with pkgs; [
     # astro
     nodePackages."@astrojs/language-server"
@@ -35,7 +30,8 @@
     # typescript
     nodePackages.typescript-language-server
   ];
-  parsers = p:
+  parsers =
+    p:
     with p; [
       astro
       bash
@@ -59,7 +55,7 @@
       vimdoc
       yaml
     ];
-  plugins = import ./plugins.nix {inherit pkgs nurpkgs;};
+  plugins = import ./plugins.nix { inherit pkgs nurpkgs; };
   ftdetectAstro = ''
     vim.filetype.add({
       extension = {
@@ -79,13 +75,12 @@
       // plugins
     );
   };
-  configFiles = files: builtins.foldl' (x: y: x // y) {} (map configFile files);
-in {
+  configFiles = files: builtins.foldl' (x: y: x // y) { } (map configFile files);
+in
+{
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-unwrapped.override {
-      treesitter-parsers = {};
-    };
+    package = pkgs.neovim-unwrapped.override { treesitter-parsers = { }; };
     vimAlias = true;
     defaultEditor = true;
     extraPackages = buildInputs ++ lsp;
@@ -104,7 +99,5 @@ in {
       "./lua/plugins/ui.lua"
     ];
 
-  home.packages = [
-    pkgs.neovim-remote
-  ];
+  home.packages = [ pkgs.neovim-remote ];
 }

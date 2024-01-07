@@ -1,10 +1,8 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: let
+{ inputs, pkgs, ... }:
+let
   inherit (inputs) nix-colors nur;
-in {
+in
+{
   programs.home-manager.enable = true;
   home = {
     stateVersion = "22.11";

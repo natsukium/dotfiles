@@ -4,10 +4,12 @@
   pkgs,
   ...
 }:
-with lib; let
+with lib;
+let
   cfg = config.programs.pdm;
-  tomlFormat = pkgs.formats.toml {};
-in {
+  tomlFormat = pkgs.formats.toml { };
+in
+{
   options.programs.pdm = {
     enable = mkEnableOption ''
       A modern Python package manager with PEP 582 support
@@ -29,7 +31,7 @@ in {
     };
     settings = mkOption {
       type = tomlFormat.type;
-      default = {};
+      default = { };
       description = ''
         Configuration written to
         <filename>$XDG_CONFIG_HOME/pdm/config.toml</filename> on Linux or
@@ -46,25 +48,31 @@ in {
     };
   };
 
-  config = let
-    settings = cfg.settings // optionalAttrs (cfg.enablePEP582) {python.use_venv = false;};
-  in
-    mkIf cfg.enable (mkMerge [
-      {
-        home.packages = [cfg.package];
-        home.sessionVariables = mkIf cfg.enablePEP582 {
-          PYTHONPATH = "${pkgs.pdm}/${pkgs.python3.sitePackages}/pdm/pep582";
-        };
-      }
-
-      (
-        mkIf (settings != {})
+  config =
+    let
+      settings = cfg.settings // optionalAttrs (cfg.enablePEP582) { python.use_venv = false; };
+    in
+    mkIf cfg.enable (
+      mkMerge [
         {
-          xdg.configFile."pdm/config.toml".source = tomlFormat.generate "config.toml" settings;
-          programs.bash.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";};
-          programs.zsh.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";};
-          programs.fish.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";};
+          home.packages = [ cfg.package ];
+          home.sessionVariables = mkIf cfg.enablePEP582 {
+            PYTHONPATH = "${pkgs.pdm}/${pkgs.python3.sitePackages}/pdm/pep582";
+          };
         }
-      )
-    ]);
+
+        (mkIf (settings != { }) {
+          xdg.configFile."pdm/config.toml".source = tomlFormat.generate "config.toml" settings;
+          programs.bash.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {
+            pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";
+          };
+          programs.zsh.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {
+            pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";
+          };
+          programs.fish.shellAliases = optionalAttrs (pkgs.stdenv.isDarwin) {
+            pdm = "pdm -c ${config.xdg.configFile."pdm/config.toml".source}";
+          };
+        })
+      ]
+    );
 }

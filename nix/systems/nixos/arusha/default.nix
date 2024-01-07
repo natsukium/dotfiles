@@ -4,10 +4,12 @@
   config,
   specialArgs,
   ...
-}: let
+}:
+let
   inherit (specialArgs) username;
   nurpkgs = config.nur.repos.natsukium;
-in {
+in
+{
   imports = [
     inputs.nixos-wsl.nixosModules.wsl
     ../../../modules/wsl/vscode.nix
@@ -45,7 +47,7 @@ in {
     nurpkgs.liga-hackgen-nf-font
   ];
 
-  environment.systemPackages = [pkgs.coreutils];
+  environment.systemPackages = [ pkgs.coreutils ];
 
   vscode-wsl.enable = true;
 }

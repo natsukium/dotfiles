@@ -3,12 +3,12 @@
   pkgs,
   specialArgs,
   ...
-}: let
+}:
+let
   inherit (specialArgs) username;
-in {
-  imports = [
-    inputs.home-manager.nixosModules.home-manager
-  ];
+in
+{
+  imports = [ inputs.home-manager.nixosModules.home-manager ];
 
   home-manager = {
     useGlobalPkgs = true;
@@ -19,7 +19,7 @@ in {
         ../../modules/nix
       ];
       programs.nix.target.user = true;
-      home.packages = [pkgs.wslu];
+      home.packages = [ pkgs.wslu ];
       programs.bash.profileExtra = ''
         export WIN_HOME=$(wslpath $(wslvar USERPROFILE))
       '';

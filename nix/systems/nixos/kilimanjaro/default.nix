@@ -3,7 +3,8 @@
   config,
   pkgs,
   ...
-}: {
+}:
+{
   imports = [
     ../../../modules/nix
     ../common.nix
@@ -12,7 +13,7 @@
     inputs.disko.nixosModules.disko
   ];
 
-  inherit (pkgs.callPackage ./disko-config.nix {disks = ["/dev/nvme1n1"];}) disko;
+  inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme1n1" ]; }) disko;
 
   boot = {
     loader = {
@@ -22,7 +23,7 @@
     kernelPackages = pkgs.linuxPackages_xanmod_latest;
 
     # it is required to run `nixos-rebuild switch --target ${aarch64-linux machines}`
-    binfmt.emulatedSystems = ["aarch64-linux"];
+    binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
   networking = {
@@ -39,7 +40,7 @@
     driSupport32Bit = true;
   };
 
-  services.xserver.videoDrivers = ["nvidia"];
+  services.xserver.videoDrivers = [ "nvidia" ];
 
   hardware.nvidia = {
     modesetting.enable = true;

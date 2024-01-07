@@ -1,6 +1,8 @@
-{specialArgs, ...}: let
+{ specialArgs, ... }:
+let
   inherit (specialArgs) username;
-in {
+in
+{
   imports = [
     ../common.nix
     ../../modules/nix

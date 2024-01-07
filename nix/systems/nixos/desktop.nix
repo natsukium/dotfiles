@@ -3,10 +3,12 @@
   config,
   pkgs,
   ...
-}: let
+}:
+let
   nurpkgs = config.nur.repos.natsukium;
-in {
-  nixpkgs.overlays = [inputs.nur.overlay];
+in
+{
+  nixpkgs.overlays = [ inputs.nur.overlay ];
   programs.hyprland = {
     enable = true;
     package = inputs.hyprland.packages.${pkgs.system}.hyprland;

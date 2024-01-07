@@ -1,13 +1,9 @@
-{
-  inputs,
-  pkgs,
-  ...
-}: let
+{ inputs, pkgs, ... }:
+let
   inherit (inputs) hyprland;
-in {
-  imports = [
-    hyprland.homeManagerModules.default
-  ];
+in
+{
+  imports = [ hyprland.homeManagerModules.default ];
   wayland.windowManager.hyprland = {
     enable = true;
     extraConfig = ''
@@ -167,5 +163,7 @@ in {
     '';
   };
   # needs to render cursor with nvidia
-  home.sessionVariables = {WLR_NO_HARDWARE_CURSORS = 1;};
+  home.sessionVariables = {
+    WLR_NO_HARDWARE_CURSORS = 1;
+  };
 }

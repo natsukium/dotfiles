@@ -3,7 +3,8 @@
   username,
   inputs,
   ...
-}: {
+}:
+{
   imports = [
     ../common.nix
     ./services/tailscale
@@ -47,7 +48,7 @@
     exporters = {
       node = {
         enable = true;
-        enabledCollectors = ["systemd"];
+        enabledCollectors = [ "systemd" ];
         port = 9002;
       };
     };
@@ -55,9 +56,7 @@
       {
         job_name = config.networking.hostName;
         static_configs = [
-          {
-            targets = ["127.0.0.1:${toString config.services.prometheus.exporters.node.port}"];
-          }
+          { targets = [ "127.0.0.1:${toString config.services.prometheus.exporters.node.port}" ]; }
         ];
       }
     ];
@@ -67,7 +66,7 @@
     home = "/home/${username}";
     isNormalUser = true;
     initialPassword = "";
-    extraGroups = ["wheel"];
+    extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
     ];

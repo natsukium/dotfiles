@@ -51,51 +51,54 @@
     ];
   };
 
-  outputs = {
-    nixpkgs,
-    home-manager,
-    darwin,
-    nix-colors,
-    flake-utils,
-    nur,
-    ...
-  } @ inputs:
+  outputs =
     {
-      homeConfigurations = let
-        conf = username:
-          home-manager.lib.homeManagerConfiguration {
-            pkgs = import nixpkgs {
-              system = "x86_64-linux";
+      nixpkgs,
+      home-manager,
+      darwin,
+      nix-colors,
+      flake-utils,
+      nur,
+      ...
+    }@inputs:
+    {
+      homeConfigurations =
+        let
+          conf =
+            username:
+            home-manager.lib.homeManagerConfiguration {
+              pkgs = import nixpkgs { system = "x86_64-linux"; };
+              modules = [ ./nix/homes/non-nixos/common.nix ];
+              extraSpecialArgs = {
+                inherit inputs;
+                username = username;
+              };
             };
-            modules = [
-              ./nix/homes/non-nixos/common.nix
-            ];
-            extraSpecialArgs = {
-              inherit inputs;
-              username = username;
-            };
-          };
-      in {
-        x64-vm = conf "gazelle";
-      };
-      darwinConfigurations = let
-        conf = {
-          host,
-          username,
-          system ? "aarch64-darwin",
-        }: {
-          "${host}" = darwin.lib.darwinSystem {
-            inherit system;
-            modules = [
-              ./nix/systems/darwin/${host}.nix
-              ./nix/homes/darwin/${host}.nix
-            ];
-            specialArgs = {
-              inherit inputs username;
-            };
-          };
+        in
+        {
+          x64-vm = conf "gazelle";
         };
-      in
+      darwinConfigurations =
+        let
+          conf =
+            {
+              host,
+              username,
+              system ? "aarch64-darwin",
+            }:
+            {
+              "${host}" = darwin.lib.darwinSystem {
+                inherit system;
+                modules = [
+                  ./nix/systems/darwin/${host}.nix
+                  ./nix/homes/darwin/${host}.nix
+                ];
+                specialArgs = {
+                  inherit inputs username;
+                };
+              };
+            };
+        in
         conf {
           host = "work";
           username = "tomoya.matsumoto";
@@ -155,9 +158,7 @@
         # main server (mini pc)
         manyara = nixpkgs.lib.nixosSystem {
           system = "x86_64-linux";
-          modules = [
-            ./nix/systems/nixos/manyara
-          ];
+          modules = [ ./nix/systems/nixos/manyara ];
           specialArgs = {
             inherit inputs;
             username = "natsukium";
@@ -165,23 +166,34 @@
         };
       };
     }
-    // flake-utils.lib.eachDefaultSystem
-    (system: let
-      pkgs = nixpkgs.legacyPackages.${system};
-      nurpkgs = import nur {
-        inherit pkgs;
-        nurpkgs = import nixpkgs {inherit system;};
-      };
-    in {
-      devShell = let
-        sketchybarrc = pkgs.python3Packages.callPackage ./nix/pkgs/sketchybarrc-py {};
-        python-env = pkgs.python3.withPackages (ps: [sketchybarrc]);
-      in
-        pkgs.mkShell
-        {
-          nativeBuildInputs = with pkgs; [checkbashisms nurpkgs.repos.natsukium.nixfmt rnix-lsp shellcheck shfmt python-env sops ssh-to-age];
-          shellHook = ''
-          '';
+    // flake-utils.lib.eachDefaultSystem (
+      system:
+      let
+        pkgs = nixpkgs.legacyPackages.${system};
+        nurpkgs = import nur {
+          inherit pkgs;
+          nurpkgs = import nixpkgs { inherit system; };
         };
-    });
+      in
+      {
+        devShell =
+          let
+            sketchybarrc = pkgs.python3Packages.callPackage ./nix/pkgs/sketchybarrc-py { };
+            python-env = pkgs.python3.withPackages (ps: [ sketchybarrc ]);
+          in
+          pkgs.mkShell {
+            nativeBuildInputs = with pkgs; [
+              checkbashisms
+              nurpkgs.repos.natsukium.nixfmt
+              rnix-lsp
+              shellcheck
+              shfmt
+              python-env
+              sops
+              ssh-to-age
+            ];
+            shellHook = "";
+          };
+      }
+    );
 }

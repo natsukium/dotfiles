@@ -1,3 +1,1 @@
-{pkgs, ...}: {
-  xdg.configFile."npm/npmrc".source = ./npmrc;
-}
+{ pkgs, ... }: { xdg.configFile."npm/npmrc".source = ./npmrc; }

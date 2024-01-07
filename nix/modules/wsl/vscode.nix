@@ -5,18 +5,17 @@
   config,
   ...
 }:
-with lib; let
+with lib;
+let
   cfg = config.vscode-wsl;
   ldEnv = {
-    NIX_LD_LIBRARY_PATH = with pkgs;
-      makeLibraryPath [
-        stdenv.cc.cc
-      ];
+    NIX_LD_LIBRARY_PATH = with pkgs; makeLibraryPath [ stdenv.cc.cc ];
     NIX_LD = removeSuffix "\n" (builtins.readFile "${pkgs.stdenv.cc}/nix-support/dynamic-linker");
   };
   ldExports = mapAttrsToList (name: value: "export ${name}=${value}") ldEnv;
   joinedLdExports = concatStringsSep "\n" ldExports;
-in {
+in
+{
   options.vscode-wsl = {
     enable = mkEnableOption "enable vscode-remote-wsl";
     user = mkOption {

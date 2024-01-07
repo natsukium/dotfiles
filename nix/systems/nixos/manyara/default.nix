@@ -4,17 +4,19 @@
   pkgs,
   specialArgs,
   ...
-}: let
+}:
+let
   inherit (specialArgs) username;
   inherit (inputs) disko;
-in {
+in
+{
   imports = [
     ../common.nix
     ./hardware-configuration.nix
     disko.nixosModules.disko
   ];
 
-  inherit (pkgs.callPackage ./disko-config.nix {disks = ["/dev/nvme0n1"];}) disko;
+  inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 
   boot = {
     loader = {
@@ -28,12 +30,12 @@ in {
     home = "/home/${username}";
     isNormalUser = true;
     initialPassword = "";
-    extraGroups = ["wheel"];
+    extraGroups = [ "wheel" ];
   };
 
   networking = {
     hostName = "manyara";
   };
 
-  environment.systemPackages = [pkgs.coreutils];
+  environment.systemPackages = [ pkgs.coreutils ];
 }
