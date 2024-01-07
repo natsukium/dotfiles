@@ -24,8 +24,8 @@
     lua-language-server
     stylua
     # nix
-    alejandra
     nil
+    nurpkgs.nixfmt
     # python
     black
     nodePackages.pyright
