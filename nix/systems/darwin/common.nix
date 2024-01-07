@@ -17,6 +17,8 @@ in {
 
   security.pam.enableSudoTouchIdAuth = true;
 
+  services.tailscale.enable = true;
+
   services.nix-daemon.enable = true;
 
   nixpkgs.config.allowUnfree = true;
