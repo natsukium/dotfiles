@@ -1,4 +1,10 @@
-{pkgs, ...}: {
+{
+  pkgs,
+  config,
+  ...
+}: let
+  nurpkgs = config.nur.repos.natsukium;
+in {
   imports = [../modules/pdm.nix];
   programs = {
     direnv = {
@@ -59,7 +65,7 @@
       nix-init
       nix-output-monitor
       nix-update
-      nixpkgs-review
+      nurpkgs.nixpkgs-review
       nkf
       pinentry-curses
       pipx
