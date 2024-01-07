@@ -53,6 +53,10 @@ in
       type = types.bool;
       default = true;
     };
+    hyprland = mkOption {
+      type = types.bool;
+      default = true;
+    };
     kitty = mkOption {
       type = types.bool;
       default = true;
@@ -235,6 +239,15 @@ in
           pointer = "#${base0C}";
           marker = "#${base0C}";
           prompt = "#${base0A}";
+        };
+      })
+      (mkIf cfg.hyprland {
+        wayland.windowManager.hyprland.settings = {
+          decoration."col.shadow" = "rbga(${base00}ff)";
+          general = {
+            "col.active_border" = "rgb(${base0D})";
+            "col.inactive_border" = "rgb(${base03})";
+          };
         };
       })
       (mkIf cfg.kitty {
