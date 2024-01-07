@@ -79,3 +79,5 @@ require("lazy").setup({
 	},
 	spec = "plugins",
 })
+
+require("misc")

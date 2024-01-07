@@ -91,6 +91,7 @@ in
     }
     // configFiles [
       "./init.lua"
+      "./lua/misc.lua"
       "./lua/plugins/completion.lua"
       "./lua/plugins/dap.lua"
       "./lua/plugins/lsp.lua"
