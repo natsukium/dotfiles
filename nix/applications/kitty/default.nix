@@ -32,11 +32,7 @@ in
       };
       keybindings = { } // tmux-compat-keybindings;
       darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
+      shellIntegration.mode = "enabled";
     };
   };
-
-  programs.fish.interactiveShellInit = ''
-    source "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_conf.d/kitty-shell-integration.fish"
-    set --prepend fish_complete_path "$KITTY_INSTALLATION_DIR/shell-integration/fish/vendor_completions.d"
-  '';
 }
