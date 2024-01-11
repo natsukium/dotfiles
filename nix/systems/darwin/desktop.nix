@@ -6,6 +6,7 @@ in
   imports = [
     ../../applications/yabai
     ../../applications/skhd
+    ../../modules/darwin/bclm.nix
     ../../modules/services/copyq.nix
   ];
 
@@ -56,4 +57,9 @@ in
   services.sketchybar.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
   services.copyq.enable = true;
+
+  services.bclm = {
+    enable = true;
+    package = config.nur.repos.natsukium.bclm;
+  };
 }
