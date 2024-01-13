@@ -35,6 +35,7 @@
     ];
     ignores = [
       ".DS_Store"
+      ".direnv"
       ".vscode/"
       "__pycache__/"
       ".ipynb_checkpoints"
