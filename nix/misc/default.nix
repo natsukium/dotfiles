@@ -5,6 +5,12 @@ in
 {
   imports = [ ../modules/pdm.nix ];
   programs = {
+    btop = {
+      enable = true;
+      settings = {
+        vim_keys = true;
+      };
+    };
     direnv = {
       enable = true;
       nix-direnv.enable = true;
