@@ -30,6 +30,9 @@ vim.keymap.set("v", "<Leader>l", "$", { noremap = true })
 vim.keymap.set("n", "<Leader>w", ":w<CR>")
 vim.keymap.set("n", "<Esc><Esc>", ":nohlsearch<CR><Esc>")
 
+-- terminal
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true })
+
 local function float_term(cmd)
 	local opts = { size = { width = 0.9, height = 0.9 } }
 	require("lazy.util").float_term(cmd, opts)
