@@ -1,12 +1,11 @@
-{ inputs, pkgs, ... }:
+{ config, pkgs, ... }:
 let
-  inherit (inputs) nixbins;
-  bins = nixbins.packages.${pkgs.stdenv.system};
+  nurpkgs = config.nur.repos.natsukium;
 in
 {
   programs.qutebrowser = {
     enable = true;
-    package = if pkgs.stdenv.isLinux then pkgs.qutebrowser else bins.qutebrowser;
+    package = if pkgs.stdenv.isLinux then pkgs.qutebrowser else nurpkgs.qutebrowser;
     settings = {
       content.blocking.method = "both";
       window.hide_decoration =
@@ -14,7 +13,7 @@ in
         # relate: https://github.com/qutebrowser/qutebrowser/issues/4067
         if (pkgs.stdenv.isLinux) then
           true
-        else if (pkgs.lib.versionOlder bins.qutebrowser.version "2.6.0") then
+        else if (pkgs.lib.versionOlder config.programs.qutebrowser.package.version "2.6.0") then
           false
         else
           true;

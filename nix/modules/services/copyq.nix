@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -7,8 +6,7 @@
 }:
 with lib;
 let
-  inherit (inputs) nixbins;
-  bins = nixbins.packages.${pkgs.stdenv.system};
+  nurpkgs = config.nur.repos.natsukium;
   cfg = config.services.copyq;
 in
 {
@@ -18,7 +16,7 @@ in
 
       package = mkOption {
         type = path;
-        default = bins.copyq;
+        default = nurpkgs.copyq;
       };
     };
   };

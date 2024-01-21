@@ -1,10 +1,9 @@
-{ inputs, pkgs, ... }:
+{ config, pkgs, ... }:
 let
-  inherit (inputs) nixbins;
-  bins = import nixbins { inherit pkgs; };
+  nurpkgs = config.nur.repos.natsukium;
 in
 {
-  home.packages = if pkgs.stdenv.isLinux then [ pkgs.vivaldi ] else [ bins.vivaldi ];
+  home.packages = if pkgs.stdenv.isLinux then [ pkgs.vivaldi ] else [ nurpkgs.vivaldi-bin ];
 
   xdg.configFile."vivaldi/mod.css".text = ''
     #header {
