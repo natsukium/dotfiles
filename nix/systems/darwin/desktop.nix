@@ -7,6 +7,7 @@ in
     ../../applications/yabai
     ../../applications/skhd
     ../../modules/darwin/bclm.nix
+    ../../modules/darwin/finder.nix
     ../../modules/services/copyq.nix
   ];
 
@@ -34,6 +35,7 @@ in
         AppleShowAllExtensions = true;
         AppleShowAllFiles = true;
         FXPreferredViewStyle = "clmv";
+        FXRemoveOldTrashItems = true;
         ShowStatusBar = true;
       };
       CustomUserPreferences = {
