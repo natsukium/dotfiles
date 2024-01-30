@@ -2,9 +2,9 @@
 
 if [ "$0" = "CI" ]; then
   if [ "$(uname)" = "Darwin" ]; then
-    nix build .#darwinConfigurations.githubActions.system
-    sudo rm /etc/nix/nix.conf
-    ./result/sw/bin/darwin-rebuild switch --flake .#githubActions
+    nix build \
+      .#darwinConfigurations.katavi.system \
+      .#darwinConfigurations.work.system
   else
     nix build --impure --show-trace \
       .#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
