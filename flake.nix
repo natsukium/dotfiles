@@ -114,19 +114,6 @@
           # main laptop (m1 macbook air)
           host = "katavi";
           username = "gazelle";
-        }
-        // {
-          githubActions = darwin.lib.darwinSystem {
-            system = "x86_64-darwin";
-            modules = [
-              ./nix/systems/darwin/common.nix
-              ./nix/homes/darwin/github-actions.nix
-            ];
-            specialArgs = {
-              inherit inputs;
-              username = "runner";
-            };
-          };
         };
       nixosConfigurations = {
         kilimanjaro = nixpkgs.lib.nixosSystem {

@@ -23,9 +23,6 @@
           grep = "auto";
         };
         init.defaultBranch = "main";
-      }
-      // pkgs.lib.optionalAttrs (config.programs.git.userEmail != "action@github.com") {
-        url."git@github.com:".pushInsteadOf = "https://github.com/";
       };
     includes = [
       {
