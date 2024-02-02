@@ -36,6 +36,10 @@
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nix-wallpaper = {
       url = "github:natsukium/nix-wallpaper/custom-logo";
       inputs.nixpkgs.follows = "nixpkgs";

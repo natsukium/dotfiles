@@ -5,12 +5,15 @@
   ...
 }:
 let
-  inherit (inputs) neovim-nightly-overlay;
+  inherit (inputs) neovim-nightly-overlay emacs-overlay;
 in
 {
   imports = [ ../modules/nix ];
 
-  nixpkgs.overlays = [ neovim-nightly-overlay.overlay ];
+  nixpkgs.overlays = [
+    neovim-nightly-overlay.overlay
+    emacs-overlay.overlays.default
+  ];
 
   programs.nix.target.system = true;
 

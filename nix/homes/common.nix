@@ -15,6 +15,7 @@ in
     nix-colors.homeManagerModule
     nur.hmModules.nur
     ../modules/home-manager
+    ../applications/emacs
     ../applications/gh-dash
     ../applications/gitui
     ../applications/lazygit
