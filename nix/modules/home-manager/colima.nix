@@ -136,7 +136,9 @@ in
             after = [ "writeBoundary" ];
             before = [ ];
             data = ''
-              colimaDir=${if cfg.enableXDG then "~/.config/colima" else "~/.colima"}/default
+              colimaDir=${
+                if cfg.enableXDG then "${config.xdg.configHome}/colima" else "${config.home.homeDirectory}/.colima"
+              }/default
               rm -rf $colimaDir/colima.yaml
               mkdir -p $colimaDir
               cat \

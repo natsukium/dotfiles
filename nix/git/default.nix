@@ -29,8 +29,8 @@
       };
     includes = [
       {
-        path = "~/src/work/.config/git/config";
-        condition = "gitdir:~/src/work/";
+        path = "${config.home.homeDirectory}/src/work/.config/git/config";
+        condition = "gitdir:${config.home.homeDirectory}/src/work/";
       }
     ];
     ignores = [
@@ -46,7 +46,7 @@
     };
     scalar = {
       enable = true;
-      repo = [ "~/src/private/github.com/natsukium/nixpkgs" ];
+      repo = [ "${config.home.homeDirectory}/src/private/github.com/natsukium/nixpkgs" ];
     };
   };
 

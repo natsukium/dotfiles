@@ -16,7 +16,7 @@ in
       repo = mkOption {
         type = types.listOf types.str;
         default = [ ];
-        example = [ "~/NixOS/nixpkgs" ];
+        example = [ "${config.home.homeDirectory}/NixOS/nixpkgs" ];
       };
     };
   };
