@@ -23,6 +23,14 @@ in
 
   home.packages = [ pkgs.wofi ];
 
+  gtk = {
+    enable = true;
+    gtk3.extraConfig = {
+      gtk-application-prefer-dark-theme = true;
+    };
+    gtk4.extraConfig = config.gtk.gtk3.extraConfig;
+  };
+
   services.mako = {
     enable = true;
     font = "HackGen35 Console 12";
