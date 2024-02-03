@@ -14,7 +14,6 @@
     nixos-wsl = {
       url = "github:nix-community/nixos-wsl";
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-utils.follows = "flake-utils";
     };
     nix-colors = {
       url = "github:misterio77/nix-colors";
@@ -32,7 +31,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    flake-utils.url = "github:numtide/flake-utils";
     nur.url = "github:nix-community/nur";
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
@@ -64,10 +62,16 @@
       home-manager,
       darwin,
       nix-colors,
-      flake-utils,
       nur,
       ...
     }@inputs:
+    let
+      forAllSystems = nixpkgs.lib.genAttrs [
+        "x86_64-linux"
+        "aarch64-linux"
+        "aarch64-darwin"
+      ];
+    in
     {
       homeConfigurations =
         let
@@ -159,35 +163,36 @@
           };
         };
       };
-    }
-    // flake-utils.lib.eachDefaultSystem (
-      system:
-      let
-        pkgs = nixpkgs.legacyPackages.${system};
-        nurpkgs = import nur {
-          inherit pkgs;
-          nurpkgs = import nixpkgs { inherit system; };
-        };
-      in
-      {
-        devShell =
-          let
-            sketchybarrc = pkgs.python3Packages.callPackage ./nix/pkgs/sketchybarrc-py { };
-            python-env = pkgs.python3.withPackages (ps: [ sketchybarrc ]);
-          in
-          pkgs.mkShell {
-            nativeBuildInputs = with pkgs; [
-              checkbashisms
-              nurpkgs.repos.natsukium.nixfmt
-              rnix-lsp
-              shellcheck
-              shfmt
-              python-env
-              sops
-              ssh-to-age
-            ];
-            shellHook = "";
+
+      devShells = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          nurpkgs = import nur {
+            inherit pkgs;
+            nurpkgs = import nixpkgs { inherit system; };
           };
-      }
-    );
+        in
+        {
+          default =
+            let
+              sketchybarrc = pkgs.python3Packages.callPackage ./nix/pkgs/sketchybarrc-py { };
+              python-env = pkgs.python3.withPackages (ps: [ sketchybarrc ]);
+            in
+            pkgs.mkShell {
+              nativeBuildInputs = with pkgs; [
+                checkbashisms
+                nurpkgs.repos.natsukium.nixfmt
+                rnix-lsp
+                shellcheck
+                shfmt
+                python-env
+                sops
+                ssh-to-age
+              ];
+              shellHook = "";
+            };
+        }
+      );
+    };
 }
