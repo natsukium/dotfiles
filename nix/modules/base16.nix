@@ -1,7 +1,7 @@
 { lib, config, ... }:
 with lib;
 let
-  inherit (config.colorScheme.colors)
+  inherit (config.colorScheme.palette)
     base00
     base01
     base02

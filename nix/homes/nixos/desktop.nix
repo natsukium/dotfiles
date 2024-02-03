@@ -7,7 +7,7 @@
 let
   wallpaper = pkgs.callPackage ../../pkgs/wallpaper {
     wallpaper = inputs.nix-wallpaper.packages.${pkgs.stdenv.hostPlatform.system}.default;
-    inherit (config.colorScheme) colors;
+    inherit (config.colorScheme) palette;
   };
 in
 {

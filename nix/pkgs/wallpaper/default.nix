@@ -1,6 +1,6 @@
 {
   wallpaper,
-  colors,
+  palette,
   width ? 3440,
   height ? 1440,
   logoSize ? 90,
@@ -19,8 +19,8 @@ wallpaper.override {
     logoOffset
     ;
 
-  backgroundColor = "#${colors.base00}";
-  logoColors = with colors; rec {
+  backgroundColor = "#${palette.base00}";
+  logoColors = with palette; rec {
     color0 = "#${base0C}";
     color1 = "#${base0D}";
     color2 = color0;

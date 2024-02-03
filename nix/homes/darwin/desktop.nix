@@ -8,7 +8,7 @@ let
   nurpkgs = config.nur.repos.natsukium;
   wallpaper = pkgs.callPackage ../../pkgs/wallpaper {
     wallpaper = inputs.nix-wallpaper.packages.${pkgs.stdenv.hostPlatform.system}.default;
-    inherit (config.colorScheme) colors;
+    inherit (config.colorScheme) palette;
     width = 2560;
     height = 1600;
   };
