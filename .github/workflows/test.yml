@@ -27,6 +27,13 @@ jobs:
           name: natsukium
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      # workaround for "No space left on device"
+      # https://github.com/actions/runner-images/issues/709
+      - name: Collect garbage
+        run: |
+          df -h
+          rm -rf "$AGENT_TOOLSDIRECTORY"
+          df -h
       - name: Create /run for darwin
         if: matrix.os == 'macos-14'
         run: |
@@ -35,3 +42,4 @@ jobs:
       - name: setup
         run: |
           sh -c "$(cat bin/install.sh)" CI
+          df -h
