@@ -13,6 +13,7 @@ in
     # nixosModule, but it should be also available on nix-darwin
     inputs.nur.nixosModules.nur
     ../common.nix
+    ../../modules/darwin
   ];
 
   users.users.${username}.home = "/Users/${username}";

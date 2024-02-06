@@ -6,8 +6,6 @@ in
   imports = [
     ../../applications/yabai
     ../../applications/skhd
-    ../../modules/darwin/bclm.nix
-    ../../modules/darwin/finder.nix
     ../../modules/services/copyq.nix
   ];
 
