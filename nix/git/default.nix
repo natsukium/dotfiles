@@ -31,6 +31,7 @@
       }
     ];
     ignores = [
+      ".direnv"
       ".DS_Store"
       ".direnv"
       ".vscode/"
