@@ -56,13 +56,6 @@ let
       yaml
     ];
   plugins = import ./plugins.nix { inherit pkgs nurpkgs; };
-  ftdetectAstro = ''
-    vim.filetype.add({
-      extension = {
-        astro = "astro"
-      }
-    })
-  '';
   configFile = file: {
     "nvim/${file}".source = pkgs.substituteAll (
       {
@@ -87,7 +80,7 @@ in
   };
   xdg.configFile =
     {
-      "nvim/ftdetect/astro.lua".text = ftdetectAstro;
+      "nvim/ftdetect".source = ./ftdetect;
     }
     // configFiles [
       "./init.lua"
