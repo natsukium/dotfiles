@@ -6,6 +6,7 @@
 }:
 {
   imports = [
+    ../../modules/nixos
     ../common.nix
     ./services/tailscale
     inputs.nur.nixosModules.nur
