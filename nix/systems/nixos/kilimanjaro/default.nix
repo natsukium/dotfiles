@@ -67,4 +67,6 @@
     remotePlay.openFirewall = true;
     dedicatedServer.openFirewall = true;
   };
+
+  dualboot.enable = true;
 }
