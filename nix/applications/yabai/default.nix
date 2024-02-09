@@ -13,6 +13,8 @@
       "layout" = "bsp";
       "window_opacity" = "on";
       "window_animation_duration" = 5.0e-2;
+      focus_follows_mouse = "autofocus";
+      mouse_follows_focus = "on";
     };
     extraConfig = ''
       yabai -m rule --add app=CopyQ manage=off
