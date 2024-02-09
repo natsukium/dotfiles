@@ -22,9 +22,8 @@ let
     nil
     nurpkgs.nixfmt
     # python
-    black
     nodePackages.pyright
-    ruff
+    ruff-lsp
     # terraform
     terraform-ls
     # typescript
