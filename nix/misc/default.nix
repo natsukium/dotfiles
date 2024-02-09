@@ -17,11 +17,7 @@ in
       nix-direnv.enable = true;
     };
     fzf.enable = true;
-    gh = {
-      enable = true;
-      # https://github.com/nix-community/home-manager/pull/4749
-      settings.version = 1;
-    };
+    gh.enable = true;
     jq.enable = true;
     lsd = {
       enable = true;
