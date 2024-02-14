@@ -2,8 +2,6 @@
 {
   programs.gpg.enable = true;
 
-  imports = [ ./../modules/git-scalar.nix ];
-
   programs.git = {
     enable = true;
     userName = "natsukium";

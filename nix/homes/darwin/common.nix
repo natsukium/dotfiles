@@ -18,7 +18,6 @@ in
     users.${username} = {
       imports = [
         ../common.nix
-        ../../modules/home-manager/colima.nix
         ../../modules/nix
       ];
 

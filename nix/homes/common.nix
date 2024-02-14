@@ -14,9 +14,7 @@ in
   imports = [
     nix-colors.homeManagerModule
     nur.hmModules.nur
-    ../modules/base16.nix
-    ../modules/home-manager/pueue.nix
-    ../modules/home-manager/xdg
+    ../modules/home-manager
     ../applications/gh-dash
     ../applications/gitui
     ../applications/lazygit

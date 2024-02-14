@@ -3,7 +3,6 @@ let
   nurpkgs = config.nur.repos.natsukium;
 in
 {
-  imports = [ ../modules/pdm.nix ];
   ext.xdg.enable = true;
   programs = {
     btop = {
