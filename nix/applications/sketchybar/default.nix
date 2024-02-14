@@ -1,32 +1,42 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
-  sketchybarrc-py = pkgs.python3Packages.callPackage ../../pkgs/sketchybarrc-py { };
-  flakeIgnore = [
-    "E402"
-    "W503"
-    "E501"
-  ];
-  libraries = with pkgs.python3Packages; [
-    typing-extensions
-    sketchybarrc-py
-  ];
-
-  rc = pkgs.writers.writePython3Bin "sketchybarrc" { inherit flakeIgnore libraries; } (
-    builtins.readFile ./sketchybarrc.py
-  );
-  battery = pkgs.writers.writePython3Bin "battery.py" { inherit flakeIgnore libraries; } (
-    builtins.readFile ./plugins/battery.py
-  );
-  clock = pkgs.writers.writePython3Bin "clock.py" { inherit flakeIgnore libraries; } (
-    builtins.readFile ./plugins/clock.py
-  );
-  weather = pkgs.writers.writePython3Bin "weather.py" { inherit flakeIgnore libraries; } (
-    builtins.readFile ./plugins/weather.py
-  );
+  lua = pkgs.lua5_4.withPackages (ps: with ps; [ luautf8 ]);
 in
 {
-  xdg.configFile."sketchybar/sketchybarrc".source = "${rc}/bin/sketchybarrc";
-  xdg.configFile."sketchybar/plugins/battery.py".source = "${battery}/bin/battery.py";
-  xdg.configFile."sketchybar/plugins/clock.py".source = "${clock}/bin/clock.py";
-  xdg.configFile."sketchybar/plugins/weather.py".source = "${weather}/bin/weather.py";
+  xdg.configFile."sketchybar/sketchybarrc" = {
+    source = pkgs.substituteAll {
+      src = ./sketchybarrc;
+      inherit lua;
+      inherit (pkgs) sbarlua;
+    };
+    executable = true;
+  };
+  xdg.configFile."sketchybar/colors.lua" = {
+    source = pkgs.substituteAll {
+      src = ./colors.lua;
+      inherit (config.colorScheme.palette)
+        base00
+        base01
+        base02
+        base03
+        base04
+        base05
+        base06
+        base07
+        base08
+        base09
+        base0A
+        base0B
+        base0C
+        base0D
+        base0E
+        base0F
+        ;
+    };
+  };
+  xdg.configFile."sketchybar/init.lua".source = config.lib.file.mkOutOfStoreSymlink "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium/dotfiles/nix/applications/sketchybar/init.lua";
+  xdg.configFile."sketchybar/items" = {
+    source = ./items;
+    recursive = true;
+  };
 }
