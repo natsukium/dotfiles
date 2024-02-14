@@ -1,0 +1,40 @@
+return {
+  base00 = "0xff@base00@",
+  base01 = "0xff@base01@",
+  base02 = "0xff@base02@",
+  base03 = "0xff@base03@",
+  base04 = "0xff@base04@",
+  base05 = "0xff@base05@",
+  base06 = "0xff@base06@",
+  base07 = "0xff@base07@",
+  base08 = "0xff@base08@",
+  base09 = "0xff@base09@",
+  base0A = "0xff@base0A@",
+  base0B = "0xff@base0B@",
+  base0C = "0xff@base0C@",
+  base0D = "0xff@base0D@",
+  base0E = "0xff@base0E@",
+  base0F = "0xff@base0F@",
+
+  black = "0xff@base00@",
+  white = "0xff@base07@",
+  red = "0xff@base0F@",
+  green = "0xff@base0A@",
+  blue = "0xff@base0B@",
+  yellow = "0xff@base09@",
+  orange = "0xff@base08@",
+  magenta = "0xff@base0E@",
+  grey = "0xff@base04@",
+  transparent = "0x00000000",
+
+  bar = {
+    bg = "0xd0@base01@",
+    border = "0xff@base0D@",
+  },
+  popup = {
+    bg = "0xff1e1e2e",
+    border = "0xffcad3f5"
+  },
+  bg1 = "0x803c3e4f",
+  bg2 = "0xff494d64",
+}
