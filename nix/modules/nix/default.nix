@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   lib,
   pkgs,
@@ -42,6 +43,10 @@ in
           sandbox = true;
           warn-dirty = false;
         };
+        # for flake (e.g. nix shell)
+        registry.nixpkgs.flake = inputs.nixpkgs;
+        # for legacy channel (e.g. nix-shell)
+        settings.nix-path = [ "nixpkgs=${inputs.nixpkgs.outPath}" ];
       };
     })
     (mkIf (cfg.target.user or cfg.target.otherDistroUser) {
