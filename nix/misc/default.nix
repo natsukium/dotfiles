@@ -5,6 +5,7 @@ in
 {
   ext.xdg.enable = true;
   programs = {
+    bat.enable = true;
     btop = {
       enable = true;
       settings = {

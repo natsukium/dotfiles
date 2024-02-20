@@ -22,7 +22,6 @@ in
     ../applications/rbw
     ../alacritty
     ../bash
-    ../bat
     ../fish
     ../ghq
     ../git
