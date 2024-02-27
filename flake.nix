@@ -118,6 +118,17 @@
           # main laptop (m1 macbook air)
           host = "katavi";
           username = "gazelle";
+        }
+        // {
+          # build server (m1 mac mini)
+          mikumi = darwin.lib.darwinSystem {
+            system = "aarch64-darwin";
+            modules = [ ./nix/systems/darwin/mikumi.nix ];
+            specialArgs = {
+              inherit inputs;
+              username = "natsukium";
+            };
+          };
         };
       nixosConfigurations = {
         kilimanjaro = nixpkgs.lib.nixosSystem {

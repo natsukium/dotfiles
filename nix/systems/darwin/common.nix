@@ -18,8 +18,6 @@ in
 
   users.users.${username}.home = "/Users/${username}";
 
-  security.pam.enableSudoTouchIdAuth = true;
-
   services.tailscale.enable = true;
 
   services.nix-daemon.enable = true;

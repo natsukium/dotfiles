@@ -56,6 +56,8 @@ in
   services.sketchybar.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
 
+  security.pam.enableSudoTouchIdAuth = true;
+
   services.bclm = {
     enable = true;
     package = config.nur.repos.natsukium.bclm;
