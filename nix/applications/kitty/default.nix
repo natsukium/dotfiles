@@ -34,5 +34,15 @@ in
       darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
       shellIntegration.mode = "enabled";
     };
+
+    fish.functions.ssh = {
+      body = ''
+        if test $TERM = "xterm-kitty"
+            kitten ssh $argv
+        else
+            command ssh $argv
+        end
+      '';
+    };
   };
 }
