@@ -22,8 +22,9 @@ in
   home.packages = with pkgs; [
     monitorcontrol
     nurpkgs.nowplaying-cli
-    raycast
   ];
+
+  services.raycast.enable = true;
 
   services.wallpaper = {
     enable = true;
