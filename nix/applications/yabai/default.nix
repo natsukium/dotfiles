@@ -19,6 +19,7 @@
     extraConfig = ''
       yabai -m rule --add app=CopyQ manage=off
       yabai -m rule --add app=kitty opacity=0.9
+      yabai -m rule --add label=emacs app=Emacs manage=on
     '';
   };
 }
