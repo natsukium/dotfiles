@@ -15,21 +15,21 @@ in
     nix-colors.homeManagerModule
     nur.hmModules.nur
     ../modules/home-manager
+    ../applications/alacritty
+    ../applications/bash
     ../applications/emacs
+    ../applications/fish
     ../applications/gh-dash
+    ../applications/ghq
+    ../applications/git
     ../applications/gitui
     ../applications/lazygit
+    ../applications/misc
+    ../applications/nix
     ../applications/nvim
     ../applications/rbw
-    ../alacritty
-    ../bash
-    ../fish
-    ../ghq
-    ../git
-    ../nix
-    ../starship
-    ../tmux
-    ../vim
-    ../misc
+    ../applications/starship
+    ../applications/tmux
+    ../applications/vim
   ];
 }

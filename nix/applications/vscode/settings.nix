@@ -1,6 +1,6 @@
 { lib, ... }:
 let
-  flattenAttrsNames = (import ../lib/attrsets.nix { inherit lib; }).flattenAttrsNames;
+  flattenAttrsNames = (import ../../lib/attrsets.nix { inherit lib; }).flattenAttrsNames;
 in
 (flattenAttrsNames rec {
   # common

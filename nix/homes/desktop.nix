@@ -7,7 +7,7 @@ in
     ../applications/kitty
     ../applications/qutebrowser
     ../applications/vivaldi
-    ../vscode
+    ../applications/vscode
   ];
 
   services.copyq = {
