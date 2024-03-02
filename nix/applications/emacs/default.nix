@@ -16,7 +16,7 @@ in
     package = emacs;
   };
 
-  xdg.configFile."emacs/init.el".source = config.lib.file.mkOutOfStoreSymlink "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium/dotfiles/nix/applications/emacs/init.el";
+  xdg.configFile."emacs/init.el".source = ./init.el;
 
   home.shellAliases = pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
     emacs = "${config.programs.emacs.package}/Applications/Emacs.app/Contents/MacOS/Emacs";
