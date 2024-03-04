@@ -9,7 +9,7 @@
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
 
       # Execute your favorite apps at launch
-      # exec-once = waybar & hyprpaper & firefox
+      exec-once = waybar
 
       # Source a file (multi-file configs)
       # source = ~/.config/hypr/myColors.conf
@@ -38,7 +38,7 @@
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
 
           gaps_in = 5
-          gaps_out = 20
+          gaps_out = 10
           border_size = 2
 
           layout = dwindle
