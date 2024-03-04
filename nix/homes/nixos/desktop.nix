@@ -57,6 +57,54 @@ in
     '';
   };
 
+  programs.waybar = {
+    enable = true;
+    style = ''
+      * {
+        font-family: "Liga HackGen35 Console NF";
+        font-size: 12px;
+      }
+    '';
+    settings = {
+      mainBar = {
+        position = "left";
+        width = 30;
+        modules-left = [
+          "clock"
+          "cpu"
+          "memory"
+        ];
+        modules-center = [ "hyprland/window" ];
+        modules-right = [ "hyprland/workspaces" ];
+        "hyprland/workspaces" = { };
+        clock = {
+          format = ''
+            {:%H:%M
+            %b%e}'';
+          tooltip = true;
+          tooltip-format = "{:%Y.%m.%d %H:%M}";
+          interval = 5;
+        };
+        cpu = {
+          interval = 5;
+          format = " {usage}%";
+          states = {
+            warning = 70;
+            critical = 90;
+          };
+        };
+        memory = {
+          interval = 5;
+          format = " {}%";
+          states = {
+            warning = 70;
+            critical = 90;
+          };
+        };
+      };
+    };
+  };
+
   services.wallpaper = {
     enable = true;
     imagePath = "${wallpaper}/share/wallpapers/nixos-wallpaper.png";
