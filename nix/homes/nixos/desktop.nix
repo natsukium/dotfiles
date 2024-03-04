@@ -21,6 +21,12 @@ in
     fcitx5.addons = with pkgs; [ fcitx5-mozc ];
   };
 
+  home.packages = with pkgs; [
+    config.nur.repos.natsukium.rofi-rbw
+    wl-clipboard
+    wtype
+  ];
+
   programs.fuzzel = {
     enable = true;
     settings = {
