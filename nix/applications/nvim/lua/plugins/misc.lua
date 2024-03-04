@@ -296,4 +296,10 @@ return {
       })
     end,
   },
+  {
+    name = "vim-table-mode",
+    dir = "@vim_table_mode@",
+    ft = "markdown",
+    config = true,
+  },
 }

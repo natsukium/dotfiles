@@ -68,5 +68,6 @@ plugins [
   todo-comments-nvim
   trouble-nvim
   vim-illuminate
+  vim-table-mode
   which-key-nvim
 ]
