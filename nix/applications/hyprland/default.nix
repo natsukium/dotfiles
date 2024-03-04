@@ -105,6 +105,7 @@ in
       # windowrule = float, ^(kitty)$
       # Example windowrule v2
       # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
+      windowrulev2 = opacity 0.9,class:^(kitty|fuzzel)$
       # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
