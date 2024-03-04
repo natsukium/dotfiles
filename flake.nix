@@ -193,24 +193,7 @@
           };
         in
         {
-          default =
-            let
-              sketchybarrc = pkgs.python3Packages.callPackage ./nix/pkgs/sketchybarrc-py { };
-              python-env = pkgs.python3.withPackages (ps: [ sketchybarrc ]);
-            in
-            pkgs.mkShell {
-              nativeBuildInputs = with pkgs; [
-                checkbashisms
-                nurpkgs.repos.natsukium.nixfmt
-                rnix-lsp
-                shellcheck
-                shfmt
-                python-env
-                sops
-                ssh-to-age
-              ];
-              shellHook = "";
-            };
+          default = import ./shell.nix { inherit pkgs nurpkgs; };
         }
       );
     };
