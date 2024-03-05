@@ -52,9 +52,7 @@ return {
       { name = "nvim-treesitter", dir = "@nvim_treesitter@" },
     },
     event = "VeryLazy",
-    config = function()
-      require("nvim-dap-virtual-text").setup()
-    end,
+    config = true,
   },
   {
     name = "nvim-dap-python",
