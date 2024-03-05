@@ -1,7 +1,4 @@
-{ config, specialArgs, ... }:
-let
-  inherit (specialArgs) username;
-in
+{ config, ... }:
 {
   imports = [
     ./hardware-configuration.nix
@@ -10,13 +7,6 @@ in
 
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  users.users.${username} = {
-    home = "/home/${username}";
-    isNormalUser = true;
-    initialPassword = "";
-    extraGroups = [ "wheel" ];
-  };
 
   networking = {
     hostName = "serengeti";
