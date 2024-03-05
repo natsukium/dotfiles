@@ -81,10 +81,12 @@
   users.users.${username} = {
     home = "/home/${username}";
     isNormalUser = true;
-    initialPassword = "";
+    hashedPasswordFile = config.sops.secrets.login-password.path;
     extraGroups = [ "wheel" ];
     openssh.authorizedKeys.keys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIKPPimMzL7CcpSpmf1QisRFxdp1e/3C21GZsoyDgZvIu gazelle"
     ];
   };
+
+  sops.secrets.login-password.neededForUsers = true;
 }
