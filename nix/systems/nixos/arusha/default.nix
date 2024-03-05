@@ -2,11 +2,9 @@
   inputs,
   pkgs,
   config,
-  specialArgs,
   ...
 }:
 let
-  inherit (specialArgs) username;
   nurpkgs = config.nur.repos.natsukium;
 in
 {
@@ -18,13 +16,6 @@ in
   ];
 
   programs.nix.target.nvidia = true;
-
-  users.users.${username} = {
-    home = "/home/${username}";
-    isNormalUser = true;
-    initialPassword = "";
-    group = "wheel";
-  };
 
   wsl = {
     enable = true;
