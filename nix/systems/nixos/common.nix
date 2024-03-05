@@ -74,6 +74,10 @@
     ];
   };
 
+  users = {
+    mutableUsers = false;
+  };
+
   users.users.${username} = {
     home = "/home/${username}";
     isNormalUser = true;
