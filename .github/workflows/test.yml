@@ -41,5 +41,6 @@ jobs:
           /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
       - name: setup
         run: |
-          sh -c "$(cat bin/install.sh)" CI
+          export MAKEFLAGS="NIX:=nix"
+          make
           df -h
