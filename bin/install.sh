@@ -1,18 +1,5 @@
 #!/bin/sh
 
-if [ "$0" = "CI" ]; then
-  if [ "$(uname)" = "Darwin" ]; then
-    nix build \
-      .#darwinConfigurations.katavi.system \
-      .#darwinConfigurations.work.system
-  else
-    nix build --impure --show-trace \
-      .#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
-      .#nixosConfigurations.manyara.config.system.build.toplevel
-  fi
-	exit
-fi
-
 if type git >/dev/null 2>&1; then
   git clone https://github.com/natsukium/dotfiles $HOME/.dotfiles
 else
