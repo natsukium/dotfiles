@@ -1,9 +1,5 @@
-{ inputs, pkgs, ... }:
-let
-  inherit (inputs) hyprland;
-in
+{ pkgs, ... }:
 {
-  imports = [ hyprland.homeManagerModules.default ];
   wayland.windowManager.hyprland = {
     enable = true;
     extraConfig = ''
