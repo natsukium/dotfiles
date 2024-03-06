@@ -1,4 +1,4 @@
-{ lib, config, ... }:
+{ lib, config, inputs, ... }:
 with lib;
 let
   inherit (config.colorScheme.palette)
@@ -19,6 +19,7 @@ let
     base0E
     base0F
     ;
+  inherit (inputs.nix-colors.lib-core) conversions;
   splitRGB =
     with builtins;
     s:
@@ -243,7 +244,7 @@ in
       })
       (mkIf cfg.hyprland {
         wayland.windowManager.hyprland.settings = {
-          decoration."col.shadow" = "rbga(${base00}ff)";
+          decoration."col.shadow" = "rgba(${conversions.hexToRGBString ", " base00}, 1)";
           general = {
             "col.active_border" = "rgb(${base0D})";
             "col.inactive_border" = "rgb(${base03})";
