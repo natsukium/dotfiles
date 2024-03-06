@@ -91,12 +91,6 @@
           workspace_swipe = off
       }
 
-      # Example per-device config
-      # See https://wiki.hyprland.org/Configuring/Keywords/#executing for more
-      device:epic-mouse-v1 {
-          sensitivity = -0.5
-      }
-
       # Example windowrule v1
       # windowrule = float, ^(kitty)$
       # Example windowrule v2
