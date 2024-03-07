@@ -54,6 +54,7 @@ return {
         "rubocop",
         "rust_analyzer",
         "solargraph",
+        "taplo",
         "terraformls",
         "tsserver",
       }) do

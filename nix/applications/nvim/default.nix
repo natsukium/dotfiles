@@ -29,6 +29,8 @@ let
     rubocop
     # terraform
     terraform-ls
+    # toml
+    taplo
     # typescript
     nodePackages.typescript-language-server
   ];
