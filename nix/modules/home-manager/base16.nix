@@ -39,6 +39,10 @@ in
 {
   options.base16 = {
     enable = mkEnableOption "";
+    alacritty = mkOption {
+      type = types.bool;
+      default = true;
+    };
     bat = mkOption {
       type = types.bool;
       default = true;
@@ -81,6 +85,40 @@ in
     };
   };
   config = mkIf cfg.enable (mkMerge [
+    (mkIf cfg.alacritty {
+      programs.alacritty.settings = {
+        colors = {
+          primary = {
+            background = "#${base00}";
+            foreground = "#${base05}";
+          };
+          cursor = {
+            text = "#${base00}";
+            cursor = "#${base05}";
+          };
+          normal = {
+            black = "#${base00}";
+            red = "#${base08}";
+            green = "#${base0B}";
+            yellow = "#${base0A}";
+            blue = "#${base0D}";
+            magenta = "#${base0E}";
+            cyan = "#${base0C}";
+            white = "#${base05}";
+          };
+          bright = {
+            black = "#${base03}";
+            red = "#${base09}";
+            green = "#${base01}";
+            yellow = "#${base02}";
+            blue = "#${base04}";
+            magenta = "#${base06}";
+            cyan = "#${base0F}";
+            white = "#${base07}";
+          };
+        };
+      };
+    })
     (mkIf cfg.bat { programs.bat.config.theme = "base16-256"; })
     (mkIf cfg.btop {
       xdg.configFile."btop/themes/base16.theme".text = ''
