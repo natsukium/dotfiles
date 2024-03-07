@@ -67,6 +67,7 @@ plugins [
   telescope-nvim
   todo-comments-nvim
   trouble-nvim
+  vim-edgemotion
   vim-illuminate
   vim-table-mode
   which-key-nvim

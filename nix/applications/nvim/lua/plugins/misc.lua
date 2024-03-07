@@ -302,4 +302,13 @@ return {
     ft = "markdown",
     config = true,
   },
+  {
+    name = "vim-edgemotion",
+    dir = "@vim_edgemotion@",
+    keys = { "<leader>j", "<leader>k" },
+    config = function()
+      vim.keymap.set("n", "<leader>j", "<Plug>(edgemotion-j)")
+      vim.keymap.set("n", "<leader>k", "<Plug>(edgemotion-k)")
+    end,
+  },
 }
