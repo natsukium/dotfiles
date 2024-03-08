@@ -33,6 +33,9 @@ let
     taplo
     # typescript
     nodePackages.typescript-language-server
+    # typst
+    typst-lsp
+    typstfmt
     # yaml
     yaml-language-server
   ];
@@ -58,6 +61,7 @@ let
       toml
       tsx
       typescript
+      tree-sitter-typst
       vim
       vimdoc
       yaml
