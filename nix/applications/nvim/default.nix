@@ -33,6 +33,8 @@ let
     taplo
     # typescript
     nodePackages.typescript-language-server
+    # yaml
+    yaml-language-server
   ];
   parsers =
     p:

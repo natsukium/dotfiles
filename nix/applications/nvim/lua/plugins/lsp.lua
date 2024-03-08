@@ -57,6 +57,7 @@ return {
         "taplo",
         "terraformls",
         "tsserver",
+        "yamlls"
       }) do
         lspconfig[ls].setup({
           capabilities = capabilities,
