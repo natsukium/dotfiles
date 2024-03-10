@@ -43,7 +43,7 @@
     };
     scalar = {
       enable = true;
-      repo = [ "${config.home.homeDirectory}/src/private/github.com/natsukium/nixpkgs" ];
+      repo = [ "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium/nixpkgs" ];
     };
   };
 
