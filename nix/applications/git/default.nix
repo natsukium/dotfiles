@@ -21,6 +21,7 @@
           grep = "auto";
         };
         init.defaultBranch = "main";
+        push.useForceIfIncludes = true;
       };
     includes = [
       {
@@ -47,6 +48,7 @@
   };
 
   programs.fish.shellAbbrs = {
+    gpf = "git push --force-with-lease";
     gpm = "git pull (git remote show origin | sed -n '/HEAD branch/s/.*: //p'";
     gpu = "git pull upstream";
     gci = "git commit ";
