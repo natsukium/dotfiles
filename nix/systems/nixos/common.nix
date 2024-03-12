@@ -2,6 +2,7 @@
   config,
   username,
   inputs,
+  pkgs,
   ...
 }:
 {
@@ -45,7 +46,7 @@
 
   programs.gnupg.agent = {
     enable = true;
-    pinentryFlavor = "curses";
+    pinentryPackage = pkgs.pinentry-curses;
   };
 
   virtualisation.docker.rootless = {
