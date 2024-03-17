@@ -59,7 +59,8 @@ in
   security.pam.enableSudoTouchIdAuth = true;
 
   services.bclm = {
-    enable = true;
+    # reenable when https://github.com/NixOS/nixpkgs/pull/296082 is merged
+    enable = false;
     package = config.nur.repos.natsukium.bclm;
   };
 }
