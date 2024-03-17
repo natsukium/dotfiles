@@ -5,7 +5,7 @@
       enable = true;
       settings = {
         email = "tomoya.otabi@gmail.com";
-        pinentry = "curses";
+        pinentry = pkgs.pinentry-curses;
       };
     };
   };
