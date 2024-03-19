@@ -10,6 +10,7 @@ let
   # https://github.com/Mic92/sops-nix/blob/99b1e37f9fc0960d064a7862eb7adfb92e64fa10/README.md?plain=1#L594-L596
   hasImpermanence = config.environment ? "persistence";
   impermanencePrefix = pkgs.lib.optionalString hasImpermanence "/persistent";
+  pinentryWrapper = pkgs.callPackage ../../pkgs/pinentry-wrapper { };
 in
 {
   imports = [
@@ -64,7 +65,7 @@ in
 
   programs.gnupg.agent = {
     enable = true;
-    pinentryPackage = pkgs.pinentry-curses;
+    pinentryPackage = pinentryWrapper;
   };
 
   virtualisation.docker.rootless = {

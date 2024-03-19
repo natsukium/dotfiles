@@ -14,6 +14,11 @@
       # set done's variable
       set -U __done_min_cmd_duration 15000
 
+      # set environment variable for pinentry
+      if test "$SSH_CONNECTION" != ""
+        set -x PINENTRY_USER_DATA "USE_CURSES"
+      end
+
       # extra abbrs
       abbr -a L --position anywhere --set-cursor "% | less"
       abbr -a !! --position anywhere --function _abbr_last_history_item
