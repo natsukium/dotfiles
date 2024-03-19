@@ -5,7 +5,7 @@
       enable = true;
       settings = {
         email = "tomoya.otabi@gmail.com";
-        pinentry = pkgs.pinentry-curses;
+        pinentry = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.pinentry_mac else pkgs.pinentry-qt;
       };
     };
   };
