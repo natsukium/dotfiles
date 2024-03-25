@@ -29,4 +29,27 @@ in
     };
     pulse.enable = true;
   };
+
+  services.greetd = {
+    enable = true;
+    package = pkgs.greetd.tuigreet;
+    settings = {
+      default_session = {
+        command = "${pkgs.lib.getExe pkgs.greetd.tuigreet} --time --remember --remember-session --cmd Hyprland";
+        user = "greeter";
+      };
+    };
+  };
+
+  # suppress systemd error message on tuigreet
+  # https://github.com/apognu/tuigreet/issues/68#issuecomment-1586359960
+  systemd.services.greetd.serviceConfig = {
+    Type = "idle";
+    StandardInputs = "tty";
+    StandardOutput = "tty";
+    StandardError = "journal";
+    TTYReset = true;
+    TTYVHangup = true;
+    TTYVTDisallocate = true;
+  };
 }
