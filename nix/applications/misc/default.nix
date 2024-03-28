@@ -41,31 +41,24 @@ in
   services = {
     pueue.enable = true;
   };
-  home.packages =
-    with pkgs;
-    [
-      bitwarden-cli
-      bottom
-      cachix
-      coreutils
-      fd
-      ghq
-      gnumake
-      gnutar
-      hydra-check
-      nix-init
-      nix-output-monitor
-      nix-update
-      nurpkgs.nixpkgs-review
-      nkf
-      pinentry-curses
-      pipx
-      podman
-      ranger
-      ripgrep
-      wget
-      zstd
-    ]
-    ++ lib.optional stdenv.isDarwin qemu;
+  home.packages = with pkgs; [
+    cachix
+    coreutils
+    fd
+    ghq
+    gnumake
+    gnutar
+    hydra-check
+    nix-init
+    nix-output-monitor
+    nix-update
+    nurpkgs.nixpkgs-review
+    nkf
+    podman
+    ranger
+    ripgrep
+    wget
+    zstd
+  ];
   xdg.enable = true;
 }
