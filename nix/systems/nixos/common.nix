@@ -25,6 +25,12 @@
 
   system.stateVersion = "23.05";
 
+  system.autoUpgrade = {
+    enable = true;
+    dates = "06:00";
+    flake = "github:natsukium/dotfiles";
+  };
+
   nixpkgs.config.allowUnfree = true;
 
   time.timeZone = "Asia/Tokyo";
