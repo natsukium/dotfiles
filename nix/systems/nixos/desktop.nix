@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   pkgs,
   ...
@@ -8,10 +7,8 @@ let
   nurpkgs = config.nur.repos.natsukium;
 in
 {
-  nixpkgs.overlays = [ inputs.nur.overlay ];
   programs.hyprland = {
     enable = true;
-    package = inputs.hyprland.packages.${pkgs.system}.hyprland;
   };
   fonts.packages = with pkgs; [
     noto-fonts-cjk
