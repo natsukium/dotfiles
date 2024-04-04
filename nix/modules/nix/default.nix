@@ -40,7 +40,7 @@ in
             "root"
             "@wheel"
           ] ++ optional pkgs.stdenv.isDarwin "@admin";
-          sandbox = true;
+          sandbox = if pkgs.stdenv.isDarwin then "relaxed" else true;
           warn-dirty = false;
         };
         # for flake (e.g. nix shell)
