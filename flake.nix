@@ -161,13 +161,10 @@
         };
         serengeti = nixpkgs.lib.nixosSystem {
           system = "aarch64-linux";
-          modules = [
-            ./nix/homes/nixos/serengeti
-            ./nix/systems/nixos/serengeti
-          ];
+          modules = [ ./nix/systems/nixos/serengeti ];
           specialArgs = {
             inherit inputs;
-            username = "gazelle";
+            username = "natsukium";
           };
         };
         # main server (mini pc)
@@ -184,7 +181,10 @@
       devShells = forAllSystems (
         system:
         let
-          pkgs = nixpkgs.legacyPackages.${system};
+          pkgs = import nixpkgs {
+            inherit system;
+            config.allowUnfree = true;
+          };
           nurpkgs = import nur {
             inherit pkgs;
             nurpkgs = import nixpkgs { inherit system; };
