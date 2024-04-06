@@ -5,6 +5,12 @@
   pkgs,
   ...
 }:
+let
+  # put the ssh auth key in the persist directory or it cannot be accessed at boot time
+  # https://github.com/Mic92/sops-nix/blob/99b1e37f9fc0960d064a7862eb7adfb92e64fa10/README.md?plain=1#L594-L596
+  hasImpermanence = config.environment ? "persistence";
+  impermanencePrefix = pkgs.lib.optionalString hasImpermanence "/persistent";
+in
 {
   imports = [
     ../../modules/nixos
@@ -17,8 +23,8 @@
   sops = {
     defaultSopsFile = ../../../secrets/default.yaml;
     age = {
-      keyFile = "/var/lib/sops-nix/key.txt";
-      sshKeyPaths = ["/etc/ssh/ssh_host_ed25519_key"];
+      keyFile = "${impermanencePrefix}/var/lib/sops-nix/key.txt";
+      sshKeyPaths = map (key: key.path) config.services.openssh.hostKeys;
       generateKey = true;
     };
   };
@@ -46,6 +52,12 @@
   services.openssh = {
     enable = true;
     settings.PasswordAuthentication = false;
+    hostKeys = [
+      {
+        path = "${impermanencePrefix}/etc/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+    ];
   };
 
   programs.ssh.startAgent = true;

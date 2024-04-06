@@ -47,6 +47,7 @@
       url = "github:natsukium/nix-wallpaper/custom-logo";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    impermanence.url = "github:nix-community/impermanence";
   };
 
   nixConfig = {
