@@ -15,13 +15,7 @@
       url = "github:nix-community/nixos-wsl";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nix-colors = {
-      url = "github:misterio77/nix-colors";
-      inputs.base16-schemes = {
-        url = "github:tinted-theming/base16-schemes";
-        flake = false;
-      };
-    };
+    nix-colors.url = "github:misterio77/nix-colors";
     disko = {
       url = "github:nix-community/disko";
       inputs.nixpkgs.follows = "nixpkgs";
