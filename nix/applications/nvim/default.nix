@@ -38,6 +38,8 @@ let
     typstfmt
     # yaml
     yaml-language-server
+    # spell check
+    typos-lsp
   ];
   parsers =
     p:
