@@ -17,6 +17,7 @@ in
   imports = [
     ../../applications/sketchybar
     ../desktop.nix
+    ./gui-apps-utils
   ];
 
   home.packages = with pkgs; [
