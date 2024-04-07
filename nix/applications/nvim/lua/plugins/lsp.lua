@@ -50,7 +50,7 @@ return {
         "biome",
         "nil_ls",
         "pyright",
-        "ruff_lsp",
+        "ruff",
         "rubocop",
         "rust_analyzer",
         "solargraph",

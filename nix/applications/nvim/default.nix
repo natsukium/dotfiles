@@ -23,7 +23,7 @@ let
     nurpkgs.nixfmt
     # python
     nodePackages.pyright
-    ruff-lsp
+    ruff
     # ruby
     solargraph
     rubocop
