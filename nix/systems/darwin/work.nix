@@ -8,6 +8,7 @@
   homebrew = {
     enable = true;
     brews = [ "libomp" ];
+    casks = [ "pritunl" ];
   };
 
   nix.extraOptions = ''
