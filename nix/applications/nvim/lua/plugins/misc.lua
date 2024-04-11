@@ -245,10 +245,10 @@ return {
     config = function()
       require("chatgpt").setup({
         openai_params = {
-          model = "gpt-4-1106-preview",
+          model = "gpt-4-turbo",
         },
         openai_edit_params = {
-          model = "gpt-4-1106-preview",
+          model = "gpt-4-turbo",
         },
         api_key_cmd = "rbw get OPENAI_API_KEY",
       })
