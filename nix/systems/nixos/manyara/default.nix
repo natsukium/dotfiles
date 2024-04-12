@@ -10,6 +10,7 @@ in
 {
   imports = [
     ../common.nix
+    ../services/adguardhome
     ../services/hydra
     ../services/miniflux
     ./hardware-configuration.nix
