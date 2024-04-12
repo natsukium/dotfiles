@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   services.adguardhome = {
     enable = true;
@@ -17,5 +17,9 @@
         }
       ];
     };
+  };
+
+  environment = lib.optionalAttrs (config.environment ? "persistence") {
+    persistence."/persistent".directories = [ "/var/lib/private/AdGuardHome" ];
   };
 }
