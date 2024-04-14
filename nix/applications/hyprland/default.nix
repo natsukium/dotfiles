@@ -100,23 +100,35 @@
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
       $mainMod = SUPER
+      $terminal = kitty
+      $launcher = fuzzel
 
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
+      bind = $mainMod, RETURN, exec, $terminal
+      bind = $mainMod, SPACE, exec, $launcher
+
       bind = $mainMod, T, exec, rbw unlock && rofi-rbw -t password
-      bind = $mainMod, Q, exec, kitty
       bind = $mainMod, C, killactive,
       bind = $mainMod, M, exit,
       bind = $mainMod, E, exec, dolphin
       bind = $mainMod, V, togglefloating,
-      bind = $mainMod, R, exec, fuzzel
       bind = $mainMod, P, pseudo, # dwindle
-      bind = $mainMod, J, togglesplit, # dwindle
+      bind = $mainMod, S, togglesplit, # dwindle
 
       # Move focus with mainMod + arrow keys
-      bind = $mainMod, left, movefocus, l
-      bind = $mainMod, right, movefocus, r
-      bind = $mainMod, up, movefocus, u
-      bind = $mainMod, down, movefocus, d
+      bind = $mainMod, H, movefocus, l
+      bind = $mainMod, L, movefocus, r
+      bind = $mainMod, K, movefocus, u
+      bind = $mainMod, J, movefocus, d
+
+      bind = $mainMod, R, submap, resize
+      submap = resize
+      bind = , ESCAPE, submap, reset
+      bind = , H, resizeactive, -10 0
+      bind = , L, resizeactive, 10 0
+      bind = , K, resizeactive, 0 -10
+      bind = , J, resizeactive, 0 10
+      submap = reset
 
       # Switch workspaces with mainMod + [0-9]
       bind = $mainMod, 1, workspace, 1
