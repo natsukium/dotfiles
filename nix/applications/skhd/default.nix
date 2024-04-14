@@ -2,6 +2,9 @@
   services.skhd = {
     enable = true;
     skhdConfig = ''
+      # launch application
+      cmd - return : ~/Applications/Home\ Manager\ Apps/kitty.app/Contents/MacOS/kitty --single-instance -d ~ -o allow_remote_control=yes
+
       # focus window
       alt - h : yabai -m window --focus west
       alt - j : yabai -m window --focus south
