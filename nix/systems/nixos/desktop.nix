@@ -49,4 +49,6 @@ in
     TTYVHangup = true;
     TTYVTDisallocate = true;
   };
+
+  services.gnome.gnome-keyring.enable = true;
 }
