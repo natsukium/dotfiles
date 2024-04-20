@@ -54,7 +54,6 @@ in
     nix-update
     nurpkgs.nixpkgs-review
     nkf
-    podman
     ranger
     ripgrep
     wget
