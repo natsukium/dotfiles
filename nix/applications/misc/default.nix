@@ -49,6 +49,7 @@ in
     gnumake
     gnutar
     hydra-check
+    jnv
     nix-init
     nix-output-monitor
     nix-update
