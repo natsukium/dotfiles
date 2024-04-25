@@ -30,6 +30,11 @@ in
         };
       };
 
+      home.packages = with pkgs; [
+        # without this, the older builtin `less` would be used
+        less
+      ];
+
       programs.nix.target.user = true;
     };
     backupFileExtension = "backup";
