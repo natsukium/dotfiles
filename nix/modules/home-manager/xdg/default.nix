@@ -5,9 +5,11 @@
   pkgs,
   ...
 }:
-with lib; let
+with lib;
+let
   cfg = config.ext.xdg;
-in {
+in
+{
   options.ext.xdg = {
     enable = mkEnableOption "enable additional XDG Base Directory support";
     aws-cli.enable = mkOption {
@@ -54,62 +56,66 @@ in {
 
   config = mkIf cfg.enable (mkMerge [
     (mkIf cfg.aws-cli.enable {
-      programs.bash.profileExtra = ''
-        export AWS_CONFIG_FILE=$XDG_CONFIG_HOME/aws/config
-        export AWS_SHARED_CREDENTIALS_FILE=$XDG_CONFIG_HOME/aws/credentials
-      '';
+      home.sessionVariables = {
+        AWS_CONFIG_FILE = "${config.xdg.configHome}/aws/config";
+        AWS_SHARED_CREDENTIALS_FILE = "${config.xdg.configHome}/aws/credentials";
+      };
     })
     (mkIf cfg.cuda.enable {
-      programs.bash.profileExtra = ''
-        export CUDA_CACHE_PATH=$XDG_CACHE_HOME/nv
-      '';
+      home.sessionVariables = {
+        CUDA_CACHE_PATH = "${config.xdg.cacheHome}/nv";
+      };
     })
     (mkIf cfg.docker.enable {
-      programs.bash.profileExtra = ''
-        export DOCKER_CONFIG=$XDG_CONFIG_HOME/docker
-        export MACHINE_STORAGE_PATH=$XDG_DATA_HOME/docker-machine
-      '';
+      home.sessionVariables = {
+        DOCKER_CONFIG = "${config.xdg.configHome}/docker";
+        MACHINE_STORAGE_PATH = "${config.xdg.dataHome}/docker-machine";
+      };
     })
     (mkIf cfg.nodejs.enable {
-      programs.bash.profileExtra = ''
-        export NODE_REPL_HISTORY=$XDG_DATA_HOME/node_repl_history
-        export NPM_CONFIG_USERCONFIG=$XDG_CONFIG_HOME/npm/npmrc
-      '';
+      home.sessionVariables = {
+        NODE_REPL_HISTORY = "${config.xdg.dataHome}/node_repl_history";
+        NPM_CONFIG_USERCONFIG = "${config.xdg.configHome}/npm/npmrc";
+      };
       xdg.configFile."npm/npmrc".source = ./npmrc;
     })
     (mkIf cfg.ollama.enable {
-      programs.bash.profileExtra = ''
-        export OLLAMA_MODELS=$XDG_DATA_HOME/ollama/models
-      '';
+      home.sessionVariables = {
+        OLLAMA_MODELS = "${config.xdg.dataHome}/ollama/models";
+      };
     })
     (mkIf cfg.parallel.enable {
-      programs.bash.profileExtra = ''
-        export PARALLEL_HOME=$XDG_CONFIG_HOME/parallel
-      '';
+      home.sessionVariables = {
+        PARALLEL_HOME = "${config.xdg.configHome}/parallel";
+      };
     })
     (mkIf cfg.python.enable {
+      home.sessionVariables = {
+        PYTHONSTARTUP = "${config.xdg.configHome}/python/pythonstartup";
+        JUPYTER_PLATFORM_DIRS = 1;
+      };
       programs.bash.profileExtra = ''
-        export PYTHONSTARTUP=$XDG_CONFIG_HOME/python/pythonstartup
-        [ ! -f $XDG_CACHE_HOME/python/history ] && mkdir -p $XDG_CACHE_HOME/python && touch $XDG_CACHE_HOME/python/history
-        export JUPYTER_PLATFORM_DIRS=1
+        [ ! -f ${config.xdg.cacheHome}/python/history ] && mkdir -p ${config.xdg.cacheHome}/python && touch ${config.xdg.cacheHome}/python/history
       '';
       xdg.configFile."python/pythonstartup".source = ./pythonstartup;
     })
     (mkIf cfg.readline.enable {
-      programs.bash.profileExtra = ''
-        export INPUTRC=$XDG_CONFIG_HOME/readline/inputrc
-      '';
+      home.sessionVariables = {
+        INPUTRC = "${config.xdg.configHome}/readline/inputrc";
+      };
     })
     (mkIf cfg.rust.enable {
-      programs.bash.profileExtra = ''
-        export CARGO_HOME=$XDG_DATA_HOME/cargo
-        # export RUSTUP_HOME=$XDG_DATA_HOME/rustup
-      '';
+      home.sessionVariables = {
+        CARGO_HOME = "${config.xdg.dataHome}/cargo";
+        RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
+      };
     })
     (mkIf cfg.wakatime.enable {
+      home.sessionVariables = {
+        WAKATIME_HOME = "${config.xdg.configHome}/wakatime";
+      };
       programs.bash.profileExtra = ''
-        [ ! -d $XDG_CONFIG_HOME/wakatime ] && mkdir $XDG_CONFIG_HOME/wakatime
-        export WAKATIME_HOME=$XDG_CONFIG_HOME/wakatime
+        [ ! -d ${config.xdg.configHome}/wakatime ] && mkdir ${config.xdg.configHome}/wakatime
       '';
     })
   ]);
