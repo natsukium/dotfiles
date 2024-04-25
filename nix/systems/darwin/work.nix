@@ -1,4 +1,7 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
+let
+  netskope-cert-file = "/Library/Application Support/Netskope/STAgent/download/nscacert.pem";
+in
 {
   imports = [
     ./common.nix
@@ -12,11 +15,19 @@
   };
 
   nix.extraOptions = ''
-    ssl-cert-file = /Library/Application Support/Netskope/STAgent/download/nscacert.pem
+    ssl-cert-file = ${netskope-cert-file}
   '';
 
-  environment.variables = {
-    REQUESTS_CA_BUNDLE = "/Library/Application Support/Netskope/STAgent/download/nscacert.pem";
-    NODE_EXTRA_CA_CERTS = "/Library/Application Support/Netskope/STAgent/download/nscacert.pem";
-  };
+  environment.variables = builtins.listToAttrs (
+    lib.lists.forEach
+      [
+        "CURL_CA_BUNDLE"
+        "NODE_EXTRA_CA_CERTS"
+        "REQUESTS_CA_BUNDLE"
+      ]
+      (x: {
+        name = x;
+        value = netskope-cert-file;
+      })
+  );
 }
