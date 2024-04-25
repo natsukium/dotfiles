@@ -8,6 +8,8 @@ in
     stateVersion = "22.11";
   };
 
+  home.preferXdgDirectories = true;
+
   colorScheme = nix-colors.colorSchemes.nord;
   base16.enable = true;
 
