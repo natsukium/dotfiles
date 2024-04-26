@@ -90,7 +90,7 @@ in
         PYTHONSTARTUP = "${config.xdg.configHome}/python/pythonstartup";
         JUPYTER_PLATFORM_DIRS = 1;
       };
-      programs.bash.profileExtra = ''
+      home.sessionVariablesExtra = ''
         [ ! -f ${config.xdg.cacheHome}/python/history ] && mkdir -p ${config.xdg.cacheHome}/python && touch ${config.xdg.cacheHome}/python/history
       '';
       xdg.configFile."python/pythonstartup".source = ./pythonstartup;
@@ -105,7 +105,7 @@ in
       home.sessionVariables = {
         WAKATIME_HOME = "${config.xdg.configHome}/wakatime";
       };
-      programs.bash.profileExtra = ''
+      home.sessionVariablesExtra = ''
         [ ! -d ${config.xdg.configHome}/wakatime ] && mkdir ${config.xdg.configHome}/wakatime
       '';
     })

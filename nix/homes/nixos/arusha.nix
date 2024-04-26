@@ -20,7 +20,7 @@ in
       ];
       programs.nix.target.user = true;
       home.packages = [ pkgs.wslu ];
-      programs.bash.profileExtra = ''
+      home.sessionVariablesExtra = ''
         export WIN_HOME=$(wslpath $(wslvar USERPROFILE))
       '';
     };
