@@ -37,11 +37,6 @@
             tmux attach || break
           done
         fi
-      ''
-      + ''
-        if type fish >/dev/null 2>&1 && [[ ! $USEBASH ]]; then
-          exec fish
-        fi
       '';
   };
 }
