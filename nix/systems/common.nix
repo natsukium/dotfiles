@@ -30,4 +30,10 @@ in
         Minute = 0;
       };
     };
+
+  # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
+  # https://github.com/LnL7/nix-darwin/issues/663
+  system.activationScripts.extraActivation.text = ''
+    ${lib.getExe pkgs.nix} store diff-closures $(ls -dv /nix/var/nix/profiles/system-*-link/ | tail -2)
+  '';
 }
