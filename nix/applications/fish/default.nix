@@ -28,6 +28,34 @@
 
     shellAbbrs = {
       l = "ls";
+
+      # for Nix
+      "--sxl" = {
+        position = "anywhere";
+        expansion =
+          "--system x86_64-linux"
+          + pkgs.lib.optionalString (
+            pkgs.stdenv.hostPlatform.isDarwin || pkgs.stdenv.hostPlatform.isAarch64
+          ) " -j0";
+      };
+      "--sal" = {
+        position = "anywhere";
+        expansion =
+          "--system aarch64-linux"
+          + pkgs.lib.optionalString (
+            pkgs.stdenv.hostPlatform.isDarwin || pkgs.stdenv.hostPlatform.isx86_64
+          ) " -j0";
+      };
+      "--sxd" = {
+        position = "anywhere";
+        expansion =
+          "--system x86_64-darwin" + pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux " -j0";
+      };
+      "--sad" = {
+        position = "anywhere";
+        expansion =
+          "--system aarch64-darwin" + pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux " -j0";
+      };
     };
 
     functions = {
