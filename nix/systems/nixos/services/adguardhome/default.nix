@@ -2,8 +2,8 @@
 {
   services.adguardhome = {
     enable = true;
+    port = 3333;
     settings = {
-      http.address = "0.0.0.0:3333";
       filters = [
         {
           name = "AdGuard DNS filter";
