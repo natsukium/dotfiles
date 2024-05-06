@@ -100,6 +100,7 @@ in
       "./lua/misc.lua"
       "./lua/plugins/completion.lua"
       "./lua/plugins/dap.lua"
+      "./lua/plugins/git.lua"
       "./lua/plugins/lsp.lua"
       "./lua/plugins/misc.lua"
       "./lua/plugins/test_runner.lua"
