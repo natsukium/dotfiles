@@ -31,6 +31,7 @@ plugins [
   diffview-nvim
   dressing-nvim
   flit-nvim
+  gitlinker-nvim
   gitsigns-nvim
   indent-blankline-nvim
   lazy-nvim

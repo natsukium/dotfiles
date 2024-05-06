@@ -7,6 +7,12 @@ return {
 		event = "VeryLazy",
 	},
 	{
+		name = "gitlinker.nvim",
+		dir = "@gitlinker_nvim@",
+		config = true,
+		event = "VeryLazy",
+	},
+	{
 		name = "gitsigns.nvim",
 		dir = "@gitsigns_nvim@",
 		config = function()
