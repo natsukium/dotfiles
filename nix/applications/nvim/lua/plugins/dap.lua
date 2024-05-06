@@ -28,7 +28,7 @@ return {
   {
     name = "nvim-dap-ui",
     dir = "@nvim_dap_ui@",
-    dependencies = { { name = "nvim-dap", dir = "@nvim_dap@" } },
+    dependencies = { { name = "nvim-dap", dir = "@nvim_dap@" }, { name = "nvim-nio", dir = "@nvim_nio@" } },
     event = "VeryLazy",
     config = function()
       require("dapui").setup()

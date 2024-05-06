@@ -56,6 +56,7 @@ plugins [
   nvim-dap-ui
   nvim-dap-virtual-text
   nvim-lspconfig
+  nvim-nio
   nvim-notify
   nvim-surround
   nvim-treesitter
