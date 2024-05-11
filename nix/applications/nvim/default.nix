@@ -1,7 +1,10 @@
 { pkgs, config, ... }:
 let
   nurpkgs = config.nur.repos.natsukium;
-  buildInputs = with pkgs; [ nodejs ];
+  buildInputs = with pkgs; [
+    nodejs
+    wakatime
+  ];
   lsp = with pkgs; [
     # astro
     nodePackages."@astrojs/language-server"

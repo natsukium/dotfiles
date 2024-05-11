@@ -72,5 +72,6 @@ plugins [
   vim-edgemotion
   vim-illuminate
   vim-table-mode
+  vim-wakatime
   which-key-nvim
 ]

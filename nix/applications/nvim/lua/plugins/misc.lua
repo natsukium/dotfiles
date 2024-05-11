@@ -230,4 +230,9 @@ return {
       vim.keymap.set("n", "<leader>k", "<Plug>(edgemotion-k)")
     end,
   },
+  {
+    name = "vim-wakatime",
+    dir = "@vim_wakatime@",
+    event = "VeryLazy",
+  },
 }
