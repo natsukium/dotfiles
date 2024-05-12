@@ -18,6 +18,7 @@ in
     nur.hmModules.nur
     ../modules/home-manager
     ../applications/alacritty
+    ../applications/atuin
     ../applications/bash
     ../applications/emacs
     ../applications/fish
