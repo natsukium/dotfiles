@@ -6,14 +6,13 @@
   ...
 }:
 let
-  inherit (inputs) neovim-nightly-overlay emacs-overlay;
+  inherit (inputs) emacs-overlay;
   inherit (specialArgs) username;
 in
 {
   imports = [ ../modules/nix ];
 
   nixpkgs.overlays = [
-    neovim-nightly-overlay.overlay
     emacs-overlay.overlays.default
   ];
 

@@ -89,7 +89,6 @@ in
 {
   programs.neovim = {
     enable = true;
-    package = pkgs.neovim-unwrapped.override { treesitter-parsers = { }; };
     vimAlias = true;
     defaultEditor = true;
     extraPackages = buildInputs ++ lsp;
