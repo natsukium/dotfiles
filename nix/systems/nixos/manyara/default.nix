@@ -11,6 +11,7 @@ in
   imports = [
     ../common.nix
     ../services/adguardhome
+    ../services/atuin
     ../services/hydra
     ../services/miniflux
     ./hardware-configuration.nix
