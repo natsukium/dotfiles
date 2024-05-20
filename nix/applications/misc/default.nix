@@ -50,6 +50,7 @@ in
     gnutar
     hydra-check
     jnv
+    maestral
     nix-init
     nix-output-monitor
     nix-update
