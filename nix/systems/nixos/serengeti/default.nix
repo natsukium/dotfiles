@@ -64,6 +64,8 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
+  services.btrfs.autoScrub.enable = true;
+
   networking = {
     hostName = "serengeti";
   };

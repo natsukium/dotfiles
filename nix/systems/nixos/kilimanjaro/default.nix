@@ -26,6 +26,8 @@
     binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
+  services.btrfs.autoScrub.enable = true;
+
   networking = {
     hostName = "kilimanjaro";
     wireless = {

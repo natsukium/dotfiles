@@ -29,6 +29,8 @@ in
     kernelPackages = pkgs.linuxPackages_xanmod_latest;
   };
 
+  services.btrfs.autoScrub.enable = true;
+
   networking = {
     hostName = "manyara";
   };
