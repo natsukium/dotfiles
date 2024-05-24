@@ -28,6 +28,7 @@ plugins [
   comment-nvim
   copilot-cmp
   copilot-lua
+  CopilotChat-nvim
   diffview-nvim
   dressing-nvim
   flit-nvim

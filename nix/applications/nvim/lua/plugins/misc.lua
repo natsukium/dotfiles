@@ -231,6 +231,16 @@ return {
     end,
   },
   {
+    name = "CopilotChat.nvim",
+    dir = "@copilotchat_nvim@",
+    dependencies = {
+      { name = "copilot.lua",  dir = "@copilot_lua@" },
+      { name = "plenary.nvim", dir = "@plenary_nvim@" },
+    },
+    config = true,
+    event = "VeryLazy",
+  },
+  {
     name = "vim-wakatime",
     dir = "@vim_wakatime@",
     event = "VeryLazy",
