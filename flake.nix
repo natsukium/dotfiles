@@ -3,7 +3,6 @@
 
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-for-vivaldi.url = "github:NixOS/nixpkgs/a1f51a5fee39a3e90c1e13b881ab82d4987d7fc6";
     home-manager = {
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";

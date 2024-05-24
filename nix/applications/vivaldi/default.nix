@@ -1,20 +1,11 @@
-{
-  config,
-  pkgs,
-  inputs,
-  ...
-}:
+{ config, pkgs, ... }:
 let
   nurpkgs = config.nur.repos.natsukium;
-  pkgs' = import inputs.nixpkgs-for-vivaldi {
-    inherit (pkgs.stdenv.hostPlatform) system;
-    config.allowUnfree = true;
-  };
 in
 {
   programs.chromium = {
     enable = true;
-    package = if pkgs.stdenv.isLinux then pkgs'.vivaldi else nurpkgs.vivaldi-bin;
+    package = if pkgs.stdenv.isLinux then pkgs.vivaldi else nurpkgs.vivaldi-bin;
     commandLineArgs = pkgs.lib.optionals config.programs.chromium.enableOzone [
       "--enable-wayland-ime"
     ];
