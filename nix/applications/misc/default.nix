@@ -1,4 +1,9 @@
-{ pkgs, config, ... }:
+{
+  inputs,
+  pkgs,
+  config,
+  ...
+}:
 let
   nurpkgs = config.nur.repos.natsukium;
 in
@@ -42,6 +47,7 @@ in
     pueue.enable = true;
   };
   home.packages = with pkgs; [
+    inputs.attic.packages.${stdenv.hostPlatform.system}.attic-client
     cachix
     coreutils
     fd
