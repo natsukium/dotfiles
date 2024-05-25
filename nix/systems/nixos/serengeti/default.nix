@@ -71,6 +71,8 @@
     hostName = "serengeti";
   };
 
+  services.cloudflared.enable = true;
+
   nix.settings = {
     max-jobs = 2;
   };

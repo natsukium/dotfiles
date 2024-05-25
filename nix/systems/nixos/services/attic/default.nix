@@ -1,6 +1,7 @@
 { config, inputs, ... }:
 let
   inherit (inputs) attic;
+  atticdPort = "8081";
 in
 {
   imports = [ attic.nixosModules.atticd ];
@@ -20,7 +21,7 @@ in
     enable = true;
     credentialsFile = config.sops.secrets.atticd.path;
     settings = {
-      listen = "[::]:8081";
+      listen = "[::]:${atticdPort}";
       chunking = {
         nar-size-threshold = 256 * 1024;
         min-size = 64 * 1024;
@@ -39,7 +40,26 @@ in
     };
   };
 
+  services.cloudflared = {
+    tunnels = {
+      "1af5e046-7d0f-4fa4-9366-69eb490d5119" = {
+        credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
+        ingress = {
+          "cache.natsukium.com" = {
+            service = "http://localhost:${atticdPort}";
+          };
+        };
+        default = "http_status:404";
+      };
+    };
+  };
+
   sops.secrets.atticd = {
     sopsFile = ./secrets.yaml;
+  };
+
+  sops.secrets.cloudflared-tunnel = {
+    sopsFile = ./secrets.yaml;
+    owner = config.services.cloudflared.user;
   };
 }
