@@ -24,7 +24,7 @@ let
     nil
     nixfmt
     # python
-    nodePackages.pyright
+    pyright
     ruff
     # ruby
     solargraph
