@@ -32,6 +32,7 @@
     tsnsrv = {
       url = "github:boinkor-net/tsnsrv";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
     nur-packages = {
       url = "github:natsukium/nur-packages";
@@ -40,6 +41,7 @@
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
     };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
@@ -53,6 +55,10 @@
     attic = {
       url = "github:zhaofengli/attic";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
     };
   };
 
@@ -69,147 +75,140 @@
   };
 
   outputs =
-    {
-      nixpkgs,
-      home-manager,
-      darwin,
-      nix-on-droid,
-      nix-colors,
-      nur-packages,
-      ...
-    }@inputs:
-    let
-      forAllSystems = nixpkgs.lib.genAttrs [
+    { self, flake-parts, ... }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      systems = [
         "x86_64-linux"
         "aarch64-linux"
         "aarch64-darwin"
       ];
-    in
-    {
-      homeConfigurations =
-        let
-          conf =
-            username:
-            home-manager.lib.homeManagerConfiguration {
-              pkgs = import nixpkgs { system = "x86_64-linux"; };
-              modules = [ ./nix/homes/non-nixos/common.nix ];
-              extraSpecialArgs = {
-                inherit inputs;
-                username = username;
-              };
-            };
-        in
-        {
-          x64-vm = conf "gazelle";
-        };
-      darwinConfigurations =
-        let
-          conf =
-            {
-              host,
-              username,
-              system ? "aarch64-darwin",
-            }:
-            {
-              "${host}" = darwin.lib.darwinSystem {
-                inherit system;
-                modules = [
-                  ./nix/systems/darwin/${host}.nix
-                  ./nix/homes/darwin/${host}.nix
-                ];
-                specialArgs = {
-                  inherit inputs username;
+
+      flake = {
+        homeConfigurations =
+          let
+            conf =
+              username:
+              self.inputs.home-manager.lib.homeManagerConfiguration {
+                pkgs = import self.inputs.nixpkgs { system = "x86_64-linux"; };
+                modules = [ ./nix/homes/non-nixos/common.nix ];
+                extraSpecialArgs = {
+                  inherit inputs;
+                  username = username;
                 };
               };
+          in
+          {
+            x64-vm = conf "gazelle";
+          };
+        darwinConfigurations =
+          let
+            conf =
+              {
+                host,
+                username,
+                system ? "aarch64-darwin",
+              }:
+              {
+                "${host}" = self.inputs.darwin.lib.darwinSystem {
+                  inherit system;
+                  modules = [
+                    ./nix/systems/darwin/${host}.nix
+                    ./nix/homes/darwin/${host}.nix
+                  ];
+                  specialArgs = {
+                    inherit inputs username;
+                  };
+                };
+              };
+          in
+          conf {
+            host = "work";
+            username = "tomoya.matsumoto";
+          }
+          // conf {
+            # main laptop (m1 macbook air)
+            host = "katavi";
+            username = "gazelle";
+          }
+          // {
+            # build server (m1 mac mini)
+            mikumi = self.inputs.darwin.lib.darwinSystem {
+              system = "aarch64-darwin";
+              modules = [ ./nix/systems/darwin/mikumi.nix ];
+              specialArgs = {
+                inherit inputs;
+                username = "natsukium";
+              };
             };
-        in
-        conf {
-          host = "work";
-          username = "tomoya.matsumoto";
-        }
-        // conf {
-          # main laptop (m1 macbook air)
-          host = "katavi";
-          username = "gazelle";
-        }
-        // {
-          # build server (m1 mac mini)
-          mikumi = darwin.lib.darwinSystem {
-            system = "aarch64-darwin";
-            modules = [ ./nix/systems/darwin/mikumi.nix ];
+          };
+        nixosConfigurations = {
+          kilimanjaro = self.inputs.nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              ./nix/homes/nixos/kilimanjaro
+              ./nix/systems/nixos/kilimanjaro
+            ];
+            specialArgs = {
+              inherit inputs;
+              username = "natsukium";
+            };
+          };
+          arusha = self.inputs.nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [
+              ./nix/homes/nixos/arusha.nix
+              ./nix/systems/nixos/arusha
+            ];
+            specialArgs = {
+              inherit inputs;
+              username = "gazelle";
+            };
+          };
+          serengeti = self.inputs.nixpkgs.lib.nixosSystem {
+            system = "aarch64-linux";
+            modules = [ ./nix/systems/nixos/serengeti ];
+            specialArgs = {
+              inherit inputs;
+              username = "natsukium";
+            };
+          };
+          # main server (mini pc)
+          manyara = self.inputs.nixpkgs.lib.nixosSystem {
+            system = "x86_64-linux";
+            modules = [ ./nix/systems/nixos/manyara ];
             specialArgs = {
               inherit inputs;
               username = "natsukium";
             };
           };
         };
-      nixosConfigurations = {
-        kilimanjaro = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./nix/homes/nixos/kilimanjaro
-            ./nix/systems/nixos/kilimanjaro
-          ];
-          specialArgs = {
-            inherit inputs;
-            username = "natsukium";
-          };
-        };
-        arusha = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [
-            ./nix/homes/nixos/arusha.nix
-            ./nix/systems/nixos/arusha
-          ];
-          specialArgs = {
-            inherit inputs;
-            username = "gazelle";
-          };
-        };
-        serengeti = nixpkgs.lib.nixosSystem {
-          system = "aarch64-linux";
-          modules = [ ./nix/systems/nixos/serengeti ];
-          specialArgs = {
-            inherit inputs;
-            username = "natsukium";
-          };
-        };
-        # main server (mini pc)
-        manyara = nixpkgs.lib.nixosSystem {
-          system = "x86_64-linux";
-          modules = [ ./nix/systems/nixos/manyara ];
-          specialArgs = {
-            inherit inputs;
-            username = "natsukium";
+
+        nixOnDroidConfigurations = {
+          default = self.inputs.nix-on-droid.lib.nixOnDroidConfiguration {
+            system = "aarch64-linux";
+            modules = [
+              ./nix/systems/nix-on-droid
+              ./nix/homes/nix-on-droid
+            ];
+            extraSpecialArgs = {
+              inherit inputs;
+            };
           };
         };
       };
 
-      nixOnDroidConfigurations = {
-        default = nix-on-droid.lib.nixOnDroidConfiguration {
-          system = "aarch64-linux";
-          modules = [
-            ./nix/systems/nix-on-droid
-            ./nix/homes/nix-on-droid
-          ];
-          extraSpecialArgs = {
-            inherit inputs;
-          };
-        };
-      };
-
-      devShells = forAllSystems (
-        system:
-        let
-          pkgs = import nixpkgs {
+      perSystem =
+        { pkgs, system, ... }:
+        {
+          _module.args.pkgs = import self.inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;
-            overlays = [ nur-packages.overlays.default ];
+            overlays = [ self.inputs.nur-packages.overlays.default ];
           };
-        in
-        {
-          default = import ./shell.nix { inherit pkgs; };
-        }
-      );
+
+          devShells = {
+            default = import ./shell.nix { inherit pkgs; };
+          };
+        };
     };
 }
