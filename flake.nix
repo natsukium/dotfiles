@@ -55,6 +55,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   nixConfig = {
@@ -77,6 +81,8 @@
         "aarch64-linux"
         "aarch64-darwin"
       ];
+
+      imports = [ inputs.treefmt-nix.flakeModule ];
 
       flake = {
         homeConfigurations =
@@ -199,6 +205,19 @@
             inherit system;
             config.allowUnfree = true;
             overlays = [ self.inputs.nur-packages.overlays.default ];
+          };
+
+          treefmt = {
+            projectRootFile = "flake.nix";
+            programs = {
+              biome.enable = true;
+              nixfmt.enable = true;
+              shfmt.enable = true;
+              stylua.enable = true;
+              taplo.enable = true;
+              terraform.enable = true;
+              yamlfmt.enable = true;
+            };
           };
 
           devShells = {
