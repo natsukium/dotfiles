@@ -1,6 +1,5 @@
 { pkgs, config, ... }:
 let
-  nurpkgs = config.nur.repos.natsukium;
 in
 {
   imports = [
@@ -48,7 +47,7 @@ in
   };
   fonts = {
     fontDir.enable = true;
-    fonts = [ nurpkgs.liga-hackgen-nf-font ];
+    fonts = [ pkgs.liga-hackgen-nf-font ];
   };
 
   homebrew.casks = [ "google-japanese-ime" ];
@@ -60,6 +59,5 @@ in
 
   services.bclm = {
     enable = true;
-    package = config.nur.repos.natsukium.bclm;
   };
 }

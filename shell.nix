@@ -3,14 +3,15 @@
     config = {
       allowUnfree = true;
     };
+    overlays = builtins.attrValues (
+      (import (builtins.fetchTarball "https://github.com/natsukium/nur-packages/archive/main.tar.gz") { })
+      .overlays
+    );
   },
-  nurpkgs ?
-    import (builtins.fetchTarball "https://github.com/nix-community/NUR/archive/master.tar.gz")
-      { inherit pkgs; },
 }:
 pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
-    nurpkgs.repos.natsukium.nixfmt
+    nixfmt
     pandoc
     shellcheck
     shfmt

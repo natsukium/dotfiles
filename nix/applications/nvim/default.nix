@@ -1,6 +1,5 @@
 { pkgs, config, ... }:
 let
-  nurpkgs = config.nur.repos.natsukium;
   buildInputs = with pkgs; [
     nodejs
     wakatime
@@ -23,7 +22,7 @@ let
     stylua
     # nix
     nil
-    nurpkgs.nixfmt
+    nixfmt
     # python
     nodePackages.pyright
     ruff
@@ -71,7 +70,7 @@ let
       vimdoc
       yaml
     ];
-  plugins = import ./plugins.nix { inherit pkgs nurpkgs; };
+  plugins = import ./plugins.nix { inherit pkgs; };
   configFile = file: {
     "nvim/${file}".source = pkgs.substituteAll (
       {

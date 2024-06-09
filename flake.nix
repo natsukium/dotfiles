@@ -28,7 +28,10 @@
       url = "github:boinkor-net/tsnsrv";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    nur.url = "github:nix-community/nur";
+    nur-packages = {
+      url = "github:natsukium/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -66,7 +69,7 @@
       home-manager,
       darwin,
       nix-colors,
-      nur,
+      nur-packages,
       ...
     }@inputs:
     let
@@ -182,14 +185,11 @@
           pkgs = import nixpkgs {
             inherit system;
             config.allowUnfree = true;
-          };
-          nurpkgs = import nur {
-            inherit pkgs;
-            nurpkgs = import nixpkgs { inherit system; };
+            overlays = [ nur-packages.overlays.default ];
           };
         in
         {
-          default = import ./shell.nix { inherit pkgs nurpkgs; };
+          default = import ./shell.nix { inherit pkgs; };
         }
       );
     };

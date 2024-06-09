@@ -1,6 +1,6 @@
 { inputs, pkgs, ... }:
 let
-  inherit (inputs) nix-colors nur;
+  inherit (inputs) nix-colors;
 in
 {
   programs.home-manager.enable = true;
@@ -15,7 +15,6 @@ in
 
   imports = [
     nix-colors.homeManagerModule
-    nur.hmModules.nur
     ../modules/home-manager
     ../applications/alacritty
     ../applications/atuin

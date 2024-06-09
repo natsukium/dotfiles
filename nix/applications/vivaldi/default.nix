@@ -1,11 +1,8 @@
 { config, pkgs, ... }:
-let
-  nurpkgs = config.nur.repos.natsukium;
-in
 {
   programs.chromium = {
     enable = true;
-    package = if pkgs.stdenv.isLinux then pkgs.vivaldi else nurpkgs.vivaldi-bin;
+    package = pkgs.vivaldi;
     commandLineArgs = pkgs.lib.optionals config.programs.chromium.enableOzone [
       "--enable-wayland-ime"
     ];

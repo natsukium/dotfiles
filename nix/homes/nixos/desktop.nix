@@ -22,7 +22,7 @@ in
   };
 
   home.packages = with pkgs; [
-    config.nur.repos.natsukium.rofi-rbw
+    rofi-rbw
     wl-clipboard
     wtype
   ];

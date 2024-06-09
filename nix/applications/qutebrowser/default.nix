@@ -1,11 +1,7 @@
 { config, pkgs, ... }:
-let
-  nurpkgs = config.nur.repos.natsukium;
-in
 {
   programs.qutebrowser = {
     enable = true;
-    package = if pkgs.stdenv.isLinux then pkgs.qutebrowser else nurpkgs.qutebrowser;
     settings = {
       content.blocking.method = "both";
       window.hide_decoration =

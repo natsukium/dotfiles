@@ -1,13 +1,11 @@
 {
   inputs,
-  config,
   pkgs,
   specialArgs,
   ...
 }:
 let
   inherit (specialArgs) username;
-  nurpkgs = config.nur.repos.natsukium;
 in
 {
   imports = [ inputs.home-manager.darwinModules.home-manager ];
@@ -23,7 +21,6 @@ in
 
       programs.colima = {
         enable = true;
-        package = nurpkgs.colima;
         settings = {
           cpu = 8;
           memory = 8;

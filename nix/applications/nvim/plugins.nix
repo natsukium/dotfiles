@@ -1,4 +1,4 @@
-{ pkgs, nurpkgs }:
+{ pkgs }:
 let
   normalizedPluginAttr = p: {
     "${builtins.replaceStrings
@@ -15,7 +15,6 @@ let
   plugins = p: builtins.foldl' (x: y: x // y) { } (map normalizedPluginAttr p);
 in
 with pkgs.vimPlugins;
-with nurpkgs.vimPlugins;
 plugins [
   ChatGPT-nvim
   FixCursorHold-nvim

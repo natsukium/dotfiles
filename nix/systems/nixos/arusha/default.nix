@@ -1,12 +1,4 @@
-{
-  inputs,
-  pkgs,
-  config,
-  ...
-}:
-let
-  nurpkgs = config.nur.repos.natsukium;
-in
+{ inputs, pkgs, ... }:
 {
   imports = [
     inputs.nixos-wsl.nixosModules.wsl
@@ -35,7 +27,7 @@ in
   fonts.fonts = with pkgs; [
     noto-fonts-cjk
     noto-fonts-emoji
-    nurpkgs.liga-hackgen-nf-font
+    liga-hackgen-nf-font
   ];
 
   environment.systemPackages = [ pkgs.coreutils ];

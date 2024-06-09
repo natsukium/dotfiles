@@ -6,13 +6,14 @@
   ...
 }:
 let
-  inherit (inputs) emacs-overlay;
+  inherit (inputs) emacs-overlay nur-packages;
   inherit (specialArgs) username;
 in
 {
   imports = [ ../modules/nix ];
 
   nixpkgs.overlays = [
+    nur-packages.overlays.default
     emacs-overlay.overlays.default
   ];
 

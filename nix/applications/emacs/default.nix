@@ -2,10 +2,7 @@
 let
   emacs = pkgs.emacsWithPackagesFromUsePackage {
     package =
-      if pkgs.stdenv.isDarwin then
-        config.nur.repos.natsukium.emacs-plus
-      else
-        pkgs.emacs.override { withPgtk = true; };
+      if pkgs.stdenv.isDarwin then pkgs.emacs-plus else pkgs.emacs.override { withPgtk = true; };
     config = ./init.el;
     extraEmacsPackages = epkgs: with epkgs; [ ];
   };

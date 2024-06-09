@@ -1,12 +1,4 @@
-{
-  inputs,
-  pkgs,
-  config,
-  ...
-}:
-let
-  nurpkgs = config.nur.repos.natsukium;
-in
+{ inputs, pkgs, ... }:
 {
   ext.xdg.enable = true;
   programs = {
@@ -60,7 +52,7 @@ in
     nix-init
     nix-output-monitor
     nix-update
-    nurpkgs.nixpkgs-review
+    nixpkgs-review
     nkf
     ranger
     ripgrep

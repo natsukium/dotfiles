@@ -1,11 +1,4 @@
-{
-  config,
-  pkgs,
-  ...
-}:
-let
-  nurpkgs = config.nur.repos.natsukium;
-in
+{ pkgs, ... }:
 {
   programs.hyprland = {
     enable = true;
@@ -13,7 +6,7 @@ in
   fonts.packages = with pkgs; [
     noto-fonts-cjk
     noto-fonts-emoji
-    nurpkgs.liga-hackgen-nf-font
+    liga-hackgen-nf-font
   ];
 
   security.rtkit.enable = true;

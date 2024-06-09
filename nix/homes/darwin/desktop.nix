@@ -5,7 +5,6 @@
   ...
 }:
 let
-  nurpkgs = config.nur.repos.natsukium;
   wallpaper = pkgs.callPackage ../../pkgs/wallpaper {
     wallpaper = inputs.nix-wallpaper.packages.${pkgs.stdenv.hostPlatform.system}.default;
     inherit (config.colorScheme) palette;
@@ -22,7 +21,7 @@ in
 
   home.packages = with pkgs; [
     monitorcontrol
-    nurpkgs.nowplaying-cli
+    nowplaying-cli
   ];
 
   services.raycast.enable = true;
