@@ -8,9 +8,5 @@ else
   mv -f dotfiles-main $HOME/.dotfiles
 fi
 
-if test $REMOTE_CONTAINERS; then
-  make container
-else
-  cd $HOME/.dotfiles
-  make install_nix
-fi
+cd $HOME/.dotfiles
+make install_nix

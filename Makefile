@@ -60,9 +60,6 @@ switch: nix/home.nix
 uninstall_nix:
 	/nix/nix-installer uninstall
 
-container: bin/remote-container.sh
-	$(PWD)/bin/remote-container.sh
-
 setup: $(PWD)/.git/hooks
 
 $(PWD)/.git/hooks: $(PWD)/.githooks/*
