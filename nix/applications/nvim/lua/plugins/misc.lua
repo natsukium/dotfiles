@@ -41,6 +41,7 @@ return {
 
       telescope.setup({
         defaults = {
+          layout_strategy = "flex",
           mappings = {
             i = { ["<c-t>"] = trouble.open_with_trouble },
             n = { ["<c-t>"] = trouble.open_with_trouble },
