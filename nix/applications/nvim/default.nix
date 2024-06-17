@@ -8,7 +8,7 @@ let
     # astro
     nodePackages."@astrojs/language-server"
     # bash
-    nodePackages.bash-language-server
+    bash-language-server
     shellcheck
     shfmt
     # docker
