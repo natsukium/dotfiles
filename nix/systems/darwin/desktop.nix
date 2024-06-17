@@ -45,10 +45,7 @@ in
       remapCapsLockToControl = true;
     };
   };
-  fonts = {
-    fontDir.enable = true;
-    fonts = [ pkgs.liga-hackgen-nf-font ];
-  };
+  fonts.packages = [ pkgs.liga-hackgen-nf-font ];
 
   homebrew.casks = [ "google-japanese-ime" ];
 
