@@ -32,8 +32,6 @@ in
 
   environment.shells = [ pkgs.fish ];
   programs.fish.enable = true;
-  # for darwin, need to run `chsh -s /run/current-system/sw/bin/fish` manually
-  # https://github.com/LnL7/nix-darwin/issues/811
   users.users.${username}.shell = pkgs.fish;
 
   nix.gc =

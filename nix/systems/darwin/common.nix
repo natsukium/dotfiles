@@ -1,8 +1,4 @@
-{
-  pkgs,
-  specialArgs,
-  ...
-}:
+{ pkgs, specialArgs, ... }:
 let
   inherit (pkgs) lib stdenv;
   inherit (specialArgs) username;
@@ -21,7 +17,13 @@ in
 
   nixpkgs.config.allowUnfree = true;
 
-  system.activationScripts.extraActivation.text = lib.optionalString stdenv.isAarch64 ''
-    softwareupdate --install-rosetta --agree-to-license
-  '';
+  # need to run `chsh -s /run/current-system/sw/bin/fish` manually
+  # https://github.com/LnL7/nix-darwin/issues/811
+  system.activationScripts.extraActivation.text =
+    ''
+      chsh -s /run/current-system/sw/bin/fish
+    ''
+    + lib.optionalString stdenv.isAarch64 ''
+      softwareupdate --install-rosetta --agree-to-license
+    '';
 }
