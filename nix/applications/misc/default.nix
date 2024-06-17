@@ -39,7 +39,7 @@
     pueue.enable = true;
   };
   home.packages = with pkgs; [
-    inputs.attic.packages.${stdenv.hostPlatform.system}.attic-client
+    attic-client
     cachix
     coreutils
     fd
