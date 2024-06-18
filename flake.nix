@@ -42,6 +42,7 @@
       url = "github:nix-community/neovim-nightly-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
+      inputs.git-hooks.follows = "git-hooks";
     };
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
@@ -63,6 +64,11 @@
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
+    };
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs";
     };
   };
 
@@ -87,7 +93,10 @@
         "aarch64-darwin"
       ];
 
-      imports = [ inputs.treefmt-nix.flakeModule ];
+      imports = [
+        inputs.git-hooks.flakeModule
+        inputs.treefmt-nix.flakeModule
+      ];
 
       flake = {
         homeConfigurations =
@@ -204,12 +213,34 @@
       };
 
       perSystem =
-        { pkgs, system, ... }:
+        {
+          config,
+          pkgs,
+          system,
+          ...
+        }:
         {
           _module.args.pkgs = import self.inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;
             overlays = [ self.inputs.nur-packages.overlays.default ];
+          };
+
+          pre-commit = {
+            check.enable = true;
+            settings = {
+              src = ./.;
+              hooks = {
+                actionlint.enable = true;
+                biome.enable = true;
+                lua-ls.enable = true;
+                nil.enable = true;
+                shellcheck.enable = true;
+                treefmt.enable = true;
+                typos.enable = true;
+                yamllint.enable = true;
+              };
+            };
           };
 
           treefmt = {
@@ -226,7 +257,23 @@
           };
 
           devShells = {
-            default = import ./shell.nix { inherit pkgs; };
+            default = pkgs.mkShell {
+              packages = with pkgs; [
+                nixfmt
+                pandoc
+                shellcheck
+                shfmt
+                sops
+                ssh-to-age
+                (terraform.withPlugins (p: [
+                  p.external
+                  p.null
+                  p.oci
+                  p.sops
+                ]))
+              ];
+              shellHook = config.pre-commit.installationScript;
+            };
           };
         };
     };
