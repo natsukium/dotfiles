@@ -3,6 +3,7 @@ module "deploy" {
   nixos_system_attr      = "..#nixosConfigurations.serengeti.config.system.build.toplevel"
   nixos_partitioner_attr = "..#nixosConfigurations.serengeti.config.system.build.diskoScript"
   target_host            = oci_core_instance.nix-builder.public_ip
+  target_user            = "natsukium"
   instance_id            = oci_core_instance.nix-builder.public_ip
   install_user           = "ubuntu"
   extra_files_script     = "${path.module}/decrypt-ssh-secret.sh"

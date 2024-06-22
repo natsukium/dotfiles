@@ -67,6 +67,9 @@
 
   services.btrfs.autoScrub.enable = true;
 
+  # https://github.com/nix-community/nixos-anywhere/issues/178
+  security.sudo.wheelNeedsPassword = false;
+
   networking = {
     hostName = "serengeti";
   };
