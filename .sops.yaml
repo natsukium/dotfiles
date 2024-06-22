@@ -3,26 +3,30 @@ keys:
   - &kilimanjaro age16jy52qzvaw7clfg8lvfz47xq3alg8h59xxfrm8uq9d40w8xz8arqys2fvh
   - &serengeti age1zcwtypme4ytx3mugstqfp7d4pe00hpjxk6f40u0pq4ftnvppuyxs48cskm
   - &manyara age1k49t7ycus0gyw37fl69y3nl3ny7vsy44p5583qs8rx6asdeeqvjqr8jlh4
-
 creation_rules:
   - path_regex: secrets/[^/]+\.yaml$
     key_groups:
       - age:
-        - *admin
-        - *kilimanjaro
-        - *serengeti
-        - *manyara
+          - *admin
+          - *kilimanjaro
+          - *serengeti
+          - *manyara
   - path_regex: infra/[^/]+\.yaml$
     key_groups:
       - age:
-        - *admin
+          - *admin
+  - path_regex: nix/systems/nixos/services/hydra/secrets.yaml$
+    key_groups:
+      - age:
+          - *admin
+          - *manyara
   - path_regex: nix/systems/nixos/serengeti/secrets.yaml$
     key_groups:
       - age:
-        - *admin
-        - *serengeti
+          - *admin
+          - *serengeti
   - path_regex: nix/systems/nixos/services/attic/secrets.yaml$
     key_groups:
       - age:
-        - *admin
-        - *serengeti
+          - *admin
+          - *serengeti
