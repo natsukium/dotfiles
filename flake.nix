@@ -237,11 +237,15 @@
                 nil.enable = true;
                 shellcheck.enable = true;
                 treefmt.enable = true;
-                yamllint.enable = true;
                 typos = {
                   enable = true;
                   excludes = [ "secrets.yaml" ];
                   settings.configPath = "typos.toml";
+                };
+                yamllint = {
+                  enable = true;
+                  excludes = [ "secrets.yaml" ];
+                  settings.configData = "{rules: {document-start: {present: false}}}";
                 };
               };
             };
