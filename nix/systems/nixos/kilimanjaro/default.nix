@@ -37,7 +37,7 @@
     };
   };
 
-  sops.secrets.wifi = {};
+  sops.secrets.wifi = { };
 
   nix.settings = {
     max-jobs = 4;
@@ -45,7 +45,6 @@
 
   hardware.opengl = {
     enable = true;
-    driSupport = true;
     driSupport32Bit = true;
   };
 
