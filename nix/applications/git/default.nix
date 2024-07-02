@@ -10,19 +10,19 @@
       key = "9EA45A31DB994C53";
       signByDefault = true;
     };
-    extraConfig =
-      {
-        core.editor = "vim";
-        color = {
-          status = "auto";
-          diff = "auto";
-          branch = "auto";
-          interactive = "auto";
-          grep = "auto";
-        };
-        init.defaultBranch = "main";
-        push.useForceIfIncludes = true;
+    extraConfig = {
+      core.editor = "vim";
+      color = {
+        status = "auto";
+        diff = "auto";
+        branch = "auto";
+        interactive = "auto";
+        grep = "auto";
       };
+      init.defaultBranch = "main";
+      push.useForceIfIncludes = true;
+      url."git@github.com:".pushInsteadOf = "https://github.com/";
+    };
     includes = [
       {
         path = "${config.home.homeDirectory}/src/work/.config/git/config";
