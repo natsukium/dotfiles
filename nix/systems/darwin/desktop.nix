@@ -38,6 +38,9 @@ in
         "com.apple.inputmethod.Kotoeri" = {
           JIMPrefLiveConversionKey = 0;
         };
+        "com.apple.WindowManager" = {
+          EnableStandardClickToShowDesktop = 0;
+        };
       };
     };
     keyboard = {
