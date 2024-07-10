@@ -44,7 +44,9 @@ in
             "root"
             "@wheel"
           ] ++ optional pkgs.stdenv.isDarwin "@admin";
-          sandbox = if pkgs.stdenv.isDarwin then "relaxed" else true;
+          # sandbox is broken on darwin
+          # https://github.com/NixOS/nix/issues/11002
+          sandbox = if pkgs.stdenv.isDarwin then false else true;
           warn-dirty = false;
         };
         # for flake (e.g. nix shell)
