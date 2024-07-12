@@ -10,7 +10,10 @@ let
   inherit (specialArgs) username;
 in
 {
-  imports = [ ../modules/nix ];
+  imports = [
+    ../modules/nix
+    ../applications/nix/buildMachines.nix
+  ];
 
   nixpkgs.overlays = [
     nur-packages.overlays.default
