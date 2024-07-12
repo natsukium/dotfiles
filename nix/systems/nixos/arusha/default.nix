@@ -24,7 +24,7 @@
     enableNvidia = true;
   };
 
-  fonts.fonts = with pkgs; [
+  fonts.packages = with pkgs; [
     noto-fonts-cjk
     noto-fonts-emoji
     liga-hackgen-nf-font
