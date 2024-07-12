@@ -19,9 +19,11 @@ let
     };
 in
 with builtins;
-with lib; {
-  options.wsl.docker-native =
-    with types; { enableNvidia = mkEnableOption "Nvidia Container Toolkit integration"; };
+with lib;
+{
+  options.wsl.docker-native = with types; {
+    enableNvidia = mkEnableOption "Nvidia Container Toolkit integration";
+  };
 
   config =
     let
@@ -29,6 +31,6 @@ with lib; {
     in
     mkIf (config.wsl.enable && cfg.enableNvidia) {
       virtualisation.docker.enableNvidia = true;
-      hardware.opengl.extraPackages = [ (pkgs.callPackage nvidia-wsl { }) ];
+      hardware.graphics.extraPackages = [ (pkgs.callPackage nvidia-wsl { }) ];
     };
 }
