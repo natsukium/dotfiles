@@ -53,6 +53,10 @@ in
         registry.nixpkgs.flake = inputs.nixpkgs;
         # for legacy channel (e.g. nix-shell)
         settings.nix-path = [ "nixpkgs=${inputs.nixpkgs.outPath}" ];
+
+        extraOptions = ''
+          max-silent-time = 3600
+        '';
       };
     })
     (mkIf (cfg.target.user or cfg.target.otherDistroUser) {
