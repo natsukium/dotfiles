@@ -268,7 +268,7 @@
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
-                nixfmt
+                nixfmt-rfc-style
                 pandoc
                 shellcheck
                 shfmt

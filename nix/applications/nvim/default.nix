@@ -22,7 +22,7 @@ let
     stylua
     # nix
     nil
-    nixfmt
+    nixfmt-rfc-style
     # python
     pyright
     ruff
