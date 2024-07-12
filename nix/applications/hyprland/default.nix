@@ -34,6 +34,10 @@
           sensitivity = 0 # -1.0 - 1.0, 0 means no modification.
       }
 
+      cursor {
+        no_hardware_cursors = true
+      }
+
       general {
           # See https://wiki.hyprland.org/Configuring/Variables/ for more
 
@@ -79,11 +83,6 @@
           # See https://wiki.hyprland.org/Configuring/Dwindle-Layout/ for more
           pseudotile = yes # master switch for pseudotiling. Enabling is bound to mainMod + P in the keybinds section below
           preserve_split = yes # you probably want this
-      }
-
-      master {
-          # See https://wiki.hyprland.org/Configuring/Master-Layout/ for more
-          new_is_master = true
       }
 
       gestures {
@@ -162,9 +161,5 @@
       bindm = $mainMod, mouse:272, movewindow
       bindm = $mainMod, mouse:273, resizewindow
     '';
-  };
-  # needs to render cursor with nvidia
-  home.sessionVariables = {
-    WLR_NO_HARDWARE_CURSORS = 1;
   };
 }
