@@ -13,7 +13,12 @@
     inputs.disko.nixosModules.disko
   ];
 
-  inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme1n1" ]; }) disko;
+  inherit
+    (pkgs.callPackage ./disko-config.nix {
+      disks = [ "/dev/disk/by-id/nvme-MS950G75PCIe4_2048G_30107347368" ];
+    })
+    disko
+    ;
 
   boot = {
     loader = {
@@ -36,6 +41,8 @@
       networks."82128927-5G".pskRaw = "@home@";
     };
   };
+
+  fileSystems."/persistent".neededForBoot = true;
 
   sops.secrets.wifi = { };
 
