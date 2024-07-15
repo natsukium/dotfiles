@@ -5,7 +5,10 @@
     hydraURL = "http://127.0.0.1";
     port = 3000;
     notificationSender = "";
-    buildMachinesFiles = [ "/var/lib/hydra/provisioner/machines" ];
+    buildMachinesFiles = [
+      "/etc/nix/machines"
+      "/var/lib/hydra/provisioner/machines"
+    ];
     useSubstitutes = true;
   };
 
