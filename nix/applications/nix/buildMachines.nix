@@ -1,3 +1,9 @@
+{ config, ... }:
+let
+  # hydra doesn't support ssh-ng protocol
+  # https://github.com/NixOS/hydra/issues/688
+  protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
+in
 {
   nix = {
     distributedBuilds = true;
@@ -14,7 +20,7 @@
           "i686-linux"
         ];
         sshUser = "natsukium";
-        protocol = "ssh-ng";
+        inherit protocol;
         maxJobs = 4;
         speedFactor = 1;
         supportedFeatures = [
@@ -29,7 +35,7 @@
         hostName = "serengeti";
         system = "aarch64-linux";
         sshUser = "natsukium";
-        protocol = "ssh-ng";
+        inherit protocol;
         maxJobs = 2;
         speedFactor = 1;
         supportedFeatures = [
@@ -47,7 +53,7 @@
           "x86_64-darwin"
         ];
         sshUser = "natsukium";
-        protocol = "ssh-ng";
+        inherit protocol;
         maxJobs = 4;
         speedFactor = 1;
         supportedFeatures = [
