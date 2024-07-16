@@ -44,8 +44,7 @@ let
     typos-lsp
   ];
   parsers =
-    p:
-    with p; [
+    p: with p; [
       astro
       bash
       c

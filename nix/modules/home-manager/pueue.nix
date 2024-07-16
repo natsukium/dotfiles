@@ -19,36 +19,34 @@ in
       package = mkPackageOption pkgs "pueue" { };
     };
   };
-  config = mkIf cfg.enable (
-    mkMerge [
-      { home.packages = [ cfg.package ]; }
+  config = mkIf cfg.enable (mkMerge [
+    { home.packages = [ cfg.package ]; }
 
-      (mkIf pkgs.stdenv.isLinux {
-        systemd.user.services.pueued = {
-          Unit = {
-            Description = "Pueue Daemon - CLI process scheduler and manager";
-          };
-          Service = {
-            ExecStart = "${cfg.package}/bin/pueued -v";
-            Restart = "on-failure";
-          };
-          Install.WantedBy = [ "default.target" ];
+    (mkIf pkgs.stdenv.isLinux {
+      systemd.user.services.pueued = {
+        Unit = {
+          Description = "Pueue Daemon - CLI process scheduler and manager";
         };
-      })
+        Service = {
+          ExecStart = "${cfg.package}/bin/pueued -v";
+          Restart = "on-failure";
+        };
+        Install.WantedBy = [ "default.target" ];
+      };
+    })
 
-      (mkIf pkgs.stdenv.isDarwin {
-        launchd.agents.pueued = {
-          enable = true;
-          config = {
-            ProgramArguments = [
-              "${cfg.package}/bin/pueued"
-              "-v"
-            ];
-            KeepAlive = true;
-            RunAtLoad = true;
-          };
+    (mkIf pkgs.stdenv.isDarwin {
+      launchd.agents.pueued = {
+        enable = true;
+        config = {
+          ProgramArguments = [
+            "${cfg.package}/bin/pueued"
+            "-v"
+          ];
+          KeepAlive = true;
+          RunAtLoad = true;
         };
-      })
-    ]
-  );
+      };
+    })
+  ]);
 }

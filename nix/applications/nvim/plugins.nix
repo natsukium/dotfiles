@@ -10,7 +10,8 @@ let
         "_"
         "_"
       ]
-      (pkgs.lib.toLower p.pname)}" = p;
+      (pkgs.lib.toLower p.pname)
+    }" = p;
   };
   plugins = p: builtins.foldl' (x: y: x // y) { } (map normalizedPluginAttr p);
 in

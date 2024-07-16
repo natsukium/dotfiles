@@ -1,4 +1,5 @@
-{config, ...}: {
+{ config, ... }:
+{
   services.miniflux = {
     enable = true;
     adminCredentialsFile = config.sops.secrets.miniflux.path;
@@ -15,5 +16,5 @@
 
   systemd.services.tsnsrv-rss-reader.serviceConfig.LoadCredential = "credentials:${config.sops.secrets.tailscale-authkey.path}";
 
-  sops.secrets.miniflux = {};
+  sops.secrets.miniflux = { };
 }

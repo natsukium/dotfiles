@@ -119,36 +119,34 @@ in
           kubernetes.enabled = cfg.enableKubernetes;
         };
     in
-    mkIf cfg.enable (
-      mkMerge [
-        {
-          home.packages =
-            [ cfg.package ]
-            ++ optionals cfg.enableDocker [
-              cfg.packageDocker
-              cfg.packageDockerBuildX
-            ]
-            ++ optionals cfg.enableKubernetes [ cfg.packageKubectl ];
+    mkIf cfg.enable (mkMerge [
+      {
+        home.packages =
+          [ cfg.package ]
+          ++ optionals cfg.enableDocker [
+            cfg.packageDocker
+            cfg.packageDockerBuildX
+          ]
+          ++ optionals cfg.enableKubernetes [ cfg.packageKubectl ];
 
-          # colima needs writable settings file
-          # https://github.com/nix-community/home-manager/issues/1800
-          home.activation.afterWriteBoundary = {
-            after = [ "writeBoundary" ];
-            before = [ ];
-            data = ''
-              colimaDir=${
-                if cfg.enableXDG then "${config.xdg.configHome}/colima" else "${config.home.homeDirectory}/.colima"
-              }/default
-              rm -rf $colimaDir/colima.yaml
-              mkdir -p $colimaDir
-              cat \
-                ${yamlFormat.generate "colima.yaml" settings} \
-                > $colimaDir/colima.yaml
-            '';
-          };
-        }
+        # colima needs writable settings file
+        # https://github.com/nix-community/home-manager/issues/1800
+        home.activation.afterWriteBoundary = {
+          after = [ "writeBoundary" ];
+          before = [ ];
+          data = ''
+            colimaDir=${
+              if cfg.enableXDG then "${config.xdg.configHome}/colima" else "${config.home.homeDirectory}/.colima"
+            }/default
+            rm -rf $colimaDir/colima.yaml
+            mkdir -p $colimaDir
+            cat \
+              ${yamlFormat.generate "colima.yaml" settings} \
+              > $colimaDir/colima.yaml
+          '';
+        };
+      }
 
-        # TODO: enable launch agent
-      ]
-    );
+      # TODO: enable launch agent
+    ]);
 }

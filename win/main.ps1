@@ -23,7 +23,7 @@ Set-ItemProperty -path "HKLM:\SYSTEM\CurrentControlSet\Control\Keyboard Layout" 
 0x1d,0x00,0x3a,0x00,`
 0x00,0x00,0x00,0x00))
 
-function excuteScript($url) {
+function executeScript($url) {
     . { Invoke-WebRequest -useb $url } | Invoke-Expression
 }
 $baseUrl = "https://raw.githubusercontent.com/natsukium/dotfiles/master/win/"
@@ -32,10 +32,10 @@ $baseUrl = "https://raw.githubusercontent.com/natsukium/dotfiles/master/win/"
 wsl --install
 
 # Remove unnecessary apps
-excuteScript ($baseUrl + "del_default_apps.ps1")
+executeScript ($baseUrl + "del_default_apps.ps1")
 
 # Add apps
-excuteScript ($baseUrl + "add_apps.ps1")
+executeScript ($baseUrl + "add_apps.ps1")
 
 # Tear down
 Remove-Item .\Desktop\*

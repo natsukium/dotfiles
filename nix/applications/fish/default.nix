@@ -29,6 +29,7 @@
     '';
 
     shellAbbrs = {
+      # spellchecker:off
       l = "ls";
 
       # for Nix
@@ -58,6 +59,7 @@
         expansion =
           "--system aarch64-darwin" + pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux " -j0";
       };
+      # spellchecker:on
     };
 
     functions = {

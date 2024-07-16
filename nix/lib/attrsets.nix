@@ -1,5 +1,6 @@
 { lib, ... }:
-with lib; {
+with lib;
+{
   flattenAttrsNames =
     let
       recurse =
@@ -11,6 +12,5 @@ with lib; {
         else
           { ${head path} = value; };
     in
-    attrs:
-    foldl recursiveUpdate { } (flatten (recurse [ ] attrs));
+    attrs: foldl recursiveUpdate { } (flatten (recurse [ ] attrs));
 }
