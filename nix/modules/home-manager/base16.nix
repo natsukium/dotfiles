@@ -67,6 +67,10 @@ in
       type = types.bool;
       default = true;
     };
+    jankyborders = mkOption {
+      type = types.bool;
+      default = true;
+    };
     kitty = mkOption {
       type = types.bool;
       default = true;
@@ -291,6 +295,12 @@ in
           "col.active_border" = "rgb(${base0D})";
           "col.inactive_border" = "rgb(${base03})";
         };
+      };
+    })
+    (mkIf cfg.jankyborders {
+      services.jankyborders = {
+        active_color = "0xff${base0D}";
+        inactive_color = "0xff${base03}";
       };
     })
     (mkIf cfg.kitty {

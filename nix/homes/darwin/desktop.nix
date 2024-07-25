@@ -14,6 +14,7 @@ let
 in
 {
   imports = [
+    ../../applications/jankyborders
     ../../applications/sketchybar
     ../desktop.nix
     ./gui-apps-utils
