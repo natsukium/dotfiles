@@ -21,6 +21,8 @@
 
       yabai -m rule --add app=kitty opacity=0.9
       yabai -m rule --add label=emacs app=Emacs manage=on
+      # https://github.com/qutebrowser/qutebrowser/issues/4067
+      yabai -m rule --add app="^qutebrowser$" title!="^$" role="AXWindow" subrole="AXDialog" manage=on
     '';
   };
 }
