@@ -24,7 +24,7 @@ Build for linux machine
 
 ```sh
 nix build --no-link .#homeConfigurations.x64-vm.activationPackage
-home-manager switch --flake .#gazelle
+home-manager switch --flake .#natsukium
 ```
 
 Update packages

@@ -11,7 +11,7 @@
 
   wsl = {
     enable = true;
-    defaultUser = "gazelle";
+    defaultUser = "natsukium";
     nativeSystemd = true;
   };
   hardware.graphics = {

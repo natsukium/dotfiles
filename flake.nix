@@ -114,7 +114,7 @@
               };
           in
           {
-            x64-vm = conf "gazelle";
+            x64-vm = conf "natsukium";
           };
         darwinConfigurations =
           let
@@ -144,7 +144,7 @@
           // conf {
             # main laptop (m1 macbook air)
             host = "katavi";
-            username = "gazelle";
+            username = "natsukium";
           }
           // {
             # build server (m1 mac mini)
@@ -177,7 +177,7 @@
             ];
             specialArgs = {
               inherit inputs;
-              username = "gazelle";
+              username = "natsukium";
             };
           };
           serengeti = self.inputs.nixpkgs.lib.nixosSystem {
