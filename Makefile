@@ -59,8 +59,3 @@ switch: nix/home.nix
 
 uninstall_nix:
 	/nix/nix-installer uninstall
-
-setup: $(PWD)/.git/hooks
-
-$(PWD)/.git/hooks: $(PWD)/.githooks/*
-	ln -sf $^ $@
