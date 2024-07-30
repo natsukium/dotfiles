@@ -2,7 +2,6 @@
 {
   imports = [
     inputs.nixos-wsl.nixosModules.wsl
-    ../../../modules/wsl/vscode.nix
     ../../../modules/nix
     ../common.nix
   ];
@@ -31,6 +30,4 @@
   ];
 
   environment.systemPackages = [ pkgs.coreutils ];
-
-  vscode-wsl.enable = true;
 }
