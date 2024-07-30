@@ -95,121 +95,45 @@
       ];
 
       imports = [
+        ./flake-module.nix
         inputs.git-hooks.flakeModule
         inputs.treefmt-nix.flakeModule
       ];
 
-      flake = {
-        homeConfigurations =
-          let
-            conf =
-              username:
-              self.inputs.home-manager.lib.homeManagerConfiguration {
-                pkgs = import self.inputs.nixpkgs { system = "x86_64-linux"; };
-                modules = [ ./nix/homes/non-nixos/common.nix ];
-                extraSpecialArgs = {
-                  inherit inputs;
-                  username = username;
-                };
-              };
-          in
-          {
-            x64-vm = conf "natsukium";
-          };
-        darwinConfigurations =
-          let
-            conf =
-              {
-                host,
-                username,
-                system ? "aarch64-darwin",
-              }:
-              {
-                "${host}" = self.inputs.darwin.lib.darwinSystem {
-                  inherit system;
-                  modules = [
-                    ./nix/systems/darwin/${host}.nix
-                    ./nix/homes/darwin/${host}.nix
-                  ];
-                  specialArgs = {
-                    inherit inputs username;
-                  };
-                };
-              };
-          in
-          conf {
-            host = "work";
-            username = "tomoya.matsumoto";
-          }
-          // conf {
-            # main laptop (m1 macbook air)
-            host = "katavi";
-            username = "natsukium";
-          }
-          // {
-            # build server (m1 mac mini)
-            mikumi = self.inputs.darwin.lib.darwinSystem {
-              system = "aarch64-darwin";
-              modules = [ ./nix/systems/darwin/mikumi.nix ];
-              specialArgs = {
-                inherit inputs;
-                username = "natsukium";
-              };
-            };
-          };
-        nixosConfigurations = {
-          kilimanjaro = self.inputs.nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            modules = [
-              ./nix/homes/nixos/kilimanjaro
-              ./nix/systems/nixos/kilimanjaro
-            ];
-            specialArgs = {
-              inherit inputs;
-              username = "natsukium";
-            };
-          };
-          arusha = self.inputs.nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            modules = [
-              ./nix/homes/nixos/arusha.nix
-              ./nix/systems/nixos/arusha
-            ];
-            specialArgs = {
-              inherit inputs;
-              username = "natsukium";
-            };
-          };
-          serengeti = self.inputs.nixpkgs.lib.nixosSystem {
-            system = "aarch64-linux";
-            modules = [ ./nix/systems/nixos/serengeti ];
-            specialArgs = {
-              inherit inputs;
-              username = "natsukium";
-            };
-          };
-          # main server (mini pc)
-          manyara = self.inputs.nixpkgs.lib.nixosSystem {
-            system = "x86_64-linux";
-            modules = [ ./nix/systems/nixos/manyara ];
-            specialArgs = {
-              inherit inputs;
-              username = "natsukium";
-            };
-          };
+      hosts = {
+        # main laptop (m1 macbook air)
+        katavi = {
+          system = "aarch64-darwin";
         };
-
-        nixOnDroidConfigurations = {
-          default = self.inputs.nix-on-droid.lib.nixOnDroidConfiguration {
-            system = "aarch64-linux";
-            modules = [
-              ./nix/systems/nix-on-droid
-              ./nix/homes/nix-on-droid
-            ];
-            extraSpecialArgs = {
-              inherit inputs;
-            };
-          };
+        # build server (m1 mac mini)
+        mikumi = {
+          system = "aarch64-darwin";
+        };
+        # laptop for work (m1 macbook pro)
+        work = {
+          system = "aarch64-darwin";
+          username = "tomoya.matsumoto";
+        };
+        # main desktop (intel core i5-12400F)
+        kilimanjaro = {
+          system = "x86_64-linux";
+        };
+        # WSL (dualboot with kilimanjaro)
+        arusha = {
+          system = "x86_64-linux";
+        };
+        # main server (intel N100)
+        manyara = {
+          system = "x86_64-linux";
+        };
+        # build server (OCI A1 Flex)
+        serengeti = {
+          system = "aarch64-linux";
+        };
+        # phone (pixel 7a)
+        android = {
+          system = "aarch64-linux";
+          platform = "android";
         };
       };
 

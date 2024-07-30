@@ -1,0 +1,99 @@
+{
+  inputs,
+  lib,
+  config,
+  ...
+}:
+let
+  inherit (builtins) attrValues pathExists;
+  inherit (lib)
+    filter
+    last
+    mapAttrs
+    mkOption
+    splitString
+    types
+    ;
+
+  getDefaultPlatform =
+    system: if (last (splitString "-" system)) == "linux" then "nixos" else "darwin";
+
+  systemConfigurations =
+    platform: hostname: attrs:
+    if platform == "nixos" then
+      { nixosConfigurations."${hostname}" = inputs.nixpkgs.lib.nixosSystem attrs; }
+    else if platform == "darwin" then
+      { darwinConfigurations."${hostname}" = inputs.darwin.lib.darwinSystem attrs; }
+    else
+      { nixOnDroidConfigurations.default = inputs.nix-on-droid.lib.nixOnDroidConfiguration attrs; };
+
+  maybePath = path: if pathExists path then path else null;
+in
+{
+  options.hosts = mkOption {
+    default = { };
+    type = types.attrsOf (
+      types.submodule (
+        { name, ... }:
+        {
+          options = {
+            system = mkOption {
+              default = "x86_64-linux";
+              type = types.str;
+            };
+            platform = mkOption {
+              default = getDefaultPlatform config.hosts.${name}.system;
+              type = types.str;
+            };
+            modules = mkOption {
+              default = [ ];
+              type = types.listOf types.path;
+            };
+            username = mkOption {
+              default = "natsukium";
+              type = types.str;
+            };
+            specialArgs = mkOption {
+              default = { };
+              type = types.attrs;
+            };
+          };
+        }
+      )
+    );
+  };
+
+  config = rec {
+    flake = lib.foldAttrs (host: acc: host // acc) { } (
+      attrValues (
+        mapAttrs (
+          name: cfg:
+          systemConfigurations cfg.platform name {
+            inherit (cfg) system;
+            modules =
+              filter (x: x != null) [
+                (maybePath ./nix/systems/${cfg.platform}/${name})
+                (maybePath ./nix/homes/${cfg.platform}/${name})
+              ]
+              ++ lib.optionals (cfg.platform == "android") [
+                ./nix/systems/nix-on-droid
+                ./nix/homes/nix-on-droid
+              ]
+              ++ cfg.modules;
+            "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
+              inherit inputs;
+              inherit (cfg) username;
+            } // cfg.specialArgs;
+          }
+        ) config.hosts
+      )
+    );
+    perSystem =
+      { config, ... }:
+      {
+        checks = builtins.mapAttrs (k: v: v.config.system.build.toplevel) (
+          flake.nixosConfigurations // flake.darwinConfigurations
+        );
+      };
+  };
+}
