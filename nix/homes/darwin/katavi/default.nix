@@ -3,9 +3,9 @@ let
   inherit (specialArgs) username;
 in
 {
-  imports = [ ./common.nix ];
+  imports = [ ../common.nix ];
 
   home-manager.users.${username} = {
-    imports = [ ./desktop.nix ];
+    imports = [ ../desktop.nix ];
   };
 }

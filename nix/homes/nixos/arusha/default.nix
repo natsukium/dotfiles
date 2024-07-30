@@ -15,8 +15,8 @@ in
     useUserPackages = true;
     users.${username} = {
       imports = [
-        ../common.nix
-        ../../modules/nix
+        ../../common.nix
+        ../../../modules/nix
       ];
       programs.nix.target.user = true;
       home.packages = [ pkgs.wslu ];

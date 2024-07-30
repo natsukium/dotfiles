@@ -1,6 +1,6 @@
 { pkgs, ... }:
 {
-  imports = [ ./common.nix ];
+  imports = [ ../common.nix ];
 
   nix.settings = {
     max-jobs = 4;
