@@ -19,6 +19,10 @@
 
 (require 'org-tempo)
 
+(org-babel-do-load-languages
+ 'org-babel-load-languages
+ '((shell . t)))
+
 (use-package nix-mode
   :ensure t
   :mode "\\.nix\\'")
