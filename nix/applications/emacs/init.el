@@ -5,16 +5,16 @@
 (scroll-bar-mode -1)
 (add-to-list 'default-frame-alist
 '(undecorated-round . t))
-(leaf doom-themes
+(use-package doom-themes
   :ensure t
   :config
 (load-theme 'doom-nord :no-confirm))
 (setq-default indent-tabs-mode nil)
-(leaf magit
+(use-package magit
   :ensure t
   :bind
 (("C-x g" . magit-status)))
-(leaf nix-mode
+(use-package nix-mode
   :ensure t
   :mode "\\.nix\\'")
 (require 'org-tempo)
