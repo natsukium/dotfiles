@@ -23,6 +23,8 @@
  'org-babel-load-languages
  '((shell . t)))
 
+(setq org-src-preserve-indentation t)
+
 (use-package nix-mode
   :ensure t
   :mode "\\.nix\\'")
