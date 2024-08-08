@@ -9,12 +9,16 @@
   :ensure t
   :config
 (load-theme 'doom-nord :no-confirm))
-(setq-default indent-tabs-mode nil)
+
 (use-package magit
   :ensure t
   :bind
-(("C-x g" . magit-status)))
+  (("C-x g" . magit-status)))
+
+(setq-default indent-tabs-mode nil)
+
+(require 'org-tempo)
+
 (use-package nix-mode
   :ensure t
   :mode "\\.nix\\'")
-(require 'org-tempo)
