@@ -6,7 +6,7 @@ let
   ];
   lsp = with pkgs; [
     # astro
-    nodePackages."@astrojs/language-server"
+    astro-language-server
     # bash
     bash-language-server
     shellcheck
