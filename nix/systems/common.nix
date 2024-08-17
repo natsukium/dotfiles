@@ -27,6 +27,8 @@ in
         swiftpm
         swiftpm2nix
         dockutil
+        # https://github.com/NixOS/nixpkgs/issues/332957
+        typst-lsp
         ;
     })
   ];
