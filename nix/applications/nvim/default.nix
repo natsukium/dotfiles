@@ -21,7 +21,7 @@ let
     lua-language-server
     stylua
     # nix
-    nil
+    nixd
     nixfmt-rfc-style
     # python
     pyright

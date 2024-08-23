@@ -48,7 +48,6 @@ return {
 				"astro",
 				"bashls",
 				"biome",
-				"nil_ls",
 				"pyright",
 				"ruff",
 				"rubocop",
@@ -88,6 +87,12 @@ return {
 					},
 				},
 			})
+			lspconfig.nixd.setup({
+				capabilities = capabilities,
+				settings = {
+					formatting = { command = { "nixfmt" } },
+				},
+			})
 		end,
 	},
 	{
@@ -99,7 +104,6 @@ return {
 			null_ls.setup({
 				sources = {
 					null_ls.builtins.diagnostics.hadolint,
-					null_ls.builtins.formatting.nixfmt,
 					null_ls.builtins.formatting.stylua,
 					null_ls.builtins.formatting.shfmt,
 				},
