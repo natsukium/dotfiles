@@ -158,7 +158,7 @@
               hooks = {
                 actionlint.enable = true;
                 biome.enable = true;
-                lua-ls.enable = true;
+                lua-ls.enable = false;
                 nil.enable = true;
                 shellcheck.enable = true;
                 treefmt.enable = true;
