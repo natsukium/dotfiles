@@ -48,9 +48,13 @@ return {
 				"astro",
 				"bashls",
 				"biome",
+				"docker_compose_language_service",
+				"dockerls",
+				"lua_ls",
+				"nixd",
 				"pyright",
-				"ruff",
 				"rubocop",
+				"ruff",
 				"rust_analyzer",
 				"solargraph",
 				"taplo",
@@ -60,39 +64,44 @@ return {
 				"typst_lsp",
 				"yamlls",
 			}) do
-				lspconfig[ls].setup({
-					capabilities = capabilities,
-				})
-			end
-			lspconfig.dockerls.setup({
-				capabilities = capabilities,
-				root_dir = lspconfig.util.root_pattern("Dockerfile", "Containerfile"),
-			})
-			lspconfig.docker_compose_language_service.setup({
-				capabilities = capabilities,
-				root_dir = lspconfig.util.root_pattern(
-					"docker-compose.yaml",
-					"docker-compose.yml",
-					"compose.yaml",
-					"compose.yml"
-				),
-			})
-			lspconfig.lua_ls.setup({
-				capabilities = capabilities,
-				settings = {
-					Lua = {
-						diagnostics = {
-							globals = { "vim" },
+				local server_config = {}
+				if ls == "dockerls" then
+					server_config = {
+						root_dir = lspconfig.util.root_pattern("Dockerfile", "Containerfile"),
+					}
+				elseif ls == "docker_compose_language_service" then
+					server_config = {
+						root_dir = lspconfig.util.root_pattern(
+							"docker-compose.yaml",
+							"docker-compose.yml",
+							"compose.yaml",
+							"compose.yml"
+						),
+					}
+				elseif ls == "lua_ls" then
+					server_config = {
+						settings = {
+							Lua = {
+								diagnostics = {
+									globals = { "vim" },
+								},
+							},
 						},
-					},
-				},
-			})
-			lspconfig.nixd.setup({
-				capabilities = capabilities,
-				settings = {
-					formatting = { command = { "nixfmt" } },
-				},
-			})
+					}
+				elseif ls == "nixd" then
+					server_config = {
+						settings = {
+							formatting = { command = { "nixfmt" } },
+						},
+					}
+				end
+
+				for k, v in pairs({ capabilities = capabilities }) do
+					server_config[k] = v
+				end
+
+				lspconfig[ls].setup(server_config)
+			end
 		end,
 	},
 	{
