@@ -71,6 +71,11 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-stable.follows = "nixpkgs";
     };
+    cachix-deploy-flake = {
+      url = "github:cachix/cachix-deploy-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.darwin.follows = "darwin";
+    };
   };
 
   nixConfig = {
@@ -150,6 +155,18 @@
             config.allowUnfree = true;
             overlays = [ self.inputs.nur-packages.overlays.default ];
           };
+
+          packages =
+            let
+              cachix-deploy-lib = inputs.cachix-deploy-flake.lib pkgs;
+            in
+            {
+              cachix-deploy = cachix-deploy-lib.spec {
+                agents = {
+                  mikumi = self.darwinConfigurations.mikumi.config.system.build.toplevel;
+                };
+              };
+            };
 
           pre-commit = {
             check.enable = true;
