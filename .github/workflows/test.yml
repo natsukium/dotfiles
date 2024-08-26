@@ -38,3 +38,11 @@ jobs:
           export MAKEFLAGS="NIX:=nix"
           make
           df -h
+      - name: deploy
+        if: matrix.os == 'macos-14' && success() && github.ref == 'refs/heads/main'
+        env:
+          CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
+        run: |
+          spec=$(nix build ".#cachix-deploy" --print-out-paths)
+          cachix push natsukium "$spec"
+          cachix deploy activate "$spec"
