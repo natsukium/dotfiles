@@ -18,6 +18,8 @@ in
   programs = {
     kitty = {
       enable = true;
+      # https://github.com/NixOS/nixpkgs/pull/338070
+      package = pkgs.kitty.overridePythonAttrs { doCheck = false; };
       settings = {
         "font_family" = "Liga HackGen Console NF";
         "font_size" = 14;
