@@ -42,11 +42,12 @@ in
   time.timeZone = "Asia/Tokyo";
 
   i18n = {
-    defaultLocale = "ja_JP.UTF-8";
-    extraLocaleSettings = {
-      LC_COLLATE = "C.UTF-8";
-      LC_MESSAGES = "en_US.UTF-8";
-    };
+    # Using tailscale SSH to access remote store fails to load extra locales
+    # /nix/store/fx3g0sgldmgh8dpcw8j8ynx99nry1mf2-set-environment: line 12: warning: setlocale: LC_MESSAGES: cannot change locale (en_US.UTF-8): No such file or directory
+    # related issues
+    # https://discourse.nixos.org/t/tailscale-ssh-destroys-nix-copy/38781
+    # https://github.com/tailscale/tailscale/issues/4940
+    defaultLocale = "en_US.UTF-8";
   };
 
   services.openssh = {
