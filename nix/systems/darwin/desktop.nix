@@ -59,5 +59,8 @@ in
 
   services.bclm = {
     enable = true;
+    # remove the override if swift is fixed
+    # https://github.com/NixOS/nixpkgs/issues/327836#issuecomment-2308417434
+    package = pkgs.bclm.overrideAttrs { meta.broken = false; };
   };
 }
