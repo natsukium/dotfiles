@@ -2,7 +2,7 @@
 let
   buildInputs = with pkgs; [
     nodejs
-    wakatime
+    (wakatime-cli.overrideAttrs { __darwinAllowLocalNetworking = true; })
   ];
   lsp = with pkgs; [
     # astro
