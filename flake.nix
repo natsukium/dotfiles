@@ -2,10 +2,10 @@
   description = "dotfiles";
 
   inputs = {
-    # use staging-next branch until it hits unstable
+    # use master branch until it hits unstable
     # this branch has the fix for fontconfig
     # https://nixpk.gs/pr-tracker.html?pr=338328
-    nixpkgs.url = "github:nixos/nixpkgs/staging-next";
+    nixpkgs.url = "github:nixos/nixpkgs";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
     home-manager = {
       url = "github:nix-community/home-manager";
