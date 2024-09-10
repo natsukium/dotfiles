@@ -35,8 +35,7 @@ jobs:
       - uses: DeterminateSystems/magic-nix-cache-action@v8
       - name: build
         run: |
-          export MAKEFLAGS="NIX:=nix"
-          make
+          nix run nixpkgs#nix-fast-build -- --skip-cached --no-link --no-nom
           df -h
   deploy:
     needs: build
