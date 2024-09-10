@@ -51,9 +51,21 @@ in
         Hour = 0;
         Minute = 0;
       };
+
+      # cachix deploy fails
+      # error: A single-user install can't run gc as root, aborting activation
+      user = "root";
     };
 
-  nix.optimise.automatic = true;
+  nix.optimise =
+    {
+      automatic = true;
+    }
+    // lib.optionalAttrs pkgs.stdenv.isDarwin {
+      # cachix deploy fails
+      # error: A single-user install can't run optimiser as root, aborting activation
+      user = "root";
+    };
 
   # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
   # https://github.com/LnL7/nix-darwin/issues/663
