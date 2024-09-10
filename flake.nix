@@ -158,10 +158,14 @@
             overlays = [ self.inputs.nur-packages.overlays.default ] ++ builtins.attrValues self.overlays;
           };
 
-          checks = import ./tests {
-            inherit (self.inputs) nixpkgs;
-            inherit pkgs;
-          };
+          checks =
+            import ./tests {
+              inherit (self.inputs) nixpkgs;
+              inherit pkgs;
+            }
+            // {
+              devshell = config.devShells.default;
+            };
 
           packages =
             let
