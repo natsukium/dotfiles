@@ -31,7 +31,9 @@
     binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
-  services.btrfs.autoScrub.enable = true;
+  ext.btrfs = {
+    enable = true;
+  };
 
   networking = {
     hostName = "kilimanjaro";
