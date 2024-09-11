@@ -216,10 +216,6 @@
             default = pkgs.mkShell {
               packages = with pkgs; [
                 nix-fast-build
-                nixfmt-rfc-style
-                pandoc
-                shellcheck
-                shfmt
                 sops
                 ssh-to-age
                 (terraform.withPlugins (p: [
