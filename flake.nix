@@ -2,10 +2,7 @@
   description = "dotfiles";
 
   inputs = {
-    # use master branch until it hits unstable
-    # this branch has the fix for fontconfig
-    # https://nixpk.gs/pr-tracker.html?pr=338328
-    nixpkgs.url = "github:nixos/nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable-small";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
     home-manager = {
       url = "github:nix-community/home-manager";
