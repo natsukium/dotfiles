@@ -39,8 +39,8 @@
     hostName = "kilimanjaro";
     wireless = {
       enable = true;
-      environmentFile = config.sops.secrets.wifi.path;
-      networks."82128927-5G".pskRaw = "@home@";
+      secretsFile = config.sops.secrets.wifi.path;
+      networks."82128927-5G".pskRaw = "ext:home";
     };
   };
 
