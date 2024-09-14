@@ -26,4 +26,6 @@ in
     + lib.optionalString stdenv.isAarch64 ''
       softwareupdate --install-rosetta --agree-to-license
     '';
+
+  system.stateVersion = 5;
 }
