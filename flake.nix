@@ -76,6 +76,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.darwin.follows = "darwin";
     };
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.pre-commit-hooks-nix.follows = "git-hooks";
+    };
   };
 
   nixConfig = {
