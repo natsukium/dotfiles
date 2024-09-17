@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (inputs) disko tsnsrv;
+  inherit (inputs) tsnsrv;
 in
 {
   imports = [
@@ -15,7 +15,6 @@ in
     ../services/hydra
     ../services/miniflux
     ./hardware-configuration.nix
-    disko.nixosModules.disko
     tsnsrv.nixosModules.default
   ];
 

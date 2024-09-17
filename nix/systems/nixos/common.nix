@@ -17,6 +17,7 @@ in
     ../../modules/nixos
     ../common.nix
     ./services/tailscale
+    inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
   ];
 

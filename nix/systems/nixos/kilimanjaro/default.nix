@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   pkgs,
   ...
@@ -10,7 +9,6 @@
     ../common.nix
     ../desktop.nix
     ./hardware-configuration.nix
-    inputs.disko.nixosModules.disko
   ];
 
   inherit

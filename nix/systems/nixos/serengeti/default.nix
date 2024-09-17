@@ -1,10 +1,9 @@
-{ inputs, pkgs, ... }:
+{ inputs, ... }:
 {
   imports = [
     ./hardware-configuration.nix
     ../common.nix
     ../services/attic
-    inputs.disko.nixosModules.disko
     inputs.impermanence.nixosModules.impermanence
   ];
 
