@@ -12,6 +12,7 @@ in
     ../common.nix
     ../services/adguardhome
     ../services/atuin
+    ../services/forgejo
     ../services/hydra
     ../services/miniflux
     ./hardware-configuration.nix
