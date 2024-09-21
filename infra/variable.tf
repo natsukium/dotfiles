@@ -9,7 +9,7 @@ variable "user_ocid" {
 }
 
 variable "fingerprint" {
-  default = "f3:c0:cc:62:7d:9b:1a:89:c6:f1:4f:86:93:d8:65:62"
+  default = "dd:40:91:0e:2a:89:c1:8d:69:9f:4a:fc:57:48:26:a1"
 }
 
 variable "region" {
