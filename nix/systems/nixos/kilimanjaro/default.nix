@@ -8,6 +8,7 @@
     ../../../modules/nix
     ../common.nix
     ../desktop.nix
+    ../services/gitea-actions-runner
     ./hardware-configuration.nix
   ];
 
