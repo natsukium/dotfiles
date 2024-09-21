@@ -43,4 +43,6 @@ in
     enable = true;
     defaults.authKeyPath = config.sops.secrets.tailscale-authkey.path;
   };
+
+  services.cloudflared.enable = true;
 }
