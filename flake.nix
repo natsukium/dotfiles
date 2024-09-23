@@ -226,6 +226,7 @@
                 ssh-to-age
                 (terraform.withPlugins (p: [
                   p.external
+                  p.hydra
                   p.null
                   p.oci
                   p.sops
