@@ -36,7 +36,7 @@ let
     # typescript
     nodePackages.typescript-language-server
     # typst
-    typst-lsp
+    tinymist
     typstfmt
     # yaml
     yaml-language-server

@@ -59,9 +59,9 @@ return {
 				"solargraph",
 				"taplo",
 				"terraformls",
+				"tinymist",
 				"tsserver",
 				"typos_lsp",
-				"typst_lsp",
 				"yamlls",
 			}) do
 				local server_config = {}
