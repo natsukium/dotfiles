@@ -1,8 +1,7 @@
 { pkgs, config, ... }:
 let
   emacs = pkgs.emacsWithPackagesFromUsePackage {
-    package =
-      if pkgs.stdenv.isDarwin then pkgs.emacs-plus else pkgs.emacs.override { withPgtk = true; };
+    package = if pkgs.stdenv.isDarwin then pkgs.emacs30-plus else pkgs.emacs30-pgtk;
     config = ./init.el;
     extraEmacsPackages = epkgs: with epkgs; [ ];
   };
