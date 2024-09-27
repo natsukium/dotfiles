@@ -8,7 +8,9 @@
 (use-package doom-themes
   :ensure t
   :config
-(load-theme 'doom-nord :no-confirm))
+  (load-theme 'doom-nord :no-confirm))
+
+(which-key-mode)
 
 (use-package magit
   :ensure t
