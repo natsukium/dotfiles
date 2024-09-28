@@ -1,4 +1,4 @@
-{ pkgs, specialArgs, ... }:
+{ specialArgs, ... }:
 let
   inherit (specialArgs) username;
 in
@@ -7,7 +7,5 @@ in
 
   home-manager.users.${username} = {
     imports = [ ../desktop.nix ];
-
-    home.packages = with pkgs; [ jetbrains.idea-community ];
   };
 }
