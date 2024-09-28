@@ -72,12 +72,12 @@ in
             inherit (cfg) system;
             modules =
               filter (x: x != null) [
-                (maybePath ./nix/systems/${cfg.platform}/${name})
-                (maybePath ./nix/homes/${cfg.platform}/${name})
+                (maybePath ./systems/${cfg.platform}/${name})
+                (maybePath ./homes/${cfg.platform}/${name})
               ]
               ++ lib.optionals (cfg.platform == "android") [
-                ./nix/systems/nix-on-droid
-                ./nix/homes/nix-on-droid
+                ./systems/nix-on-droid
+                ./homes/nix-on-droid
               ]
               ++ cfg.modules;
             "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {

@@ -22,7 +22,7 @@ in
   ];
 
   sops = {
-    defaultSopsFile = ../../../secrets/default.yaml;
+    defaultSopsFile = ../../secrets/default.yaml;
     age = {
       keyFile = "${impermanencePrefix}/var/lib/sops-nix/key.txt";
       sshKeyPaths = map (key: key.path) config.services.openssh.hostKeys;
