@@ -16,7 +16,11 @@ in
     };
   };
   config = mkIf cfg.enable {
-    home.packages = [ cfg.package ];
+    home.packages = [
+      cfg.package
+      # for bitwarden vault
+      pkgs.bitwarden-cli
+    ];
 
     launchd.agents.raycast = {
       enable = true;
