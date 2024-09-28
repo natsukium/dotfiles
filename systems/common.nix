@@ -1,5 +1,6 @@
 {
   inputs,
+  self,
   lib,
   pkgs,
   specialArgs,
@@ -18,20 +19,7 @@ in
   nixpkgs.overlays = [
     nur-packages.overlays.default
     emacs-overlay.overlays.default
-    # swift is broken on darwin as of 2024-06
-    # https://github.com/NixOS/nixpkgs/issues/320900
-    (final: prev: {
-      inherit (inputs.nixpkgs-stable.legacyPackages.${pkgs.stdenv.hostPlatform.system})
-        swift
-        swiftPackages
-        swiftpm
-        swiftpm2nix
-        dockutil
-        # https://github.com/NixOS/nixpkgs/issues/339576
-        bitwarden-cli
-        ;
-    })
-  ];
+  ] ++ lib.attrValues self.overlays;
 
   programs.nix.target.system = true;
 
