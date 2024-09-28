@@ -28,6 +28,7 @@ in
     ../applications/lazygit
     ../applications/misc
     ../applications/nix
+    ../applications/nushell
     ../applications/nvim
     ../applications/rbw
     ../applications/starship
