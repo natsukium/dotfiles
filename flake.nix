@@ -148,6 +148,10 @@
         };
       };
 
+      flake = {
+        templates = import ./templates;
+      };
+
       perSystem =
         {
           config,
