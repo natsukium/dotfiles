@@ -38,8 +38,22 @@ jobs:
           export MAKEFLAGS="NIX:=nix"
           make
           df -h
+  deploy:
+    needs: build
+    runs-on: macos-14
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v29
+      - name: Setup cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: natsukium
+          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community,cuda-maintainers
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
       - name: deploy
-        if: matrix.os == 'macos-14' && success() && github.ref == 'refs/heads/main'
         env:
           CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
         run: |
