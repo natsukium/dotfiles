@@ -1,22 +1,16 @@
 {
-  inputs,
   config,
   pkgs,
   ...
 }:
-let
-  inherit (inputs) tsnsrv;
-in
 {
   imports = [
     ../common.nix
     ../services/adguardhome
     ../services/atuin
     ../services/forgejo
-    ../services/hydra
     ../services/miniflux
     ./hardware-configuration.nix
-    tsnsrv.nixosModules.default
   ];
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;

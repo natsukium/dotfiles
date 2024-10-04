@@ -19,6 +19,7 @@ in
     ./services/tailscale
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
+    inputs.tsnsrv.nixosModules.default
   ];
 
   sops = {

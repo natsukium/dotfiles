@@ -3,7 +3,7 @@ data "sops_file" "hydra-secret" {
 }
 
 provider "hydra" {
-  host     = "http://manyara:3000"
+  host     = "http://kilimanjaro:3000"
   password = data.sops_file.hydra-secret.data["hydra-password"]
   username = "natsukium"
 }

@@ -9,6 +9,7 @@
     ../common.nix
     ../desktop.nix
     ../services/gitea-actions-runner
+    ../services/hydra
     ../services/llm
     ./hardware-configuration.nix
   ];
