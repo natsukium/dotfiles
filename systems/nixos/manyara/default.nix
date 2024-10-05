@@ -8,6 +8,7 @@
     ../common.nix
     ../services/adguardhome
     ../services/atuin
+    ../services/calibre-web
     ../services/forgejo
     ../services/miniflux
     ./hardware-configuration.nix
