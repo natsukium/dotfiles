@@ -167,6 +167,11 @@
             overlays = [ self.inputs.nur-packages.overlays.default ];
           };
 
+          checks = import ./tests {
+            inherit (self.inputs) nixpkgs;
+            inherit pkgs;
+          };
+
           packages =
             let
               cachix-deploy-lib = inputs.cachix-deploy-flake.lib pkgs;
