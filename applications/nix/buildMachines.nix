@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 let
   # hydra doesn't support ssh-ng protocol
   # https://github.com/NixOS/hydra/issues/688
@@ -12,8 +12,9 @@ in
       builders-use-substitutes = true
     '';
 
-    buildMachines = [
-      {
+    buildMachines =
+      [ ]
+      ++ lib.optional (config.networking.hostName != "kilimanjaro") {
         hostName = "kilimanjaro";
         systems = [
           "x86_64-linux"
@@ -31,7 +32,7 @@ in
         ];
         mandatoryFeatures = [ ];
       }
-      {
+      ++ lib.optional (config.networking.hostName != "serengeti") {
         hostName = "serengeti";
         system = "aarch64-linux";
         sshUser = "natsukium";
@@ -46,7 +47,7 @@ in
         ];
         mandatoryFeatures = [ ];
       }
-      {
+      ++ lib.optional (config.networking.hostName != "mikumi") {
         hostName = "mikumi";
         systems = [
           "aarch64-darwin"
@@ -63,7 +64,6 @@ in
           "nixos-test"
         ];
         mandatoryFeatures = [ ];
-      }
-    ];
+      };
   };
 }
