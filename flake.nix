@@ -82,6 +82,12 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.pre-commit-hooks-nix.follows = "git-hooks";
     };
+    niri-flake = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+      inputs.flake-parts.follows = "flake-parts";
+    };
   };
 
   nixConfig = {
