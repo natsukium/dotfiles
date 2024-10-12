@@ -1,3 +1,4 @@
+{ lib, pkgs, ... }:
 let
   defaultKeyBind = import ./defaultKeyBind.nix;
   terminal = "kitty";
@@ -15,6 +16,10 @@ in
         "rbw unlock && rofi-rbw -t password"
       ];
     };
+    # XWayland
+    spawn-at-startup = [
+      { command = [ "${lib.getExe pkgs.xwayland-satellite}" ]; }
+    ];
     environment = {
       DISPLAY = ":0";
     };
