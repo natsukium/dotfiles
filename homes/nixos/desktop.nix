@@ -13,6 +13,7 @@ in
 {
   imports = [
     ../../applications/hyprland
+    ../../applications/niri
     ../desktop.nix
   ];
 
