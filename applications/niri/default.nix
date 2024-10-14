@@ -16,6 +16,10 @@ in
         "rbw unlock && rofi-rbw -t password"
       ];
     };
+    input = {
+      focus-follows-mouse.enable = true;
+      warp-mouse-to-focus = true;
+    };
     # XWayland
     spawn-at-startup = [
       { command = [ "${lib.getExe pkgs.xwayland-satellite}" ]; }
