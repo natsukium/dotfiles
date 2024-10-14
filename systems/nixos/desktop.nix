@@ -11,7 +11,9 @@
   programs.niri.enable = true;
 
   programs.hyprland = {
-    enable = true;
+    # fcitx doesn't start if multiple WMs are enabled
+    # TODO: fix ime settings
+    enable = false;
   };
   fonts.packages = with pkgs; [
     noto-fonts-cjk
