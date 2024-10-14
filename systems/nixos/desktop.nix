@@ -1,4 +1,10 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [ inputs.niri-flake.nixosModules.niri ];
 
@@ -48,4 +54,17 @@
   };
 
   services.gnome.gnome-keyring.enable = true;
+
+  i18n.inputMethod = {
+    enable = true;
+    type = "fcitx5";
+    fcitx5 = {
+      addons = [ pkgs.fcitx5-mozc ];
+      waylandFrontend = true;
+    };
+  };
+
+  environment.variables = lib.optionalAttrs config.i18n.inputMethod.enable {
+    "GLFW_IM_MODULE" = "ibus";
+  };
 }

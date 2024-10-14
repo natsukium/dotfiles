@@ -17,11 +17,6 @@ in
     ../desktop.nix
   ];
 
-  i18n.inputMethod = {
-    enabled = "fcitx5";
-    fcitx5.addons = with pkgs; [ fcitx5-mozc ];
-  };
-
   home.packages = with pkgs; [
     rofi-rbw
     wl-clipboard
