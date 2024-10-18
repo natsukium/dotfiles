@@ -60,7 +60,7 @@ return {
 				"taplo",
 				"terraformls",
 				"tinymist",
-				"tsserver",
+				"ts_ls",
 				"typos_lsp",
 				"yamlls",
 			}) do
