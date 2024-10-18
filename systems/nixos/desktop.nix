@@ -8,7 +8,12 @@
 {
   imports = [ inputs.niri-flake.nixosModules.niri ];
 
-  programs.niri.enable = true;
+  programs.niri = {
+    enable = true;
+    package = pkgs.niri;
+  };
+
+  niri-flake.cache.enable = false;
 
   programs.hyprland = {
     # fcitx doesn't start if multiple WMs are enabled
