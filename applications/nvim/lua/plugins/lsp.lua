@@ -52,7 +52,7 @@ return {
 				"dockerls",
 				"lua_ls",
 				"nixd",
-				"pyright",
+				"basedpyright",
 				"rubocop",
 				"ruff",
 				"rust_analyzer",

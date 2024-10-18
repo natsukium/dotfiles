@@ -24,7 +24,7 @@ let
     nixd
     nixfmt-rfc-style
     # python
-    pyright
+    basedpyright
     ruff
     # ruby
     solargraph
