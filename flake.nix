@@ -234,6 +234,8 @@
             };
           };
 
+          checks.devshell = config.devShells.default;
+
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
