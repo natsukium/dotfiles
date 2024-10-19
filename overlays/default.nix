@@ -13,4 +13,14 @@
       bitwarden-cli
       ;
   };
+
+  temporary-fix = final: prev: {
+    python3 = prev.python3.override {
+      packageOverrides = pyfinal: pyprev: {
+        opentelemetry-proto = pyprev.opentelemetry-proto.overridePythonAttrs (oldAttrs: {
+          pythonRelaxDeps = [ "protobuf" ];
+        });
+      };
+    };
+  };
 }
