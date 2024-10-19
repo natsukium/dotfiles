@@ -64,7 +64,7 @@ let
       toml
       tsx
       typescript
-      tree-sitter-typst
+      typst
       vim
       vimdoc
       yaml
