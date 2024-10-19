@@ -37,7 +37,7 @@ let
     nodePackages.typescript-language-server
     # typst
     tinymist
-    typstfmt
+    typstyle
     # yaml
     yaml-language-server
     # spell check

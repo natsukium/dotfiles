@@ -94,6 +94,12 @@ return {
 							formatting = { command = { "nixfmt" } },
 						},
 					}
+				elseif ls == "tinymist" then
+					server_config = {
+						settings = {
+							formatterMode = "typstyle",
+						},
+					}
 				end
 
 				for k, v in pairs({ capabilities = capabilities }) do
