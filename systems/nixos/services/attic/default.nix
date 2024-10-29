@@ -1,11 +1,8 @@
-{ config, inputs, ... }:
+{ config, ... }:
 let
-  inherit (inputs) attic;
   atticdPort = "8081";
 in
 {
-  imports = [ attic.nixosModules.atticd ];
-
   # to create the token, run the following command
   # sudo atticd-atticadm make-token \
   #   --validity "10 years" \
