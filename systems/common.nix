@@ -55,6 +55,8 @@ in
       user = "root";
     };
 
+  nix.channel.enable = false;
+
   # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
   # https://github.com/LnL7/nix-darwin/issues/663
   system.activationScripts.extraActivation.text = ''
