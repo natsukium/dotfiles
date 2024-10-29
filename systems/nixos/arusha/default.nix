@@ -24,7 +24,7 @@
   };
 
   fonts.packages = with pkgs; [
-    noto-fonts-cjk
+    noto-fonts-cjk-sans
     noto-fonts-emoji
     liga-hackgen-nf-font
   ];
