@@ -4,86 +4,78 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable-small";
     nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
-    home-manager = {
-      url = "github:nix-community/home-manager";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    darwin = {
-      url = "github:lnl7/nix-darwin";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nixos-wsl = {
-      url = "github:nix-community/nixos-wsl";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-on-droid = {
-      url = "github:nix-community/nix-on-droid";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.home-manager.follows = "home-manager";
-    };
-    nix-colors.url = "github:misterio77/nix-colors";
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    sops-nix = {
-      url = "github:Mic92/sops-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    tsnsrv = {
-      url = "github:boinkor-net/tsnsrv";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-    };
-    nur-packages = {
-      url = "github:natsukium/nur-packages";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    neovim-nightly-overlay = {
-      url = "github:nix-community/neovim-nightly-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.git-hooks.follows = "git-hooks";
-    };
-    emacs-overlay = {
-      url = "github:nix-community/emacs-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-wallpaper = {
-      url = "github:natsukium/nix-wallpaper/custom-logo";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
+    cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
+    darwin.url = "github:lnl7/nix-darwin";
+    disko.url = "github:nix-community/disko";
+    emacs-overlay.url = "github:nix-community/emacs-overlay";
+    flake-parts.url = "github:hercules-ci/flake-parts";
+    git-hooks.url = "github:cachix/git-hooks.nix";
+    home-manager.url = "github:nix-community/home-manager";
     impermanence.url = "github:nix-community/impermanence";
-    flake-parts = {
-      url = "github:hercules-ci/flake-parts";
-      inputs.nixpkgs-lib.follows = "nixpkgs";
-    };
-    treefmt-nix = {
-      url = "github:numtide/treefmt-nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    git-hooks = {
-      url = "github:cachix/git-hooks.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-stable.follows = "nixpkgs";
-    };
-    cachix-deploy-flake = {
-      url = "github:cachix/cachix-deploy-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.darwin.follows = "darwin";
-    };
-    lanzaboote = {
-      url = "github:nix-community/lanzaboote";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.pre-commit-hooks-nix.follows = "git-hooks";
-    };
-    niri-flake = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
-      inputs.flake-parts.follows = "flake-parts";
-    };
+    lanzaboote.url = "github:nix-community/lanzaboote";
+    neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
+    niri-flake.url = "github:sodiboo/niri-flake";
+    nix-colors.url = "github:misterio77/nix-colors";
+    nix-on-droid.url = "github:nix-community/nix-on-droid";
+    nix-wallpaper.url = "github:natsukium/nix-wallpaper/custom-logo";
+    nixos-wsl.url = "github:nix-community/nixos-wsl";
+    nur-packages.url = "github:natsukium/nur-packages";
+    sops-nix.url = "github:Mic92/sops-nix";
+    treefmt-nix.url = "github:numtide/treefmt-nix";
+    tsnsrv.url = "github:boinkor-net/tsnsrv";
+
+    # used in follows
+    flake-utils.url = "github:numtide/flake-utils";
+
+    cachix-deploy-flake.inputs.darwin.follows = "darwin";
+    cachix-deploy-flake.inputs.disko.follows = "disko";
+    cachix-deploy-flake.inputs.home-manager.follows = "home-manager";
+    cachix-deploy-flake.inputs.nixos-anywhere.follows = "";
+    cachix-deploy-flake.inputs.nixpkgs.follows = "nixpkgs";
+    darwin.inputs.nixpkgs.follows = "nixpkgs";
+    disko.inputs.nixpkgs.follows = "nixpkgs";
+    emacs-overlay.inputs.flake-utils.follows = "flake-utils";
+    emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
+    git-hooks.inputs.flake-compat.follows = "";
+    git-hooks.inputs.gitignore.follows = "";
+    git-hooks.inputs.nixpkgs-stable.follows = "nixpkgs";
+    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
+    home-manager.inputs.nixpkgs.follows = "nixpkgs";
+    lanzaboote.inputs.flake-compat.follows = "";
+    lanzaboote.inputs.flake-parts.follows = "flake-parts";
+    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
+    lanzaboote.inputs.pre-commit-hooks-nix.follows = "git-hooks";
+    neovim-nightly-overlay.inputs.flake-compat.follows = "";
+    neovim-nightly-overlay.inputs.flake-parts.follows = "flake-parts";
+    neovim-nightly-overlay.inputs.git-hooks.follows = "git-hooks";
+    neovim-nightly-overlay.inputs.hercules-ci-effects.follows = "";
+    neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    niri-flake.inputs.flake-parts.follows = "flake-parts";
+    niri-flake.inputs.niri-stable.follows = "";
+    niri-flake.inputs.niri-unstable.follows = "";
+    niri-flake.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+    niri-flake.inputs.nixpkgs.follows = "nixpkgs";
+    niri-flake.inputs.xwayland-satellite-stable.follows = "";
+    niri-flake.inputs.xwayland-satellite-unstable.follows = "";
+    nix-on-droid.inputs.home-manager.follows = "home-manager";
+    nix-on-droid.inputs.nix-formatter-pack.follows = "";
+    nix-on-droid.inputs.nixpkgs-docs.follows = "nixpkgs";
+    nix-on-droid.inputs.nixpkgs-for-bootstrap.follows = "nixpkgs";
+    nix-on-droid.inputs.nixpkgs.follows = "nixpkgs";
+    nix-wallpaper.inputs.flake-utils.follows = "flake-utils";
+    nix-wallpaper.inputs.nixpkgs.follows = "nixpkgs";
+    nix-wallpaper.inputs.pre-commit-hooks.follows = "git-hooks";
+    nixos-wsl.inputs.flake-compat.follows = "";
+    nixos-wsl.inputs.flake-utils.follows = "flake-utils";
+    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
+    nur-packages.inputs.nixpkgs.follows = "nixpkgs";
+    sops-nix.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
+    tsnsrv.inputs.flake-parts.follows = "flake-parts";
+    tsnsrv.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   nixConfig = {
