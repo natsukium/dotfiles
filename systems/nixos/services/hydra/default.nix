@@ -82,4 +82,6 @@
       export URL=http://localhost:${toString config.services.hydra.port}
     '';
   };
+
+  ext.hydra.localBuilder.enable = true;
 }
