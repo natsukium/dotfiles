@@ -31,4 +31,17 @@
       };
     };
   };
+
+  pre-release = final: prev: {
+    terraform = prev.terraform.overrideAttrs (oldAttrs: {
+      version = "1.10.0-alpha20241023";
+      src = final.fetchFromGitHub {
+        owner = "hashicorp";
+        repo = "terraform";
+        rev = "v1.10.0-alpha20241023";
+        hash = "sha256-LCFHumML7U5nvN1e2HItFMPBVk60sBEH6kHFXZNjn94=";
+      };
+      vendorHash = "sha256-69Q224SP6P1HRD5UZe6IMow/Dtt1GbppDP3fbUYwYxg=";
+    });
+  };
 }

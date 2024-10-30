@@ -158,7 +158,7 @@
           _module.args.pkgs = import self.inputs.nixpkgs {
             inherit system;
             config.allowUnfree = true;
-            overlays = [ self.inputs.nur-packages.overlays.default ];
+            overlays = [ self.inputs.nur-packages.overlays.default ] ++ builtins.attrValues self.overlays;
           };
 
           checks = import ./tests {
