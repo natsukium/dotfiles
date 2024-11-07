@@ -31,6 +31,7 @@ in
         "enabled_layouts" = "Splits,Stack,Tall";
         "macos_option_as_alt" = "yes";
         "confirm_os_window_close" = 0;
+        "cursor_trail" = 1;
       };
       keybindings = { } // tmux-compat-keybindings;
       darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
