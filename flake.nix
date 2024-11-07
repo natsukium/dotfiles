@@ -34,7 +34,6 @@
     cachix-deploy-flake.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     disko.inputs.nixpkgs.follows = "nixpkgs";
-    emacs-overlay.inputs.flake-utils.follows = "flake-utils";
     emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
     emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
