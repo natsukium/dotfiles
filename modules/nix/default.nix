@@ -31,15 +31,11 @@ in
           substituters = [
             "https://natsukium.cachix.org"
             "https://cache.natsukium.com/nixpkgs"
-          ] ++ lib.optionals cfg.target.nvidia [ "https://cuda-maintainers.cachix.org" ];
-          trusted-public-keys =
-            [
-              "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
-              "nixpkgs:eWsaFvCVF6vABk5GUebfJ2I0qnBwn61e5hdOZfWAm1I="
-            ]
-            ++ lib.optionals cfg.target.nvidia [
-              "cuda-maintainers.cachix.org-1:0dq3bujKpuEPMCX6U4WylrUDZ9JyUG0VpVZa7CNfq5E="
-            ];
+          ];
+          trusted-public-keys = [
+            "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
+            "nixpkgs:eWsaFvCVF6vABk5GUebfJ2I0qnBwn61e5hdOZfWAm1I="
+          ];
           trusted-users = [
             "root"
             "@wheel"
