@@ -40,4 +40,11 @@
   };
 
   services.cloudflared.enable = true;
+
+  ext.services.nixpkgs-review.autoDeleteLogs = {
+    enable = true;
+    environmentFile = config.sops.secrets.gh-token.path;
+  };
+
+  sops.secrets.gh-token = { };
 }
