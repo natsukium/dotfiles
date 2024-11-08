@@ -16,7 +16,7 @@ in
 
   services.atticd = {
     enable = true;
-    credentialsFile = config.sops.secrets.atticd.path;
+    environmentFile = config.sops.secrets.atticd.path;
     settings = {
       listen = "[::]:${atticdPort}";
       chunking = {
