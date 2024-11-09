@@ -1,5 +1,7 @@
 # Dotfiles
 
+[![Hercules CI](https://hercules-ci.com/api/v1/site/github/account/natsukium/project/dotfiles/badge)](https://hercules-ci.com/github/natsukium/dotfiles/status)
+
 ## Install
 ### for *nix
 ```sh

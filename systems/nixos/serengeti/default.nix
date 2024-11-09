@@ -2,6 +2,7 @@
 {
   imports = [
     ../../server.nix
+    ../../shared/hercules-ci/agent.nix
     ../common.nix
     ../services/attic
     ./hardware-configuration.nix

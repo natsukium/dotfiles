@@ -189,6 +189,7 @@
                   excludes = [
                     "secrets/default.yaml"
                     "secrets.yaml"
+                    "systems/shared/hercules-ci/binary-caches.json"
                   ];
                   settings.configPath = "typos.toml";
                 };

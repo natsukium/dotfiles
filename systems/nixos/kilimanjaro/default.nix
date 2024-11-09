@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ../../shared/hercules-ci/agent.nix
     ../common.nix
     ../desktop.nix
     ../services/gitea-actions-runner
