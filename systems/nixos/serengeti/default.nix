@@ -25,6 +25,10 @@
     files = [ "/etc/machine-id" ];
   };
 
+  # workaround for https://github.com/NixOS/nixpkgs/pull/351151#issuecomment-2440083015
+  boot.initrd.systemd.suppressedUnits = [ "systemd-machine-id-commit.service" ];
+  systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
+
   fileSystems."/persistent".neededForBoot = true;
 
   boot.loader.systemd-boot.enable = true;
