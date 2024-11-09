@@ -29,11 +29,9 @@ in
           ];
           substituters = [
             "https://natsukium.cachix.org"
-            "https://cache.natsukium.com/nixpkgs"
           ];
           trusted-public-keys = [
             "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
-            "nixpkgs:eWsaFvCVF6vABk5GUebfJ2I0qnBwn61e5hdOZfWAm1I="
           ];
           trusted-users = [
             "root"
