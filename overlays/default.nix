@@ -14,10 +14,17 @@
       ;
   };
 
-  temporary-fix =
-    final: prev:
-    {
+  temporary-fix = final: prev: {
+    # reduce needless heavy rebuild
+    open-webui = prev.open-webui.override { python311 = final.python3; };
+    python3 = prev.python3.override {
+      packageOverrides = pyfinal: pyprev: {
+        pyhanko = pyprev.pyhanko.overridePythonAttrs (_: {
+          doCheck = false;
+        });
+      };
     };
+  };
 
   pre-release = final: prev: {
     terraform = prev.terraform.overrideAttrs (oldAttrs: {
