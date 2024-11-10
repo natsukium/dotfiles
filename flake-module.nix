@@ -90,11 +90,19 @@ in
       )
     );
     perSystem =
-      { config, ... }:
       {
-        checks = builtins.mapAttrs (k: v: v.config.system.build.toplevel) (
-          flake.nixosConfigurations // flake.darwinConfigurations
-        );
+        lib,
+        system,
+        ...
+      }:
+      {
+        checks =
+          let
+            currentSystemConfigurations = lib.filterAttrs (k: v: v.pkgs.system == system) (
+              flake.nixosConfigurations // flake.darwinConfigurations
+            );
+          in
+          builtins.mapAttrs (k: v: v.config.system.build.toplevel) currentSystemConfigurations;
       };
   };
 }
