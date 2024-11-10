@@ -1,0 +1,17 @@
+ARG IMAGE="base"
+
+# alias for major languages
+FROM debian:12-slim AS base
+FROM python:slim AS python
+FROM node:lts-slim AS nodejs
+FROM rust:slim AS rust
+
+FROM ${IMAGE}
+
+RUN apt-get update && apt-get install -y \
+  build-essential \
+  cmake \
+  git \
+  vim
+
+CMD ["bash"]
