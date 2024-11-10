@@ -5,7 +5,6 @@
 }:
 {
   imports = [
-    ../../../modules/nix
     ../common.nix
     ../desktop.nix
     ../services/gitea-actions-runner
