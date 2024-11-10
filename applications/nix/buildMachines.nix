@@ -1,8 +1,15 @@
-{ config, lib, ... }:
+{
+  inputs,
+  config,
+  lib,
+  ...
+}:
 let
   # hydra doesn't support ssh-ng protocol
   # https://github.com/NixOS/hydra/issues/688
   protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
+  inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti;
+  inherit (inputs.self.outputs.darwinConfigurations) mikumi;
 in
 {
   nix = {
@@ -15,47 +22,37 @@ in
     buildMachines =
       [ ]
       ++ lib.optional (config.networking.hostName != "kilimanjaro") {
-        hostName = "kilimanjaro";
+        inherit (kilimanjaro.config.networking) hostName;
         systems = [
           "x86_64-linux"
           "i686-linux"
         ];
         sshUser = "natsukium";
         inherit protocol;
-        maxJobs = 4;
+        maxJobs = kilimanjaro.config.nix.settings.max-jobs;
         speedFactor = 1;
-        supportedFeatures = [
-          "benchmark"
-          "big-parallel"
-          "kvm"
-          "nixos-test"
-        ];
+        supportedFeatures = kilimanjaro.config.nix.settings.system-features;
         mandatoryFeatures = [ ];
       }
       ++ lib.optional (config.networking.hostName != "serengeti") {
-        hostName = "serengeti";
+        inherit (serengeti.config.networking) hostName;
         system = "aarch64-linux";
         sshUser = "natsukium";
         inherit protocol;
-        maxJobs = 2;
+        maxJobs = serengeti.config.nix.settings.max-jobs;
         speedFactor = 1;
-        supportedFeatures = [
-          "benchmark"
-          "big-parallel"
-          "kvm"
-          "nixos-test"
-        ];
+        supportedFeatures = serengeti.config.nix.settings.system-features;
         mandatoryFeatures = [ ];
       }
       ++ lib.optional (config.networking.hostName != "mikumi") {
-        hostName = "mikumi";
+        inherit (mikumi.config.networking) hostName;
         systems = [
           "aarch64-darwin"
           "x86_64-darwin"
         ];
         sshUser = "natsukium";
         inherit protocol;
-        maxJobs = 4;
+        maxJobs = mikumi.config.nix.settings.max-jobs;
         speedFactor = 1;
         supportedFeatures = [
           "apple-virt"
