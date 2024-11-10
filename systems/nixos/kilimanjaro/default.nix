@@ -71,8 +71,6 @@
 
   nixpkgs.config.cudaSupport = true;
 
-  programs.nix.target.nvidia = true;
-
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;

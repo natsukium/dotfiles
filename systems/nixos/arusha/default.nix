@@ -5,8 +5,6 @@
     ../common.nix
   ];
 
-  programs.nix.target.nvidia = true;
-
   wsl = {
     enable = true;
     defaultUser = "natsukium";

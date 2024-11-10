@@ -14,7 +14,6 @@ in
     system = mkEnableOption "";
     user = mkEnableOption "";
     otherDistroUser = mkEnableOption "";
-    nvidia = mkEnableOption "";
   };
 
   config = mkMerge [
