@@ -60,6 +60,7 @@ in
   # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
   # https://github.com/LnL7/nix-darwin/issues/663
   system.activationScripts.extraActivation.text = ''
+    # shellcheck disable=SC2046
     ${lib.getExe pkgs.nix} store diff-closures $(find /nix/var/nix/profiles/system-*-link/ | tail -2)
   '';
 }
