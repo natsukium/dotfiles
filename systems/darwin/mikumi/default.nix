@@ -1,6 +1,9 @@
 { pkgs, ... }:
 {
-  imports = [ ../common.nix ];
+  imports = [
+    ../../server.nix
+    ../common.nix
+  ];
 
   networking.hostName = "mikumi";
 

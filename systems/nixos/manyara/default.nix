@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ../../server.nix
     ../common.nix
     ../services/adguardhome
     ../services/atuin

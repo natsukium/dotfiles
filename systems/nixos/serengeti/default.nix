@@ -1,9 +1,10 @@
 { inputs, ... }:
 {
   imports = [
-    ./hardware-configuration.nix
+    ../../server.nix
     ../common.nix
     ../services/attic
+    ./hardware-configuration.nix
     inputs.impermanence.nixosModules.impermanence
   ];
 
