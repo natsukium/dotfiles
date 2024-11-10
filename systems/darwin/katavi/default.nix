@@ -4,4 +4,6 @@
     ../common.nix
     ../desktop.nix
   ];
+
+  networking.hostName = "katavi";
 }

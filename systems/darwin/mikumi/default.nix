@@ -2,6 +2,8 @@
 {
   imports = [ ../common.nix ];
 
+  networking.hostName = "mikumi";
+
   nix.settings = {
     max-jobs = 4;
   };
