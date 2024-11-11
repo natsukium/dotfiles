@@ -51,7 +51,6 @@
     neovim-nightly-overlay.inputs.git-hooks.follows = "git-hooks";
     neovim-nightly-overlay.inputs.hercules-ci-effects.follows = "";
     neovim-nightly-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    niri-flake.inputs.flake-parts.follows = "flake-parts";
     niri-flake.inputs.niri-stable.follows = "";
     niri-flake.inputs.niri-unstable.follows = "";
     niri-flake.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
