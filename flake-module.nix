@@ -69,23 +69,31 @@ in
       attrValues (
         mapAttrs (
           name: cfg:
-          systemConfigurations cfg.platform name {
-            inherit (cfg) system;
-            modules =
-              filter (x: x != null) [
-                (maybePath ./systems/${cfg.platform}/${name})
-                (maybePath ./homes/${cfg.platform}/${name})
-              ]
-              ++ lib.optionals (cfg.platform == "android") [
-                ./systems/nix-on-droid
-                ./homes/nix-on-droid
-              ]
-              ++ cfg.modules;
-            "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
-              inherit self inputs;
-              inherit (cfg) username;
-            } // cfg.specialArgs;
-          }
+          systemConfigurations cfg.platform name (
+            {
+              modules =
+                filter (x: x != null) [
+                  (maybePath ./systems/${cfg.platform}/${name})
+                  (maybePath ./homes/${cfg.platform}/${name})
+                ]
+                ++ lib.optionals (cfg.platform == "android") [
+                  ./systems/nix-on-droid
+                  ./homes/nix-on-droid
+                ]
+                ++ cfg.modules;
+              "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
+                inherit self inputs;
+                inherit (cfg) username;
+              } // cfg.specialArgs;
+            }
+            // lib.optionalAttrs (cfg.platform != "android") { inherit (cfg) system; }
+            // lib.optionalAttrs (cfg.platform == "android") {
+              pkgs = import inputs.nixpkgs {
+                inherit (cfg) system;
+                inherit (inputs.self.outputs.nixosConfigurations.kilimanjaro.config.nixpkgs) overlays;
+              };
+            }
+          )
         ) config.hosts
       )
     );
