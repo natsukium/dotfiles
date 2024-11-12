@@ -1,4 +1,9 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   inherit (inputs) nixpkgs;
 in
@@ -24,5 +29,9 @@ in
       sandbox = true
       warn-dirty = false
     '';
+  };
+
+  user = {
+    shell = "${lib.getExe pkgs.fish}";
   };
 }
