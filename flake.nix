@@ -69,7 +69,6 @@
     nixos-wsl.inputs.flake-utils.follows = "flake-utils";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
-    sops-nix.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     tsnsrv.inputs.flake-parts.follows = "flake-parts";
