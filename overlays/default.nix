@@ -28,14 +28,14 @@
 
   pre-release = final: prev: {
     terraform = prev.terraform.overrideAttrs (oldAttrs: {
-      version = "1.10.0-alpha20241023";
+      version = "1.10.0-rc2";
       src = final.fetchFromGitHub {
         owner = "hashicorp";
         repo = "terraform";
-        rev = "v1.10.0-alpha20241023";
-        hash = "sha256-LCFHumML7U5nvN1e2HItFMPBVk60sBEH6kHFXZNjn94=";
+        rev = "refs/tags/v${final.terraform.version}";
+        hash = "sha256-V2iDXn/nkC6vPwF15+N4+ck/r83LXMbAU8E0rSZitSM=";
       };
-      vendorHash = "sha256-69Q224SP6P1HRD5UZe6IMow/Dtt1GbppDP3fbUYwYxg=";
+      vendorHash = "sha256-UmPnOfjR6kYI0TMH2J54LzDeDGJKMkAC0xZk6xstIuk=";
     });
   };
 }
