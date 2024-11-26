@@ -1,13 +1,28 @@
-{ pkgs, specialArgs, ... }:
+{
+  inputs,
+  pkgs,
+  specialArgs,
+  ...
+}:
 let
   inherit (pkgs) lib stdenv;
   inherit (specialArgs) username;
 in
 {
   imports = [
-    ../common.nix
     ../../modules/darwin
+    ../common.nix
+    inputs.sops-nix.darwinModules.sops
   ];
+
+  sops = {
+    defaultSopsFile = ../../secrets/default.yaml;
+    age = {
+      keyFile = "/var/lib/sops-nix/key.txt";
+      sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+      generateKey = true;
+    };
+  };
 
   users.users.${username}.home = "/Users/${username}";
 
