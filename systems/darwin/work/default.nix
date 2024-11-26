@@ -11,7 +11,11 @@ in
   homebrew = {
     enable = true;
     brews = [ "libomp" ];
-    casks = [ "pritunl" ];
+    casks = [
+      "google-chrome"
+      "microsoft-edge"
+      "pritunl"
+    ];
   };
 
   nix.extraOptions = ''
