@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ config, pkgs, ... }:
 {
   imports = [
     ../../server.nix
@@ -16,8 +16,10 @@
   services.cachix-agent = {
     enable = true;
     name = "mikumi";
-    # sops-nix does not yet support nix-darwin
-    # https://github.com/Mic92/sops-nix/pull/558
-    credentialsFile = "/etc/cachix-agent.token";
+    credentialsFile = config.sops.secrets.cachix-agent-token.path;
+  };
+
+  sops.secrets.cachix-agent-token = {
+    sopsFile = ./secrets.yaml;
   };
 }
