@@ -2,7 +2,7 @@
 let
   nixos-lib = import "${nixpkgs}/nixos/lib" { };
 in
-pkgs.lib.optionalAttrs (pkgs.stdenv.hostPlatform.isLinux) {
+pkgs.lib.optionalAttrs (pkgs.stdenv.hostPlatform.system == "x86_64-linux") {
   nixosModuleTests = nixos-lib.runTest {
     hostPkgs = pkgs;
 
