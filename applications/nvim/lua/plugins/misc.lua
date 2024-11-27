@@ -103,7 +103,7 @@ return {
 		name = "trouble.nvim",
 		dir = "@trouble_nvim@",
 		config = true,
-		cmd = "Trouble",
+		event = "VeryLazy",
 	},
 	{
 		name = "which-key.nvim",
