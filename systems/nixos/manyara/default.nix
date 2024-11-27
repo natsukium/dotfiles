@@ -11,6 +11,7 @@
     ../services/atuin
     ../services/calibre-web
     ../services/forgejo
+    ../services/grafana
     ../services/miniflux
     ./hardware-configuration.nix
   ];
