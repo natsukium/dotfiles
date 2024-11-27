@@ -31,7 +31,7 @@ return {
 		keys = { "<leader>f" },
 		config = function()
 			local telescope = require("telescope")
-			local trouble = require("trouble.providers.telescope")
+			local open_with_trouble = require("trouble.sources.telescope").open
 			local builtin = require("telescope.builtin")
 
 			vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
@@ -43,8 +43,8 @@ return {
 				defaults = {
 					layout_strategy = "flex",
 					mappings = {
-						i = { ["<c-t>"] = trouble.open_with_trouble },
-						n = { ["<c-t>"] = trouble.open_with_trouble },
+						i = { ["<c-t>"] = open_with_trouble },
+						n = { ["<c-t>"] = open_with_trouble },
 					},
 				},
 			})
