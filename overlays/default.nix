@@ -16,16 +16,5 @@
 
   temporary-fix = final: prev: { };
 
-  pre-release = final: prev: {
-    terraform = prev.terraform.overrideAttrs (oldAttrs: {
-      version = "1.10.0-rc2";
-      src = final.fetchFromGitHub {
-        owner = "hashicorp";
-        repo = "terraform";
-        rev = "refs/tags/v${final.terraform.version}";
-        hash = "sha256-V2iDXn/nkC6vPwF15+N4+ck/r83LXMbAU8E0rSZitSM=";
-      };
-      vendorHash = "sha256-UmPnOfjR6kYI0TMH2J54LzDeDGJKMkAC0xZk6xstIuk=";
-    });
-  };
+  pre-release = final: prev: { };
 }
