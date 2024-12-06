@@ -14,7 +14,8 @@
     toURL = "http://127.0.0.1:${config.services.miniflux.config.PORT}";
   };
 
-  systemd.services.tsnsrv-rss-reader.serviceConfig.LoadCredential = "credentials:${config.sops.secrets.tailscale-authkey.path}";
+  systemd.services.tsnsrv-rss-reader.serviceConfig.LoadCredential =
+    "credentials:${config.sops.secrets.tailscale-authkey.path}";
 
   sops.secrets.miniflux = { };
 }
