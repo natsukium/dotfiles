@@ -18,7 +18,8 @@
     toURL = config.services.hydra.hydraURL;
   };
 
-  systemd.services.tsnsrv-hydra.serviceConfig.LoadCredential = "credentials:${config.sops.secrets.tailscale-authkey.path}";
+  systemd.services.tsnsrv-hydra.serviceConfig.LoadCredential =
+    "credentials:${config.sops.secrets.tailscale-authkey.path}";
 
   sops.secrets = {
     hydra-admin-password = {
