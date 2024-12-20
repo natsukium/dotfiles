@@ -2,8 +2,8 @@
   description = "dotfiles";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable-small";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/nixos-24.05";
+    nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
+    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-24.05";
     cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
     darwin.url = "github:lnl7/nix-darwin";
     disko.url = "github:nix-community/disko";
