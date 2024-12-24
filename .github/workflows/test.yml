@@ -1,0 +1,62 @@
+name: build and cache
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-14]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v30
+      - name: Setup cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: natsukium
+          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community,cuda-maintainers
+      # workaround for "No space left on device"
+      # https://github.com/actions/runner-images/issues/709
+      - name: Collect garbage
+        if: matrix.os == 'ubuntu-latest'
+        uses: jlumbroso/free-disk-space@v1.3.1
+      - name: Create /run for darwin
+        if: matrix.os == 'macos-14'
+        run: |
+          printf "run\tprivate/var/run\n" | sudo tee -a /etc/synthetic.conf
+          /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - name: build
+        run: |
+          export MAKEFLAGS="NIX:=nix"
+          make
+          df -h
+  deploy:
+    needs: build
+    runs-on: macos-14
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v30
+      - name: Setup cachix
+        uses: cachix/cachix-action@v15
+        with:
+          name: natsukium
+          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+          extraPullNames: nix-community,cuda-maintainers
+      - uses: DeterminateSystems/magic-nix-cache-action@v8
+      - name: deploy
+        env:
+          CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
+        run: |
+          spec=$(nix build ".#cachix-deploy" --print-out-paths)
+          cachix push natsukium "$spec"
+          cachix deploy activate "$spec"
