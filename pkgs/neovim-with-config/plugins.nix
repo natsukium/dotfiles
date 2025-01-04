@@ -11,6 +11,7 @@ with vimPlugins;
 pluginsWithLazy true [
   ChatGPT-nvim
   FixCursorHold-nvim
+  blink-cmp
   bufferline-nvim
   comment-nvim
   copilot-lua
@@ -61,12 +62,5 @@ pluginsWithLazy true [
   nvim-web-devicons
   # don't make nvim-cmp related packages lazy loading
   # https://github.com/nvim-neorocks/lz.n/wiki/lazy%E2%80%90loading-nvim%E2%80%90cmp-and-its-extensions
-  nvim-cmp
-  cmp-buffer
-  cmp-cmdline
-  cmp-nvim-lsp
-  cmp-path
-  cmp_luasnip
   copilot-cmp
-  lspkind-nvim
 ])
