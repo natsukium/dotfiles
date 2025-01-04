@@ -1,33 +1,18 @@
-{ pkgs }:
+{ vimPlugins }:
 let
-  normalizedPluginAttr = p: {
-    "${builtins.replaceStrings
-      [
-        "-"
-        "."
-      ]
-      [
-        "_"
-        "_"
-      ]
-      (pkgs.lib.toLower p.pname)
-    }" =
-      p;
-  };
-  plugins = p: builtins.foldl' (x: y: x // y) { } (map normalizedPluginAttr p);
+  pluginsWithLazy =
+    bool:
+    map (p: {
+      plugin = p;
+      optional = bool;
+    });
 in
-with pkgs.vimPlugins;
-plugins [
+with vimPlugins;
+pluginsWithLazy true [
   ChatGPT-nvim
   FixCursorHold-nvim
   bufferline-nvim
-  cmp-buffer
-  cmp-cmdline
-  cmp-nvim-lsp
-  cmp-path
-  cmp_luasnip
   comment-nvim
-  copilot-cmp
   copilot-lua
   CopilotChat-nvim
   diffview-nvim
@@ -36,9 +21,7 @@ plugins [
   gitlinker-nvim
   gitsigns-nvim
   indent-blankline-nvim
-  lazy-nvim
   leap-nvim
-  lspkind-nvim
   lspsaga-nvim
   lualine-nvim
   luasnip
@@ -50,9 +33,7 @@ plugins [
   noice-nvim
   none-ls-nvim
   nord-nvim
-  nui-nvim
   nvim-autopairs
-  nvim-cmp
   nvim-dap
   nvim-dap-python
   nvim-dap-ui
@@ -61,12 +42,10 @@ plugins [
   nvim-nio
   nvim-notify
   nvim-surround
-  nvim-treesitter
-  nvim-web-devicons
+  nvim-treesitter.withAllGrammars
   octo-nvim
   oil-nvim
   overseer-nvim
-  plenary-nvim
   rainbow-delimiters-nvim
   telescope-nvim
   todo-comments-nvim
@@ -77,3 +56,17 @@ plugins [
   vim-wakatime
   which-key-nvim
 ]
+++ (pluginsWithLazy false [
+  lz-n
+  nvim-web-devicons
+  # don't make nvim-cmp related packages lazy loading
+  # https://github.com/nvim-neorocks/lz.n/wiki/lazy%E2%80%90loading-nvim%E2%80%90cmp-and-its-extensions
+  nvim-cmp
+  cmp-buffer
+  cmp-cmdline
+  cmp-nvim-lsp
+  cmp-path
+  cmp_luasnip
+  copilot-cmp
+  lspkind-nvim
+])

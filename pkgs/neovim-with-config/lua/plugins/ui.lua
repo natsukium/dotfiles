@@ -1,8 +1,7 @@
 return {
 	{
-		name = "lualine.nvim",
-		dir = "@lualine_nvim@",
-		config = function()
+		"lualine.nvim",
+		after = function()
 			require("lualine").setup({
 				options = {
 					theme = "nord",
@@ -10,13 +9,11 @@ return {
 				},
 			})
 		end,
-		event = "VeryLazy",
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "bufferline.nvim",
-		dir = "@bufferline_nvim@",
-		dependencies = { { name = "nvim-web-devicons", dir = "@nvim_web_devicons@" } },
-		config = function()
+		"bufferline.nvim",
+		after = function()
 			local highlights = require("nord").bufferline.highlights({
 				italic = true,
 				bold = true,
@@ -29,17 +26,12 @@ return {
 				highlights = highlights,
 			})
 		end,
-		event = "VeryLazy",
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "noice.nvim",
-		dir = "@noice_nvim@",
-		event = "VeryLazy",
-		dependencies = {
-			{ name = "nui.nvim", dir = "@nui_nvim@" },
-			{ name = "nvim-notify", dir = "@nvim_notify@" },
-		},
-		config = function()
+		"noice.nvim",
+		event = "DeferredUIEnter",
+		after = function()
 			require("noice").setup({
 				lsp = {
 					override = {
@@ -52,8 +44,7 @@ return {
 		end,
 	},
 	{
-		name = "dressing.nvim",
-		dir = "@dressing_nvim@",
-		event = "VeryLazy",
+		"dressing.nvim",
+		event = "DeferredUIEnter",
 	},
 }

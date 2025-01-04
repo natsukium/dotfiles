@@ -1,21 +1,17 @@
 return {
 	{
-		name = "diffview.nvim",
-		dir = "@diffview_nvim@",
-		dependencies = { { name = "plenary.nvim", dir = "@plenary_nvim@" } },
-		config = true,
-		event = "VeryLazy",
+		"diffview.nvim",
+		after = true,
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "gitlinker.nvim",
-		dir = "@gitlinker_nvim@",
-		config = true,
-		event = "VeryLazy",
+		"gitlinker.nvim",
+		after = true,
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "gitsigns.nvim",
-		dir = "@gitsigns_nvim@",
-		config = function()
+		"gitsigns.nvim",
+		after = function()
 			require("gitsigns").setup({
 				signcolumn = false,
 				numhl = true,
@@ -75,15 +71,9 @@ return {
 		event = "BufRead",
 	},
 	{
-		name = "octo.nvim",
-		dir = "@octo_nvim@",
-		dependencies = {
-			{ name = "plenary.nvim", dir = "@plenary_nvim@" },
-			{ name = "telescope.nvim", dir = "@telescope_nvim@" },
-			{ name = "nvim-web-devicons", dir = "@nvim_web_devicons@" },
-		},
+		"octo.nvim",
 		cmd = { "Octo" },
-		config = function()
+		after = function()
 			require("octo").setup({
 				ssh_aliases = { ["github.com-emu"] = "github.com" },
 			})

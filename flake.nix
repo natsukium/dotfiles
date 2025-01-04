@@ -166,6 +166,7 @@
               cachix-deploy-lib = inputs.cachix-deploy-flake.lib pkgs;
             in
             {
+              neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
               cachix-deploy = cachix-deploy-lib.spec {
                 agents = {
                   mikumi = self.darwinConfigurations.mikumi.config.system.build.toplevel;

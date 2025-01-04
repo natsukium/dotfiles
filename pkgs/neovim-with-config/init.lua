@@ -33,14 +33,6 @@ vim.keymap.set("n", "<Esc><Esc>", ":nohlsearch<CR><Esc>")
 -- terminal
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { noremap = true })
 
-local function float_term(cmd)
-	local opts = { size = { width = 0.9, height = 0.9 } }
-	require("lazy.util").float_term(cmd, opts)
-end
-vim.keymap.set("n", "<Leader>gg", function()
-	float_term({ "lazygit" })
-end)
-
 -- buffers
 vim.keymap.set("n", "[b", "<cmd>bprevious<CR>", { desc = "Prev buffer" })
 vim.keymap.set("n", "]b", "<cmd>bnext<CR>", { desc = "Next buffer" })
@@ -61,27 +53,8 @@ vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
-local lazypath = "@lazy_nvim@"
-vim.opt.rtp:prepend(lazypath)
+vim.opt.rtp:prepend("@myconfig@")
 
-require("lazy").setup({
-	defaults = { lazy = true },
-	rocks = { enabled = false },
-	performance = {
-		rtp = {
-			disabled_plugins = {
-				"gzip",
-				"matchit",
-				"matchparen",
-				"netrwPlugin",
-				"tarPlugin",
-				"tohtml",
-				"tutor",
-				"zipPlugin",
-			},
-		},
-	},
-	spec = "plugins",
-})
+require("lz.n").load("plugins")
 
-require("misc")
+vim.cmd([[colorscheme nord]])

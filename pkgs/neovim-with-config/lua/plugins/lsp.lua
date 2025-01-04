@@ -1,9 +1,8 @@
 return {
 	{
-		name = "nvim-lspconfig",
-		dir = "@nvim_lspconfig@",
+		"nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
-		config = function()
+		after = function()
 			-- Mappings.
 			-- See `:help vim.diagnostic.*` for documentation on any of the below functions
 			vim.keymap.set("n", "<space>e", vim.diagnostic.open_float)
@@ -111,10 +110,9 @@ return {
 		end,
 	},
 	{
-		name = "none-ls.nvim",
-		dir = "@none_ls_nvim@",
+		"none-ls.nvim",
 		event = { "BufReadPre", "BufNewFile" },
-		config = function()
+		after = function()
 			local null_ls = require("null-ls")
 			null_ls.setup({
 				sources = {
@@ -126,10 +124,9 @@ return {
 		end,
 	},
 	{
-		name = "lspsaga.nvim",
-		dir = "@lspsaga_nvim@",
+		"lspsaga.nvim",
 		event = "BufRead",
-		config = function()
+		after = function()
 			require("lspsaga").setup({
 				lightbulb = {
 					sign = false,

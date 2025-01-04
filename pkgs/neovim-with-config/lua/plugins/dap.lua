@@ -1,9 +1,8 @@
 return {
 	{
-		name = "nvim-dap",
-		dir = "@nvim_dap@",
-		event = "VeryLazy",
-		config = function()
+		"nvim-dap",
+		event = "DeferredUIEnter",
+		after = function()
 			vim.api.nvim_set_keymap("n", "<F5>", ":DapContinue<CR>", { silent = true })
 			vim.api.nvim_set_keymap("n", "<F10>", ":DapStepOver<CR>", { silent = true })
 			vim.api.nvim_set_keymap("n", "<F11>", ":DapStepInto<CR>", { silent = true })
@@ -26,11 +25,9 @@ return {
 		end,
 	},
 	{
-		name = "nvim-dap-ui",
-		dir = "@nvim_dap_ui@",
-		dependencies = { { name = "nvim-dap", dir = "@nvim_dap@" }, { name = "nvim-nio", dir = "@nvim_nio@" } },
-		event = "VeryLazy",
-		config = function()
+		"nvim-dap-ui",
+		event = "DeferredUIEnter",
+		after = function()
 			require("dapui").setup()
 			local dap, dapui = require("dap"), require("dapui")
 			dap.listeners.after.event_initialized["dapui_config"] = function()
@@ -45,24 +42,14 @@ return {
 		end,
 	},
 	{
-		name = "nvim-dap-virtual-text",
-		dir = "@nvim_dap_virtual_text@",
-		dependencies = {
-			{ name = "nvim-dap", dir = "@nvim_dap@" },
-			{ name = "nvim-treesitter", dir = "@nvim_treesitter@" },
-		},
-		event = "VeryLazy",
-		config = true,
+		"nvim-dap-virtual-text",
+		event = "DeferredUIEnter",
+		after = true,
 	},
 	{
-		name = "nvim-dap-python",
-		dir = "@nvim_dap_python@",
-		dependencies = {
-			{ name = "nvim-dap", dir = "@nvim_dap@" },
-			{ name = "nvim-treesitter", dir = "@nvim_treesitter@" },
-		},
+		"nvim-dap-python",
 		ft = "python",
-		config = function()
+		after = function()
 			local dap_python = require("dap-python")
 			dap_python.setup("python")
 			dap_python.test_runner = "pytest"

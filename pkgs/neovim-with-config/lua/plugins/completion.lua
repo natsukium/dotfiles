@@ -1,22 +1,8 @@
 return {
 	{
-		name = "nvim-cmp",
-		dir = "@nvim_cmp@",
+		"nvim-cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
-		dependencies = {
-			{ name = "cmp-buffer", dir = "@cmp_buffer@" },
-			{ name = "cmp-nvim-lsp", dir = "@cmp_nvim_lsp@" },
-			{ name = "cmp-path", dir = "@cmp_path@" },
-			{
-				name = "cmp_luasnip",
-				dir = "@cmp_luasnip@",
-				dependencies = { name = "LuaSnip", dir = "@luasnip@" },
-			},
-			{ name = "cmp-cmdline", dir = "@cmp_cmdline@" },
-			{ name = "lspkind.nvim", dir = "@lspkind_nvim@" },
-			{ name = "copilot-cmp", dir = "@copilot_cmp@", config = true },
-		},
-		opts = function()
+		after = function()
 			vim.g.completeopt = "menu,menuone,noselect"
 			local cmp = require("cmp")
 			local luasnip = require("luasnip")
@@ -66,10 +52,9 @@ return {
 		end,
 	},
 	{
-		name = "copilot.lua",
-		dir = "@copilot_lua@",
+		"copilot.lua",
 		event = "InsertEnter",
-		config = function()
+		after = function()
 			require("copilot").setup({
 				suggestion = { enabled = false },
 				panel = { enabled = false },

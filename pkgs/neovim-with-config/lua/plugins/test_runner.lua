@@ -1,15 +1,8 @@
 return {
 	{
-		name = "neotest",
-		dir = "@neotest@",
-		dependencies = {
-			--https://github.com/antoinemadec/FixCursorHold.nvim/issues/13
-			{ name = "FixCursorHold.nvim", dir = "@fixcursorhold_nvim@" },
-			{ name = "nvim-treesitter", dir = "@nvim_treesitter@" },
-			{ name = "plenary.nvim", dir = "@plenary_nvim@" },
-		},
+		"neotest",
 		keys = { "<Leader>u" },
-		config = function()
+		after = function()
 			require("neotest").setup({
 				adapters = {
 					require("neotest-python")({
@@ -26,11 +19,6 @@ return {
 		end,
 	},
 	{
-		name = "neotest-python",
-		dir = "@neotest_python@",
-		dependencies = {
-			{ name = "neotest", dir = "@neotest@" },
-			{ name = "nvim-treesitter", dir = "@nvim_treesitter@" },
-		},
+		"neotest-python",
 	},
 }

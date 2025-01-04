@@ -13,6 +13,15 @@ in
   colorScheme = nix-colors.colorSchemes.nord;
   base16.enable = true;
 
+  # editor
+  home.packages = [
+    (pkgs.callPackage ../pkgs/neovim-with-config { })
+    pkgs.neovim-remote
+  ];
+  home.sessionVariables = {
+    EDITOR = "nvim";
+  };
+
   imports = [
     nix-colors.homeManagerModule
     ../modules/home-manager
@@ -29,7 +38,6 @@ in
     ../applications/misc
     ../applications/nix
     ../applications/nushell
-    ../applications/nvim
     ../applications/rbw
     ../applications/starship
     ../applications/tmux

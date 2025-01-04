@@ -1,37 +1,29 @@
 return {
 	{
-		name = "nord.nvim",
-		dir = "@nord_nvim@",
-		config = function()
+		"nord.nvim",
+		colorscheme = "nord",
+		after = function()
 			vim.g.nord_contrast = true
 			vim.g.nord_italic = false
 			require("nord").set()
 		end,
-		lazy = false,
 	},
 	{
-		name = "neo-tree.nvim",
-		dir = "@neo_tree_nvim@",
-		dependencies = {
-			{ name = "nui.nvim", dir = "@nui_nvim@" },
-			{ name = "nvim-web-devicons", dir = "@nvim_web_devicons@" },
-			{ name = "plenary.nvim", dir = "@plenary_nvim@" },
-		},
+		"neo-tree.nvim",
 		cmd = { "Neotree" },
-		init = function()
+		before = function()
 			vim.g.neo_tree_remove_legacy_commands = 1
 		end,
-		config = true,
+		after = function()
+			require("neo-tree").setup()
+		end,
 	},
 	{
-		name = "telescope.nvim",
-		dir = "@telescope_nvim@",
-		dependencies = { name = "plenary.nvim", dir = "@plenary_nvim@" },
+		"telescope.nvim",
 		cmd = "Telescope",
 		keys = { "<leader>f" },
-		config = function()
+		after = function()
 			local telescope = require("telescope")
-			local open_with_trouble = require("trouble.sources.telescope").open
 			local builtin = require("telescope.builtin")
 
 			vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
@@ -39,6 +31,7 @@ return {
 			vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
 			vim.keymap.set("n", "<leader>fh", builtin.help_tags, {})
 
+			local open_with_trouble = require("trouble.sources.telescope").open
 			telescope.setup({
 				defaults = {
 					layout_strategy = "flex",
@@ -51,8 +44,7 @@ return {
 		end,
 	},
 	{
-		name = "flit.nvim",
-		dir = "@flit_nvim@",
+		"flit.nvim",
 		keys = function()
 			local ret = {}
 			for _, key in ipairs({ "f", "f", "t", "t" }) do
@@ -60,17 +52,18 @@ return {
 			end
 			return ret
 		end,
-		opts = { labeled_modes = "nx" },
+		after = function()
+			require("flit").setup({ labeled_modes = "nx" })
+		end,
 	},
 	{
-		name = "leap.nvim",
-		dir = "@leap_nvim@",
+		"leap.nvim",
 		keys = {
 			{ "s", mode = { "n", "x", "o" }, desc = "Leap forward to" },
 			{ "S", mode = { "n", "x", "o" }, desc = "Leap backward to" },
 			{ "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
 		},
-		config = function(_, opts)
+		after = function(_, opts)
 			local leap = require("leap")
 			for k, v in pairs(opts) do
 				leap.opts[k] = v
@@ -81,85 +74,77 @@ return {
 		end,
 	},
 	{
-		name = "nvim-treesitter",
-		dir = "@nvim_treesitter@",
-		config = function()
-			vim.opt.runtimepath:append("@ts_parser_dirs@")
-		end,
+		"nvim-treesitter",
 		event = "BufRead",
 	},
 	{
-		name = "rainbow-delimiters.nvim",
-		dir = "@rainbow_delimiters_nvim@",
-		event = "VeryLazy",
+		"rainbow-delimiters.nvim",
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "nvim-surround",
-		dir = "@nvim_surround@",
-		config = true,
-		event = "VeryLazy",
+		"nvim-surround",
+		after = function()
+			require("nvim-surround").setup()
+		end,
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "trouble.nvim",
-		dir = "@trouble_nvim@",
-		config = true,
-		event = "VeryLazy",
+		"trouble.nvim",
+		after = function()
+			require("trouble").setup()
+		end,
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "which-key.nvim",
-		dir = "@which_key_nvim@",
-		config = function()
+		"which-key.nvim",
+		after = function()
 			vim.o.timeout = true
 			vim.o.timeoutlen = 300
 			require("which-key").setup({})
 		end,
-		event = "VeryLazy",
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "todo-comments.nvim",
-		dir = "@todo_comments_nvim@",
-		config = true,
+		"todo-comments.nvim",
+		after = function()
+			require("todo-comments").setup()
+		end,
 		event = "BufRead",
 	},
 	{
-		name = "indent-blankline.nvim",
-		dir = "@indent_blankline_nvim@",
-		event = "VeryLazy",
-		main = "ibl",
-		config = true,
+		"indent-blankline.nvim",
+		event = "DeferredUIEnter",
+		after = function()
+			require("ibl").setup()
+		end,
 	},
 	{
-		name = "Comment.nvim",
-		dir = "@comment_nvim@",
+		"Comment.nvim",
 		event = "BufRead",
-		config = true,
+		after = function()
+			require("comment").setup()
+		end,
 	},
 	{
-		name = "vim-illuminate",
-		dir = "@vim_illuminate@",
-		event = "VeryLazy",
+		"vim-illuminate",
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "overseer.nvim",
-		dir = "@overseer_nvim@",
+		"overseer.nvim",
 		cmd = { "OverseerRun", "OverseerToggle" },
-		config = true,
+		after = function()
+			require("oveseer").setup()
+		end,
 	},
 	{
-		name = "ChatGPT.nvim",
-		dir = "@chatgpt_nvim@",
-		dependencies = {
-			{ name = "nui.nvim", dir = "@nui_nvim@" },
-			{ name = "plenary.nvim", dir = "@plenary_nvim@" },
-			{ name = "telescope.nvim", dir = "@telescope_nvim@" },
-		},
+		"ChatGPT.nvim",
 		cmd = {
 			"ChatGPT",
 			"ChatGPTActAs",
 			"ChatGPTEditWithInstructions",
 			"ChatGPTRun",
 		},
-		config = function()
+		after = function()
 			require("chatgpt").setup({
 				openai_params = {
 					model = "gpt-4o",
@@ -172,20 +157,18 @@ return {
 		end,
 	},
 	{
-		name = "markdown-preview.nvim",
-		dir = "@markdown_preview_nvim@",
+		"markdown-preview.nvim",
 		ft = "markdown",
 		keys = { "<Leader>mp" },
-		config = function()
+		after = function()
 			vim.g.mkdp_filetypes = { "markdown" }
 			vim.keymap.set("n", "<leader>mp", ":MarkdownPreviewToggle<CR>")
 		end,
 	},
 	{
-		name = "neogen",
-		dir = "@neogen@",
+		"neogen",
 		cmd = "Neogen",
-		config = function()
+		after = function()
 			require("neogen").setup({
 				enable = true,
 				languages = {
@@ -195,20 +178,18 @@ return {
 		end,
 	},
 	{
-		name = "nvim-autopairs",
-		dir = "@nvim_autopairs@",
+		"nvim-autopairs",
 		event = "InsertEnter",
-		config = function()
+		after = function()
 			local npairs = require("nvim-autopairs")
 			local Rule = require("nvim-autopairs.rule")
 			npairs.setup({})
 		end,
 	},
 	{
-		name = "oil.nvim",
-		dir = "@oil_nvim@",
+		"oil.nvim",
 		event = "syntax",
-		config = function()
+		after = function()
 			require("oil").setup({
 				skip_confirm_for_simple_edits = true,
 				view_options = {
@@ -218,33 +199,26 @@ return {
 		end,
 	},
 	{
-		name = "vim-table-mode",
-		dir = "@vim_table_mode@",
+		"vim-table-mode",
 		ft = "markdown",
-		config = true,
 	},
 	{
-		name = "vim-edgemotion",
-		dir = "@vim_edgemotion@",
+		"vim-edgemotion",
 		keys = { "<leader>j", "<leader>k" },
-		config = function()
+		after = function()
 			vim.keymap.set("n", "<leader>j", "<Plug>(edgemotion-j)")
 			vim.keymap.set("n", "<leader>k", "<Plug>(edgemotion-k)")
 		end,
 	},
 	{
-		name = "CopilotChat.nvim",
-		dir = "@copilotchat_nvim@",
-		dependencies = {
-			{ name = "copilot.lua", dir = "@copilot_lua@" },
-			{ name = "plenary.nvim", dir = "@plenary_nvim@" },
-		},
-		config = true,
-		event = "VeryLazy",
+		"CopilotChat.nvim",
+		after = function()
+			require("CopilotChat").setup()
+		end,
+		event = "DeferredUIEnter",
 	},
 	{
-		name = "vim-wakatime",
-		dir = "@vim_wakatime@",
-		event = "VeryLazy",
+		"vim-wakatime",
+		event = "DeferredUIEnter",
 	},
 }
