@@ -39,8 +39,6 @@ return {
 				end,
 			})
 
-			local capabilities = require("cmp_nvim_lsp").default_capabilities()
-
 			local lspconfig = require("lspconfig")
 
 			for _, ls in pairs({
@@ -99,10 +97,6 @@ return {
 							formatterMode = "typstyle",
 						},
 					}
-				end
-
-				for k, v in pairs({ capabilities = capabilities }) do
-					server_config[k] = v
 				end
 
 				lspconfig[ls].setup(server_config)
