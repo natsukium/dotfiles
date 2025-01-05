@@ -18,6 +18,17 @@ return {
 					},
 				},
 				signature = { enabled = true },
+				sources = {
+					default = { "lsp", "path", "snippets", "buffer", "copilot" },
+					providers = {
+						copilot = {
+							name = "copilot",
+							module = "blink-cmp-copilot",
+							score_offset = 100,
+							async = true,
+						},
+					},
+				},
 			})
 		end,
 	},
@@ -31,5 +42,9 @@ return {
 				filetypes = { markdown = true },
 			})
 		end,
+	},
+	{
+		"blink-cmp-copilot",
+		event = "InsertEnter",
 	},
 }
