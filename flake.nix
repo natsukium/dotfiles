@@ -41,7 +41,6 @@
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     git-hooks.inputs.flake-compat.follows = "";
     git-hooks.inputs.gitignore.follows = "";
-    git-hooks.inputs.nixpkgs-stable.follows = "nixpkgs";
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote.inputs.flake-compat.follows = "";
@@ -68,7 +67,6 @@
     nix-wallpaper.inputs.nixpkgs.follows = "nixpkgs";
     nix-wallpaper.inputs.pre-commit-hooks.follows = "git-hooks";
     nixos-wsl.inputs.flake-compat.follows = "";
-    nixos-wsl.inputs.flake-utils.follows = "flake-utils";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
