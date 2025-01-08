@@ -2,6 +2,9 @@ return {
 	{
 		"blink.cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
+		before = function()
+			require("lz.n").trigger_load("blink-cmp-copilot")
+		end,
 		after = function()
 			require("blink.cmp").setup({
 				completion = {
@@ -45,6 +48,5 @@ return {
 	},
 	{
 		"blink-cmp-copilot",
-		event = "InsertEnter",
 	},
 }
