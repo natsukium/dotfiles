@@ -27,6 +27,9 @@ return {
 	{
 		"nvim-dap-ui",
 		event = "DeferredUIEnter",
+		before = function()
+			require("lz.n").trigger_load("nvim-dap")
+		end,
 		after = function()
 			require("dapui").setup()
 			local dap, dapui = require("dap"), require("dapui")
