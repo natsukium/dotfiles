@@ -119,10 +119,10 @@ return {
 		end,
 	},
 	{
-		"Comment.nvim",
+		"comment.nvim",
 		event = "BufRead",
 		after = function()
-			require("comment").setup()
+			require("Comment").setup()
 		end,
 	},
 	{
