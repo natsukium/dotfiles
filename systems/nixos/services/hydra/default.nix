@@ -14,7 +14,7 @@
 
   services.tsnsrv.services.hydra = {
     ephemeral = true;
-    authKeyPath = "/run/credentials/tsnsrv-hydra.service/credentials";
+    authKeyPath = config.sops.secrets.tailscale-authkey.path;
     toURL = config.services.hydra.hydraURL;
   };
 
