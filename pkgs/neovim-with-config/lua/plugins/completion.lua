@@ -3,6 +3,7 @@ return {
 		"blink.cmp",
 		event = { "InsertEnter", "CmdlineEnter" },
 		before = function()
+			require("lz.n").trigger_load("copilot.lua")
 			require("lz.n").trigger_load("blink-cmp-copilot")
 		end,
 		after = function()
@@ -37,7 +38,6 @@ return {
 	},
 	{
 		"copilot.lua",
-		event = "InsertEnter",
 		after = function()
 			require("copilot").setup({
 				suggestion = { enabled = false },
