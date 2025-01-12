@@ -1,10 +1,19 @@
-{ lib, pkgs, ... }:
+{
+  inputs,
+  lib,
+  pkgs,
+  ...
+}:
 let
   defaultKeyBind = import ./defaultKeyBind.nix;
   terminal = "kitty";
   launcher = "fuzzel";
 in
 {
+  imports = [ inputs.niri-flake.homeModules.niri ];
+
+  programs.niri.package = pkgs.niri;
+
   programs.niri.settings = {
     binds = defaultKeyBind // {
       "Mod+Return".action.spawn = terminal;
