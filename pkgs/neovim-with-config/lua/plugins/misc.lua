@@ -221,4 +221,16 @@ return {
 		"vim-wakatime",
 		event = "DeferredUIEnter",
 	},
+	{
+		"snacks.nvim",
+		after = function()
+			require("snacks").setup({
+				lazygit = {},
+				bigfile = { size = 500 * 1024 },
+			})
+			vim.keymap.set("n", "<Space>gg", function()
+				Snacks.lazygit.open()
+			end)
+		end,
+	},
 }
