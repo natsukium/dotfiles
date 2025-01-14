@@ -45,6 +45,14 @@ let
     "zipPlugin.vim"
   ];
 
+  neovim-unwrapped' = neovim-unwrapped.overrideAttrs (oldAttrs: {
+    postInstall =
+      (oldAttrs.postInstall or "")
+      + ''
+        rm ${lib.concatStringsSep " " disabledBuiltinPluginPaths}
+      '';
+  });
+
   language-servers = [
     # astro
     astro-language-server
@@ -120,14 +128,7 @@ let
 
   };
 in
-(wrapNeovimUnstable neovim-unwrapped (
+(wrapNeovimUnstable neovim-unwrapped' (
   # if wrapperArgs is defined directly in config, it will somehow be overwritten
   config // { wrapperArgs = config.wrapperArgs ++ extraWrapperArgs; }
-)).overrideAttrs
-  (oldAttrs: {
-    postInstall =
-      (oldAttrs.postInstall or "")
-      + ''
-        echo ${lib.concatStringsSep " " disabledBuiltinPluginPaths} | xargs rm
-      '';
-  })
+))
