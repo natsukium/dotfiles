@@ -1,5 +1,6 @@
 {
   inputs,
+  config,
   lib,
   pkgs,
   ...
@@ -24,6 +25,9 @@ in
         "-c"
         "rbw unlock && rofi-rbw -t password"
       ];
+      # The quit action will show a confirmation dialog to avoid accidental exits.
+      "Mod+Shift+E".action =
+        if config.programs.wlogout.enable then { spawn = "wlogout"; } else { quit = { }; };
     };
     input = {
       focus-follows-mouse.enable = true;

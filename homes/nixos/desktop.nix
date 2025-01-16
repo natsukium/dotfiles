@@ -31,6 +31,10 @@ in
     };
   };
 
+  programs.wlogout = {
+    enable = true;
+  };
+
   gtk = {
     enable = true;
     gtk3.extraConfig = {
