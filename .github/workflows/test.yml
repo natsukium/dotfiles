@@ -14,10 +14,6 @@ jobs:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-14]
     steps:
       - uses: actions/checkout@v4
-      - name: Workaround to fix environment variables in aarch64-linux 
-        # https://github.com/orgs/community/discussions/148648#discussioncomment-11867019
-        if: matrix.os == 'ubuntu-24.04-arm'
-        run: for var in PATH XDG_CONFIG_HOME; do sed -Ee "s/^/${var}=/" -e 's/(runner)admin/\1/g' <<< "${!var}"; done | tee -a "$GITHUB_ENV"
       - uses: cachix/install-nix-action@v30
       - name: Setup cachix
         uses: cachix/cachix-action@v15
