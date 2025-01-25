@@ -36,6 +36,11 @@ in
 
   my.services.spotlight.enableIndex = false;
 
+  my.services.caffeinate = {
+    enable = true;
+    preventSleepOnCharge = true;
+  };
+
   # need to run `chsh -s /run/current-system/sw/bin/fish` manually
   # https://github.com/LnL7/nix-darwin/issues/811
   system.activationScripts.extraActivation.text =
