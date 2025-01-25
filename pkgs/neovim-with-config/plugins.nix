@@ -11,6 +11,7 @@ with vimPlugins;
 pluginsWithLazy true [
   ChatGPT-nvim
   FixCursorHold-nvim
+  SchemaStore-nvim
   blink-cmp
   blink-cmp-copilot
   bufferline-nvim

@@ -29,6 +29,7 @@
   typescript-language-server,
   typos-lsp,
   typstyle,
+  vscode-langservers-extracted,
   wakatime-cli,
   yaml-language-server,
 }:
@@ -66,6 +67,8 @@ let
     docker-compose-language-service
     # javascript
     biome
+    # json
+    vscode-langservers-extracted
     # lua
     lua-language-server
     stylua
