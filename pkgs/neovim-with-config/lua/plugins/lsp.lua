@@ -2,6 +2,9 @@ return {
 	{
 		"nvim-lspconfig",
 		event = { "BufReadPre", "BufNewFile" },
+		before = function()
+			require("lz.n").trigger_load("blink.cmp")
+		end,
 		after = function()
 			-- Mappings.
 			-- See `:help vim.diagnostic.*` for documentation on any of the below functions
@@ -40,6 +43,12 @@ return {
 			})
 
 			local lspconfig = require("lspconfig")
+			local capabilities = vim.tbl_deep_extend(
+				"force",
+				{},
+				vim.lsp.protocol.make_client_capabilities(),
+				require("blink.cmp").get_lsp_capabilities() or {}
+			)
 
 			for _, ls in pairs({
 				"astro",
@@ -98,6 +107,8 @@ return {
 						},
 					}
 				end
+
+				server_config.capabilities = capabilities
 
 				lspconfig[ls].setup(server_config)
 			end
