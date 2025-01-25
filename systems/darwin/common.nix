@@ -34,6 +34,8 @@ in
 
   nixpkgs.config.allowUnfree = true;
 
+  my.services.spotlight.enableIndex = false;
+
   # need to run `chsh -s /run/current-system/sw/bin/fish` manually
   # https://github.com/LnL7/nix-darwin/issues/811
   system.activationScripts.extraActivation.text =
