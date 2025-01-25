@@ -28,6 +28,8 @@ in
 
   services.tailscale.enable = true;
 
+  services.openssh.enable = true;
+
   services.nix-daemon.enable = true;
 
   nixpkgs.config.allowUnfree = true;
