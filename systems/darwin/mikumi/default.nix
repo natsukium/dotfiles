@@ -20,6 +20,12 @@
     credentialsFile = config.sops.secrets.cachix-agent-token.path;
   };
 
+  power = {
+    # Enable these options only on Mac mini because MacBook does not support these features
+    restartAfterFreeze = true;
+    restartAfterPowerFailure = true;
+  };
+
   sops.secrets.cachix-agent-token = {
     sopsFile = ./secrets.yaml;
   };
