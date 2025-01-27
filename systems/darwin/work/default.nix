@@ -10,6 +10,10 @@ in
 
   homebrew = {
     enable = true;
+    onActivation = {
+      autoUpdate = true;
+      cleanup = "zap";
+    };
     brews = [ "libomp" ];
     casks = [
       "google-chrome"
