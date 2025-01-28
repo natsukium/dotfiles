@@ -16,7 +16,6 @@ in
     };
     brews = [ "libomp" ];
     casks = [
-      "google-chrome"
       "microsoft-edge"
       "pritunl"
     ];

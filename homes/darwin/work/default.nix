@@ -1,4 +1,4 @@
-{ specialArgs, ... }:
+{ specialArgs, pkgs, ... }:
 let
   inherit (specialArgs) username;
 in
@@ -7,5 +7,6 @@ in
 
   home-manager.users.${username} = {
     imports = [ ../desktop.nix ];
+    home.packages = [ pkgs.google-chrome ];
   };
 }
