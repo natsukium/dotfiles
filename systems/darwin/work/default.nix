@@ -6,6 +6,7 @@ in
   imports = [
     ../common.nix
     ../desktop.nix
+    ../linux-builder.nix
   ];
 
   homebrew = {
