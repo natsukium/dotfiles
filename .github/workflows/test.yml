@@ -32,7 +32,6 @@ jobs:
         run: |
           printf "run\tprivate/var/run\n" | sudo tee -a /etc/synthetic.conf
           /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
-      - uses: DeterminateSystems/magic-nix-cache-action@v9
       - name: build
         run: |
           export MAKEFLAGS="NIX:=nix"
@@ -52,7 +51,6 @@ jobs:
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community,cuda-maintainers
-      - uses: DeterminateSystems/magic-nix-cache-action@v9
       - name: deploy
         env:
           CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
