@@ -18,19 +18,27 @@ in
   programs = {
     kitty = {
       enable = true;
-      settings = {
-        "font_family" = "Liga HackGen Console NF";
-        "font_size" = 14;
-        "hide_window_decorations" = if pkgs.stdenv.isLinux then "yes" else "titlebar-only";
-        "tab_bar_edge" = "top";
-        "tab_bar_style" = "powerline";
-        "scrollback_pager_history_size" = 50;
-        "enable_audio_bell" = "no";
-        "enabled_layouts" = "Splits,Stack,Tall";
-        "macos_option_as_alt" = "yes";
-        "confirm_os_window_close" = 0;
-        "cursor_trail" = 1;
-      };
+      settings =
+        let
+          moralerspace = family: "'Moralerspace ${family} HWNF'";
+          font-features = "'calt liga ss01 ss02 ss03 ss05 ss09'";
+        in
+        {
+          "font_family" = "family=${moralerspace "Neon"} features=${font-features}";
+          "bold_font" = "family=${moralerspace "Xenon"} features=${font-features}";
+          "italic_font" = "family=${moralerspace "Radon"} features=${font-features}";
+          "bold_italic_font" = "family=${moralerspace "Krypton"} features=${font-features}";
+          "font_size" = 14;
+          "hide_window_decorations" = if pkgs.stdenv.isLinux then "yes" else "titlebar-only";
+          "tab_bar_edge" = "top";
+          "tab_bar_style" = "powerline";
+          "scrollback_pager_history_size" = 50;
+          "enable_audio_bell" = "no";
+          "enabled_layouts" = "Splits,Stack,Tall";
+          "macos_option_as_alt" = "yes";
+          "confirm_os_window_close" = 0;
+          "cursor_trail" = 1;
+        };
       keybindings = { } // tmux-compat-keybindings;
       darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
       shellIntegration.mode = "enabled";

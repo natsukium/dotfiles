@@ -15,6 +15,7 @@
     enable = false;
   };
   fonts.packages = with pkgs; [
+    moralerspace-hwnf
     noto-fonts-cjk-sans
     noto-fonts-emoji
     liga-hackgen-nf-font
