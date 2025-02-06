@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ lib, specialArgs, ... }:
 let
   netskope-cert-file = "/Library/Application Support/Netskope/STAgent/download/nscacert.pem";
 in
@@ -8,6 +8,8 @@ in
     ../desktop.nix
     ../linux-builder.nix
   ];
+
+  users.users.${specialArgs.username}.uid = 503;
 
   homebrew = {
     enable = true;

@@ -24,7 +24,15 @@ in
     };
   };
 
-  users.users.${username}.home = "/Users/${username}";
+  # uid and knownUsers are needed to set fish as the default shell
+  # https://github.com/LnL7/nix-darwin/issues/1237#issuecomment-2562242340
+  users = {
+    users.${username} = {
+      home = "/Users/${username}";
+      uid = lib.mkDefault 501;
+    };
+    knownUsers = [ username ];
+  };
 
   services.tailscale.enable = true;
 
@@ -41,15 +49,9 @@ in
     preventSleepOnCharge = true;
   };
 
-  # need to run `chsh -s /run/current-system/sw/bin/fish` manually
-  # https://github.com/LnL7/nix-darwin/issues/811
-  system.activationScripts.extraActivation.text =
-    ''
-      chsh -s /run/current-system/sw/bin/fish
-    ''
-    + lib.optionalString stdenv.isAarch64 ''
-      softwareupdate --install-rosetta --agree-to-license
-    '';
+  system.activationScripts.extraActivation.text = lib.optionalString stdenv.hostPlatform.isAarch64 ''
+    softwareupdate --install-rosetta --agree-to-license
+  '';
 
   system.stateVersion = 5;
 }
