@@ -168,6 +168,7 @@
               cachix-deploy-lib = inputs.cachix-deploy-flake.lib pkgs;
             in
             {
+              fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
               neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
               cachix-deploy = cachix-deploy-lib.spec {
                 agents = {
