@@ -2,11 +2,6 @@
 let
 in
 {
-  imports = [
-    ../../applications/yabai
-    ../../applications/skhd
-  ];
-
   system = {
     defaults = {
       NSGlobalDomain = {
