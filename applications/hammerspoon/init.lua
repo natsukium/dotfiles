@@ -11,16 +11,16 @@ PaperWM.swipe_fingers = 3
 
 PaperWM:bindHotkeys({
 	-- switch to a new focused window in tiled grid
-	focus_left = { { "alt" }, "h" },
-	focus_right = { { "alt" }, "l" },
-	focus_up = { { "alt" }, "k" },
-	focus_down = { { "alt" }, "j" },
+	focus_left = { { "cmd" }, "h" },
+	focus_right = { { "cmd" }, "l" },
+	focus_up = { { "cmd" }, "k" },
+	focus_down = { { "cmd" }, "j" },
 
 	-- move windows around in tiled grid
-	swap_left = { { "alt", "shift" }, "h" },
-	swap_right = { { "alt", "shift" }, "l" },
-	swap_up = { { "alt", "shift" }, "k" },
-	swap_down = { { "alt", "shift" }, "j" },
+	swap_left = { { "cmd", "ctrl" }, "h" },
+	swap_right = { { "cmd", "ctrl" }, "l" },
+	swap_up = { { "cmd", "ctrl" }, "k" },
+	swap_down = { { "cmd", "ctrl" }, "j" },
 
 	-- position and resize focused window
 	center_window = { { "alt" }, "c" },
