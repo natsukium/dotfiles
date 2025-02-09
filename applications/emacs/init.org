@@ -13,13 +13,28 @@
   :ensure t
   :config
   (load-theme 'doom-nord :no-confirm))
+#+end_src
 
-(which-key-mode)
-
+* version control system
+** git
+#+begin_src emacs-lisp
 (use-package magit
   :ensure t
   :bind
   (("C-x g" . magit-status)))
+
+(use-package diff-hl
+  :ensure t
+  :init
+  (global-diff-hl-mode)
+  (diff-hl-flydiff-mode)
+  (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
+  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
+#+end_src
+
+* misc
+#+begin_src emacs-lisp
+(which-key-mode)
 
 (setq-default indent-tabs-mode nil)
 
