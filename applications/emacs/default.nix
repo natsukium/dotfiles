@@ -36,6 +36,7 @@ in
   };
 
   xdg.configFile."emacs/init.el".source = tangle ./init.org;
+  xdg.configFile."emacs/early-init.el".source = tangle ./early-init.org;
 
   home.shellAliases = pkgs.lib.optionalAttrs pkgs.stdenv.isDarwin {
     emacs = "${config.programs.emacs.package}/Applications/Emacs.app/Contents/MacOS/Emacs";
