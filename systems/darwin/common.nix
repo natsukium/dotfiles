@@ -49,6 +49,8 @@ in
     preventSleepOnCharge = true;
   };
 
+  system.startup.chime = false;
+
   system.activationScripts.extraActivation.text = lib.optionalString stdenv.hostPlatform.isAarch64 ''
     softwareupdate --install-rosetta --agree-to-license
   '';
