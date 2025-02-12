@@ -2,10 +2,9 @@
 { inputs, pkgs, ... }:
 
 {
-  # Install MacOS applications to the user Applications folder. Also update Docked applications
+  # Install MacOS applications to the user Applications folder.
   home.extraActivationPath = with pkgs; [
     rsync
-    dockutil
     gawk
   ];
   home.activation.trampolineApps = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''

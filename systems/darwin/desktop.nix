@@ -1,4 +1,10 @@
-{ pkgs, config, ... }:
+{
+  lib,
+  pkgs,
+  config,
+  specialArgs,
+  ...
+}:
 let
 in
 {
@@ -21,6 +27,13 @@ in
         tilesize = 40;
         wvous-br-corner = 4;
         wvous-tl-corner = 10;
+        persistent-apps =
+          let
+            inherit (config.home-manager.users.${specialArgs.username}) programs;
+          in
+          [ "${pkgs.zen-browser}/Applications/Zen.app" ]
+          ++ lib.optional programs.kitty.enable "${programs.kitty.package}/Applications/kitty.app"
+          ++ lib.optional programs.emacs.enable "${programs.emacs.package}/Applications/Emacs.app";
       };
       finder = {
         AppleShowAllExtensions = true;

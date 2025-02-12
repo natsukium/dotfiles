@@ -8,7 +8,6 @@
       swiftPackages
       swiftpm
       swiftpm2nix
-      dockutil
       # https://github.com/NixOS/nixpkgs/issues/339576
       bitwarden-cli
       ;

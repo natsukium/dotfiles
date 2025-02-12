@@ -3,7 +3,6 @@
 
 # Utilities not in nixpkgs.
 plutil="/usr/bin/plutil"
-killall="/usr/bin/killall"
 osacompile="/usr/bin/osacompile"
 
 copyable_app_props=(
@@ -67,41 +66,6 @@ function copy_paths() {
   popd >/dev/null || exit
 }
 
-function sync_dock() {
-  # Make sure all environment variables are cleared that might affect dockutil
-  unset SUDO_USER
-
-  # Array of applications to sync
-  declare -a apps=("$@")
-
-  # Iterate through each provided app
-  for app_path in "${apps[@]}"; do
-    if [ -d "$app_path" ]; then
-      # Extract the name of the app from the path
-      app_name=$(basename "$app_path")
-      app_name=${app_name%.*} # Remove the '.app' extension
-      resolved_path=$(realpath "$app_path")
-
-      # Find the current Dock item for the app, if it exists
-      current_dock_item=$(dockutil --list --no-restart | grep "$app_name.app" | awk -F "\t" '{print $1}' || echo "")
-
-      if [ -n "$current_dock_item" ]; then
-        # The app is currently in the Dock, attempt to replace it
-        echo "Updating $app_name in Dock..."
-        dockutil --add "$resolved_path" --replacing "$current_dock_item" --no-restart
-      else
-        # The app is not in the Dock; you might choose to add it or do nothing
-        echo "$app_name is not currently in the Dock."
-      fi
-    else
-      echo "Warning: Provided path $app_path is not valid."
-    fi
-  done
-
-  # Restart the Dock to apply changes
-  $killall Dock
-}
-
 function mktrampoline() {
   local app="$1"
   local trampoline="$2"
@@ -131,5 +95,4 @@ function sync_trampolines() {
     trampoline="$2/$(basename "$app")"
     mktrampoline "$app" "$trampoline"
   done
-  sync_dock "${apps[@]}"
 }
