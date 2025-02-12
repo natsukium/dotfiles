@@ -23,8 +23,9 @@ in
         # FIXME: This is a workaround to avoid the following error
         # GoogleJapaneseInput[2588:20231] [_IMKServerLegacy _createConnection] could not register com.google.inputmethod.Japanese_Connection
         # GoogleJapaneseInput[2588:20231] [_IMKServerLegacy initWithName:bundleIdentifier:]: [IMKServer _createConnection]: *Failed* to register NSConnection name=com.google.inputmethod.Japanese_Connection
+        # need to remove the packages from `/Library/Input Method` when disabling the service
         system.activationScripts.extraActivation.text = ''
-          echo "copying google-japanese-input into /Library..."
+          echo "copying google-japanese-input into /Library/Input Methods..."
           cp -r ${cfg.package}/Library/Input\ Methods /Library/
         '';
 
@@ -56,7 +57,7 @@ in
           };
         };
       }
-      # FIXME: The following script is automatically registered
+      # FIXME: The following script is automatically registered as
       # application.com.google.inputmethod.Japanese.146947176.146947248
       (lib.mkIf false {
         launchd.agents.google-japanese-input = {
