@@ -52,7 +52,9 @@ in
   system.startup.chime = false;
 
   system.activationScripts.extraActivation.text = lib.optionalString stdenv.hostPlatform.isAarch64 ''
-    softwareupdate --install-rosetta --agree-to-license
+    if [ ! -d /usr/libexec/rosetta ]; then
+      softwareupdate --install-rosetta --agree-to-license
+    fi
   '';
 
   system.stateVersion = 5;
