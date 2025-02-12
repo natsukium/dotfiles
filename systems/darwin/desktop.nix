@@ -49,7 +49,7 @@ in
     pkgs.moralerspace-hwnf
   ];
 
-  homebrew.casks = [ "google-japanese-ime" ];
+  my.services.google-japanese-input.enable = true;
 
   services.sketchybar.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
