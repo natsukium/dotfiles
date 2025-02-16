@@ -8,7 +8,6 @@
   wsl = {
     enable = true;
     defaultUser = "natsukium";
-    nativeSystemd = true;
   };
   hardware.graphics = {
     enable = true;
