@@ -26,6 +26,9 @@ in
         # need to remove the packages from `/Library/Input Method` when disabling the service
         system.activationScripts.extraActivation.text = ''
           echo "copying google-japanese-input into /Library/Input Methods..."
+          if [ -d "/Library/Input Methods/GoogleJapaneseInput.app" ]; then
+            rm -r /Library/Input\ Methods/GoogleJapaneseInput.app
+          fi
           cp -r ${cfg.package}/Library/Input\ Methods /Library/
         '';
 
