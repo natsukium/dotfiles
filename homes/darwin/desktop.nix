@@ -24,7 +24,9 @@ in
   home.packages = with pkgs; [
     monitorcontrol
     nowplaying-cli
-    zen-browser
+    (zen-browser.overrideAttrs (_: {
+      sourceRoot = "Zen Browser.app";
+    }))
   ];
 
   services.raycast.enable = true;

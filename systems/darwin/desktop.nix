@@ -6,6 +6,11 @@
   ...
 }:
 let
+  zen-browser' = (
+    pkgs.zen-browser.overrideAttrs (_: {
+      sourceRoot = "Zen Browser.app";
+    })
+  );
 in
 {
   system = {
@@ -31,7 +36,7 @@ in
           let
             inherit (config.home-manager.users.${specialArgs.username}) programs;
           in
-          [ "${pkgs.zen-browser}/Applications/Zen.app" ]
+          [ "${zen-browser'}/Applications/Zen.app" ]
           ++ lib.optional programs.kitty.enable "${programs.kitty.package}/Applications/kitty.app"
           ++ lib.optional programs.emacs.enable "${programs.emacs.package}/Applications/Emacs.app";
       };
