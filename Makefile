@@ -32,17 +32,17 @@ build: $(SYSTEM)
 build-all: x86_64-linux aarch64-linux aarch64-darwin
 
 x86_64-linux:
-	$(NIX) build --impure --no-link --show-trace --system x86_64-linux $(JOBS_X86_64-LINUX) \
+	$(NIX) build --impure --keep-going --no-link --show-trace --system x86_64-linux $(JOBS_X86_64-LINUX) \
 		.#nixosConfigurations.arusha.config.system.build.toplevel \
 		.#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
 		.#nixosConfigurations.manyara.config.system.build.toplevel \
 
 aarch64-linux: eval-android
-	$(NIX) build --impure --no-link --show-trace --system aarch64-linux $(JOBS_AARCH64-LINUX) \
+	$(NIX) build --impure --keep-going --no-link --show-trace --system aarch64-linux $(JOBS_AARCH64-LINUX) \
 		.#nixosConfigurations.serengeti.config.system.build.toplevel \
 
 aarch64-darwin:
-	$(NIX) build --no-link --show-trace --system aarch64-darwin $(JOBS_AARCH64-DARWIN) \
+	$(NIX) build --keep-going --no-link --show-trace --system aarch64-darwin $(JOBS_AARCH64-DARWIN) \
 		.#darwinConfigurations.katavi.system \
 		.#darwinConfigurations.mikumi.system \
 		.#darwinConfigurations.work.system \
