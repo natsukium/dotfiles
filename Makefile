@@ -43,7 +43,7 @@ aarch64-linux:
 		.#nixOnDroidConfigurations.default.config.environment.path
 
 aarch64-darwin:
-	$(NIX) build --keep-going --no-link --show-trace --system aarch64-darwin $(JOBS_AARCH64-DARWIN) \
+	$(NIX) build --keep-going --no-link --show-trace --system aarch64-darwin $(JOBS_AARCH64-DARWIN) --option extra-sandbox-paths /nix/store \
 		.#darwinConfigurations.katavi.system \
 		.#darwinConfigurations.mikumi.system \
 		.#darwinConfigurations.work.system \
