@@ -55,5 +55,5 @@ in
     fi
   '';
 
-  system.stateVersion = 5;
+  system.stateVersion = lib.mkDefault 4;
 }
