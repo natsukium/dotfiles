@@ -14,7 +14,6 @@ in
 
   environment.packages = with pkgs; [
     openssh
-    vim
     which
   ];
 
