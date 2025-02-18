@@ -1,4 +1,4 @@
-.PHONY: install_nix uninstall_nix build build-all x86_64-linux aarch64-linux aarch64-darwin eval-android
+.PHONY: install_nix uninstall_nix build build-all x86_64-linux aarch64-linux aarch64-darwin
 
 UNAME := $(shell uname)
 NIX_PROFILE := /nix/var/nix/profiles/default/etc/profile.d/nix-daemon.sh
@@ -37,18 +37,16 @@ x86_64-linux:
 		.#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
 		.#nixosConfigurations.manyara.config.system.build.toplevel \
 
-aarch64-linux: eval-android
+aarch64-linux:
 	$(NIX) build --impure --keep-going --no-link --show-trace --system aarch64-linux $(JOBS_AARCH64-LINUX) \
 		.#nixosConfigurations.serengeti.config.system.build.toplevel \
+		.#nixOnDroidConfigurations.default.config.environment.path
 
 aarch64-darwin:
 	$(NIX) build --keep-going --no-link --show-trace --system aarch64-darwin $(JOBS_AARCH64-DARWIN) \
 		.#darwinConfigurations.katavi.system \
 		.#darwinConfigurations.mikumi.system \
 		.#darwinConfigurations.work.system \
-
-eval-android:
-	nix eval .#nixOnDroidConfigurations.default.config.environment.packages | grep -v "error" >/dev/null
 
 $(NIX_PROFILE):
 	curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
