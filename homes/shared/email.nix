@@ -25,5 +25,8 @@
     };
     sort = "reverse-last-date-received";
     vimKeys = true;
+    extraConfig = ''
+      set pager_index_lines=10
+    '';
   };
 }
