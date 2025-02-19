@@ -39,26 +39,22 @@ in
             "${cfg.package}/Library/LaunchAgents/com.google.inputmethod.Japanese.Renderer.plist";
         };
 
-        system.defaults.CustomUserPreferences = {
-          "com.apple.inputsources" = {
-            AppleEnabledThirdPartyInputSources = [
-              {
-                "Bundle ID" = "com.google.inputmethod.Japanese";
-                InputSourceKind = "Keyboard Input Method";
-              }
-              {
-                "Bundle ID" = "com.google.inputmethod.Japanese";
-                "Input Mode" = "com.apple.inputmethod.Roman";
-                InputSourceKind = "Input Mode";
-              }
-              {
-                "Bundle ID" = "com.google.inputmethod.Japanese";
-                "Input Mode" = "com.apple.inputmethod.Japanese";
-                InputSourceKind = "Input Mode";
-              }
-            ];
-          };
-        };
+        system.defaults.inputsources.AppleEnabledThirdPartyInputSources = [
+          {
+            "Bundle ID" = "com.google.inputmethod.Japanese";
+            InputSourceKind = "Keyboard Input Method";
+          }
+          {
+            "Bundle ID" = "com.google.inputmethod.Japanese";
+            "Input Mode" = "com.apple.inputmethod.Roman";
+            InputSourceKind = "Input Mode";
+          }
+          {
+            "Bundle ID" = "com.google.inputmethod.Japanese";
+            "Input Mode" = "com.apple.inputmethod.Japanese";
+            InputSourceKind = "Input Mode";
+          }
+        ];
       }
       # FIXME: The following script is automatically registered as
       # application.com.google.inputmethod.Japanese.146947176.146947248
