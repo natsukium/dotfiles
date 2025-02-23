@@ -6,6 +6,7 @@
     ../applications/vivaldi
     ../applications/vscode
     ./shared/email.nix
+    ./shared/weechat.nix
   ];
 
   services.copyq = {
