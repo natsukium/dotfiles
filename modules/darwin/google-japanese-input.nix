@@ -25,11 +25,17 @@ in
         # GoogleJapaneseInput[2588:20231] [_IMKServerLegacy initWithName:bundleIdentifier:]: [IMKServer _createConnection]: *Failed* to register NSConnection name=com.google.inputmethod.Japanese_Connection
         # need to remove the packages from `/Library/Input Method` when disabling the service
         system.activationScripts.extraActivation.text = ''
-          echo "copying google-japanese-input into /Library/Input Methods..."
-          if [ -d "/Library/Input Methods/GoogleJapaneseInput.app" ]; then
-            rm -r /Library/Input\ Methods/GoogleJapaneseInput.app
+          OLD="/Library/Input Methods/GoogleJapaneseInput.app"
+          NEW="${cfg.package}/Library/Input Methods/GoogleJapaneseInput.app"
+          echo copying google-japanese-input into "$OLD"...
+          if [ -d "$OLD" ]; then
+            if ! diff -rq "$NEW" "$OLD"; then
+              rm -r "$OLD"
+              cp -r "$NEW" "$OLD"
+            fi
+          else
+            cp -r "$NEW" "$OLD"
           fi
-          cp -r ${cfg.package}/Library/Input\ Methods /Library/
         '';
 
         environment.userLaunchAgents = {
