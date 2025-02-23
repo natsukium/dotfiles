@@ -230,6 +230,7 @@
                 ssh-to-age
                 (terraform.withPlugins (p: [
                   p.aws
+                  p.cloudflare
                   p.external
                   p.hydra
                   p.null
