@@ -37,7 +37,6 @@ in
     ../applications/lazygit
     ../applications/misc
     ../applications/newsboat
-    ../applications/nix
     ../applications/nushell
     ../applications/rbw
     ../applications/starship
