@@ -228,10 +228,10 @@ in
         put_template_custom 12 ";7" # cursor (reverse video)
 
         # set syntax highlighting colors
-        set -U fish_color_autosuggestion ${base03} brblack
+        set -U fish_color_autosuggestion ${base03} brblack --bold --italics
         set -U fish_color_cancel -r
         set -U fish_color_command ${base0D} blue
-        set -U fish_color_comment ${base03} brblack
+        set -U fish_color_comment ${base03} brblack --italics
         set -U fish_color_cwd ${base0B} green
         set -U fish_color_cwd_root ${base08} red
         set -U fish_color_end ${base0C} cyan
