@@ -6,7 +6,10 @@ in
   imports = [ ../common.nix ];
 
   home-manager.users.${username} = {
-    imports = [ ../desktop.nix ];
-    home.packages = [ pkgs.google-chrome ];
+    imports = [
+      ../desktop.nix
+      ./accounts.nix
+      ./git.nix
+    ];
   };
 }

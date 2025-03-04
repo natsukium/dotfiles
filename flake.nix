@@ -111,10 +111,9 @@
         mikumi = {
           system = "aarch64-darwin";
         };
-        # laptop for work (m1 macbook pro)
+        # laptop for work (m4 macbook pro)
         work = {
           system = "aarch64-darwin";
-          username = "tomoya.matsumoto";
         };
         # main desktop (intel core i5-12400F)
         kilimanjaro = {

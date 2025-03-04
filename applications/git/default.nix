@@ -23,12 +23,6 @@
       push.useForceIfIncludes = true;
       url."git@github.com:".pushInsteadOf = "https://github.com/";
     };
-    includes = [
-      {
-        path = "${config.home.homeDirectory}/src/work/.config/git/config";
-        condition = "gitdir:${config.home.homeDirectory}/src/work/";
-      }
-    ];
     ignores = [
       ".direnv"
       ".DS_Store"
