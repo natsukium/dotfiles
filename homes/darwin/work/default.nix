@@ -11,5 +11,7 @@ in
       ./accounts.nix
       ./git.nix
     ];
+
+    services.ollama.enable = true;
   };
 }
