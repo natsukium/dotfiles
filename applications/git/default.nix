@@ -24,13 +24,12 @@
       url."git@github.com:".pushInsteadOf = "https://github.com/";
     };
     ignores = [
-      ".direnv"
       ".DS_Store"
       ".direnv"
-      ".vscode/"
-      "__pycache__/"
       ".ipynb_checkpoints"
+      ".vscode/"
       ".worktree"
+      "__pycache__/"
     ];
     delta = {
       enable = true;
