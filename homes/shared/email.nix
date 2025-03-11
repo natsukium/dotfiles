@@ -38,4 +38,6 @@
       set pager_index_lines=10
     '';
   };
+
+  my.programs.neomutt.enableHtmlView = true;
 }
