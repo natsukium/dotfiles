@@ -62,7 +62,6 @@ return {
 				"basedpyright",
 				"rubocop",
 				"ruff",
-				"rust_analyzer",
 				"solargraph",
 				"taplo",
 				"terraformls",
@@ -156,5 +155,17 @@ return {
 	{
 		"SchemaStore.nvim",
 		ft = { "json", "jsonc", "json5" },
+	},
+	{
+		"rustaceanvim",
+		after = function()
+			vim.g.rustaceanvim = {
+				server = {
+					default_settings = {
+						["rust-analyzer"] = { files = { excludeDirs = { "./.direnv" } } },
+					},
+				},
+			}
+		end,
 	},
 }

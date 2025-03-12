@@ -9,6 +9,7 @@ return {
 						dap = { justMyCode = false },
 						python = "python",
 					}),
+					require("rustaceanvim.neotest"),
 				},
 			})
 			vim.keymap.set("n", "<Leader>ur", ':lua require("neotest").run.run()<CR>')

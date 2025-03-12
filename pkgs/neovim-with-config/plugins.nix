@@ -62,5 +62,6 @@ pluginsWithLazy true [
 ++ (pluginsWithLazy false [
   lz-n
   nvim-web-devicons
+  rustaceanvim
   snacks-nvim
 ])
