@@ -17,6 +17,7 @@ return {
 			vim.keymap.set("n", "<Leader>ud", ':lua require("neotest").run.run({strategy = "dap"})<CR>')
 			vim.keymap.set("n", "<Leader>us", ':lua require("neotest").run.stop()<CR>')
 			vim.keymap.set("n", "<Leader>ua", ':lua require("neotest").run.attach()<CR>')
+			vim.keymap.set("n", "<Leader>uw", ':lua require("neotest").watch.toggle()<CR>')
 		end,
 	},
 	{
