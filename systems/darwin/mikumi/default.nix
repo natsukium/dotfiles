@@ -26,6 +26,10 @@
     restartAfterPowerFailure = true;
   };
 
+  # fails to activate
+  # ln: failed to create symbolic link '/etc/pam.d/sudo_local': Operation not permitted
+  security.pam.services.sudo_local.enable = false;
+
   sops.secrets.cachix-agent-token = {
     sopsFile = ./secrets.yaml;
   };
