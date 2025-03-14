@@ -1,4 +1,4 @@
-{ inputs, ... }:
+{ inputs, config, ... }:
 {
   imports = [
     ../../server.nix
@@ -43,7 +43,11 @@
     hostName = "serengeti";
   };
 
-  services.cloudflared.enable = true;
+  services.cloudflared = {
+    enable = true;
+    certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
+  };
+  sops.secrets.cloudflared-tunnel-cert = { };
 
   nix.settings = {
     max-jobs = 2;

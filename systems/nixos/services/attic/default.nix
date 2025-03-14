@@ -57,6 +57,5 @@ in
 
   sops.secrets.cloudflared-tunnel = {
     sopsFile = ./secrets.yaml;
-    owner = config.services.cloudflared.user;
   };
 }
