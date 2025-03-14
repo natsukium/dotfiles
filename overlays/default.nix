@@ -13,7 +13,16 @@
       ;
   };
 
-  temporary-fix = final: prev: { };
+  temporary-fix = final: prev: {
+    python312 = prev.python312.override {
+      packageOverrides = pyfinal: pyprev: {
+        rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {
+          # segmentation fault
+          doCheck = false;
+        });
+      };
+    };
+  };
 
   pre-release = final: prev: { };
 }
