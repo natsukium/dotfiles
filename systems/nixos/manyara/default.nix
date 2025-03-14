@@ -40,7 +40,10 @@
     defaults.authKeyPath = config.sops.secrets.tailscale-authkey.path;
   };
 
-  services.cloudflared.enable = true;
+  services.cloudflared = {
+    enable = true;
+    certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
+  };
 
   ext.services.nixpkgs-review.autoDeleteLogs = {
     enable = true;
@@ -48,4 +51,5 @@
   };
 
   sops.secrets.gh-token = { };
+  sops.secrets.cloudflared-tunnel-cert = { };
 }
