@@ -1,19 +1,7 @@
-{ pkgs, config, ... }:
+{ config, ... }:
 {
   programs.gh-dash = {
     enable = true;
-
-    # preview pane is corrupted when `LANG=ja_JP.UTF-8`
-    # https://github.com/dlvhdr/gh-dash/issues/316
-    package = pkgs.gh-dash.overrideAttrs (oldAttrs: {
-      nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.makeWrapper ];
-      postFixup =
-        (oldAttrs.postFixup or "")
-        + ''
-          wrapProgram $out/bin/gh-dash --set LANG C.UTF-8
-        '';
-    });
-
     settings = {
       prSections = [
         {
