@@ -44,6 +44,10 @@ in
       type = types.bool;
       default = true;
     };
+    ruby.enable = mkOption {
+      type = types.bool;
+      default = true;
+    };
     rust.enable = mkOption {
       type = types.bool;
       default = true;
@@ -101,6 +105,12 @@ in
         [ ! -f ${config.xdg.cacheHome}/python/history ] && mkdir -p ${config.xdg.cacheHome}/python && touch ${config.xdg.cacheHome}/python/history
       '';
       xdg.configFile."python/pythonstartup".source = ./pythonstartup;
+    })
+    (mkIf cfg.ruby.enable {
+      home.sessionVariables = {
+        GEM_HOME = "${config.xdg.dataHome}/gem";
+        GEM_SPEC_CACHE = "$${config.xdg.cacheHome}/gem";
+      };
     })
     (mkIf cfg.rust.enable {
       home.sessionVariables = {
