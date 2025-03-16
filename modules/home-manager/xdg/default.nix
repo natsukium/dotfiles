@@ -24,6 +24,10 @@ in
       type = types.bool;
       default = true;
     };
+    gpg.enable = mkOption {
+      type = types.bool;
+      default = true;
+    };
     nodejs.enable = mkOption {
       type = types.bool;
       default = true;
@@ -67,6 +71,9 @@ in
         DOCKER_CONFIG = "${config.xdg.configHome}/docker";
         MACHINE_STORAGE_PATH = "${config.xdg.dataHome}/docker-machine";
       };
+    })
+    (mkIf cfg.gpg.enable {
+      programs.gpg.homedir = "${config.xdg.dataHome}/gnupg";
     })
     (mkIf cfg.nodejs.enable {
       home.sessionVariables = {
