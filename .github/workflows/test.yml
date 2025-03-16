@@ -14,6 +14,19 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-14]
     steps:
+      # workaround for "No space left on device"
+      - name: Collect garbage
+        if: matrix.os == 'ubuntu-latest'
+        uses: easimon/maximize-build-space@v10
+        with:
+          root-reserve-mb: 8192
+          swap-size-mb: 1024
+          build-mount-path: "/nix"
+          remove-dotnet: 'true'
+          remove-android: 'true'
+          remove-haskell: 'true'
+          remove-codeql: 'true'
+          remove-docker-images: 'true'
       - uses: actions/checkout@v4
       - uses: nixbuild/nix-quick-install-action@v30
       - name: Setup cachix
@@ -23,11 +36,6 @@ jobs:
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
           extraPullNames: nix-community
-      # workaround for "No space left on device"
-      # https://github.com/actions/runner-images/issues/709
-      - name: Collect garbage
-        if: matrix.os == 'ubuntu-latest'
-        uses: jlumbroso/free-disk-space@v1.3.1
       - name: Create /run for darwin
         if: matrix.os == 'macos-14'
         run: |
