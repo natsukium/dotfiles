@@ -2,13 +2,6 @@
 {
   programs.fish = {
     enable = true;
-    shellInit = pkgs.lib.mkIf pkgs.stdenv.isDarwin ''
-      for p in /nix/var/nix/profiles/default/bin /run/current-system/sw/bin /etc/profiles/per-user/(users)/bin /Users/(users)/.nix-profile/bin
-        if not contains $p $fish_user_paths
-          set -g fish_user_paths $p $fish_user_paths
-        end
-      end
-    '';
     interactiveShellInit = ''
       bind \cs zi
       # set done's variable
