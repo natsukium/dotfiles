@@ -112,20 +112,18 @@ let
     withRuby = false;
     withPython3 = false;
     vimAlias = true;
-    luaRcContent = builtins.readFile (
-      replaceVars ./init.lua {
-        myconfig = lib.fileset.toSource {
-          root = ./.;
-          fileset = lib.fileset.difference ./. (
-            lib.fileset.unions [
-              ./init.lua
-              ./plugins.nix
-              ./default.nix
-            ]
-          );
-        };
-      }
-    );
+    luaRcContent = replaceVars ./init.lua {
+      myconfig = lib.fileset.toSource {
+        root = ./.;
+        fileset = lib.fileset.difference ./. (
+          lib.fileset.unions [
+            ./init.lua
+            ./plugins.nix
+            ./default.nix
+          ]
+        );
+      };
+    };
 
     plugins = import ./plugins.nix { inherit vimPlugins; };
 
