@@ -20,6 +20,10 @@
           # segmentation fault
           doCheck = false;
         });
+        chromadb = pyprev.chromadb.overridePythonAttrs (_: {
+          # raise httpx.ReadError
+          doCheck = false;
+        });
       };
     };
   };
