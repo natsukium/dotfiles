@@ -1,6 +1,8 @@
 {
   services.jankyborders = {
     enable = true;
-    hidpi = true;
+    settings = {
+      hidpi = true;
+    };
   };
 }

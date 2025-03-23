@@ -298,7 +298,7 @@ in
       };
     })
     (mkIf cfg.jankyborders {
-      services.jankyborders = {
+      services.jankyborders.settings = {
         active_color = "0xff${base0D}";
         inactive_color = "0xff${base03}";
       };
