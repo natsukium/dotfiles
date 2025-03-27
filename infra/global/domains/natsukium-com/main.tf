@@ -72,7 +72,7 @@ locals {
   }
 }
 
-resource "cloudflare_record" "record" {
+resource "cloudflare_dns_record" "record" {
   for_each = local.records
   content  = each.value.content
   name     = each.value.name
