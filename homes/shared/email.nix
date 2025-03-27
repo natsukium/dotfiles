@@ -10,6 +10,10 @@
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
       passwordCommand = "rbw get \"gmail app password for neomutt\"";
+      mbsync = {
+        enable = true;
+        create = "maildir";
+      };
       notmuch.enable = true;
       neomutt = {
         enable = true;
@@ -26,6 +30,8 @@
       };
     };
   };
+
+  programs.mbsync.enable = true;
 
   programs.neomutt = {
     enable = true;

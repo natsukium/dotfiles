@@ -8,6 +8,7 @@
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
       passwordCommand = "rbw get \"work: gmail app password\"";
+      mbsync.enable = true;
       notmuch.enable = true;
       neomutt = {
         enable = true;
