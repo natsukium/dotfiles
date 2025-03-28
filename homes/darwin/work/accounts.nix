@@ -10,10 +10,7 @@
       passwordCommand = "rbw get \"work: gmail app password\"";
       mbsync.enable = true;
       notmuch.enable = true;
-      neomutt = {
-        enable = true;
-        mailboxType = "imap";
-      };
+      neomutt.enable = true;
       # to sync with GMail's trash, I need to add the label like "+[Gmail]/ゴミ箱"
       # but labels with Japanese characters are not supported by neomutt
       # so I set the display language to English(US) in GMail settings
