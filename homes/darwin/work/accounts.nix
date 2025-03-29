@@ -1,4 +1,4 @@
-{ lib, ... }:
+{ config, lib, ... }:
 {
   accounts.email.accounts = {
     gmail.primary = lib.mkForce false;
@@ -7,7 +7,7 @@
       address = "tomoya.otabi@attm.co.jp";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "rbw get \"work: gmail app password\"";
+      passwordCommand = "cat ${config.sops.secrets.gmail-app-password-for-work.path}";
       mbsync.enable = true;
       notmuch.enable = true;
       neomutt.enable = true;
@@ -21,5 +21,9 @@
         drafts = "\[Gmail\]/Drafts";
       };
     };
+  };
+
+  sops.secrets.gmail-app-password-for-work = {
+    sopsFile = ./secrets.yaml;
   };
 }

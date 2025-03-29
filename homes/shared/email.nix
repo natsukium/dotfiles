@@ -1,3 +1,4 @@
+{ config, ... }:
 {
   accounts.email = {
     maildirBasePath = "Mail";
@@ -9,7 +10,7 @@
       address = "tomoya.otabi@gmail.com";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "rbw get \"gmail app password for neomutt\"";
+      passwordCommand = "cat ${config.sops.secrets.gmail-app-password.path}";
       mbsync = {
         enable = true;
         create = "maildir";
@@ -43,4 +44,8 @@
   };
 
   my.programs.neomutt.enableHtmlView = true;
+
+  sops.secrets.gmail-app-password = {
+    sopsFile = ./secrets.yaml;
+  };
 }
