@@ -1,6 +1,11 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  config,
+  pkgs,
+  ...
+}:
 let
-  inherit (inputs) nix-colors;
+  inherit (inputs) nix-colors sops-nix;
 in
 {
   programs.home-manager.enable = true;
@@ -22,8 +27,11 @@ in
     EDITOR = "nvim";
   };
 
+  sops.age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
+
   imports = [
     nix-colors.homeManagerModule
+    sops-nix.homeManagerModules.sops
     ../modules/home-manager
     ../applications/alacritty
     ../applications/atuin
