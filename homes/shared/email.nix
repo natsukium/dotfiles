@@ -30,6 +30,7 @@
   };
 
   programs.mbsync.enable = true;
+  my.services.mbsync.enable = true;
 
   programs.neomutt = {
     enable = true;
