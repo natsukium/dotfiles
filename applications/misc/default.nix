@@ -35,9 +35,7 @@
     };
     zoxide.enable = true;
   };
-  services = {
-    pueue.enable = true;
-  };
+  my.services.pueue.enable = true;
   home.packages = with pkgs; [
     attic-client
     cachix
