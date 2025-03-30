@@ -19,7 +19,7 @@ in
         ../../modules/nix
       ];
 
-      programs.colima = {
+      my.virtualisation.colima = {
         enable = true;
         settings = {
           cpu = 8;

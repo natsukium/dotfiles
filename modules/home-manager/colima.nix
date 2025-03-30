@@ -6,11 +6,11 @@
 }:
 with lib;
 let
-  cfg = config.programs.colima;
+  cfg = config.my.virtualisation.colima;
   yamlFormat = pkgs.formats.yaml { };
 in
 {
-  options.programs.colima = {
+  options.my.virtualisation.colima = {
     enable = mkEnableOption "";
     enableXDG = mkOption {
       type = types.bool;
