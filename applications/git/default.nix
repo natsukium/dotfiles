@@ -25,6 +25,7 @@
     };
     ignores = [
       ".DS_Store"
+      ".aider*"
       ".direnv"
       ".ipynb_checkpoints"
       ".vscode/"
