@@ -1,4 +1,7 @@
-{ config, ... }:
+{ config, pkgs, ... }:
+let
+  inherit (pkgs) lib stdenv;
+in
 {
   accounts.email = {
     maildirBasePath = "Mail";
@@ -14,6 +17,16 @@
       mbsync = {
         enable = true;
         create = "maildir";
+      };
+      imapnotify = {
+        enable = true;
+        boxes = [ "Inbox" ];
+        onNotify = "${lib.getExe config.my.services.mbsync.package} -a";
+        onNotifyPost =
+          if stdenv.hostPlatform.isLinux then
+            "${lib.getExe pkgs.libnotify} 'New mail arrived'"
+          else
+            ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
       };
       notmuch.enable = true;
       neomutt.enable = true;
@@ -31,6 +44,8 @@
 
   programs.mbsync.enable = true;
   my.services.mbsync.enable = true;
+
+  services.imapnotify.enable = true;
 
   programs.neomutt = {
     enable = true;

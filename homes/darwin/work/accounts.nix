@@ -9,6 +9,12 @@
       realName = "OTABI Tomoya";
       passwordCommand = "cat ${config.sops.secrets.gmail-app-password-for-work.path}";
       mbsync.enable = true;
+      imapnotify = {
+        enable = true;
+        boxes = [ "Inbox" ];
+        onNotify = "${lib.getExe config.my.services.mbsync.package} -a";
+        onNotifyPost = ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
+      };
       notmuch.enable = true;
       neomutt.enable = true;
       # to sync with GMail's trash, I need to add the label like "+[Gmail]/ゴミ箱"
