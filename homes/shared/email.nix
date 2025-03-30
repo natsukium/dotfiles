@@ -13,7 +13,7 @@ in
       address = "tomoya.otabi@gmail.com";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "cat ${config.sops.secrets.gmail-app-password.path}";
+      passwordCommand = "${lib.getExe' pkgs.coreutils "cat"} ${config.sops.secrets.gmail-app-password.path}";
       mbsync = {
         enable = true;
         create = "maildir";

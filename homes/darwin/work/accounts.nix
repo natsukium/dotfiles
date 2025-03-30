@@ -1,4 +1,7 @@
-{ config, lib, ... }:
+{ config, pkgs, ... }:
+let
+  inherit (pkgs) lib;
+in
 {
   accounts.email.accounts = {
     gmail.primary = lib.mkForce false;
@@ -7,7 +10,7 @@
       address = "tomoya.otabi@attm.co.jp";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "cat ${config.sops.secrets.gmail-app-password-for-work.path}";
+      passwordCommand = "${lib.getExe' pkgs.coreutils "cat"} ${config.sops.secrets.gmail-app-password.path}";
       mbsync = {
         enable = true;
         create = "maildir";
