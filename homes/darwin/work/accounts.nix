@@ -8,7 +8,10 @@
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
       passwordCommand = "cat ${config.sops.secrets.gmail-app-password-for-work.path}";
-      mbsync.enable = true;
+      mbsync = {
+        enable = true;
+        create = "maildir";
+      };
       imapnotify = {
         enable = true;
         boxes = [ "Inbox" ];
