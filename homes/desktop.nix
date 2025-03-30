@@ -9,7 +9,5 @@
     ./shared/weechat.nix
   ];
 
-  services.copyq = {
-    enable = true;
-  };
+  my.services.copyq.enable = true;
 }
