@@ -145,8 +145,14 @@ in
               > $colimaDir/colima.yaml
           '';
         };
-      }
 
-      # TODO: enable launch agent
+        launchd.agents.colima = {
+          enable = true;
+          config = {
+            ProgramArguments = [ "${lib.getExe cfg.package}" ];
+            RunAtLoad = true;
+          };
+        };
+      }
     ]);
 }
