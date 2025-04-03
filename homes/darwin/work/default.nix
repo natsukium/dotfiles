@@ -12,6 +12,10 @@ in
       ./git.nix
     ];
 
+    home.packages = with pkgs; [
+      google-chrome
+    ];
+
     services.ollama.enable = true;
   };
 }
