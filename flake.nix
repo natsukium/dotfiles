@@ -15,6 +15,7 @@
     home-manager.url = "github:nix-community/home-manager";
     impermanence.url = "github:nix-community/impermanence";
     lanzaboote.url = "github:nix-community/lanzaboote";
+    mcp-servers.url = "github:natsukium/mcp-servers-nix";
     neovim-nightly-overlay.url = "github:nix-community/neovim-nightly-overlay";
     niri-flake.url = "github:sodiboo/niri-flake";
     nix-colors.url = "github:misterio77/nix-colors";
@@ -48,6 +49,7 @@
     lanzaboote.inputs.flake-parts.follows = "flake-parts";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
     lanzaboote.inputs.pre-commit-hooks-nix.follows = "git-hooks";
+    mcp-servers.inputs.nixpkgs.follows = "nixpkgs";
     neovim-nightly-overlay.inputs.flake-compat.follows = "";
     neovim-nightly-overlay.inputs.flake-parts.follows = "flake-parts";
     neovim-nightly-overlay.inputs.git-hooks.follows = "git-hooks";
