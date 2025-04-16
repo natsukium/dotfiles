@@ -7,6 +7,7 @@
     # see https://github.com/renovatebot/renovate/issues/29721
     # "github:NixOS/nixpkgs/trick-renovate-into-working"
     cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
+    claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
     darwin.url = "github:lnl7/nix-darwin";
     disko.url = "github:nix-community/disko";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -36,6 +37,8 @@
     cachix-deploy-flake.inputs.home-manager.follows = "home-manager";
     cachix-deploy-flake.inputs.nixos-anywhere.follows = "";
     cachix-deploy-flake.inputs.nixpkgs.follows = "nixpkgs";
+    claude-desktop.inputs.flake-utils.follows = "flake-utils";
+    claude-desktop.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";

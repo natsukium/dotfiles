@@ -22,6 +22,7 @@ in
     wl-clipboard
     wtype
     inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
+    inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   programs.fuzzel = {
