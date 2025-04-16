@@ -21,7 +21,6 @@ in
     rofi-rbw
     wl-clipboard
     wtype
-    inputs.zen-browser.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   programs.fuzzel = {

@@ -26,7 +26,7 @@
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     tsnsrv.url = "github:boinkor-net/tsnsrv";
-    zen-browser.url = "github:youwen5/zen-browser-flake";
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     # used in follows
     flake-utils.url = "github:numtide/flake-utils";
@@ -77,6 +77,7 @@
     tsnsrv.inputs.flake-parts.follows = "flake-parts";
     tsnsrv.inputs.nixpkgs.follows = "nixpkgs";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    zen-browser.inputs.home-manager.follows = "home-manager";
   };
 
   nixConfig = {

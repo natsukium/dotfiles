@@ -5,6 +5,7 @@
     ../applications/qutebrowser
     ../applications/vivaldi
     ../applications/vscode
+    ../applications/zen-browser
     ./shared/claude.nix
     ./shared/email.nix
     ./shared/weechat.nix
