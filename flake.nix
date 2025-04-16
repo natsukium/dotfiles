@@ -11,6 +11,7 @@
     darwin.url = "github:lnl7/nix-darwin";
     disko.url = "github:nix-community/disko";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
+    firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
     flake-parts.url = "github:hercules-ci/flake-parts";
     git-hooks.url = "github:cachix/git-hooks.nix";
     home-manager.url = "github:nix-community/home-manager";
@@ -26,7 +27,7 @@
     sops-nix.url = "github:Mic92/sops-nix";
     treefmt-nix.url = "github:numtide/treefmt-nix";
     tsnsrv.url = "github:boinkor-net/tsnsrv";
-    zen-browser.url = "github:youwen5/zen-browser-flake";
+    zen-browser.url = "github:0xc000022070/zen-browser-flake";
 
     # used in follows
     flake-utils.url = "github:numtide/flake-utils";
@@ -42,6 +43,7 @@
     disko.inputs.nixpkgs.follows = "nixpkgs";
     emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
     emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
+    firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
     flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
     git-hooks.inputs.flake-compat.follows = "";
     git-hooks.inputs.gitignore.follows = "";
@@ -74,6 +76,7 @@
     tsnsrv.inputs.flake-parts.follows = "flake-parts";
     tsnsrv.inputs.nixpkgs.follows = "nixpkgs";
     zen-browser.inputs.nixpkgs.follows = "nixpkgs";
+    zen-browser.inputs.home-manager.follows = "home-manager";
   };
 
   nixConfig = {

@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (inputs) nix-colors sops-nix;
+  inherit (inputs) nix-colors sops-nix zen-browser;
 in
 {
   programs.home-manager.enable = true;
@@ -32,6 +32,7 @@ in
   imports = [
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
+    zen-browser.homeModules.default
     ../modules/home-manager
     ../applications/alacritty
     ../applications/atuin
