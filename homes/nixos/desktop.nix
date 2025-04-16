@@ -21,6 +21,7 @@ in
     rofi-rbw
     wl-clipboard
     wtype
+    inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   programs.fuzzel = {

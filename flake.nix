@@ -27,6 +27,7 @@
     treefmt-nix.url = "github:numtide/treefmt-nix";
     tsnsrv.url = "github:boinkor-net/tsnsrv";
     zen-browser.url = "github:0xc000022070/zen-browser-flake";
+    claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
 
     # used in follows
     flake-utils.url = "github:numtide/flake-utils";
