@@ -1,16 +1,11 @@
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+{ config, lib, ... }:
 with lib;
 let
-  cfg = config.ext.btrfs;
+  cfg = config.my.services.btrfs;
 in
 {
   options = with types; {
-    ext.btrfs = {
+    my.services.btrfs = {
       enable = mkOption {
         type = lib.types.bool;
         default = if config.fileSystems ? "/" then config.fileSystems."/".fsType == "btrfs" else false;
