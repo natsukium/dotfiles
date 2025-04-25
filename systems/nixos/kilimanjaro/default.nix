@@ -33,10 +33,6 @@
     binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
-  ext.btrfs = {
-    enable = true;
-  };
-
   networking = {
     hostName = "kilimanjaro";
     wireless = {

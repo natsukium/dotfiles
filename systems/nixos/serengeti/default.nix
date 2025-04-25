@@ -12,7 +12,6 @@
   inherit (import ./disko-config.nix { disks = [ "/dev/sda" ]; }) disko;
 
   ext.btrfs = {
-    enable = true;
     wipeRootOnBoot = true;
   };
 

@@ -11,7 +11,12 @@ in
 {
   options = with types; {
     ext.btrfs = {
-      enable = mkEnableOption "Enable btrfs filesystem";
+      enable = mkOption {
+        type = lib.types.bool;
+        default = if config.fileSystems ? "/" then config.fileSystems."/".fsType == "btrfs" else false;
+        description = "Whether to enable my btrfs services.";
+      };
+
       wipeRootOnBoot = mkOption {
         type = bool;
         default = false;

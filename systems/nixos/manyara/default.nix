@@ -25,10 +25,6 @@
     kernelPackages = pkgs.linuxPackages_xanmod_latest;
   };
 
-  ext.btrfs = {
-    enable = true;
-  };
-
   networking = {
     hostName = "manyara";
   };
