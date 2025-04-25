@@ -48,7 +48,13 @@ in
           background_blur = 10;
           background_opacity = 0.9;
         };
-      keybindings = { } // tmux-compat-keybindings;
+      keybindings = {
+        "ctrl+shift+f" = "remote_control_script ${pkgs.writeScript "tab-finder" ''
+          #!${pkgs.runtimeShell}
+
+          ${builtins.readFile (pkgs.replaceVars ./tab-finder.sh { inherit (pkgs) fzf; })}
+        ''}";
+      } // tmux-compat-keybindings;
       darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
       shellIntegration.mode = "enabled";
     };
