@@ -19,7 +19,7 @@ in
 
       wipeRootOnBoot = mkOption {
         type = bool;
-        default = false;
+        default = config.environment ? persistence;
         description = ''
           Wipe the root volume on boot.
         '';

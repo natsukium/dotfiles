@@ -11,10 +11,6 @@
 
   inherit (import ./disko-config.nix { disks = [ "/dev/sda" ]; }) disko;
 
-  ext.btrfs = {
-    wipeRootOnBoot = true;
-  };
-
   environment.persistence."/persistent" = {
     hideMounts = true;
     directories = [
