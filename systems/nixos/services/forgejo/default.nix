@@ -25,7 +25,7 @@
   systemd.services.forgejo.preStart = ''
     ${lib.getExe config.services.forgejo.package} admin user create \
       --username natsukium \
-      --email "tomoya.otabi@gmail.com" \
+      --email ${config.accounts.email.accounts.gmail.address}
       --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})" || true
   '';
 
