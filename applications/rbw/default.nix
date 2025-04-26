@@ -1,10 +1,10 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 {
   programs = {
     rbw = {
       enable = true;
       settings = {
-        email = config.accounts.email.accounts.gmail.address;
+        email = "tomoya.otabi@gmail.com";
         pinentry = pkgs.callPackage ../../pkgs/pinentry-wrapper { };
       };
     };

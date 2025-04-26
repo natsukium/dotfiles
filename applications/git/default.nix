@@ -5,7 +5,7 @@
   programs.git = {
     enable = true;
     userName = "natsukium";
-    userEmail = config.accounts.email.accounts.gmail.address;
+    userEmail = "tomoya.otabi@gmail.com";
     signing = {
       key = "9EA45A31DB994C53";
       signByDefault = true;
