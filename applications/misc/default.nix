@@ -16,10 +16,7 @@
     fzf.enable = true;
     gh.enable = true;
     jq.enable = true;
-    lsd = {
-      enable = true;
-      enableAliases = true;
-    };
+    lsd.enable = true;
     pdm = {
       enable = true;
       settings = {
