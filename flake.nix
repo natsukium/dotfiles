@@ -233,6 +233,7 @@
                   p.aws
                   p.cloudflare
                   p.external
+                  p.github
                   p.hydra
                   p.null
                   p.oci
