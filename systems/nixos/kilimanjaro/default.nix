@@ -40,6 +40,15 @@
       secretsFile = config.sops.secrets.wifi.path;
       networks."82128927-5G".pskRaw = "ext:home";
     };
+    interfaces.enp5s0.ipv4.addresses = [
+      {
+        address = "192.168.2.10";
+        prefixLength = 24;
+      }
+    ];
+    hosts = {
+      "192.168.2.11" = [ "mikumi" ];
+    };
   };
 
   fileSystems."/persistent".neededForBoot = true;

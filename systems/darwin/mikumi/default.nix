@@ -8,6 +8,13 @@
 
   networking.hostName = "mikumi";
 
+  my.networking.interfaces.Ethernet.ipv4.addresses = [
+    {
+      address = "192.168.2.11";
+      prefixLength = 24;
+    }
+  ];
+
   nix.settings = {
     max-jobs = 4;
   };
