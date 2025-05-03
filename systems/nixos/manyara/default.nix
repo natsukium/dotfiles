@@ -12,6 +12,7 @@
     ../services/calibre-web
     ../services/forgejo
     ../services/miniflux
+    ../services/prometheus
     ./hardware-configuration.nix
   ];
 
