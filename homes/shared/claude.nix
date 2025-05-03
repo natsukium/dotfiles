@@ -20,11 +20,6 @@ let
         envFile = config.sops.secrets.gh-token-for-mcp.path;
       };
     };
-
-    settings.servers.duckduckgo-search = {
-      command = "${pkgs.lib.getExe' pkgs.uv "uvx"}";
-      args = [ "duckduckgo-mcp-server" ];
-    };
   };
 in
 {
