@@ -192,8 +192,9 @@
                 typos = {
                   enable = true;
                   excludes = [
-                    "secrets/default.yaml"
+                    "homes/shared/gpg/keys.txt"
                     "secrets.yaml"
+                    "secrets/default.yaml"
                     "systems/shared/hercules-ci/binary-caches.json"
                   ];
                   settings.configPath = "typos.toml";

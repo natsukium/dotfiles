@@ -1,13 +1,11 @@
 { pkgs, config, ... }:
 {
-  programs.gpg.enable = true;
-
   programs.git = {
     enable = true;
     userName = "natsukium";
     userEmail = "tomoya.otabi@gmail.com";
     signing = {
-      key = "9EA45A31DB994C53";
+      key = "2D5ADD7530F56A42";
       signByDefault = true;
     };
     extraConfig = {
