@@ -351,21 +351,24 @@ in
     (mkIf cfg.mako {
       # https://github.com/stacyharper/base16-mako
       services.mako = {
-        backgroundColor = "#${base00}";
-        textColor = "#${base05}";
-        borderColor = "#${base0D}";
+        settings = {
+          backgroundColor = "#${base00}";
+          textColor = "#${base05}";
+          borderColor = "#${base0D}";
+        };
 
-        extraConfig = ''
-          [urgency=low]
-          background-color=#${base00}
-          text-color=#${base0A}
-          border-color=#${base0D}
-
-          [urgency=high]
-          background-color=#${base00}
-          text-color=#${base08}
-          border-color=#${base0D}
-        '';
+        criteria = {
+          "urgency=low" = {
+            background-color = "#${base00}";
+            text-color = "#${base0A}";
+            border-color = "#${base0D}";
+          };
+          "urgency=high" = {
+            background-color = "#${base00}";
+            text-color = "#${base08}";
+            border-color = "#${base0D}";
+          };
+        };
       };
     })
     (mkIf cfg.qutebrowser {
