@@ -38,8 +38,6 @@ in
 
   services.openssh.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
-
   my.services.spotlight.enableIndex = false;
 
   my.services.caffeinate = {

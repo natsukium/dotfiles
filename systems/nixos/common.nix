@@ -39,8 +39,6 @@ in
     flake = "github:natsukium/dotfiles";
   };
 
-  nixpkgs.config.allowUnfree = true;
-
   time.timeZone = "Asia/Tokyo";
 
   i18n = {

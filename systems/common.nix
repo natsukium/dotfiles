@@ -22,6 +22,8 @@ in
     nur-packages.overlays.default
   ] ++ lib.attrValues self.overlays;
 
+  nixpkgs.config.allowUnfree = true;
+
   programs.nix.target.system = true;
 
   environment.shells = [ pkgs.fish ];
