@@ -91,6 +91,7 @@ in
               pkgs = import inputs.nixpkgs {
                 inherit (cfg) system;
                 inherit (inputs.self.outputs.nixosConfigurations.kilimanjaro.config.nixpkgs) overlays;
+                config.allowUnfree = true;
               };
             }
           )
