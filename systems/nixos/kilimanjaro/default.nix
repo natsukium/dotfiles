@@ -68,6 +68,8 @@
 
   nixpkgs.config.cudaSupport = true;
 
+  hardware.nvidia-container-toolkit.enable = true;
+
   programs.steam = {
     enable = true;
     remotePlay.openFirewall = true;
