@@ -8,12 +8,6 @@
   };
 
   temporary-fix = final: prev: {
-    claude-code = prev.claude-code.override {
-      buildNpmPackage = prev.buildNpmPackage.override {
-        # npm error sh: ./gyp-mac-tool: /usr/bin/env: bad interpreter: Operation not permitted
-        nodejs = final.nodejs_20;
-      };
-    };
     python312 = prev.python312.override {
       packageOverrides = pyfinal: pyprev: {
         rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {
