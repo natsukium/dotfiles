@@ -18,5 +18,9 @@
     search = [ "tail4108.ts.net" ];
   };
 
+  # address DNS issue
+  # https://github.com/tailscale/tailscale/issues/4254
+  services.resolved.enable = true;
+
   sops.secrets.tailscale-authkey = { };
 }
