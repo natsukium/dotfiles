@@ -4,16 +4,14 @@ let
 in
 {
   xdg.configFile."sketchybar/sketchybarrc" = {
-    source = pkgs.substituteAll {
-      src = ./sketchybarrc;
+    source = pkgs.replaceVars ./sketchybarrc {
       inherit lua;
       inherit (pkgs) sbarlua;
     };
     executable = true;
   };
   xdg.configFile."sketchybar/colors.lua" = {
-    source = pkgs.substituteAll {
-      src = ./colors.lua;
+    source = pkgs.replaceVars ./colors.lua {
       inherit (config.colorScheme.palette)
         base00
         base01
