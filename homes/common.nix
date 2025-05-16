@@ -34,10 +34,8 @@ in
     sops-nix.homeManagerModules.sops
     zen-browser.homeModules.default
     ../modules/home-manager
-    ../applications/alacritty
     ../applications/atuin
     ../applications/bash
-    ../applications/emacs
     ../applications/fish
     ../applications/gh-dash
     ../applications/ghq

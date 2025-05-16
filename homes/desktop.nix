@@ -1,6 +1,8 @@
 { pkgs, ... }:
 {
   imports = [
+    ../applications/alacritty
+    ../applications/emacs
     ../applications/kitty
     ../applications/qutebrowser
     ../applications/vivaldi
