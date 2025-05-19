@@ -8,6 +8,16 @@ NIX := nom
 OS := $(shell uname -s)
 ARCH := $(shell uname -m)
 
+ifeq ($(OS),Linux)
+  ifeq ($(ARCH),x86_64)
+    SYSTEM := x86_64-linux
+  else ifeq ($(ARCH),aarch64)
+    SYSTEM := aarch64-linux
+  endif
+else ifeq ($(OS),Darwin)
+	SYSTEM := aarch64-darwin
+endif
+
 build: $(SYSTEM)
 
 build-all: x86_64-linux aarch64-linux aarch64-darwin
