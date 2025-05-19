@@ -34,6 +34,8 @@ in
     knownUsers = [ username ];
   };
 
+  system.primaryUser = username;
+
   services.tailscale.enable = true;
 
   services.openssh.enable = true;
