@@ -56,5 +56,14 @@ vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous
 vim.opt.rtp:prepend("@myconfig@")
 
 require("lz.n").load("plugins")
+require("misc")
+
+-- Load nix-helper only for nix files
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "nix",
+	callback = function()
+		require("nix-helper")
+	end,
+})
 
 vim.cmd([[colorscheme nord]])

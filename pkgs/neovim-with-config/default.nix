@@ -17,6 +17,7 @@
   lua-language-server,
   nixd,
   nixfmt-rfc-style,
+  nurl,
   rubocop,
   ruff,
   shellcheck,
@@ -97,6 +98,7 @@ let
   ];
 
   tools = [
+    nurl
     (wakatime-cli.overrideAttrs { __darwinAllowLocalNetworking = true; })
   ];
 
