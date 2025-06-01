@@ -22,6 +22,7 @@
     nix-colors.url = "github:misterio77/nix-colors";
     nix-on-droid.url = "github:nix-community/nix-on-droid";
     nix-wallpaper.url = "github:natsukium/nix-wallpaper/custom-logo";
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
     nixos-wsl.url = "github:nix-community/nixos-wsl";
     nur-packages.url = "github:natsukium/nur-packages";
     sops-nix.url = "github:Mic92/sops-nix";
@@ -133,6 +134,10 @@
         serengeti = {
           system = "aarch64-linux";
         };
+        # build server (Ryzen 9 9950X)
+        tarangire = {
+          system = "x86_64-linux";
+        };
         # phone (pixel 7a)
         android = {
           system = "aarch64-linux";
@@ -195,6 +200,7 @@
                     "homes/shared/gpg/keys.txt"
                     "secrets.yaml"
                     "secrets/default.yaml"
+                    "systems/nixos/tarangire/facter.json"
                     "systems/shared/hercules-ci/binary-caches.json"
                   ];
                   settings.configPath = "typos.toml";

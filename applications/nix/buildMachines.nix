@@ -8,7 +8,7 @@ let
   # hydra doesn't support ssh-ng protocol
   # https://github.com/NixOS/hydra/issues/688
   protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
-  inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti;
+  inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
   inherit (inputs.self.outputs.darwinConfigurations) mikumi;
 in
 {
@@ -21,6 +21,19 @@ in
 
     buildMachines =
       [ ]
+      ++ lib.optional (config.networking.hostName != "tarangire") {
+        inherit (tarangire.config.networking) hostName;
+        systems = [
+          "x86_64-linux"
+          "i686-linux"
+        ];
+        sshUser = "natsukium";
+        inherit protocol;
+        maxJobs = tarangire.config.nix.settings.max-jobs;
+        speedFactor = 1;
+        supportedFeatures = tarangire.config.nix.settings.system-features;
+        mandatoryFeatures = [ ];
+      }
       ++ lib.optional (config.networking.hostName != "kilimanjaro") {
         inherit (kilimanjaro.config.networking) hostName;
         systems = [
