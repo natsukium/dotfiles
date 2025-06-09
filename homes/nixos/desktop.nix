@@ -54,11 +54,10 @@ in
       borderSize = 2;
       defaultTimeout = 15000;
     };
-    criteria = {
-      "mode=do-not-disturb" = {
-        invisible = 1;
-      };
-    };
+    extraConfig = ''
+      [mode=do-not-disturb]
+      invisible = 1
+    '';
   };
 
   services.wallpaper = {
