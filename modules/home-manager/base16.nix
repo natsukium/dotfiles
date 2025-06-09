@@ -357,18 +357,16 @@ in
           borderColor = "#${base0D}";
         };
 
-        criteria = {
-          "urgency=low" = {
-            background-color = "#${base00}";
-            text-color = "#${base0A}";
-            border-color = "#${base0D}";
-          };
-          "urgency=high" = {
-            background-color = "#${base00}";
-            text-color = "#${base08}";
-            border-color = "#${base0D}";
-          };
-        };
+        extraConfig = ''
+          [urgency=low]
+          background-color=#${base00}
+          text-color=#${base0A}
+          border-color=#${base0D}
+          [urgency=high]
+          background-color=#${base00}
+          text-color=#${base08}
+          border-color=#${base0D}
+        '';
       };
     })
     (mkIf cfg.qutebrowser {
