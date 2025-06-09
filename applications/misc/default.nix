@@ -36,7 +36,6 @@
   home.packages = with pkgs; [
     attic-client
     cachix
-    claude-code
     coreutils
     fd
     ghq
