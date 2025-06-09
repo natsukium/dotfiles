@@ -36,6 +36,7 @@ in
     ../modules/home-manager
     ../applications/atuin
     ../applications/bash
+    ../applications/claude-code
     ../applications/fish
     ../applications/gh-dash
     ../applications/ghq
