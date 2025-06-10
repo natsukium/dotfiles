@@ -14,6 +14,7 @@ in
 
     home.packages = with pkgs; [
       google-chrome
+      google-cloud-sdk
       slack
     ];
 
