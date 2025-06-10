@@ -52,6 +52,14 @@ in
           }
         ];
       }
+      {
+        job_name = "claude-code";
+        static_configs = [
+          {
+            targets = [ "katavi:9464" ];
+          }
+        ];
+      }
     ];
   };
 }
