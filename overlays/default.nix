@@ -38,5 +38,7 @@
         #  161|         path = "${p}/bin";
         #  error: attribute 'pname' missing
         { pname = "gh-dash"; };
+
+    inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;
   };
 }
