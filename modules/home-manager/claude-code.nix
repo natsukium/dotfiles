@@ -17,6 +17,12 @@ in
 
     package = lib.mkPackageOption pkgs "claude-code" { };
 
+    userMemory = lib.mkOption {
+      type = lib.types.nullOr lib.types.str;
+      default = null;
+      description = "Content for the User memory file (~/.claude/CLAUDE.md) with custom instructions.";
+    };
+
     enableTelemetry = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -112,6 +118,10 @@ in
 
     home.file.".claude/settings.json" = lib.mkIf (cfg.settings != { }) {
       source = settingsFile;
+    };
+
+    home.file.".claude/CLAUDE.md" = lib.mkIf (cfg.userMemory != null) {
+      text = cfg.userMemory;
     };
   };
 }
