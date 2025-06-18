@@ -8,10 +8,15 @@
   };
 
   temporary-fix = final: prev: {
-    python312 = prev.python312.override {
+    python313 = prev.python313.override {
       packageOverrides = pyfinal: pyprev: {
         rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {
           # segmentation fault
+          doCheck = false;
+        });
+        lxml-html-clean = pyprev.lxml-html-clean.overridePythonAttrs (_: {
+          # test failures with libxml2 2.14
+          # https://github.com/fedora-python/lxml_html_clean/issues/24
           doCheck = false;
         });
       };
