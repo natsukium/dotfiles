@@ -71,6 +71,14 @@ in
   virtualisation.docker.rootless = {
     enable = true;
     setSocketVariable = true;
+    # fix DNS issue caused by systemd-resolved
+    # https://discourse.nixos.org/t/rootless-docker-systemd-resolved-and-dns-inside-containers/47030
+    daemon.settings = {
+      dns = [
+        "1.1.1.1"
+        "8.8.8.8"
+      ];
+    };
   };
 
   services.prometheus.exporters.node = {
