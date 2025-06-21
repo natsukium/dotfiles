@@ -62,6 +62,7 @@ in
   };
 
   programs.ssh.startAgent = true;
+  services.gnome.gcr-ssh-agent.enable = false;
 
   programs.gnupg.agent = {
     enable = true;
