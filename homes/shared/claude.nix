@@ -9,7 +9,6 @@ let
   inherit (inputs) mcp-servers;
   mcp-config = mcp-servers.lib.mkConfig pkgs {
     programs = {
-      fetch.enable = true;
       playwright.enable = true;
       filesystem = {
         enable = true;
