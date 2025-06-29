@@ -16,7 +16,7 @@
   };
 
   services.open-webui = {
-    enable = true;
+    enable = false;
     host = "0.0.0.0";
     environment = {
       OLLAMA_API_BASE_URL = "http://${config.services.ollama.host}:${toString config.services.ollama.port}";
