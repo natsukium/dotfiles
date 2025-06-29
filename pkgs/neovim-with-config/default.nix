@@ -114,7 +114,7 @@ let
     withRuby = false;
     withPython3 = false;
     vimAlias = true;
-    luaRcContent = builtins.readFile (
+    customLuaRC = builtins.readFile (
       replaceVars ./init.lua {
         myconfig = lib.fileset.toSource {
           root = ./.;
