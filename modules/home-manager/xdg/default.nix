@@ -52,10 +52,6 @@ in
       type = types.bool;
       default = true;
     };
-    wakatime.enable = mkOption {
-      type = types.bool;
-      default = true;
-    };
   };
 
   config = mkIf cfg.enable (mkMerge [
@@ -117,14 +113,6 @@ in
         CARGO_HOME = "${config.xdg.dataHome}/cargo";
         RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
       };
-    })
-    (mkIf cfg.wakatime.enable {
-      home.sessionVariables = {
-        WAKATIME_HOME = "${config.xdg.configHome}/wakatime";
-      };
-      home.sessionVariablesExtra = ''
-        [ ! -d ${config.xdg.configHome}/wakatime ] && mkdir ${config.xdg.configHome}/wakatime
-      '';
     })
   ]);
 }

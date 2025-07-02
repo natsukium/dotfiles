@@ -56,7 +56,6 @@ pluginsWithLazy true [
   vim-edgemotion
   vim-illuminate
   vim-table-mode
-  vim-wakatime
   which-key-nvim
 ]
 ++ (pluginsWithLazy false [

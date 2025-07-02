@@ -218,10 +218,6 @@ return {
 		event = "DeferredUIEnter",
 	},
 	{
-		"vim-wakatime",
-		event = "DeferredUIEnter",
-	},
-	{
 		"snacks.nvim",
 		after = function()
 			require("snacks").setup({

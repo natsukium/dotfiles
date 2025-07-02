@@ -31,7 +31,6 @@
   typos-lsp,
   typstyle,
   vscode-langservers-extracted,
-  wakatime-cli,
   yaml-language-server,
 }:
 let
@@ -99,7 +98,6 @@ let
 
   tools = [
     nurl
-    (wakatime-cli.overrideAttrs { __darwinAllowLocalNetworking = true; })
   ];
 
   extraWrapperArgs = [
