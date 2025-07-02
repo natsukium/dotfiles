@@ -9,7 +9,6 @@ let
 in
 with vimPlugins;
 pluginsWithLazy true [
-  ChatGPT-nvim
   FixCursorHold-nvim
   SchemaStore-nvim
   blink-cmp

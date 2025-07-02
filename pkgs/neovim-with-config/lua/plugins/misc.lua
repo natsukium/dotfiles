@@ -137,26 +137,6 @@ return {
 		end,
 	},
 	{
-		"ChatGPT.nvim",
-		cmd = {
-			"ChatGPT",
-			"ChatGPTActAs",
-			"ChatGPTEditWithInstructions",
-			"ChatGPTRun",
-		},
-		after = function()
-			require("chatgpt").setup({
-				openai_params = {
-					model = "gpt-4o",
-				},
-				openai_edit_params = {
-					model = "gpt-4o",
-				},
-				api_key_cmd = "rbw get OPENAI_API_KEY",
-			})
-		end,
-	},
-	{
 		"markdown-preview.nvim",
 		ft = "markdown",
 		keys = { "<Leader>mp" },
