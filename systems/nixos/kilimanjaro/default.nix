@@ -79,4 +79,29 @@
   dualboot.enable = true;
 
   programs.nix-ld.enable = true;
+
+  services.pipewire.wireplumber.extraConfig = {
+    "51-alsa-default" = {
+      "monitor.alsa.rules" = [
+        {
+          matches = [
+            {
+              "node.name" = "alsa_output.pci-0000_01_00.1.hdmi-stereo";
+            }
+          ];
+          actions = {
+            update-props = {
+              "priority.driver" = 1000;
+              "priority.session" = 1000;
+            };
+          };
+        }
+      ];
+    };
+    "99-ephemeral" = {
+      "wireplumber.settings" = {
+        "node.restore-default-targets" = false;
+      };
+    };
+  };
 }
