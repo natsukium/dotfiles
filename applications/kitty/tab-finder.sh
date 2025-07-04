@@ -18,7 +18,7 @@ kitty @ launch --type=overlay --allow_remote_control sh -c "
   }
 
   get_tab_id() {
-    cat \$temp_dir/candidates | @fzf@/bin/fzf --reverse --preview \"cat \\\"\${temp_dir}\\\"/{-1}\" | awk '{ print \$NF }'
+    cat \$temp_dir/candidates | fzf --reverse --preview \"cat \\\"\${temp_dir}\\\"/{-1}\" | awk '{ print \$NF }'
   }
 
   get_all_tab
