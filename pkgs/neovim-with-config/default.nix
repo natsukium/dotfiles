@@ -4,7 +4,6 @@
   neovimUtils,
   vimPlugins,
   wrapNeovimUnstable,
-  replaceVars,
 
   # runtime dependencies
   astro-language-server,
@@ -112,20 +111,11 @@ let
     withRuby = false;
     withPython3 = false;
     vimAlias = true;
-    customLuaRC = builtins.readFile (
-      replaceVars ./init.lua {
-        myconfig = lib.fileset.toSource {
-          root = ./.;
-          fileset = lib.fileset.difference ./. (
-            lib.fileset.unions [
-              ./init.lua
-              ./plugins.nix
-              ./default.nix
-            ]
-          );
-        };
-      }
-    );
+    customLuaRC = ''
+      vim.opt.rtp:prepend('${./.}')
+
+      ${builtins.readFile ./init.lua}
+    '';
 
     plugins = import ./plugins.nix { inherit vimPlugins; };
 
