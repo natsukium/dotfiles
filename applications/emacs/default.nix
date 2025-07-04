@@ -24,7 +24,8 @@ let
 
   emacs = pkgs.emacsWithPackagesFromUsePackage {
     package = emacs-unwrapped;
-    config = tangle ./init.org;
+    config = ./init.org;
+    alwaysTangle = true;
     extraEmacsPackages = epkgs: with epkgs; [ ];
   };
 in
