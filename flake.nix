@@ -61,11 +61,13 @@
     niri-flake.inputs.nixpkgs.follows = "nixpkgs";
     niri-flake.inputs.xwayland-satellite-stable.follows = "";
     niri-flake.inputs.xwayland-satellite-unstable.follows = "";
+    nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
     nix-on-droid.inputs.home-manager.follows = "home-manager";
     nix-on-droid.inputs.nix-formatter-pack.follows = "";
     nix-on-droid.inputs.nixpkgs-docs.follows = "nixpkgs";
     nix-on-droid.inputs.nixpkgs-for-bootstrap.follows = "nixpkgs";
     nix-on-droid.inputs.nixpkgs.follows = "nixpkgs";
+    nix-on-droid.inputs.nmd.follows = "";
     nix-wallpaper.inputs.flake-utils.follows = "flake-utils";
     nix-wallpaper.inputs.nixpkgs.follows = "nixpkgs";
     nix-wallpaper.inputs.pre-commit-hooks.follows = "git-hooks";
