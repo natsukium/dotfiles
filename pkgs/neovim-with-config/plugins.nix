@@ -40,7 +40,6 @@ pluginsWithLazy true [
   nvim-dap-python
   nvim-dap-ui
   nvim-dap-virtual-text
-  nvim-lspconfig
   nvim-nio
   nvim-notify
   nvim-surround
@@ -59,6 +58,7 @@ pluginsWithLazy true [
 ]
 ++ (pluginsWithLazy false [
   lz-n
+  nvim-lspconfig
   nvim-web-devicons
   rustaceanvim
   snacks-nvim
