@@ -1,14 +1,16 @@
 { vimPlugins }:
 let
-  pluginsWithLazy =
-    bool:
-    map (p: {
-      plugin = p;
-      optional = bool;
-    });
+  toLazyPlugins = map (plugin: {
+    inherit plugin;
+    optional = true;
+  });
+  toEagerPlugins = map (plugin: {
+    inherit plugin;
+    optional = false;
+  });
 in
 with vimPlugins;
-pluginsWithLazy true [
+toLazyPlugins [
   FixCursorHold-nvim
   SchemaStore-nvim
   blink-cmp
@@ -56,7 +58,7 @@ pluginsWithLazy true [
   vim-table-mode
   which-key-nvim
 ]
-++ (pluginsWithLazy false [
+++ (toEagerPlugins [
   lz-n
   nvim-lspconfig
   nvim-web-devicons
