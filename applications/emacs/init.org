@@ -113,6 +113,25 @@ The built-in savehist package keeps a record of user inputs and stores them acro
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+end_src
 
+* org
+** org-capture
+#+begin_src emacs-lisp
+(global-set-key (kbd "C-c c") 'org-capture)
+
+(setq org-root "~/dropbox/org/")
+
+(setq org-capture-templates
+      `(("t" "Todo" entry
+         (file+headline ,(concat org-root "todo.org") "Tasks")
+         "* TODO %?\n  %i\n  %a")
+        ("j" "Journal" entry
+         (file+datetree ,(concat org-root "journal.org"))
+         "* %U\n%?\n  %i\n  %a")
+        ("f" "Fleeting" entry
+         (file ,(concat org-root "fleeting.org"))
+         "* %?\n  %U\n  %i\n  %a")))
+#+end_src
+
 * misc
 #+begin_src emacs-lisp
 (which-key-mode)
