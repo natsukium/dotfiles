@@ -9,4 +9,6 @@
   users.users.${specialArgs.username}.uid = 502;
 
   networking.hostName = "katavi";
+
+  my.services.timemachine.enableLocalSnapshot = true;
 }

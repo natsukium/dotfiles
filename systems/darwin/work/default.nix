@@ -7,4 +7,6 @@
   ];
 
   system.stateVersion = 6;
+
+  my.services.timemachine.enableLocalSnapshot = true;
 }
