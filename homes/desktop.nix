@@ -15,4 +15,6 @@
   ];
 
   my.services.copyq.enable = true;
+
+  home.packages = with pkgs; [ zotero ];
 }

@@ -73,6 +73,7 @@ in
           tampermonkey
           vimium
           wayback-machine
+          zotero-connector
         ];
       };
     };
