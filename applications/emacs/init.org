@@ -139,6 +139,37 @@ The built-in savehist package keeps a record of user inputs and stores them acro
 (setq org-agenda-files '("~/dropbox/org"))
 #+end_src
 
+** org-roam
+#+begin_src emacs-lisp
+(use-package org-roam
+  :ensure t
+  :custom
+  (org-roam-directory "~/dropbox/org-roam")
+  (org-roam-db-location "~/.local/share/org-roam.db")
+  :bind
+  (("C-c n l" . org-roam-buffer-toggle)
+   ("C-c n f" . org-roam-node-find)
+   ("C-c n g" . org-roam-graph)
+   ("C-c n i" . org-roam-node-insert)
+   ("C-c n c" . org-roam-capture)
+   ("C-c n j" . org-roam-dailies-capture-today))
+  :config
+  (setq org-roam-capture-templates
+        '(("p" "permanent" plain "%?"
+           :target (file+head "permanent/${slug}.org" "#+title: ${title}\n")
+           :unnarrowed t)
+          ("l" "literature" plain "%?"
+           :target (file+head "literature/${title}.org" "#+title: ${title}\n")
+           :unnarrowed t)))
+  (setq org-roam-node-display-template
+        (concat "${title:*} "
+                (propertize "${tags:10}" 'face 'org-tag)))
+  (org-roam-db-autosync-mode)
+  (require 'org-roam-protocol)
+  )
+
+#+end_src
+
 * misc
 ** vundo
 #+begin_src emacs-lisp
@@ -269,26 +300,6 @@ The built-in savehist package keeps a record of user inputs and stores them acro
  '((shell . t)))
 
 (setq org-src-preserve-indentation t)
-
-(use-package org-roam
-  :ensure t
-  :custom
-  (org-roam-directory "~/dropbox/org-roam")
-  (org-roam-db-location "~/.local/share/org-roam.db")
-  :bind
-  (("C-c n l" . org-roam-buffer-toggle)
-   ("C-c n f" . org-roam-node-find)
-   ("C-c n g" . org-roam-graph)
-   ("C-c n i" . org-roam-node-insert)
-   ("C-c n c" . org-roam-capture)
-   ("C-c n j" . org-roam-dailies-capture-today))
-  :config
-  (setq org-roam-node-display-template
-        (concat "${title:*} "
-                (propertize "${tags:10}" 'face 'org-tag)))
-  (org-roam-db-autosync-mode)
-  (require 'org-roam-protocol)
-  )
 
 (use-package nix-mode
   :ensure t
