@@ -8,13 +8,12 @@
     ../applications/vivaldi
     ../applications/vscode
     ../applications/zen-browser
-    ./shared/gpg
+    ../applications/zotero
     ./shared/claude.nix
     ./shared/email.nix
+    ./shared/gpg
     ./shared/weechat.nix
   ];
 
   my.services.copyq.enable = true;
-
-  home.packages = with pkgs; [ zotero ];
 }
