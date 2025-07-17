@@ -17,6 +17,7 @@ in
     ../../modules/nixos
     ../common.nix
     ./services/tailscale
+    inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
     inputs.tsnsrv.nixosModules.default
@@ -32,12 +33,6 @@ in
   };
 
   system.stateVersion = "24.11";
-
-  system.autoUpgrade = {
-    enable = true;
-    dates = "06:00";
-    flake = "github:natsukium/dotfiles";
-  };
 
   time.timeZone = "Asia/Tokyo";
 

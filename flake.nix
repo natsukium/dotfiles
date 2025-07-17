@@ -11,6 +11,7 @@
     brew-nix.url = "github:BatteredBunny/brew-nix";
     cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
     claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
+    comin.url = "github:nlewo/comin";
     darwin.url = "github:nix-darwin/nix-darwin";
     disko.url = "github:nix-community/disko";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
@@ -46,6 +47,7 @@
     cachix-deploy-flake.inputs.nixpkgs.follows = "nixpkgs";
     claude-desktop.inputs.flake-utils.follows = "flake-utils";
     claude-desktop.inputs.nixpkgs.follows = "nixpkgs";
+    comin.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     disko.inputs.nixpkgs.follows = "nixpkgs";
     emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";

@@ -36,6 +36,16 @@ in
   programs.fish.enable = true;
   users.users.${username}.shell = pkgs.fish;
 
+  services.comin = {
+    enable = true;
+    remotes = [
+      {
+        name = "origin";
+        url = "https://github.com/natsukium/dotfiles";
+      }
+    ];
+  };
+
   nix.gc =
     {
       automatic = true;
