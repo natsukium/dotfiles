@@ -8,14 +8,13 @@ let
   inherit (pkgs) lib stdenv;
 in
 {
-  programs.zen-browser = {
+  my.programs.zen-browser = {
     enable = true;
-    package = pkgs.lib.mkForce (
+    package =
       if stdenv.hostPlatform.isDarwin then
         pkgs.zen-browser
       else
-        inputs.zen-browser.packages.${stdenv.hostPlatform.system}.default
-    );
+        inputs.zen-browser.packages.${stdenv.hostPlatform.system}.default;
     profiles.natsukium = {
       settings = { };
       search = {
