@@ -11,7 +11,7 @@
     brew-nix.url = "github:BatteredBunny/brew-nix";
     cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
     claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
-    darwin.url = "github:lnl7/nix-darwin";
+    darwin.url = "github:nix-darwin/nix-darwin";
     disko.url = "github:nix-community/disko";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
