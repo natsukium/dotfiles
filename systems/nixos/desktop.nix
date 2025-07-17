@@ -34,7 +34,6 @@
 
   services.greetd = {
     enable = true;
-    package = pkgs.greetd.tuigreet;
     settings = {
       default_session = {
         command = "${pkgs.lib.getExe pkgs.greetd.tuigreet} --time --remember --remember-session --cmd niri";
