@@ -32,7 +32,6 @@ in
   imports = [
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
-    zen-browser.homeModules.default
     ../modules/home-manager
     ../applications/atuin
     ../applications/bash
