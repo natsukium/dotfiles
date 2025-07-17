@@ -7,7 +7,12 @@
   ...
 }:
 let
-  inherit (inputs) emacs-overlay firefox-addons nur-packages;
+  inherit (inputs)
+    brew-nix
+    emacs-overlay
+    firefox-addons
+    nur-packages
+    ;
   inherit (specialArgs) username;
 in
 {
@@ -17,6 +22,7 @@ in
   ];
 
   nixpkgs.overlays = [
+    brew-nix.overlays.default
     emacs-overlay.overlays.default
     firefox-addons.overlays.default
     nur-packages.overlays.default

@@ -6,6 +6,9 @@
     nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-24.05";
     # see https://github.com/renovatebot/renovate/issues/29721
     # "github:NixOS/nixpkgs/trick-renovate-into-working"
+    brew-api.flake = false;
+    brew-api.url = "github:BatteredBunny/brew-api";
+    brew-nix.url = "github:BatteredBunny/brew-nix";
     cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
     claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
     darwin.url = "github:lnl7/nix-darwin";
@@ -33,6 +36,9 @@
     # used in follows
     flake-utils.url = "github:numtide/flake-utils";
 
+    brew-nix.inputs.brew-api.follows = "brew-api";
+    brew-nix.inputs.nix-darwin.follows = "darwin";
+    brew-nix.inputs.nixpkgs.follows = "nixpkgs";
     cachix-deploy-flake.inputs.darwin.follows = "darwin";
     cachix-deploy-flake.inputs.disko.follows = "disko";
     cachix-deploy-flake.inputs.home-manager.follows = "home-manager";
