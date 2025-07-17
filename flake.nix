@@ -9,7 +9,6 @@
     brew-api.flake = false;
     brew-api.url = "github:BatteredBunny/brew-api";
     brew-nix.url = "github:BatteredBunny/brew-nix";
-    cachix-deploy-flake.url = "github:cachix/cachix-deploy-flake";
     claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
     comin.url = "github:nlewo/comin";
     darwin.url = "github:nix-darwin/nix-darwin";
@@ -40,11 +39,6 @@
     brew-nix.inputs.brew-api.follows = "brew-api";
     brew-nix.inputs.nix-darwin.follows = "darwin";
     brew-nix.inputs.nixpkgs.follows = "nixpkgs";
-    cachix-deploy-flake.inputs.darwin.follows = "darwin";
-    cachix-deploy-flake.inputs.disko.follows = "disko";
-    cachix-deploy-flake.inputs.home-manager.follows = "home-manager";
-    cachix-deploy-flake.inputs.nixos-anywhere.follows = "";
-    cachix-deploy-flake.inputs.nixpkgs.follows = "nixpkgs";
     claude-desktop.inputs.flake-utils.follows = "flake-utils";
     claude-desktop.inputs.nixpkgs.follows = "nixpkgs";
     comin.inputs.nixpkgs.follows = "nixpkgs";
@@ -179,19 +173,10 @@
             inherit pkgs;
           };
 
-          packages =
-            let
-              cachix-deploy-lib = inputs.cachix-deploy-flake.lib pkgs;
-            in
-            {
-              fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
-              neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
-              cachix-deploy = cachix-deploy-lib.spec {
-                agents = {
-                  mikumi = self.darwinConfigurations.mikumi.config.system.build.toplevel;
-                };
-              };
-            };
+          packages = {
+            fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
+            neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
+          };
 
           pre-commit = {
             check.enable = true;

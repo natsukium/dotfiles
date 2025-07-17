@@ -79,20 +79,3 @@ jobs:
           export MAKEFLAGS="NIX:=nix"
           make
           df -h
-  deploy:
-    needs: build
-    runs-on: macos-14
-    if: github.ref == 'refs/heads/main'
-    steps:
-      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-      - uses: ./.github/actions/setup-nix
-        with:
-          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
-      - name: deploy
-        env:
-          CACHIX_ACTIVATE_TOKEN: ${{ secrets.CACHIX_ACTIVATE_TOKEN }}
-        run: |
-          spec=$(nix build ".#cachix-deploy" --print-out-paths)
-          cachix push natsukium "$spec"
-          cachix deploy activate "$spec"
