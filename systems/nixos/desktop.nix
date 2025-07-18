@@ -49,7 +49,7 @@
     enable = true;
     settings = {
       default_session = {
-        command = "${pkgs.lib.getExe pkgs.greetd.tuigreet} --time --remember --remember-session --cmd niri";
+        command = "${pkgs.lib.getExe pkgs.greetd.tuigreet} --time --remember --remember-session --cmd niri-session";
         user = "greeter";
       };
     };
