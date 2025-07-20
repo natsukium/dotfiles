@@ -17,8 +17,9 @@ let
 in
 {
   imports = [
-    ../modules/nix
     ../applications/nix/buildMachines.nix
+    ../modules/nix
+    ./shared/comin
   ];
 
   nixpkgs.overlays = [
@@ -26,7 +27,8 @@ in
     emacs-overlay.overlays.default
     firefox-addons.overlays.default
     nur-packages.overlays.default
-  ] ++ lib.attrValues self.overlays;
+  ]
+  ++ lib.attrValues self.overlays;
 
   nixpkgs.config.allowUnfree = true;
 
@@ -36,29 +38,18 @@ in
   programs.fish.enable = true;
   users.users.${username}.shell = pkgs.fish;
 
-  services.comin = {
-    enable = true;
-    remotes = [
-      {
-        name = "origin";
-        url = "https://github.com/natsukium/dotfiles";
-      }
-    ];
-  };
-
-  nix.gc =
-    {
-      automatic = true;
-      options = "--delete-older-than 7d";
-    }
-    // lib.optionalAttrs pkgs.stdenv.isLinux { dates = "weekly"; }
-    // lib.optionalAttrs pkgs.stdenv.isDarwin {
-      interval = {
-        Weekday = 0;
-        Hour = 0;
-        Minute = 0;
-      };
+  nix.gc = {
+    automatic = true;
+    options = "--delete-older-than 7d";
+  }
+  // lib.optionalAttrs pkgs.stdenv.isLinux { dates = "weekly"; }
+  // lib.optionalAttrs pkgs.stdenv.isDarwin {
+    interval = {
+      Weekday = 0;
+      Hour = 0;
+      Minute = 0;
     };
+  };
 
   nix.optimise.automatic = true;
 
