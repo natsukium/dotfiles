@@ -6,6 +6,7 @@
 {
   imports = [
     ../../server.nix
+    ../../shared/comin/prometheus.nix
     ../common.nix
     ../services/adguardhome
     ../services/atuin
