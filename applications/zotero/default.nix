@@ -21,6 +21,9 @@ let
     url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v${better-bibtex-version}/zotero-better-bibtex-${better-bibtex-version}.xpi";
     hash = "sha256-tdjRFMmnrst6JTNP5yCuDLX2pDIS9olAKEnyHp8m8WE=";
   };
+  user-js = ''
+    user_pref("extensions.autoDisableScopes", 0);
+  '';
 in
 {
   home.packages = [ pkgs.zotero ];
@@ -37,4 +40,12 @@ in
   home.file.".zotero/zotero/natsukium/extensions/better-bibtex@iris-advies.com.xpi" =
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux
       { source = better-bibtex; };
+  home.file."Library/Application Support/Zotero/Profiles/natsukium/user.js" =
+    lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
+      {
+        text = user-js;
+      };
+  home.file.".zotero/zotero/natsukium/user.js" = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+    text = user-js;
+  };
 }
