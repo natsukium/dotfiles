@@ -29,12 +29,12 @@ in
       {
         text = profilesIni;
       };
-  home.file.".zotero/profiles.ini" = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+  home.file.".zotero/zotero/profiles.ini" = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
     text = profilesIni;
   };
   home.file."Library/Application Support/Zotero/Profiles/natsukium/extensions/better-bibtex@iris-advies.com.xpi" =
     lib.mkIf pkgs.stdenv.hostPlatform.isDarwin { source = better-bibtex; };
-  home.file.".zotero/natsukium/extensions/better-bibtex@iris-advies.com.xpi" =
+  home.file.".zotero/zotero/natsukium/extensions/better-bibtex@iris-advies.com.xpi" =
     lib.mkIf pkgs.stdenv.hostPlatform.isLinux
       { source = better-bibtex; };
 }
