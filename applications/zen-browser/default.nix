@@ -16,7 +16,9 @@ in
       else
         inputs.zen-browser.packages.${stdenv.hostPlatform.system}.default;
     profiles.natsukium = {
-      settings = { };
+      settings = {
+        "extensions.autoDisableScopes" = 0;
+      };
       search = {
         engines = {
           nix-packages = {
@@ -67,6 +69,7 @@ in
         packages = with pkgs.firefox-addons; [
           bitwarden
           grammarly
+          instapaper-official
           onepassword-password-manager
           refined-github
           tampermonkey
