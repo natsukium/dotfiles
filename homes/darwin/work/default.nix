@@ -13,6 +13,7 @@ in
     ];
 
     home.packages = with pkgs; [
+      brewCasks.meetingbar
       brewCasks.slack
       google-chrome
       google-cloud-sdk
