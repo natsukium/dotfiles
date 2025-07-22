@@ -13,9 +13,9 @@ in
     ];
 
     home.packages = with pkgs; [
+      brewCasks.slack
       google-chrome
       google-cloud-sdk
-      slack
     ];
 
     services.ollama.enable = true;
