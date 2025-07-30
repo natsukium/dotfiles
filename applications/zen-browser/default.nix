@@ -20,6 +20,7 @@ in
         "extensions.autoDisableScopes" = 0;
       };
       search = {
+        force = true;
         engines = {
           nix-packages = {
             name = "Nix Packages";
