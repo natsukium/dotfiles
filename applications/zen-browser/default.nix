@@ -67,17 +67,23 @@ in
         };
       };
       extensions = {
-        packages = with pkgs.firefox-addons; [
-          bitwarden
-          grammarly
-          instapaper-official
-          onepassword-password-manager
-          refined-github
-          tampermonkey
-          vimium
-          wayback-machine
-          zotero-connector
-        ];
+        packages =
+          (with pkgs.firefox-addons; [
+            bitwarden
+            instapaper-official
+            keepa
+            onepassword-password-manager
+            refined-github
+            tampermonkey
+            vimium
+            wayback-machine
+            zotero-connector
+          ])
+          ++ (with pkgs.my-firefox-addons; [
+            adguard-adblocker
+            calilay
+            kiseppe-price-chart-kindle
+          ]);
       };
     };
   };
