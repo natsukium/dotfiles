@@ -54,6 +54,14 @@ in
     };
     sort = "reverse-last-date-received";
     vimKeys = true;
+    settings = {
+      # Display format for email timestamps:
+      # - Today's emails: time only
+      # - This year's emails: month/day/weekday/time
+      # - Previous years: year/month/day/time
+      # https://neomutt.org/feature/cond-date
+      index_format = "'%4C %Z %<[y?%<[d?%[           %R]&%[%m/%d (%a) %R]>&%[%Y/%m/%d %R]> %-15.15L (%?l?%4l&%4c?) %s'";
+    };
     extraConfig = ''
       set pager_index_lines=10
     '';
