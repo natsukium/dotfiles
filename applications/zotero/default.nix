@@ -16,6 +16,11 @@ let
 
   profilesIni = lib.generators.toINI { } profiles;
 
+  configPath =
+    if stdenv.hostPlatform.isDarwin then "Library/Application Support/Zotero" else ".zotero/zotero";
+
+  profilesPath = if stdenv.hostPlatform.isDarwin then "${configPath}/Profiles" else configPath;
+
   better-bibtex-version = "7.0.38";
   better-bibtex = pkgs.fetchurl {
     url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v${better-bibtex-version}/zotero-better-bibtex-${better-bibtex-version}.xpi";
@@ -27,25 +32,18 @@ let
 in
 {
   home.packages = [ pkgs.zotero ];
-  home.file."Library/Application Support/Zotero/profiles.ini" =
-    lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
-      {
-        text = profilesIni;
-      };
-  home.file.".zotero/zotero/profiles.ini" = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
-    text = profilesIni;
-  };
-  home.file."Library/Application Support/Zotero/Profiles/natsukium/extensions/better-bibtex@iris-advies.com.xpi" =
-    lib.mkIf pkgs.stdenv.hostPlatform.isDarwin { source = better-bibtex; };
-  home.file.".zotero/zotero/natsukium/extensions/better-bibtex@iris-advies.com.xpi" =
-    lib.mkIf pkgs.stdenv.hostPlatform.isLinux
-      { source = better-bibtex; };
-  home.file."Library/Application Support/Zotero/Profiles/natsukium/user.js" =
-    lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
-      {
-        text = user-js;
-      };
-  home.file.".zotero/zotero/natsukium/user.js" = lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
-    text = user-js;
+
+  home.file = {
+    "${configPath}/profiles.ini" = {
+      text = profilesIni;
+    };
+
+    "${profilesPath}/natsukium/extensions/better-bibtex@iris-advies.com.xpi" = {
+      source = better-bibtex;
+    };
+
+    "${profilesPath}/natsukium/user.js" = {
+      text = user-js;
+    };
   };
 }
