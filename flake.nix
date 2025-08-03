@@ -189,6 +189,50 @@
                 doCheck = false;
               })
             );
+            html =
+              with pkgs;
+              let
+                org-html-themes = fetchurl {
+                  url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
+                  hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
+                };
+                org-to-html = writeScript "org-to-html.el" ''
+                  (require 'org)
+                  (require 'htmlize)
+
+                  (find-file "README.org")
+                  (org-html-export-to-html)
+
+                  (find-file "README.ja.org")
+                  (org-html-export-to-html)
+                '';
+              in
+              stdenvNoCC.mkDerivation {
+                name = "dotfiles";
+                src = lib.cleanSource ./.;
+                postPatch = ''
+                  substituteInPlace README.org \
+                    --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
+                '';
+                nativeBuildInputs = [
+                  (emacs.pkgs.withPackages (epkgs: [ epkgs.htmlize ]))
+                  gettext
+                  self'.packages.po4a_0_74
+                ];
+                buildPhase = ''
+                  runHook preBuild
+                  po4a po4a.cfg
+                  emacs --batch -l ${org-to-html}
+                  runHook postBuild
+                '';
+
+                installPhase = ''
+                  runHook preInstall
+                  install -Dm644 README.html $out/index.html
+                  install -Dm644 README.ja.html $out/ja/index.html
+                  runHook postInstall
+                '';
+              };
           };
 
           pre-commit = {
