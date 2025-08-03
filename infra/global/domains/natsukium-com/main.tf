@@ -41,25 +41,25 @@ locals {
     }
     www = {
       content = "natsukium.com"
-      name    = "www"
+      name    = "www.natsukium.com"
       proxied = true
       type    = "CNAME"
     }
     attic = {
       content = "1af5e046-7d0f-4fa4-9366-69eb490d5119.cfargotunnel.com"
-      name    = "cache"
+      name    = "cache.natsukium.com"
       proxied = true
       type    = "CNAME"
     }
     forgejo = {
       content = "acfc103f-c6b4-4cef-8269-e1985b80e1ac.cfargotunnel.com"
-      name    = "git"
+      name    = "git.natsukium.com"
       proxied = true
       type    = "CNAME"
     }
     bluesky = {
       content = "\"did=did:plc:wy2g5mzv3k273vqhns2cxnuy\""
-      name    = "_atproto"
+      name    = "_atproto.natsukium.com"
       proxied = false
       type    = "TXT"
     }
