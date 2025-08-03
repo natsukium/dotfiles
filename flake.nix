@@ -156,6 +156,7 @@
 
       perSystem =
         {
+          self',
           config,
           pkgs,
           system,
@@ -176,6 +177,18 @@
           packages = {
             fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
             neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
+            po4a_0_74 = (
+              pkgs.po4a.overrideAttrs (oldAttrs: {
+                version = "0.74";
+                src = pkgs.fetchurl {
+                  url = "https://github.com/mquinson/po4a/releases/download/v0.74/po4a-0.74.tar.gz";
+                  hash = "sha256-JfwyPyuje71Iw68Ov0mVJkSw5GgmH5hjPpEhmoOP58I=";
+                };
+                patches = [ ];
+                nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.libxml2 ];
+                doCheck = false;
+              })
+            );
           };
 
           pre-commit = {
@@ -228,7 +241,9 @@
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
+                gettext
                 nix-fast-build
+                self'.packages.po4a_0_74
                 sops
                 ssh-to-age
                 (terraform.withPlugins (p: [

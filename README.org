@@ -1,4 +1,69 @@
 #+TITLE: My literate configurations with Org and Nix
 #+STARTUP: overview
 
+* About
+
+** Translation
+
+This project uses po4a to manage translations.
+
+*** Requirements
+
+- gettext
+- po4a >= 0.74 (required for Org mode support)
+
+*** Translation workflow
+
+**** Create po4a configuration
+
+Configure the target language,
+location for generated po files,
+and documents
+to translate as follows.
+The =-k 0= option forces output of translated files
+even if the translation is incomplete
+(default threshold is 80%).
+
+#+begin_src
+[po4a_langs] ja
+[po4a_paths] po/dotfiles.pot $lang:po/$lang.po
+[type: org] README.org $lang:README.$lang.org opt:"-k 0"
+[type: org] configuration.org $lang:configuration.$lang.org opt:"-k 0"
+[type: org] applications/emacs/init.org $lang:applications/emacs/init.$lang.org opt:"-k 0"
+[type: org] applications/emacs/early-init.org $lang:applications/emacs/early-init.$lang.org opt:"-k 0"
+#+end_src
+
+For detailed information about =po4a.cfg= configuration, see =man po4a=.
+
+**** Create/Update po
+
+When documents are updated and you need to create/update po files,
+run the following command.
+This generates template (pot) and po files for each language
+at the paths configured in =po4a.cfg=.
+
+#+begin_src bash
+po4a --no-translations po4a.cfg
+#+end_src
+
+**** Translate
+
+Edit the target language po using a po editor.
+Popular options include
+Emacs po-mode,
+poedit,
+GNOME's Gtranslator,
+and KDE's Lokalize.
+
+**** Create/Update translation file
+
+After completing translations,
+generate files with the following command.
+Since po files are also updated at this time,
+in practice you only need to run this command.
+
+#+begin_src bash
+po4a po4a.cfg
+#+end_src
+
 #+INCLUDE: "./configuration.org" :minlevel 1
