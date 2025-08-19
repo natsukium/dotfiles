@@ -31,7 +31,7 @@ in
     };
     input = {
       focus-follows-mouse.enable = true;
-      warp-mouse-to-focus = true;
+      warp-mouse-to-focus.enable = true;
     };
     # XWayland
     spawn-at-startup = [
