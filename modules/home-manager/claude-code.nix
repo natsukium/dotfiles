@@ -23,6 +23,12 @@ in
       description = "Content for the User memory file (~/.claude/CLAUDE.md) with custom instructions.";
     };
 
+    customCommands = lib.mkOption {
+      type = lib.types.attrsOf lib.types.str;
+      default = { };
+      description = "Custom commands for claude-code. Each command will be written to ~/.claude/commands/{name}.md";
+    };
+
     enableTelemetry = lib.mkOption {
       type = lib.types.bool;
       default = false;
@@ -116,12 +122,21 @@ in
       })
     ];
 
-    home.file.".claude/settings.json" = lib.mkIf (cfg.settings != { }) {
-      source = settingsFile;
-    };
-
-    home.file.".claude/CLAUDE.md" = lib.mkIf (cfg.userMemory != null) {
-      text = cfg.userMemory;
-    };
+    home.file = lib.mkMerge [
+      (lib.mkIf (cfg.settings != { }) {
+        ".claude/settings.json".source = settingsFile;
+      })
+      (lib.mkIf (cfg.userMemory != null) {
+        ".claude/CLAUDE.md".text = cfg.userMemory;
+      })
+      (lib.mkIf (cfg.customCommands != { }) (
+        lib.mapAttrs' (
+          name: content:
+          lib.nameValuePair ".claude/commands/${name}.md" {
+            text = content;
+          }
+        ) cfg.customCommands
+      ))
+    ];
   };
 }
