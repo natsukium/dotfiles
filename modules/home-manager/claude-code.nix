@@ -46,8 +46,8 @@ in
         freeformType = settingsFormat.type;
         options = {
           apiKeyHelper = lib.mkOption {
-            type = lib.types.nullOr lib.types.str;
-            default = null;
+            type = lib.types.str;
+            default = "";
             description = "Custom script path to generate an auth value.";
           };
 
