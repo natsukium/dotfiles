@@ -20,6 +20,7 @@
 
       # Available Tools
       - ast-grep: Use for AST-based code searching and structural pattern matching
+      - ghq: Use for cloning GitHub repositories to $(ghq root)/$org/$repo and prioritize local code search over web search
     '';
 
     customCommands = {
