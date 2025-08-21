@@ -34,6 +34,7 @@
   };
   my.services.pueue.enable = true;
   home.packages = with pkgs; [
+    ast-grep
     attic-client
     cachix
     coreutils

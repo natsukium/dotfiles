@@ -17,6 +17,9 @@
 
       # Language Requirements
       - All documentation, comments, and commit messages must be written in English
+
+      # Available Tools
+      - ast-grep: Use for AST-based code searching and structural pattern matching
     '';
 
     customCommands = {
