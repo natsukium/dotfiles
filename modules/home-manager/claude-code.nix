@@ -10,12 +10,36 @@ let
   settingsFormat = pkgs.formats.json { };
 
   settingsFile = settingsFormat.generate "settings.json" cfg.settings;
+
+  wrappedPackage =
+    pkgs.runCommand "claude-code-wrapped"
+      {
+        buildInputs = [ pkgs.makeWrapper ];
+      }
+      ''
+        mkdir -p $out/bin
+        makeWrapper ${cfg.package}/bin/claude $out/bin/claude \
+          --set CLAUDE_CONFIG_DIR "$HOME/${cfg.configDir}"
+      '';
 in
 {
   options.my.programs.claude-code = {
     enable = lib.mkEnableOption "claude-code";
 
     package = lib.mkPackageOption pkgs "claude-code" { };
+
+    wrappedPackage = lib.mkOption {
+      type = lib.types.package;
+      readOnly = true;
+      default = wrappedPackage;
+      description = "The wrapped claude-code package with CLAUDE_CONFIG_DIR set.";
+    };
+
+    configDir = lib.mkOption {
+      type = lib.types.str;
+      default = ".claude";
+      description = "Directory for claude-code configuration files (relative to home directory).";
+    };
 
     userMemory = lib.mkOption {
       type = lib.types.nullOr lib.types.str;
@@ -111,7 +135,7 @@ in
   };
 
   config = lib.mkIf cfg.enable {
-    home.packages = [ cfg.package ];
+    home.packages = [ cfg.wrappedPackage ];
 
     my.programs.claude-code.settings = lib.mkMerge [
       (lib.mkIf cfg.enableTelemetry {
@@ -124,15 +148,15 @@ in
 
     home.file = lib.mkMerge [
       (lib.mkIf (cfg.settings != { }) {
-        ".claude/settings.json".source = settingsFile;
+        "${cfg.configDir}/settings.json".source = settingsFile;
       })
       (lib.mkIf (cfg.userMemory != null) {
-        ".claude/CLAUDE.md".text = cfg.userMemory;
+        "${cfg.configDir}/CLAUDE.md".text = cfg.userMemory;
       })
       (lib.mkIf (cfg.customCommands != { }) (
         lib.mapAttrs' (
           name: content:
-          lib.nameValuePair ".claude/commands/${name}.md" {
+          lib.nameValuePair "${cfg.configDir}/commands/${name}.md" {
             text = content;
           }
         ) cfg.customCommands

@@ -1,8 +1,10 @@
+{ config, ... }:
 {
   my.programs.claude-code = {
     enable = true;
     enableTelemetry = true;
     otelMetricsExporter = "prometheus";
+    configDir = "${config.xdg.configHome}/claude";
     settings = {
       includeCoAuthoredBy = false;
       permissions = {
