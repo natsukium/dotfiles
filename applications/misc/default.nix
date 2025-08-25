@@ -17,6 +17,7 @@
     gh.enable = true;
     jq.enable = true;
     lsd.enable = true;
+    nix-index.enable = true;
     pdm = {
       enable = true;
       settings = {
