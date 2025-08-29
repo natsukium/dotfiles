@@ -18,13 +18,6 @@
     jq.enable = true;
     lsd.enable = true;
     nix-index.enable = true;
-    pdm = {
-      enable = true;
-      settings = {
-        install.cache = true;
-        venv.in_project = true;
-      };
-    };
     readline = {
       enable = true;
       variables = {
