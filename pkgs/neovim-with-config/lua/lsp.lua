@@ -2,6 +2,7 @@ vim.lsp.enable({
 	"astro",
 	"bashls",
 	"biome",
+	"buf_ls",
 	"docker_compose_language_service",
 	"dockerls",
 	"jsonls",
