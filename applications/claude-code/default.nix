@@ -1,29 +1,18 @@
 {
-  my.programs.claude-code = {
+  programs.claude-code = {
     enable = true;
-    enableTelemetry = true;
-    otelMetricsExporter = "prometheus";
     settings = {
       includeCoAuthoredBy = false;
       permissions = {
         allow = [ ];
       };
+      env = {
+        CLAUDE_CODE_ENABLE_TELEMETRY = "1";
+        OTEL_METRICS_EXPORTER = "prometheus";
+      };
     };
-    userMemory = ''
-      # Code Documentation Guidelines
-      - Comments should explain WHY NOT an alternative approach was chosen, rather than WHAT the code does
-      - Test code should clearly describe WHAT is being tested
-      - Commit messages must include WHY the change was made
 
-      # Language Requirements
-      - All documentation, comments, and commit messages must be written in English
-
-      # Available Tools
-      - ast-grep: Use for AST-based code searching and structural pattern matching
-      - ghq: Use for cloning GitHub repositories to $(ghq root)/$org/$repo and prioritize local code search over web search
-    '';
-
-    customCommands = {
+    commands = {
       commit-staged = ''
         ---
         allowed-tools: Bash(git diff:*), Bash(git log:*), Bash(git status:*), Bash(git commit:*)
@@ -53,6 +42,20 @@
       '';
     };
   };
+
+  home.file.".claude/CLAUDE.md".text = ''
+    # Code Documentation Guidelines
+    - Comments should explain WHY NOT an alternative approach was chosen, rather than WHAT the code does
+    - Test code should clearly describe WHAT is being tested
+    - Commit messages must include WHY the change was made
+
+    # Language Requirements
+    - All documentation, comments, and commit messages must be written in English
+
+    # Available Tools
+    - ast-grep: Use for AST-based code searching and structural pattern matching
+    - ghq: Use for cloning GitHub repositories to $(ghq root)/$org/$repo and prioritize local code search over web search
+  '';
 
   programs.git.ignores = [
     "**/.claude/settings.local.json"
