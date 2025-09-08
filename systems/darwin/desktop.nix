@@ -59,7 +59,7 @@ in
 
   fonts.packages = [
     pkgs.liga-hackgen-nf-font
-    pkgs.moralerspace-hwnf
+    pkgs.moralerspace-hw
   ];
 
   my.services.google-japanese-input.enable = true;
