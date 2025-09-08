@@ -4,7 +4,20 @@
     settings = {
       includeCoAuthoredBy = false;
       permissions = {
-        allow = [ ];
+        allow = [
+          "Bash(ast-grep:*)"
+          "Bash(cargo build:*)"
+          "Bash(cargo check:*)"
+          "Bash(cargo clippy:*)"
+          "Bash(cargo test:*)"
+          "Bash(deno check:*)"
+          "Bash(find:*)"
+          "Bash(grep:*)"
+          "Bash(pnpm run check:*)"
+          "Bash(pnpm run lint:*)"
+          "Bash(pnpm run test:*)"
+          "Bash(rg:*)"
+        ];
       };
       env = {
         CLAUDE_CODE_ENABLE_TELEMETRY = "1";
