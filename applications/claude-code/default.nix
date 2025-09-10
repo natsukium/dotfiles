@@ -1,4 +1,9 @@
-{ config, ... }:
+{
+  inputs,
+  config,
+  pkgs,
+  ...
+}:
 {
   programs.claude-code = {
     enable = true;
@@ -68,6 +73,25 @@
         $ARGUMENTS
       '';
     };
+
+    mcpServers =
+      (inputs.mcp-servers.lib.evalModule pkgs {
+        programs = {
+          context7.enable = true;
+          playwright.enable = true;
+          serena = {
+            enable = true;
+            args = [
+              "--context=ide-assistant"
+              "--enable-web-dashboard=false"
+            ];
+          };
+          time = {
+            enable = true;
+            args = [ "--local-timezone=Asia/Tokyo" ];
+          };
+        };
+      }).config.settings.servers;
   };
 
   home.file.".claude/CLAUDE.md".text = ''
