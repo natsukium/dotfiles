@@ -51,13 +51,13 @@ in
       font = "HackGen35 Console 12";
       width = 300;
       height = 100;
-      borderRadius = 5;
-      borderSize = 2;
-      defaultTimeout = 15000;
+      border-radius = 5;
+      border-size = 2;
+      default-timeout = 15000;
     };
     extraConfig = ''
       [mode=do-not-disturb]
-      invisible = 1
+      invisible=1
     '';
   };
 

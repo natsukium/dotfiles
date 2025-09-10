@@ -352,9 +352,9 @@ in
       # https://github.com/stacyharper/base16-mako
       services.mako = {
         settings = {
-          backgroundColor = "#${base00}";
-          textColor = "#${base05}";
-          borderColor = "#${base0D}";
+          background-color = "#${base00}";
+          text-color = "#${base05}";
+          border-color = "#${base0D}";
         };
 
         extraConfig = ''
