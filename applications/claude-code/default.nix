@@ -1,3 +1,4 @@
+{ config, ... }:
 {
   programs.claude-code = {
     enable = true;
@@ -17,6 +18,19 @@
           "Bash(pnpm run lint:*)"
           "Bash(pnpm run test:*)"
           "Bash(rg:*)"
+        ];
+      };
+      hooks = {
+        Notification = [
+          {
+            matcher = "";
+            hooks = [
+              {
+                type = "command";
+                command = "jq -r .message | curl -H 'Title: Claude Code' -d @- ntfy.sh/$(cat ${config.sops.secrets.ntfy-topic.path})";
+              }
+            ];
+          }
         ];
       };
       env = {
@@ -73,4 +87,8 @@
   programs.git.ignores = [
     "**/.claude/settings.local.json"
   ];
+
+  sops.secrets.ntfy-topic = {
+    sopsFile = ./../../homes/shared/secrets.yaml;
+  };
 }
