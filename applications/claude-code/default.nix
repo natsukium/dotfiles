@@ -24,6 +24,7 @@
           "Bash(pnpm run test:*)"
           "Bash(rg:*)"
         ];
+        defaultMode = "plan";
       };
       hooks = {
         Notification = [
