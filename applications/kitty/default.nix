@@ -21,7 +21,7 @@ in
       enable = true;
       settings =
         let
-          moralerspace = family: "'Moralerspace ${family} HWNF'";
+          moralerspace = family: "'Moralerspace ${family} HW'";
           font-features = "'calt liga ss01 ss02 ss03 ss05 ss09'";
         in
         {
@@ -56,7 +56,8 @@ in
             text = builtins.readFile ./tab-finder.sh;
           }
         }/bin/tab-finder";
-      } // tmux-compat-keybindings;
+      }
+      // tmux-compat-keybindings;
       darwinLaunchOptions = [ "-o allow_remote_control=yes" ];
       shellIntegration.mode = "enabled";
     };
