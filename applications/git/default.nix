@@ -29,6 +29,8 @@
       ".vscode/"
       ".worktree"
       "__pycache__/"
+      # For personal notes and LLM instructions
+      ".private/"
     ];
     delta = {
       enable = true;
