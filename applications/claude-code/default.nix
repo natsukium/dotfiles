@@ -23,6 +23,16 @@
           "Bash(pnpm run lint:*)"
           "Bash(pnpm run test:*)"
           "Bash(rg:*)"
+          "mcp__serena__activate_project"
+          "mcp__serena__check_onboarding_performed"
+          "mcp__serena__find_file"
+          "mcp__serena__find_symbol"
+          "mcp__serena__get_symbols_overview"
+          "mcp__serena__list_dir"
+          "mcp__serena__onboarding"
+          "mcp__serena__search_for_pattern"
+          "mcp__serena__think_about_collected_information"
+          "mcp__serena__write_memory"
         ];
         defaultMode = "plan";
       };
@@ -111,6 +121,7 @@
 
   programs.git.ignores = [
     "**/.claude/settings.local.json"
+    ".serena/"
   ];
 
   sops.secrets.ntfy-topic = {
