@@ -10,10 +10,6 @@
     enable = true;
     historyFile = "$XDG_CONFIG_HOME/bash/history";
     enableCompletion = false;
-    sessionVariables = {
-      LANG = "ja_JP.UTF-8";
-      LC_TYPE = "ja_JP.UTF-8";
-    };
     shellAliases = {
       l = "ls -CF";
       grep = "grep --color=auto";

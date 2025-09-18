@@ -43,6 +43,7 @@ in
     # https://discourse.nixos.org/t/tailscale-ssh-destroys-nix-copy/38781
     # https://github.com/tailscale/tailscale/issues/4940
     defaultLocale = "en_US.UTF-8";
+    extraLocales = [ "ja_JP.UTF-8/UTF-8" ];
   };
 
   services.openssh = {
