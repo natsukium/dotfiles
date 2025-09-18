@@ -38,7 +38,8 @@ in
           trusted-users = [
             "root"
             "@wheel"
-          ] ++ optional pkgs.stdenv.isDarwin "@admin";
+          ]
+          ++ optional pkgs.stdenv.isDarwin "@admin";
           sandbox = if pkgs.stdenv.isDarwin then "relaxed" else true;
           warn-dirty = false;
         };

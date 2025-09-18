@@ -25,10 +25,11 @@ in
   config = lib.mkIf cfg.enable {
     launchd.daemons.caffeinate = {
       serviceConfig = {
-        ProgramArguments =
-          [ "/usr/bin/caffeinate" ]
-          ++ lib.optional cfg.preventSleepOnCharge "-s"
-          ++ lib.optional (cfg.args != [ ]) cfg.args;
+        ProgramArguments = [
+          "/usr/bin/caffeinate"
+        ]
+        ++ lib.optional cfg.preventSleepOnCharge "-s"
+        ++ lib.optional (cfg.args != [ ]) cfg.args;
         KeepAlive = true;
         RunAtLoad = true;
       };

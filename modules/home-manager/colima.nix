@@ -121,13 +121,14 @@ in
     in
     mkIf cfg.enable (mkMerge [
       {
-        home.packages =
-          [ cfg.package ]
-          ++ optionals cfg.enableDocker [
-            cfg.packageDocker
-            cfg.packageDockerBuildX
-          ]
-          ++ optionals cfg.enableKubernetes [ cfg.packageKubectl ];
+        home.packages = [
+          cfg.package
+        ]
+        ++ optionals cfg.enableDocker [
+          cfg.packageDocker
+          cfg.packageDockerBuildX
+        ]
+        ++ optionals cfg.enableKubernetes [ cfg.packageKubectl ];
 
         # colima needs writable settings file
         # https://github.com/nix-community/home-manager/issues/1800

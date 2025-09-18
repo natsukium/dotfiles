@@ -7,10 +7,11 @@
 }:
 let
   cfg = config.my.services.mbsync;
-  mbsyncOptions =
-    [ "--all" ]
-    ++ lib.optional (cfg.verbose) "--verbose"
-    ++ lib.optional (cfg.configFile != null) "--config ${cfg.configFile}";
+  mbsyncOptions = [
+    "--all"
+  ]
+  ++ lib.optional (cfg.verbose) "--verbose"
+  ++ lib.optional (cfg.configFile != null) "--config ${cfg.configFile}";
 in
 {
   options.my.services = { inherit (options.services) mbsync; };

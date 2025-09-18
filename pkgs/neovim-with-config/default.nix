@@ -46,11 +46,9 @@ let
   ];
 
   neovim-unwrapped' = neovim-unwrapped.overrideAttrs (oldAttrs: {
-    postInstall =
-      (oldAttrs.postInstall or "")
-      + ''
-        rm ${lib.concatStringsSep " " disabledBuiltinPluginPaths}
-      '';
+    postInstall = (oldAttrs.postInstall or "") + ''
+      rm ${lib.concatStringsSep " " disabledBuiltinPluginPaths}
+    '';
   });
 
   language-servers = [

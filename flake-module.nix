@@ -84,7 +84,8 @@ in
               "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
                 inherit self inputs;
                 inherit (cfg) username;
-              } // cfg.specialArgs;
+              }
+              // cfg.specialArgs;
             }
             // lib.optionalAttrs (cfg.platform != "android") { inherit (cfg) system; }
             // lib.optionalAttrs (cfg.platform == "android") {
