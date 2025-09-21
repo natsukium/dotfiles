@@ -17,6 +17,7 @@ in
       imports = [
         ../../common.nix
         ../desktop.nix
+        ../../../modules/profiles/home/base.nix
       ];
     };
     backupFileExtension = "backup";

@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ../../../modules/profiles/nixos/base.nix
     ../../server.nix
     ../../shared/comin/prometheus.nix
     ../common.nix

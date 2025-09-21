@@ -4,11 +4,9 @@ let
 in
 {
   imports = [
+    ../../modules/profiles/home/generic-linux.nix
     ../common.nix
-    ../../modules/nix
   ];
-
-  programs.nix.target.otherDistroUser = true;
 
   targets.genericLinux.enable = true;
   home = {

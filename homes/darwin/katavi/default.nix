@@ -6,6 +6,9 @@ in
   imports = [ ../common.nix ];
 
   home-manager.users.${username} = {
-    imports = [ ../desktop.nix ];
+    imports = [
+      ../../../modules/profiles/home/base.nix
+      ../desktop.nix
+    ];
   };
 }
