@@ -16,9 +16,8 @@ in
     users.${username} = {
       imports = [
         ../../common.nix
-        ../../../modules/nix
+        ../../../modules/profiles/home/base.nix
       ];
-      programs.nix.target.user = true;
       home.packages = [ pkgs.wslu ];
       home.sessionVariablesExtra = ''
         export WIN_HOME=$(wslpath $(wslvar USERPROFILE))

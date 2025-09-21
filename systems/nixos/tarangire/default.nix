@@ -1,6 +1,7 @@
 { inputs, config, ... }:
 {
   imports = [
+    ../../../modules/profiles/nixos/base.nix
     ../../server.nix
     ../../shared/hercules-ci/agent.nix
     ../common.nix

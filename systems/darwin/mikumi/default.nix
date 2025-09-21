@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 {
   imports = [
+    ../../../modules/profiles/darwin/base.nix
     ../../server.nix
     ../../shared/hercules-ci/agent.nix
     ../common.nix

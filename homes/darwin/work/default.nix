@@ -7,6 +7,7 @@ in
 
   home-manager.users.${username} = {
     imports = [
+      ../../../modules/profiles/home/base.nix
       ../desktop.nix
       ./accounts.nix
       ./git.nix

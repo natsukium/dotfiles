@@ -16,7 +16,6 @@ in
     users.${username} = {
       imports = [
         ../common.nix
-        ../../modules/nix
       ];
 
       my.virtualisation.colima = {
@@ -31,8 +30,6 @@ in
         # without this, the older builtin `less` would be used
         less
       ];
-
-      programs.nix.target.user = true;
     };
     backupFileExtension = "backup";
     extraSpecialArgs = {
