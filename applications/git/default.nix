@@ -26,6 +26,7 @@
       ".aider*"
       ".direnv"
       ".ipynb_checkpoints"
+      ".pre-commit-config.yaml"
       ".vscode/"
       ".worktree"
       "__pycache__/"
