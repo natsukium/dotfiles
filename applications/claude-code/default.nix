@@ -55,6 +55,10 @@
       };
     };
 
+    agents = {
+      playwright = builtins.readFile ./agents/playwright.md;
+    };
+
     commands = {
       commit-staged = ''
         ---
