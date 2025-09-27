@@ -6,7 +6,7 @@
 {
   imports = [
     ../../../modules/profiles/nixos/base.nix
-    ../../server.nix
+    ../../../modules/profiles/nixos/server.nix
     ../../shared/comin/prometheus.nix
     ../common.nix
     ../services/adguardhome

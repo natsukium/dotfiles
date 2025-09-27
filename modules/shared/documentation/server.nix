@@ -1,4 +1,4 @@
-{ lib, pkgs, ... }:
+{ lib, ... }:
 
 let
   inherit (lib) mkDefault;
@@ -9,8 +9,5 @@ in
     doc.enable = mkDefault false;
     info.enable = mkDefault false;
     man.enable = mkDefault false;
-  }
-  // lib.optionalAttrs pkgs.stdenv.hostPlatform.isLinux {
-    nixos.enable = mkDefault false;
   };
 }

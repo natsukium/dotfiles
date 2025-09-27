@@ -2,7 +2,7 @@
 {
   imports = [
     ../../../modules/profiles/nixos/base.nix
-    ../../server.nix
+    ../../../modules/profiles/nixos/server.nix
     ../../shared/hercules-ci/agent.nix
     ../common.nix
     inputs.impermanence.nixosModules.impermanence

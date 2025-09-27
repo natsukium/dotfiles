@@ -2,7 +2,7 @@
 {
   imports = [
     ../../../modules/profiles/darwin/base.nix
-    ../../server.nix
+    ../../../modules/profiles/darwin/server.nix
     ../../shared/hercules-ci/agent.nix
     ../common.nix
   ];
