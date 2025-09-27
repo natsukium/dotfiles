@@ -18,6 +18,7 @@ in
         ../../common.nix
         ../desktop.nix
         ../../../modules/profiles/home/base.nix
+        ../../../modules/profiles/home/development.nix
       ];
     };
     backupFileExtension = "backup";

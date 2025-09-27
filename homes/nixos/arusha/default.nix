@@ -17,6 +17,7 @@ in
       imports = [
         ../../common.nix
         ../../../modules/profiles/home/base.nix
+        ../../../modules/profiles/home/development.nix
       ];
       home.packages = [ pkgs.wslu ];
       home.sessionVariablesExtra = ''

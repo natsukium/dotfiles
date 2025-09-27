@@ -4,6 +4,7 @@ let
 in
 {
   imports = [
+    ../../modules/profiles/home/development.nix
     ../../modules/profiles/home/generic-linux.nix
     ../common.nix
   ];
