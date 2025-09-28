@@ -162,6 +162,24 @@ The built-in savehist package keeps a record of user inputs and stores them acro
   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+end_src
+* language support
+
+** Markdown
+
+https://github.com/jrblevin/markdown-mode
+
+#+begin_quote
+markdown-mode is a major mode for editing Markdown-formatted text.
+#+end_quote
+
+#+begin_src emacs-lisp
+(use-package markdown-mode
+  :ensure t
+  :mode ("README\\.md\\'" . gfm-mode)
+  :init (setq markdown-command "multimarkdown")
+  :bind (:map markdown-mode-map
+              ("C-c C-e" . markdown-do)))
+#+end_src
 
 * org
 
