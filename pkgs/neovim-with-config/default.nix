@@ -11,7 +11,7 @@
   bash-language-server,
   biome,
   docker-compose-language-service,
-  dockerfile-language-server-nodejs,
+  dockerfile-language-server,
   hadolint,
   lua-language-server,
   nixd,
@@ -59,7 +59,7 @@ let
     shellcheck
     shfmt
     # docker
-    dockerfile-language-server-nodejs
+    dockerfile-language-server
     hadolint
     docker-compose-language-service
     # javascript
