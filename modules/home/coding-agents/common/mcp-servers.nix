@@ -5,10 +5,8 @@
     playwright.enable = true;
     serena = {
       enable = true;
-      args = [
-        "--context=ide-assistant"
-        "--enable-web-dashboard=false"
-      ];
+      context = "ide-assistant";
+      enableWebDashboard = false;
     };
     time = {
       enable = true;
