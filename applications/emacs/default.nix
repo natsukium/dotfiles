@@ -5,7 +5,7 @@
   ...
 }:
 let
-  emacs-unwrapped = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.emacs-plus else pkgs.emacs30-pgtk;
+  emacs-unwrapped = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.emacs-plus else pkgs.emacs-pgtk;
 
   tangle =
     org:
