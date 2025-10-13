@@ -422,3 +422,34 @@ Used when converting Org files to HTML with syntax highlighting for code blocks.
 
 (setq org-src-preserve-indentation t)
 #+end_src
+
+*** project.el
+
+Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) as projects.
+
+Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=.
+
+#+begin_src emacs-lisp
+(defun my/sync-project-list ()
+  "Find all projects under ~/src and synchronize the project-list-file."
+  (interactive)
+  (let* (;; 1. Retrieve directory list as a string using find command
+         (command (format "find %s -mindepth 4 -maxdepth 4 -type d"
+                          (expand-file-name "~/src")))
+         (dir-list-string (shell-command-to-string command))
+         ;; 2. Split string by newlines and exclude empty lines to create a list
+         (dirs (split-string dir-list-string "\n" t)))
+
+    ;; 3. Build file contents in a temporary buffer
+    (with-temp-buffer
+      (insert ";;; -*- lisp-data -*-\n")
+      (insert "(\n")
+      (dolist (dir dirs)
+        (insert (format " (\"%s/\")\n" dir)))
+      (insert ")\n")
+
+      ;; 4. Write the built contents to file
+      (write-file project-list-file))))
+
+(my/sync-project-list)
+#+end_src
