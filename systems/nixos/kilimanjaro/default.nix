@@ -45,6 +45,12 @@
 
   fileSystems."/persistent".neededForBoot = true;
 
+  fileSystems."/data" = {
+    device = "/dev/disk/by-uuid/4EBE31C2BE31A37F";
+    fsType = "ntfs-3g";
+    options = [ "rw" ];
+  };
+
   sops.secrets.wifi = { };
 
   nix.settings = {
