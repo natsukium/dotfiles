@@ -13,6 +13,7 @@
     comin.url = "github:nlewo/comin";
     darwin.url = "github:nix-darwin/nix-darwin";
     disko.url = "github:nix-community/disko";
+    edgepkgs.url = "github:natsukium/edgepkgs";
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
     flake-parts.url = "github:hercules-ci/flake-parts";
@@ -44,6 +45,7 @@
     comin.inputs.nixpkgs.follows = "nixpkgs";
     darwin.inputs.nixpkgs.follows = "nixpkgs";
     disko.inputs.nixpkgs.follows = "nixpkgs";
+    edgepkgs.inputs.nixpkgs.follows = "nixpkgs";
     emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
     emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
     firefox-addons.inputs.nixpkgs.follows = "nixpkgs";

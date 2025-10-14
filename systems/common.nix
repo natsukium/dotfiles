@@ -9,6 +9,7 @@
 let
   inherit (inputs)
     brew-nix
+    edgepkgs
     emacs-overlay
     firefox-addons
     nur-packages
@@ -23,6 +24,7 @@ in
 
   nixpkgs.overlays = [
     brew-nix.overlays.default
+    edgepkgs.overlays.default
     emacs-overlay.overlays.default
     firefox-addons.overlays.default
     nur-packages.overlays.default
