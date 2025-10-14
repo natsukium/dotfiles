@@ -46,6 +46,8 @@ in
             "Bash(pnpm run lint:*)"
             "Bash(pnpm run test:*)"
             "Bash(rg:*)"
+            "mcp__context7__get-library-docs"
+            "mcp__context7__resolve-library-id"
             "mcp__playwright__browser_click"
             "mcp__playwright__browser_console_messages"
             "mcp__playwright__browser_navigate"
