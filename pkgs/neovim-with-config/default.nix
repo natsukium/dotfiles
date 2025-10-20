@@ -76,7 +76,7 @@ let
     basedpyright
     ruff
     # ruby
-    solargraph
+    # solargraph
     rubocop
     # terraform
     terraform-ls

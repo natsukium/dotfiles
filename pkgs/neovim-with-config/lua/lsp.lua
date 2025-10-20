@@ -11,7 +11,7 @@ vim.lsp.enable({
 	"basedpyright",
 	"rubocop",
 	"ruff",
-	"solargraph",
+	-- "solargraph",
 	"taplo",
 	"terraformls",
 	"tinymist",
