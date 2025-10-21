@@ -1,0 +1,357 @@
+#+TITLE: Nixインストールガイド
+#+STARTUP: overview
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+
+* 概要
+
+このドキュメントは、Nixパッケージマネージャーのインストール方法をまとめたものです。
+systemdが利用できない環境でも対応できるよう、複数のインストール方法を紹介します。
+
+* 環境確認
+
+** 動作確認環境
+
+- OS: Ubuntu 24.04.3 LTS (Noble Numbat)
+- systemd: 利用可能 (systemd 255)
+- アーキテクチャ: x86_64
+
+** 環境確認コマンド
+
+#+begin_src bash
+# systemdの確認
+systemctl --version
+
+# OS情報の確認
+cat /etc/os-release
+
+# アーキテクチャの確認
+uname -m
+#+end_src
+
+* インストール方法の選択肢
+
+** 1. 公式インストーラー（推奨）
+
+最も標準的で安定した方法です。マルチユーザーインストールとシングルユーザーインストールの両方に対応しています。
+
+*** メリット
+
+- 公式サポート
+- 安定性が高い
+- ドキュメントが充実
+- systemdの有無に対応（~--daemon~ / ~--no-daemon~ オプション）
+
+*** デメリット
+
+- アンインストールがやや複雑（マルチユーザーモードの場合）
+
+** 2. Determinate Systems Nix Installer
+
+Determinate Systemsが提供する改良版インストーラーです。
+公式インストーラーよりも柔軟で使いやすい設計になっています。
+
+*** メリット
+
+- インストール・アンインストールが簡単
+- より良いエラーメッセージ
+- MacOSでの対応が優れている
+- アンインストーラーが付属
+
+*** デメリット
+
+- サードパーティ製（ただし、NixOSコミュニティでは信頼されている）
+- 一部のネットワーク環境ではアクセス制限がある可能性
+
+** 3. 静的リンクバイナリ
+
+Hydraから直接バイナリをダウンロードする方法です。
+最小限の依存関係でNixを実行できます。
+
+*** メリット
+
+- 依存関係が最小限
+- 特殊な環境でも動作する可能性が高い
+- 完全にオフラインでの利用が可能（一度ダウンロードすれば）
+
+*** デメリット
+
+- 手動でのセットアップが必要
+- アップデートの管理が手動
+
+* 詳細なインストール手順
+
+** 公式インストーラーを使用する方法
+
+*** マルチユーザーインストール（systemd利用、推奨）
+
+マルチユーザーインストールは、複数のユーザーでNixを共有する場合や、
+より良いビルドの分離とセキュリティが必要な場合に推奨されます。
+
+#+begin_src bash
+# インストーラーのダウンロードと実行
+sh <(curl -L https://nixos.org/nix/install) --daemon
+
+# 非対話的インストール（自動でyes）
+sh <(curl -L https://nixos.org/nix/install) --daemon --yes
+#+end_src
+
+インストール後、シェルを再起動するか、以下のコマンドを実行：
+
+#+begin_src bash
+# bashの場合
+source /etc/profile.d/nix.sh
+
+# zshの場合
+source /etc/profile.d/nix.sh
+#+end_src
+
+*** シングルユーザーインストール（systemd不要）
+
+systemdが利用できない環境や、よりシンプルなインストールを希望する場合はこちらを使用します。
+root権限が不要で、簡単にアンインストールできます。
+
+#+begin_src bash
+# シングルユーザーインストール
+sh <(curl -L https://nixos.org/nix/install) --no-daemon
+
+# 非対話的インストール
+sh <(curl -L https://nixos.org/nix/install) --no-daemon --yes
+#+end_src
+
+インストール後、プロファイルを読み込む：
+
+#+begin_src bash
+# bashの場合
+source ~/.nix-profile/etc/profile.d/nix.sh
+
+# zshの場合
+source ~/.nix-profile/etc/profile.d/nix.sh
+#+end_src
+
+*** インストーラーのオプション
+
+公式インストーラーは以下のオプションをサポートしています：
+
+| オプション                  | 説明                                                   |
+|-----------------------------+--------------------------------------------------------|
+| ~--daemon~                  | マルチユーザーインストール（systemd使用）              |
+| ~--no-daemon~               | シングルユーザーインストール（デフォルト）             |
+| ~--yes~                     | 非対話的インストール（すべてのプロンプトにyes）        |
+| ~--no-channel-add~          | チャンネルを追加しない（nixpkgs-unstableがデフォルト） |
+| ~--no-modify-profile~       | プロファイルを変更しない                               |
+| ~--daemon-user-count INT~   | ビルドユーザー数（デフォルト: 32）                     |
+| ~--nix-extra-conf-file FILE~ | /etc/nix/nix.confに追加する設定ファイル                |
+| ~--tarball-url-prefix URL~  | NixのtarballをダウンロードするベースURL                 |
+
+*** インストールの確認
+
+#+begin_src bash
+# Nixバージョンの確認
+nix --version
+
+# サンプルコマンドの実行
+nix-shell -p hello --run hello
+#+end_src
+
+** Determinate Systems Nix Installerを使用する方法
+
+注意: 一部のネットワーク環境ではアクセス制限がある可能性があります。
+
+#+begin_src bash
+# インストーラーのダウンロードと実行
+curl --proto '=https' --tlsv1.2 -sSf -L https://install.determinate.systems/nix | sh -s -- install
+
+# アンインストール
+/nix/nix-installer uninstall
+#+end_src
+
+** 静的リンクバイナリを使用する方法
+
+この方法は高度なユーザー向けです。手動でのセットアップが必要になります。
+
+*** バイナリの取得
+
+Hydraから最新の静的リンクバイナリを取得：
+
+#+begin_src bash
+# 静的リンクバイナリのダウンロード
+curl -L https://hydra.nixos.org/job/nix/master/buildStatic.x86_64-linux/latest/download/1/nix \
+  -o nix-static
+
+# 実行権限の付与
+chmod +x nix-static
+
+# 動作確認
+./nix-static --version
+#+end_src
+
+注意: Hydraへのアクセス方法は時々変更される可能性があります。
+最新の情報は [[https://hydra.nixos.org/job/nix/master/buildStatic.x86_64-linux/latest][Hydra]] で確認してください。
+
+*** 手動セットアップ
+
+静的バイナリを使用する場合、以下の手動セットアップが必要です：
+
+#+begin_src bash
+# /nixディレクトリの作成
+sudo mkdir -p /nix
+sudo chown $USER /nix
+
+# Nixストアの初期化
+./nix-static store init
+
+# 環境変数の設定（~/.bashrc または ~/.zshrcに追加）
+export PATH="$HOME/.nix-profile/bin:/nix/var/nix/profiles/default/bin:$PATH"
+#+end_src
+
+* トラブルシューティング
+
+** systemdが利用できない場合
+
+~--no-daemon~ オプションを使用してシングルユーザーインストールを行ってください：
+
+#+begin_src bash
+sh <(curl -L https://nixos.org/nix/install) --no-daemon --yes
+#+end_src
+
+** パーミッションエラー
+
+/nixディレクトリへのアクセス権限がない場合：
+
+#+begin_src bash
+# /nixディレクトリの作成（root権限が必要）
+sudo mkdir -p /nix
+sudo chown -R $USER /nix
+#+end_src
+
+** プロファイルが読み込まれない
+
+シェル設定ファイルを確認し、Nixのプロファイルが読み込まれるようにしてください：
+
+#+begin_src bash
+# ~/.bashrcまたは~/.zshrcに以下を追加
+if [ -e /home/$USER/.nix-profile/etc/profile.d/nix.sh ]; then
+  . /home/$USER/.nix-profile/etc/profile.d/nix.sh
+fi
+#+end_src
+
+マルチユーザーインストールの場合：
+
+#+begin_src bash
+# ~/.bashrcまたは~/.zshrcに以下を追加
+if [ -e /etc/profile.d/nix.sh ]; then
+  . /etc/profile.d/nix.sh
+fi
+#+end_src
+
+** ネットワークエラー
+
+インストーラーのダウンロードに失敗する場合、手動でダウンロードして実行：
+
+#+begin_src bash
+# インストーラーのダウンロード
+curl -L https://nixos.org/nix/install -o nix-install.sh
+
+# 実行権限の付与
+chmod +x nix-install.sh
+
+# インストールの実行
+./nix-install.sh --no-daemon --yes
+#+end_src
+
+* アンインストール
+
+** シングルユーザーインストールの場合
+
+#+begin_src bash
+# Nixストアとプロファイルの削除
+sudo rm -rf /nix ~/.nix-profile ~/.nix-defexpr ~/.nix-channels
+
+# シェル設定ファイルからNix関連の行を削除
+# ~/.bashrc, ~/.zshrc, ~/.profile などを編集
+#+end_src
+
+** マルチユーザーインストールの場合
+
+マルチユーザーインストールのアンインストールはより複雑です。
+公式ドキュメントを参照してください：
+https://nix.dev/manual/nix/stable/installation/uninstall.html
+
+基本的な手順：
+
+#+begin_src bash
+# Nixデーモンの停止
+sudo systemctl stop nix-daemon
+sudo systemctl disable nix-daemon
+sudo systemctl daemon-reload
+
+# ビルドユーザーの削除
+sudo userdel nixbld1
+# nixbld2, nixbld3, ... も同様に削除
+
+# ビルドグループの削除
+sudo groupdel nixbld
+
+# Nixストアの削除
+sudo rm -rf /nix
+
+# systemdサービスファイルの削除
+sudo rm -f /etc/systemd/system/nix-daemon.service
+sudo rm -f /etc/systemd/system/nix-daemon.socket
+
+# プロファイル設定の削除
+sudo rm -f /etc/profile.d/nix.sh
+rm -f ~/.nix-profile ~/.nix-defexpr ~/.nix-channels
+#+end_src
+
+** Determinate Systems Nix Installerの場合
+
+#+begin_src bash
+# 専用のアンインストーラーを使用
+/nix/nix-installer uninstall
+#+end_src
+
+* 参考リンク
+
+- [[https://nix.dev/manual/nix/stable/installation/installing-binary.html][公式インストールガイド]]
+- [[https://github.com/NixOS/experimental-nix-installer][experimental-nix-installer (Determinate Systems)]]
+- [[https://hydra.nixos.org/][Hydra CI/CD]]
+- [[https://nix.dev/][Nix開発者向けドキュメント]]
+- [[https://nixos.org/][NixOS公式サイト]]
+
+* まとめ
+
+** 推奨インストール方法
+
+| 環境                      | 推奨方法                                     |
+|---------------------------+----------------------------------------------|
+| systemd利用可能           | 公式インストーラー（~--daemon~）             |
+| systemd利用不可           | 公式インストーラー（~--no-daemon~）          |
+| 簡単なアンインストールが必要 | Determinate Systems Nix Installer            |
+| 特殊な環境・オフライン    | 静的リンクバイナリ                           |
+
+** 次のステップ
+
+Nixのインストールが完了したら、以下を試してみてください：
+
+1. チャンネルの更新:
+   #+begin_src bash
+   nix-channel --update
+   #+end_src
+
+2. 基本的なパッケージのインストール:
+   #+begin_src bash
+   nix-env -iA nixpkgs.hello
+   hello
+   #+end_src
+
+3. nix-shellの使用:
+   #+begin_src bash
+   nix-shell -p python3 nodejs
+   #+end_src
+
+4. Flakesの有効化（推奨）:
+   ~/.config/nix/nix.confに以下を追加:
+   #+begin_src
+   experimental-features = nix-command flakes
+   #+end_src
