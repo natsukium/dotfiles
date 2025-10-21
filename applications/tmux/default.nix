@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 {
   programs.tmux = {
     enable = true;
@@ -27,6 +27,8 @@
       setw -g mouse on
       set -g status-position top
       set -ag terminal-overrides ",$TERM:RGB"
+    ''
+    + pkgs.lib.optionalString config.programs.gitui.enable ''
       bind g popup -d '#{pane_current_path}' -w90% -h90% -E ${pkgs.gitui}/bin/gitui
     '';
   };

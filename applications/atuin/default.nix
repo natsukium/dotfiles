@@ -3,6 +3,7 @@
   programs = {
     atuin = {
       enable = true;
+      enableBashIntegration = false;
       flags = [ "--disable-up-arrow" ];
       settings = {
         auto_sync = true;
