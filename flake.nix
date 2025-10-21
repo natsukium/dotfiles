@@ -295,14 +295,14 @@
                 sops
                 ssh-to-age
                 (terraform.withPlugins (p: [
-                  p.aws
-                  p.cloudflare
-                  p.external
-                  p.github
-                  p.hydra
-                  p.null
-                  p.oci
-                  p.sops
+                  p.carlpett_sops
+                  p.cloudflare_cloudflare
+                  p.determinatesystems_hydra
+                  p.hashicorp_aws
+                  p.hashicorp_external
+                  p.hashicorp_null
+                  p.integrations_github
+                  p.oracle_oci
                 ]))
               ];
               shellHook = config.pre-commit.installationScript;
