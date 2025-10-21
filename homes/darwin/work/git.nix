@@ -12,7 +12,7 @@ in
         };
       }
     ];
-    extraConfig = {
+    settings = {
       "ghq \"https://github.com/attmcojp\"".root = workRoot;
     };
   };

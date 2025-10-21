@@ -12,7 +12,7 @@ let
       playwright.enable = true;
       filesystem = {
         enable = true;
-        args = [ "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium" ];
+        args = [ "${config.programs.git.settings.ghq.root}/github.com/natsukium" ];
       };
       github = {
         enable = true;

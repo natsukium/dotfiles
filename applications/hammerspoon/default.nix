@@ -2,7 +2,7 @@
 {
   my.services.hammerspoon = {
     enable = true;
-    configFile = config.lib.file.mkOutOfStoreSymlink "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium/dotfiles/applications/hammerspoon/init.lua";
+    configFile = config.lib.file.mkOutOfStoreSymlink "${config.programs.git.settings.ghq.root}/github.com/natsukium/dotfiles/applications/hammerspoon/init.lua";
     spoons = [
       (pkgs.paperwm-spoon.overrideAttrs (oldAttrs: {
         patches = (oldAttrs.patches or [ ]) ++ [

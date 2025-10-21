@@ -2,13 +2,11 @@
 {
   programs.git = {
     enable = true;
-    userName = "natsukium";
-    userEmail = "tomoya.otabi@gmail.com";
-    signing = {
-      key = "2D5ADD7530F56A42";
-      signByDefault = true;
-    };
-    extraConfig = {
+    settings = {
+      user = {
+        name = "natsukium";
+        email = "tomoya.otabi@gmail.com";
+      };
       core.editor = "vim";
       color = {
         status = "auto";
@@ -20,6 +18,10 @@
       init.defaultBranch = "main";
       push.useForceIfIncludes = true;
       url."git@github.com:".pushInsteadOf = "https://github.com/";
+    };
+    signing = {
+      key = "2D5ADD7530F56A42";
+      signByDefault = true;
     };
     ignores = [
       ".DS_Store"
@@ -33,13 +35,15 @@
       # For personal notes and LLM instructions
       ".private/"
     ];
-    delta = {
-      enable = true;
-    };
     scalar = {
       enable = true;
-      repo = [ "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium/nixpkgs" ];
+      repo = [ "${config.programs.git.settings.ghq.root}/github.com/natsukium/nixpkgs" ];
     };
+  };
+
+  programs.delta = {
+    enable = true;
+    enableGitIntegration = true;
   };
 
   programs.fish.shellAbbrs = {

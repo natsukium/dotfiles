@@ -31,7 +31,7 @@
           layout.repo.hidden = true;
         }
       ];
-      pager.diff = if config.programs.git.delta.enable then "delta" else "less";
+      pager.diff = if config.programs.delta.enable then "delta" else "less";
       keybindings = {
         prs = [
           {
@@ -44,7 +44,7 @@
       };
       repoPaths =
         let
-          basePath = "${config.programs.git.extraConfig.ghq.root}/github.com";
+          basePath = "${config.programs.git.settings.ghq.root}/github.com";
         in
         {
           "NixOS/nixpkgs" = "${basePath}/natsukium/nixpkgs";

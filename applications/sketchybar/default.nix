@@ -33,7 +33,7 @@ in
     };
   };
   xdg.configFile."sketchybar/init.lua".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.programs.git.extraConfig.ghq.root}/github.com/natsukium/dotfiles/applications/sketchybar/init.lua";
+    config.lib.file.mkOutOfStoreSymlink "${config.programs.git.settings.ghq.root}/github.com/natsukium/dotfiles/applications/sketchybar/init.lua";
   xdg.configFile."sketchybar/items" = {
     source = ./items;
     recursive = true;

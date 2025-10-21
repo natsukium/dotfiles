@@ -22,7 +22,7 @@ in
   };
 
   config = mkIf cfg.enable {
-    programs.git.extraConfig = {
+    programs.git.settings = {
       scalar.repo = cfg.repo;
       core = {
         multipackindex = true;
