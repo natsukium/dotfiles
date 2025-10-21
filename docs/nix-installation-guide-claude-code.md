@@ -173,9 +173,11 @@ cargo run
 error: reading a line: Input/output error
 ```
 
-**原因**: コンテナ環境でのビルドプロセスの制限
+**原因**: gVisor (runsc)のpipe実装の問題により、Nixのbuilderプロセスとの通信でEIOエラーが発生
 
-**解決策**: Flakesを使用した`nix profile install`を使用
+**詳細**: [nix-build-limitation-analysis.md](./nix-build-limitation-analysis.md)を参照
+
+**解決策**: Binary cache (substitutes)を利用する`nix profile install`を使用
 
 ### 3. サンドボックスの問題
 
@@ -197,13 +199,29 @@ error: reading a line: Input/output error
 - Rust: 1.89.0 / 1.90.0
 - Cargo: 1.89.0 / 1.90.0
 
+## 重要な制限事項
+
+この環境では、**カスタムderivationのビルドができません**。以下の操作は失敗します：
+
+- `nix-build` - カスタムパッケージのビルド
+- `nix develop` - 開発環境の構築（withPackagesなど）
+- `nix-shell -p 'python3.withPackages(...)'` - Pythonパッケージの結合
+
+**使用可能な操作**：
+- `nix profile install nixpkgs#<package>` - binary cacheからのインストール
+- `nix shell nixpkgs#<package>` - 一時的な使用
+- `nix run nixpkgs#<package>` - 直接実行
+
+詳細は [nix-build-limitation-analysis.md](./nix-build-limitation-analysis.md) を参照してください。
+
 ## まとめ
 
 Claude Code on the Web環境では、以下の対応が必要です：
 
 1. 公式インストーラーではなく手動インストール
 2. サンドボックスの無効化（`/etc/nix/nix.conf`）
-3. Flakesを使用したパッケージインストール
+3. **Binary cache (substitutes)を活用**したパッケージインストール
 4. シングルユーザーモードでの運用
+5. カスタムビルドは不可（gVisorの制限）
 
-これらの対応により、Nixを使用してRustなどの開発環境を構築できます。
+これらの制限を理解した上で、Nixを使用してRustなどの開発環境を構築できます。
