@@ -277,8 +277,38 @@ Claude Code on the Web環境でNixを使用する場合：
 - `nix profile install`、`nix shell`、`nix run`を使用する
 - カスタムビルドが必要な場合は、別の環境でビルドしてcacheに格納する
 
+## gVisorの既存Issue調査
+
+2025年10月時点で、この具体的な問題（O_CLOEXECフラグ付きpipeでexecve()後にEOFではなくEIOが返される）について、gVisorのGitHubリポジトリに報告されている既存のissueは**見つかりませんでした**。
+
+### 調査した関連Issue
+
+以下のissueを確認しましたが、本問題とは異なります：
+
+- **Issue #101**: "failed to generate root mount point: broken pipe" - goferプロセスとの通信の問題
+- **Issue #161**: "Send SIGPIPE when writing to a closed pipe/socket" - SIGPIPEシグナルの動作に関する議論
+- **Issue #6796**: "Container exits with IO exception" - Javaプログラムの一般的なIOエラー
+- **Issue #11064**: "checkpoint restored guest process stuck on write syscall to stdout" - checkpointに関する問題
+
+### 新規Issue報告の推奨
+
+この問題は、以下の理由から**gVisorプロジェクトに新規issueとして報告する価値がある**と考えられます：
+
+1. **POSIX標準との不整合**: 標準的なLinuxではEOFが返されるべき状況でEIOが返される
+2. **実用的な影響**: Nixなどのビルドシステムが動作しなくなる
+3. **再現性**: straceで明確に再現・確認できる
+
+### 報告時に含めるべき情報
+
+- **環境情報**: runsc バージョン、カーネルバージョン
+- **再現手順**: 最小限のderivationでの再現例
+- **期待される動作**: 標準Linuxでの動作（EOF）
+- **実際の動作**: gVisorでの動作（EIO）
+- **straceログ**: pipe2()からread()までの詳細なトレース
+
 ## 関連情報
 
 - [gVisor](https://gvisor.dev/)
+- [gVisor GitHub Issues](https://github.com/google/gvisor/issues)
 - [Nix Package Manager](https://nixos.org/)
 - [Nix Binary Cache](https://nixos.org/manual/nix/stable/command-ref/conf-file.html#conf-substituters)
