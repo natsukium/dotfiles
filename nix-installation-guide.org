@@ -7,6 +7,17 @@
 このドキュメントは、Nixパッケージマネージャーのインストール方法をまとめたものです。
 systemdが利用できない環境でも対応できるよう、複数のインストール方法を紹介します。
 
+** 実際のインストール経験
+
+このガイドは、Ubuntu 24.04.3 LTS（コンテナ環境）で実際にNixをインストールした経験に基づいています。
+以下の問題に遭遇し、解決しました：
+
+- systemdがインストールされていても、PID 1として起動していないため ~--daemon~ モードが失敗
+- ビルド環境の初期化時にI/Oエラーが発生（サンドボックスの問題）
+- プロファイルの自動作成に失敗したため、手動でシンボリックリンクを作成
+
+最終的に、~--no-daemon~ モードと手動設定の組み合わせでインストールに成功しました。
+
 * 環境確認
 
 ** 動作確認環境
@@ -26,7 +37,22 @@ cat /etc/os-release
 
 # アーキテクチャの確認
 uname -m
+
+# systemdがPID 1として起動しているか確認（重要）
+ps -p 1 -o comm=
 #+end_src
+
+** Docker/コンテナ環境での注意事項
+
+Docker/コンテナ環境では、いくつかの制限があります：
+
+- systemdがインストールされていても、PID 1として起動していないことがある
+  - この場合、~systemctl --version~ は動作しますが、~--daemon~ モードは使用できません
+  - ~ps -p 1 -o comm=~ で確認し、「systemd」と表示されない場合は ~--no-daemon~ を使用してください
+- サンドボックス機能が正しく動作しない場合がある
+  - ビルド時にI/Oエラーが発生する場合は、~sandbox = false~ を設定してください
+- ネットワーク制限やDNS解決の問題がある場合がある
+  - 事前にtarballをダウンロードして使用することを検討してください
 
 * インストール方法の選択肢
 
@@ -259,6 +285,67 @@ chmod +x nix-install.sh
 ./nix-install.sh --no-daemon --yes
 #+end_src
 
+** コンテナ環境でのビルドエラー（I/Oエラー）
+
+コンテナ環境で「error: reading a line: Input/output error」が発生する場合、
+サンドボックス機能を無効にしてください：
+
+#+begin_src bash
+# ~/.config/nix/nix.confを作成
+mkdir -p ~/.config/nix
+echo "sandbox = false" > ~/.config/nix/nix.conf
+#+end_src
+
+** 手動インストール（インストーラーが完全に失敗する場合）
+
+インストーラーが失敗する場合、手動でNixをセットアップできます：
+
+#+begin_src bash
+# 1. Nixバイナリtarballをダウンロード
+curl -L https://releases.nixos.org/nix/nix-2.32.1/nix-2.32.1-x86_64-linux.tar.xz -o nix-tarball.tar.xz
+
+# 2. tarballを展開
+mkdir -p ~/nix-install
+tar -xJf nix-tarball.tar.xz -C ~/nix-install
+
+# 3. /nixディレクトリの作成と権限設定
+sudo mkdir -p /nix
+sudo chown -R $USER /nix
+
+# 4. Nixをストアにコピー
+cd ~/nix-install/nix-2.32.1-x86_64-linux
+cp -rp ./store/* /nix/store/
+
+# 5. プロファイルへのシンボリックリンクを作成
+# （Nixストア内のパスは実際のハッシュに置き換えてください）
+ln -s /nix/store/XXXXX-nix-2.32.1 ~/.nix-profile
+
+# 6. PATHを設定（~/.bashrcに追加）
+echo 'export PATH="$HOME/.nix-profile/bin:$PATH"' >> ~/.bashrc
+
+# 7. 設定を反映
+source ~/.bashrc
+
+# 8. 動作確認
+nix --version
+#+end_src
+
+実際のNixストアパスを確認：
+
+#+begin_src bash
+find /nix/store -maxdepth 1 -name "*nix-2.32.1" -type d
+#+end_src
+
+** root権限でのインストールエラー
+
+公式インストーラーはroot権限での実行をサポートしていません。
+一般ユーザーでインストールを行うか、手動インストールを使用してください：
+
+#+begin_src bash
+# 一般ユーザーに切り替えてインストール
+su - username -c 'sh <(curl -L https://nixos.org/nix/install) --no-daemon --yes'
+#+end_src
+
 * アンインストール
 
 ** シングルユーザーインストールの場合
@@ -323,12 +410,13 @@ rm -f ~/.nix-profile ~/.nix-defexpr ~/.nix-channels
 
 ** 推奨インストール方法
 
-| 環境                      | 推奨方法                                     |
-|---------------------------+----------------------------------------------|
-| systemd利用可能           | 公式インストーラー（~--daemon~）             |
-| systemd利用不可           | 公式インストーラー（~--no-daemon~）          |
-| 簡単なアンインストールが必要 | Determinate Systems Nix Installer            |
-| 特殊な環境・オフライン    | 静的リンクバイナリ                           |
+| 環境                          | 推奨方法                                         |
+|-------------------------------+--------------------------------------------------|
+| systemd利用可能（PID 1）      | 公式インストーラー（~--daemon~）                 |
+| systemd利用不可               | 公式インストーラー（~--no-daemon~）              |
+| Docker/コンテナ環境           | 公式インストーラー（~--no-daemon~）+ 手動設定    |
+| 簡単なアンインストールが必要   | Determinate Systems Nix Installer                |
+| 特殊な環境・オフライン        | 静的リンクバイナリまたは手動インストール         |
 
 ** 次のステップ
 
