@@ -62,7 +62,50 @@ in
     pkgs.moralerspace-hw
   ];
 
-  my.services.google-japanese-input.enable = true;
+  my.services.google-japanese-input = {
+    enable = true;
+    package = pkgs.brewCasks.google-japanese-ime.overrideAttrs (oldAttrs: {
+      src = pkgs.fetchurl {
+        url = oldAttrs.src.url;
+        hash = "sha256-j6vXsk9x7QphwKqFcgTzX+s7yR6ImcAjxhTxkpIUUgc=";
+      };
+      unpackPhase = ''
+        runHook preUnpack
+
+        undmg $src
+        mv GoogleJapaneseInput.pkg GoogleJapaneseInputOrig.pkg
+        xar -xf GoogleJapaneseInputOrig.pkg
+        rm GoogleJapaneseInputOrig.pkg
+        pushd GoogleJapaneseInput.pkg
+        zcat Payload | cpio -i
+        popd
+
+        runHook postUnpack
+      '';
+
+      nativeBuildInputs = with pkgs; [
+        cpio
+        undmg
+        xar
+      ];
+
+      installPhase = ''
+        runHook preInstall
+
+        mkdir -p $out
+        cp -r GoogleJapaneseInput.pkg/{Applications,Library} $out
+
+        runHook postInstall
+      '';
+
+      postFixup = ''
+        substituteInPlace $out/Library/LaunchAgents/com.google.inputmethod.Japanese.Converter.plist \
+          --replace-fail "/Library" "$out/Library"
+        substituteInPlace $out/Library/LaunchAgents/com.google.inputmethod.Japanese.Renderer.plist \
+          --replace-fail "/Library" "$out/Library"
+      '';
+    });
+  };
 
   services.sketchybar.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
