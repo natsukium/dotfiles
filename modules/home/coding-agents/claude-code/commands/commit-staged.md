@@ -2,7 +2,7 @@
 allowed-tools: Bash(git diff:*), Bash(git log:*), Bash(git status:*), Bash(git commit:*)
 argument-hint: intention
 description: Review staged changes and create commit with appropriate message
-model: claude-sonnet-4-20250514
+model: claude-haiku-4-5-20251001
 ---
 
 ## Context
