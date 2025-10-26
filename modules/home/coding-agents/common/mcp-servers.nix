@@ -3,11 +3,6 @@
   programs = {
     context7.enable = true;
     playwright.enable = true;
-    serena = {
-      enable = true;
-      context = "ide-assistant";
-      enableWebDashboard = false;
-    };
     time = {
       enable = true;
       args = [ "--local-timezone=Asia/Tokyo" ];
