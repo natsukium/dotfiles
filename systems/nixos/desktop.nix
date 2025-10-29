@@ -30,7 +30,7 @@
   fonts.packages = with pkgs; [
     moralerspace-hw
     noto-fonts-cjk-sans
-    noto-fonts-emoji
+    noto-fonts-color-emoji
     liga-hackgen-nf-font
   ];
 
