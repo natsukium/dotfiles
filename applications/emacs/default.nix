@@ -13,7 +13,7 @@ let
       stem = path: lib.head (lib.splitString "." path);
       outName = "${stem (builtins.baseNameOf org)}.el";
     in
-    pkgs.runCommandNoCC "${outName}" { nativeBuildInputs = [ emacs-unwrapped ]; } ''
+    pkgs.runCommand "${outName}" { nativeBuildInputs = [ emacs-unwrapped ]; } ''
       cp ${org} tmp.org
       emacs -Q --batch --eval \
         "(progn 

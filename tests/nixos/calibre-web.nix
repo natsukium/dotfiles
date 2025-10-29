@@ -14,7 +14,7 @@
       };
 
       my.services.calibre-web = {
-        adminPasswordFile = pkgs.runCommandNoCC "admin-password" { } ''
+        adminPasswordFile = pkgs.runCommand "admin-password" { } ''
           echo "dummy-HDat1@WLJ&9AdSfc!MEH" > $out
         '';
       };
