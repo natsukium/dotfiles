@@ -25,6 +25,7 @@ in
     brewCasks.aqua-voice
     monitorcontrol
     nowplaying-cli
+    shottr
   ];
 
   services.raycast.enable = true;
