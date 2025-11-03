@@ -8,6 +8,7 @@
           showIcons = true;
         };
         git = {
+          overrideGpg = true;
           pagers = [
             {
               colorArg = "always";
