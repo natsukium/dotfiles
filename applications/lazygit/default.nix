@@ -14,9 +14,16 @@
               colorArg = "always";
               pager = "delta --dark --paging=never";
             }
+            {
+              externalDiffCommand = "difft --color=always";
+            }
           ];
         };
       };
     };
+  };
+
+  programs.difftastic = {
+    enable = true;
   };
 }
