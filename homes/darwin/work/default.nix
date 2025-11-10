@@ -23,6 +23,9 @@ in
 
     services.ollama.enable = true;
 
-    my.virtualisation.colima.settings.disk = 200;
+    my.virtualisation.colima = {
+      settings.disk = 200;
+      enableKubernetes = true;
+    };
   };
 }
