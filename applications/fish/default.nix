@@ -18,7 +18,7 @@
       abbr -a extract_tar_gz --position command --regex ".+\.tar\.gz" --function _abbr_extract_tar_gz
       abbr -a dotdot --regex '^\.\.+$' --function _abbr_multicd
 
-      ${pkgs.any-nix-shell}/bin/any-nix-shell fish --info-right | source
+      ${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
     '';
 
     shellAbbrs = {
