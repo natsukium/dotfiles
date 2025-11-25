@@ -45,7 +45,6 @@ toLazyPlugins [
   nvim-nio
   nvim-notify
   nvim-surround
-  nvim-treesitter.withAllGrammars
   octo-nvim
   oil-nvim
   overseer-nvim
@@ -61,6 +60,8 @@ toLazyPlugins [
 ++ (toEagerPlugins [
   lz-n
   nvim-lspconfig
+  # Eager load to make treesitter queries available in runtimepath for Telescope preview highlighting.
+  nvim-treesitter.withAllGrammars
   nvim-web-devicons
   rustaceanvim
   snacks-nvim
