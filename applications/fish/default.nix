@@ -71,4 +71,5 @@
       }
     ];
   };
+  xdg.configFile."fish/completions/just.fish".source = ./completions/just.fish;
 }
