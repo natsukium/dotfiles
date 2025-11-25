@@ -114,5 +114,10 @@ in
         RUSTUP_HOME = "${config.xdg.dataHome}/rustup";
       };
     })
+    (mkIf pkgs.stdenv.hostPlatform.isDarwin {
+      home.sessionVariables = {
+        XDG_RUNTIME_DIR = "\"$TMPDIR\"runtime-\"$UID\"";
+      };
+    })
   ]);
 }
