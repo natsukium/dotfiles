@@ -6,8 +6,10 @@ return {
 	},
 	{
 		"gitlinker.nvim",
-		after = true,
-		event = "DeferredUIEnter",
+		after = function()
+			require("gitlinker").setup()
+		end,
+		keys = { "<leader>gy" },
 	},
 	{
 		"gitsigns.nvim",
