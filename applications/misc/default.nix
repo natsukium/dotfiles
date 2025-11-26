@@ -33,7 +33,6 @@
     cachix
     coreutils
     fd
-    ghq
     gnumake
     gnutar
     hydra-check

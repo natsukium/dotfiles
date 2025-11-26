@@ -37,7 +37,6 @@ in
     ../applications/bash
     ../applications/fish
     ../applications/gh-dash
-    ../applications/ghq
     ../applications/git
     ../applications/lazygit
     ../applications/misc
