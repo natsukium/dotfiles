@@ -39,7 +39,6 @@ in
     ../applications/gh-dash
     ../applications/ghq
     ../applications/git
-    ../applications/gitui
     ../applications/lazygit
     ../applications/misc
     ../applications/newsboat
