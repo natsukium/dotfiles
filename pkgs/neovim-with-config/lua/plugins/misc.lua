@@ -25,6 +25,7 @@ return {
 		after = function()
 			local telescope = require("telescope")
 			local builtin = require("telescope.builtin")
+			local custom_actions = require("telescope_custom_actions")
 
 			vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
 			vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
@@ -37,8 +38,14 @@ return {
 				defaults = {
 					layout_strategy = "flex",
 					mappings = {
-						i = { ["<c-t>"] = open_with_trouble },
-						n = { ["<c-t>"] = open_with_trouble },
+						i = {
+							["<c-t>"] = open_with_trouble,
+							["<c-g>"] = custom_actions.grep_in_picker_results,
+						},
+						n = {
+							["<c-t>"] = open_with_trouble,
+							["<c-g>"] = custom_actions.grep_in_picker_results,
+						},
 					},
 				},
 			})
