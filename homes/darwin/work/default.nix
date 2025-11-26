@@ -23,6 +23,8 @@ in
 
     services.ollama.enable = true;
 
+    my.programs.just.enableEnhancedCompletion = true;
+
     my.virtualisation.colima = {
       settings.disk = 200;
       enableKubernetes = true;
