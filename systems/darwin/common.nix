@@ -48,6 +48,17 @@ in
     preventSleepOnCharge = true;
   };
 
+  my.services.newsyslog = {
+    enable = true;
+    settings = {
+      "/var/log/comin.log" = {
+        count = 10;
+        size = 1000;
+        flags = [ "Z" ];
+      };
+    };
+  };
+
   system.startup.chime = false;
 
   system.activationScripts.extraActivation.text = lib.optionalString stdenv.hostPlatform.isAarch64 ''
