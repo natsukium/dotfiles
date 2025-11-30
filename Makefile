@@ -24,14 +24,17 @@ x86_64-linux:
 		.#nixosConfigurations.arusha.config.system.build.toplevel \
 		.#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
 		.#nixosConfigurations.manyara.config.system.build.toplevel \
+		.#devShells.x86_64-linux.default \
 
 aarch64-linux:
 	$(NIX) build --impure --keep-going --no-link --show-trace --eval-system aarch64-linux \
 		.#nixosConfigurations.serengeti.config.system.build.toplevel \
-		.#nixOnDroidConfigurations.default.config.environment.path
+		.#nixOnDroidConfigurations.default.config.environment.path \
+		.#devShells.aarch64-linux.default \
 
 aarch64-darwin:
 	$(NIX) build --keep-going --no-link --show-trace --eval-system aarch64-darwin --option extra-sandbox-paths /nix/store \
 		.#darwinConfigurations.katavi.system \
 		.#darwinConfigurations.mikumi.system \
 		.#darwinConfigurations.work.system \
+		.#devShells.aarch64-darwin.default \
