@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-08-03 14:56+0900\n"
+"POT-Creation-Date: 2025-12-01 02:34+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -24,7 +24,7 @@ msgstr ""
 
 #. type: keyword STARTUP
 #: README.org:2 configuration.org:1 applications/emacs/init.org:1
-#: applications/emacs/early-init.org:1
+#: applications/emacs/early-init.org:1 overlays/configuration.org:2
 #, no-wrap
 msgid "overview"
 msgstr ""
@@ -178,29 +178,41 @@ msgstr ""
 #. type: heading **
 #: configuration.org:5
 #, no-wrap
+msgid "Overlays"
+msgstr ""
+
+#. type: keyword INCLUDE
+#: configuration.org:6
+#, no-wrap
+msgid "\"./overlays/configuration.org\""
+msgstr ""
+
+#. type: heading **
+#: configuration.org:8
+#, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:6
+#: configuration.org:9
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:7
+#: configuration.org:10
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:8
+#: configuration.org:11
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:9
+#: configuration.org:12
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr ""
@@ -512,19 +524,78 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:166
+#: applications/emacs/init.org:165
+#, no-wrap
+msgid "language support"
+msgstr ""
+
+#. type: heading **
+#: applications/emacs/init.org:167
+#, no-wrap
+msgid "Markdown"
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:169
+msgid "https://github.com/jrblevin/markdown-mode"
+msgstr ""
+
+#. type: paragraph in quote
+#: applications/emacs/init.org:172
+msgid "markdown-mode is a major mode for editing Markdown-formatted text."
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:176
+#, no-wrap
+msgid ""
+"(use-package markdown-mode\n"
+"  :ensure t\n"
+"  :mode (\"README\\\\.md\\\\'\" . gfm-mode)\n"
+"  :init (setq markdown-command \"multimarkdown\")\n"
+"  :bind (:map markdown-mode-map\n"
+"              (\"C-c C-e\" . markdown-do)))"
+msgstr ""
+
+#. type: heading **
+#: applications/emacs/init.org:184
+#, no-wrap
+msgid "Nix"
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:186
+msgid "https://github.com/NixOS/nix-mode"
+msgstr ""
+
+#. type: paragraph in quote
+#: applications/emacs/init.org:189
+msgid "An Emacs major mode for editing Nix expressions."
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:193
+#, no-wrap
+msgid ""
+"(use-package nix-mode\n"
+"  :ensure t\n"
+"  :mode \"\\\\.nix\\\\'\")"
+msgstr ""
+
+#. type: heading *
+#: applications/emacs/init.org:198
 #, no-wrap
 msgid "org"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:168
+#: applications/emacs/init.org:200
 #, no-wrap
 msgid "Semantic Line Breaks"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:170
+#: applications/emacs/init.org:202
 msgid ""
 "[[https://sembr.org/][Semantic Line Breaks (SemBr)]] is a writing convention "
 "where line breaks are placed at logical boundaries in sentences, such as "
@@ -534,14 +605,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:176
+#: applications/emacs/init.org:208
 msgid ""
 "The recommended line length is around 80 characters.  I set this as an upper "
 "limit in the editor to prevent lines from becoming unnecessarily long."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:181
+#: applications/emacs/init.org:213
 #, no-wrap
 msgid ""
 "(add-hook 'text-mode-hook\n"
@@ -551,25 +622,25 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:187
+#: applications/emacs/init.org:219
 #, no-wrap
 msgid "org-capture"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:189
+#: applications/emacs/init.org:221
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c c\") 'org-capture)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:191
+#: applications/emacs/init.org:223
 #, no-wrap
 msgid "(setq org-root \"~/dropbox/org/\")"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:193
+#: applications/emacs/init.org:225
 #, no-wrap
 msgid ""
 "(setq org-capture-templates\n"
@@ -577,7 +648,7 @@ msgid ""
 "         (file+headline ,(concat org-root \"todo.org\") \"Tasks\")\n"
 "         \"* TODO %?\\n  %i\\n  %a\")\n"
 "        (\"j\" \"Journal\" entry\n"
-"         (file+datetree ,(concat org-root \"journal.org\"))\n"
+"         (file+olp+datetree ,(concat org-root \"journal.org\"))\n"
 "         \"* %U\\n%?\\n  %i\\n  %a\")\n"
 "        (\"f\" \"Fleeting\" entry\n"
 "         (file ,(concat org-root \"fleeting.org\"))\n"
@@ -585,31 +656,31 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:205
+#: applications/emacs/init.org:237
 #, no-wrap
 msgid "org-agenda"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:207
+#: applications/emacs/init.org:239
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c a\") 'org-agenda)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:209
+#: applications/emacs/init.org:241
 #, no-wrap
 msgid "(setq org-agenda-files '(\"~/dropbox/org\"))"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:212
+#: applications/emacs/init.org:244
 #, no-wrap
 msgid "org-roam"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:214
+#: applications/emacs/init.org:246
 #, no-wrap
 msgid ""
 "(use-package org-roam\n"
@@ -643,25 +714,25 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:243
+#: applications/emacs/init.org:275
 #, no-wrap
 msgid "htmlize"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:245
+#: applications/emacs/init.org:277
 msgid ""
 "Used when converting Org files to HTML with syntax highlighting for code "
 "blocks."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:247
+#: applications/emacs/init.org:279
 msgid "=C-c C-e h h= exports the current Org buffer to HTML."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:250
+#: applications/emacs/init.org:282
 #, no-wrap
 msgid ""
 "(use-package htmlize\n"
@@ -669,19 +740,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:254
+#: applications/emacs/init.org:286
 #, no-wrap
 msgid "misc"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:255
+#: applications/emacs/init.org:287
 #, no-wrap
 msgid "vundo"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:257
+#: applications/emacs/init.org:289
 #, no-wrap
 msgid ""
 "(use-package vundo\n"
@@ -692,13 +763,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:264
+#: applications/emacs/init.org:296
 #, no-wrap
 msgid "consult"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:266
+#: applications/emacs/init.org:298
 #, no-wrap
 msgid ""
 ";; Example configuration for Consult\n"
@@ -777,7 +848,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:323
+#: applications/emacs/init.org:355
 #, no-wrap
 msgid ""
 ";; Enable automatic preview at point in the *Completions* buffer. This is\n"
@@ -786,7 +857,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:327
+#: applications/emacs/init.org:359
 #, no-wrap
 msgid ""
 ";; The :init configuration is always executed (Not lazy)\n"
@@ -794,7 +865,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:330
+#: applications/emacs/init.org:362
 #, no-wrap
 msgid ""
 ";; Tweak the register preview for `consult-register-load',\n"
@@ -807,7 +878,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:337
+#: applications/emacs/init.org:369
 #, no-wrap
 msgid ""
 ";; Use Consult to select xref locations with preview\n"
@@ -816,7 +887,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:341
+#: applications/emacs/init.org:373
 #, no-wrap
 msgid ""
 ";; Configure other variables and modes in the :config section,\n"
@@ -825,7 +896,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:345
+#: applications/emacs/init.org:377
 #, no-wrap
 msgid ""
 ";; Optionally configure preview. The default value\n"
@@ -847,7 +918,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:361
+#: applications/emacs/init.org:393
 #, no-wrap
 msgid ""
 ";; Optionally configure the narrowing key.\n"
@@ -856,7 +927,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:365
+#: applications/emacs/init.org:397
 #, no-wrap
 msgid ""
 "  ;; Optionally make narrowing help available in the minibuffer.\n"
@@ -868,7 +939,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:372
+#: applications/emacs/init.org:404
 #, no-wrap
 msgid ""
 ";; Consult users will also want the embark-consult package.\n"
@@ -880,31 +951,31 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:379
+#: applications/emacs/init.org:411
 #, no-wrap
 msgid "Others"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:381
+#: applications/emacs/init.org:413
 #, no-wrap
 msgid "(which-key-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:383
+#: applications/emacs/init.org:415
 #, no-wrap
 msgid "(setq-default indent-tabs-mode nil)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:385
+#: applications/emacs/init.org:417
 #, no-wrap
 msgid "(require 'org-tempo)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:387
+#: applications/emacs/init.org:419
 #, no-wrap
 msgid ""
 "(org-babel-do-load-languages\n"
@@ -913,18 +984,70 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:391
+#: applications/emacs/init.org:423
 #, no-wrap
 msgid "(setq org-src-preserve-indentation t)"
 msgstr ""
 
+#. type: heading ***
+#: applications/emacs/init.org:426
+#, no-wrap
+msgid "project.el"
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:428
+msgid ""
+"Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) "
+"as projects."
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:430
+msgid "Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=."
+msgstr ""
+
 #. type: paragraph in src
-#: applications/emacs/init.org:393
+#: applications/emacs/init.org:433
 #, no-wrap
 msgid ""
-"(use-package nix-mode\n"
-"  :ensure t\n"
-"  :mode \"\\\\.nix\\\\'\")"
+"(defun my/sync-project-list ()\n"
+"  \"Find all projects under ~/src and synchronize the project-list-file.\"\n"
+"  (interactive)\n"
+"  (let* (;; 1. Retrieve directory list as a string using find command\n"
+"         (command (format \"find %s -mindepth 4 -maxdepth 4 -type d\"\n"
+"                          (expand-file-name \"~/src\")))\n"
+"         (dir-list-string (shell-command-to-string command))\n"
+"         ;; 2. Split string by newlines and exclude empty lines to create a "
+"list\n"
+"         (dirs (split-string dir-list-string \"\\n\" t)))"
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:443
+#, no-wrap
+msgid ""
+";; 3. Build file contents in a temporary buffer\n"
+"(with-temp-buffer\n"
+"  (insert \";;; -*- lisp-data -*-\\n\")\n"
+"  (insert \"(\\n\")\n"
+"  (dolist (dir dirs)\n"
+"    (insert (format \" (\\\"%s/\\\")\\n\" dir)))\n"
+"  (insert \")\\n\")"
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:451
+#, no-wrap
+msgid ""
+";; 4. Write the built contents to file\n"
+"(write-file project-list-file))))"
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:454
+#, no-wrap
+msgid "(my/sync-project-list)"
 msgstr ""
 
 #. type: heading **
@@ -965,4 +1088,448 @@ msgstr ""
 msgid ""
 "(setq make-backup-files nil)\n"
 "(setq auto-save-default nil)"
+msgstr ""
+
+#. type: keyword TITLE
+#: overlays/configuration.org:1
+#, no-wrap
+msgid "Nix Overlays"
+msgstr ""
+
+#. type: keyword PROPERTY
+#: overlays/configuration.org:3
+#, no-wrap
+msgid "header-args:nix :mkdirp yes :noweb yes"
+msgstr ""
+
+#. type: keyword OPTIONS
+#: overlays/configuration.org:4
+#, no-wrap
+msgid "^:{}"
+msgstr ""
+
+#. type: heading *
+#: overlays/configuration.org:6
+#, no-wrap
+msgid "Overview"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:8
+msgid ""
+"This file defines nixpkgs overlays for patching broken packages, pinning "
+"specific versions, and adding local workarounds. Each overlay modifies the "
+"package set to address issues that would otherwise block the system build or "
+"cause runtime problems."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:12
+msgid ""
+"For details on overlay mechanics (=final: prev:= pattern, composition order, "
+"etc.), see [[https://nixos.org/manual/nixpkgs/stable/#chap-overlays][nixpkgs "
+"overlay documentation]]."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:15
+msgid ""
+"Overlays are organized into four categories based on their purpose and "
+"expected lifetime:"
+msgstr ""
+
+#. type: plain list -
+#: overlays/configuration.org:19
+#, no-wrap
+msgid ""
+"*stable*: Packages fetched from nixpkgs-stable when broken in unstable and "
+"the fix would\n"
+"trigger excessive rebuilds or is too complex to patch locally."
+msgstr ""
+
+#. type: plain list -
+#: overlays/configuration.org:21
+#, no-wrap
+msgid ""
+"*temporary-fix*: Local overrides (e.g., disabling tests) that don't require "
+"a different\n"
+"nixpkgs version. Remove once fixed upstream."
+msgstr ""
+
+#. type: plain list -
+#: overlays/configuration.org:22
+#, no-wrap
+msgid ""
+"*pre-release*: Alpha, beta, or pre-release packages for testing before they "
+"land in nixpkgs."
+msgstr ""
+
+#. type: plain list -
+#: overlays/configuration.org:24
+#, no-wrap
+msgid ""
+"*patches*: Workarounds not suitable for upstream contribution (e.g., "
+"locale-specific fixes,\n"
+"local tooling shims). Expected to remain indefinitely."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:26
+#, no-wrap
+msgid ""
+"{ inputs }:\n"
+"{\n"
+"  <<stable>>"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:30
+#, no-wrap
+msgid "<<temporary-fix>>"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:32
+#, no-wrap
+msgid "<<pre-release>>"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:34
+#, no-wrap
+msgid ""
+"  <<patches>>\n"
+"}"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:38 overlays/configuration.org:44
+#, no-wrap
+msgid "stable"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:40
+msgid ""
+"Fetch packages from nixpkgs-stable when broken in unstable. This includes "
+"cases where the upstream fix would trigger excessive rebuilds, or where the "
+"issue is too complex to patch locally."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:46
+#, no-wrap
+msgid ""
+"stable = final: prev: {\n"
+"  inherit "
+"(inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system})\n"
+"    <<hercules-ci-agent>>\n"
+"    ;\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:53 overlays/configuration.org:65
+#: overlays/configuration.org:67
+#, no-wrap
+msgid "hercules-ci-agent"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:55
+msgid ""
+"Build is broken on darwin in nixpkgs-unstable due to a dependency issue.  A "
+"fix is proposed in "
+"[[https://github.com/NixOS/nixpkgs/pull/463879][NixOS/nixpkgs#463879]], but "
+"as of 2025-11-30, the PR targets the staging branch and is still under "
+"review."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:59
+msgid ""
+"Cherry-picking this fix locally isn't practical because the PR touches core "
+"darwin infrastructure, which would trigger rebuilds of numerous "
+"packages. Using the stable branch package avoids this rebuild cascade while "
+"we wait for the fix to land in master."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:63
+msgid ""
+"Remove this override once the PR is merged and propagates to the master "
+"branch."
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:70 overlays/configuration.org:77
+#, no-wrap
+msgid "temporary-fix"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:72
+msgid ""
+"Local overrides for packages that build but have failing tests or minor "
+"issues.  Unlike the =stable= overlay, these don't require fetching packages "
+"from a different nixpkgs branch. We simply override specific attributes "
+"(like =doCheck=) on the existing packages. Remove these overrides once the "
+"issues are fixed upstream."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:79
+#, no-wrap
+msgid ""
+"temporary-fix = final: prev: {\n"
+"  <<python313-package-set>>\n"
+"};"
+msgstr ""
+
+#. type: heading ***
+#: overlays/configuration.org:84
+#, no-wrap
+msgid "Python313 package set"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:86
+msgid "Override problematic Python packages using =packageOverrides=."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:88
+msgid ""
+"Python packages in nixpkgs form an interconnected dependency graph. The "
+"=packageOverrides= mechanism ensures that when a package is overridden, all "
+"dependent packages automatically see the modified version. This is essential "
+"for consistency—a direct overlay override (e.g., =python313Packages.foo = "
+"...=) would only affect top-level access, leaving internal dependencies "
+"using the original broken version."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:94
+msgid ""
+"See "
+"[[https://nixos.org/manual/nixpkgs/stable/#overriding-python-packages][nixpkgs "
+"Python documentation]] for details."
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:96
+#, no-wrap
+msgid "python313-package-set"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:98
+#, no-wrap
+msgid ""
+"python313 = prev.python313.override {\n"
+"  packageOverrides = pyfinal: pyprev: {\n"
+"    <<rapidocr-onnxruntime>>\n"
+"    <<lxml-html-clean>>\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:106 overlays/configuration.org:114
+#, no-wrap
+msgid "rapidocr-onnxruntime"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:108
+msgid ""
+"The test suite causes a segmentation fault during execution. The root cause "
+"is still under investigation."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:111
+msgid ""
+"This package is pulled in as a transitive dependency. Runtime functionality "
+"has been verified to work correctly in actual use, so disabling the test "
+"suite is a safe workaround."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:116
+#, no-wrap
+msgid ""
+"rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: "
+"{\n"
+"  doCheck = false;\n"
+"});"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:121 overlays/configuration.org:130
+#, no-wrap
+msgid "lxml-html-clean"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:123
+msgid ""
+"Tests fail due to breaking changes in libxml2 2.14, which modified how "
+"certain DOM operations handle whitespace and entity encoding. These changes "
+"cause test assertions to fail even though the actual HTML cleaning "
+"functionality works correctly."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:127
+msgid ""
+"Tracked upstream in "
+"[[https://github.com/fedora-python/lxml_html_clean/issues/24][fedora-python/lxml_html_clean#24]].  "
+"Remove this override once the test suite is updated for libxml2 2.14 "
+"compatibility."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:132
+#, no-wrap
+msgid ""
+"lxml-html-clean = pyprev.lxml-html-clean.overridePythonAttrs (_: {\n"
+"  doCheck = false;\n"
+"});"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:137 overlays/configuration.org:143
+#, no-wrap
+msgid "pre-release"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:139
+msgid ""
+"Overlay for testing alpha, beta, or pre-release versions of packages before "
+"they land in nixpkgs. Useful for evaluating release candidates, nightly "
+"builds, or packages pending upstream review. Once a package is available in "
+"nixpkgs, remove it from this overlay."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:145
+#, no-wrap
+msgid "pre-release = final: prev: { };"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:148 overlays/configuration.org:157
+#, no-wrap
+msgid "patches"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:150
+msgid "Workarounds that are not suitable for upstream contribution."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:152
+msgid ""
+"These patches address issues that upstream would likely not accept—either "
+"because they are specific to this configuration (e.g., locale settings), "
+"bypass intended behavior, or solve problems in unconventional ways. Unlike "
+"=temporary-fix=, these are expected to remain indefinitely."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:159
+#, no-wrap
+msgid ""
+"patches = final: prev: {\n"
+"  <<gh-dash>>\n"
+"  <<command-line-tools-shim>>\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:165 overlays/configuration.org:178
+#, no-wrap
+msgid "gh-dash"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:167
+msgid ""
+"The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
+"issue stems from gh-dash's terminal width calculation, which miscounts the "
+"display width of certain UTF-8 characters (particularly CJK characters and "
+"some emoji). This causes text wrapping and alignment to break."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:172
+msgid ""
+"Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
+"preserving UTF-8 encoding support, which fixes the rendering issue. We use "
+"=writeShellApplication= to create a wrapper that sets this environment "
+"variable before invoking the real binary."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:176
+msgid ""
+"Reported upstream in "
+"[[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]]."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:180
+#, no-wrap
+msgid ""
+"gh-dash =\n"
+"  (final.writeShellApplication {\n"
+"    name = \"gh-dash\";\n"
+"    text = ''\n"
+"      LANG=C.UTF-8 ${final.lib.getExe prev.gh-dash} \"$@\"\n"
+"    '';\n"
+"  }).overrideAttrs\n"
+"    { pname = \"gh-dash\"; };"
+msgstr ""
+
+#. type: heading ***
+#: overlays/configuration.org:190
+#, no-wrap
+msgid "mkShim"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:192
+msgid "Shim utility for providing stub implementations of macOS Command Line Tools."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:194
+msgid ""
+"On darwin systems without Xcode Command Line Tools installed, invoking "
+"commands like =cc= or =python3= triggers an annoying system popup prompting "
+"installation.  These shims intercept such calls and either delegate to "
+"Nix-provided tools or return appropriate exit codes, suppressing the popup "
+"and preventing spurious build failures."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:199
+msgid ""
+"See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
+"list of shimmed commands."
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:201
+#, no-wrap
+msgid "command-line-tools-shim"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:203
+#, no-wrap
+msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
