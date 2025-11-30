@@ -1,4 +1,11 @@
-.PHONY: build build-all x86_64-linux aarch64-linux aarch64-darwin
+.PHONY: build build-all x86_64-linux aarch64-linux aarch64-darwin tangle
+
+# org-babel tangle
+EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t)'
+
+define tangle-org
+	$(EMACS) --eval '(org-babel-tangle-file "$(1)")'
+endef
 
 NIX := nom
 
@@ -38,3 +45,10 @@ aarch64-darwin:
 		.#darwinConfigurations.mikumi.system \
 		.#darwinConfigurations.work.system \
 		.#devShells.aarch64-darwin.default \
+
+# tangle targets: configuration.org -> generated files
+# Each directory has a configuration.org that tangles to one or more .nix files
+tangle: overlays/default.nix
+
+overlays/default.nix: overlays/configuration.org
+	$(call tangle-org,$<)
