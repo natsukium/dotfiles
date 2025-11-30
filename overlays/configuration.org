@@ -1,0 +1,204 @@
+#+TITLE: Nix Overlays
+#+STARTUP: overview
+#+PROPERTY: header-args:nix :mkdirp yes :noweb yes
+#+OPTIONS: ^:{}
+
+* Overview
+
+This file defines nixpkgs overlays for patching broken packages, pinning specific versions,
+and adding local workarounds. Each overlay modifies the package set to address issues that
+would otherwise block the system build or cause runtime problems.
+
+For details on overlay mechanics (=final: prev:= pattern, composition order, etc.),
+see [[https://nixos.org/manual/nixpkgs/stable/#chap-overlays][nixpkgs overlay documentation]].
+
+Overlays are organized into four categories based on their purpose and expected lifetime:
+
+- *stable*: Packages fetched from nixpkgs-stable when broken in unstable and the fix would
+  trigger excessive rebuilds or is too complex to patch locally.
+- *temporary-fix*: Local overrides (e.g., disabling tests) that don't require a different
+  nixpkgs version. Remove once fixed upstream.
+- *pre-release*: Alpha, beta, or pre-release packages for testing before they land in nixpkgs.
+- *patches*: Workarounds not suitable for upstream contribution (e.g., locale-specific fixes,
+  local tooling shims). Expected to remain indefinitely.
+
+#+begin_src nix :tangle default.nix
+{ inputs }:
+{
+  <<stable>>
+
+  <<temporary-fix>>
+
+  <<pre-release>>
+
+  <<patches>>
+}
+#+end_src
+
+** stable
+
+Fetch packages from nixpkgs-stable when broken in unstable. This includes cases where
+the upstream fix would trigger excessive rebuilds, or where the issue is too complex
+to patch locally.
+
+#+NAME: stable
+#+begin_src nix
+stable = final: prev: {
+  inherit (inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system})
+    <<hercules-ci-agent>>
+    ;
+};
+#+end_src
+
+*** hercules-ci-agent
+
+Build is broken on darwin in nixpkgs-unstable due to a dependency issue.
+A fix is proposed in [[https://github.com/NixOS/nixpkgs/pull/463879][NixOS/nixpkgs#463879]], but as of 2025-11-30, the PR targets
+the staging branch and is still under review.
+
+Cherry-picking this fix locally isn't practical because the PR touches core darwin
+infrastructure, which would trigger rebuilds of numerous packages. Using the stable
+branch package avoids this rebuild cascade while we wait for the fix to land in master.
+
+Remove this override once the PR is merged and propagates to the master branch.
+
+#+NAME: hercules-ci-agent
+#+begin_src nix
+hercules-ci-agent
+#+end_src
+
+** temporary-fix
+
+Local overrides for packages that build but have failing tests or minor issues.
+Unlike the =stable= overlay, these don't require fetching packages from a different
+nixpkgs branch. We simply override specific attributes (like =doCheck=) on the
+existing packages. Remove these overrides once the issues are fixed upstream.
+
+#+NAME: temporary-fix
+#+begin_src nix
+temporary-fix = final: prev: {
+  <<python313-package-set>>
+};
+#+end_src
+
+*** Python313 package set
+
+Override problematic Python packages using =packageOverrides=.
+
+Python packages in nixpkgs form an interconnected dependency graph. The =packageOverrides=
+mechanism ensures that when a package is overridden, all dependent packages automatically
+see the modified version. This is essential for consistency—a direct overlay override
+(e.g., =python313Packages.foo = ...=) would only affect top-level access, leaving
+internal dependencies using the original broken version.
+
+See [[https://nixos.org/manual/nixpkgs/stable/#overriding-python-packages][nixpkgs Python documentation]] for details.
+
+#+NAME: python313-package-set
+#+begin_src nix
+python313 = prev.python313.override {
+  packageOverrides = pyfinal: pyprev: {
+    <<rapidocr-onnxruntime>>
+    <<lxml-html-clean>>
+  };
+};
+#+end_src
+
+**** rapidocr-onnxruntime
+
+The test suite causes a segmentation fault during execution. The root cause is still
+under investigation.
+
+This package is pulled in as a transitive dependency. Runtime functionality has been
+verified to work correctly in actual use, so disabling the test suite is a safe workaround.
+
+#+NAME: rapidocr-onnxruntime
+#+begin_src nix
+rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {
+  doCheck = false;
+});
+#+end_src
+
+**** lxml-html-clean
+
+Tests fail due to breaking changes in libxml2 2.14, which modified how certain DOM
+operations handle whitespace and entity encoding. These changes cause test assertions
+to fail even though the actual HTML cleaning functionality works correctly.
+
+Tracked upstream in [[https://github.com/fedora-python/lxml_html_clean/issues/24][fedora-python/lxml_html_clean#24]].
+Remove this override once the test suite is updated for libxml2 2.14 compatibility.
+
+#+NAME: lxml-html-clean
+#+begin_src nix
+lxml-html-clean = pyprev.lxml-html-clean.overridePythonAttrs (_: {
+  doCheck = false;
+});
+#+end_src
+
+** pre-release
+
+Overlay for testing alpha, beta, or pre-release versions of packages before they land in
+nixpkgs. Useful for evaluating release candidates, nightly builds, or packages pending
+upstream review. Once a package is available in nixpkgs, remove it from this overlay.
+
+#+NAME: pre-release
+#+begin_src nix
+pre-release = final: prev: { };
+#+end_src
+
+** patches
+
+Workarounds that are not suitable for upstream contribution.
+
+These patches address issues that upstream would likely not accept—either because they
+are specific to this configuration (e.g., locale settings), bypass intended behavior,
+or solve problems in unconventional ways. Unlike =temporary-fix=, these are expected
+to remain indefinitely.
+
+#+NAME: patches
+#+begin_src nix
+patches = final: prev: {
+  <<gh-dash>>
+  <<command-line-tools-shim>>
+};
+#+end_src
+
+*** gh-dash
+
+The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The issue stems from
+gh-dash's terminal width calculation, which miscounts the display width of certain UTF-8
+characters (particularly CJK characters and some emoji). This causes text wrapping and
+alignment to break.
+
+Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while preserving UTF-8
+encoding support, which fixes the rendering issue. We use =writeShellApplication= to create
+a wrapper that sets this environment variable before invoking the real binary.
+
+Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]].
+
+#+NAME: gh-dash
+#+begin_src nix
+gh-dash =
+  (final.writeShellApplication {
+    name = "gh-dash";
+    text = ''
+      LANG=C.UTF-8 ${final.lib.getExe prev.gh-dash} "$@"
+    '';
+  }).overrideAttrs
+    { pname = "gh-dash"; };
+#+end_src
+
+*** mkShim
+
+Shim utility for providing stub implementations of macOS Command Line Tools.
+
+On darwin systems without Xcode Command Line Tools installed, invoking commands like
+=cc= or =python3= triggers an annoying system popup prompting installation.
+These shims intercept such calls and either delegate to Nix-provided tools or return
+appropriate exit codes, suppressing the popup and preventing spurious build failures.
+
+See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and list of shimmed commands.
+
+#+NAME: command-line-tools-shim
+#+begin_src nix
+inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;
+#+end_src
