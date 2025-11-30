@@ -21,8 +21,6 @@ in
       google-cloud-sdk
     ];
 
-    services.ollama.enable = true;
-
     my.programs.just.enableEnhancedCompletion = true;
 
     my.virtualisation.colima = {
