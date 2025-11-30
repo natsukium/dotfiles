@@ -3,15 +3,11 @@
   services.ollama = {
     enable = true;
     loadModels = [
-      "deepseek-r1:14b"
-      "deepseek-r1:32b"
-      "deepseek-r1:7b"
-      "gemma2:27b"
-      "gemma2:2b"
-      "gemma2:9b"
-      "phi3.5:3.8b"
-      "phi4" # 14B
-      "qwen2.5:14b"
+      "gemma3:12b"
+      "gemma3:27b"
+      "gemma3:4b"
+      "gpt-oss:20b"
+      "qwen3:14b"
     ];
   };
 
