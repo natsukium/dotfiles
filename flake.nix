@@ -3,7 +3,7 @@
 
   inputs = {
     nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
-    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-24.05";
+    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";
     # see https://github.com/renovatebot/renovate/issues/29721
     # "github:NixOS/nixpkgs/trick-renovate-into-working"
     brew-api.flake = false;

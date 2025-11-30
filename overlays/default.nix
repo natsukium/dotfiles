@@ -1,10 +1,6 @@
 { inputs }:
 {
   stable = final: prev: {
-    inherit (inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system})
-      # https://github.com/NixOS/nixpkgs/issues/339576
-      bitwarden-cli
-      ;
   };
 
   temporary-fix = final: prev: {
