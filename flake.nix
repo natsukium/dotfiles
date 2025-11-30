@@ -36,9 +36,6 @@
 
     # used in follows
     flake-utils.url = "github:numtide/flake-utils";
-    # temporary workaround for lanzaboote rust-overlay issue
-    # https://github.com/nix-community/lanzaboote/issues/485
-    rust-overlay.url = "github:oxalica/rust-overlay";
 
     brew-nix.inputs.brew-api.follows = "brew-api";
     brew-nix.inputs.nix-darwin.follows = "darwin";
@@ -57,11 +54,8 @@
     git-hooks.inputs.gitignore.follows = "";
     git-hooks.inputs.nixpkgs.follows = "nixpkgs";
     home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote.inputs.flake-compat.follows = "";
-    lanzaboote.inputs.flake-parts.follows = "flake-parts";
     lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote.inputs.pre-commit-hooks-nix.follows = "git-hooks";
-    lanzaboote.inputs.rust-overlay.follows = "rust-overlay";
+    lanzaboote.inputs.pre-commit.follows = "git-hooks";
     mcp-servers.inputs.nixpkgs.follows = "nixpkgs";
     niri-flake.inputs.niri-stable.follows = "";
     niri-flake.inputs.niri-unstable.follows = "";
@@ -82,7 +76,6 @@
     nixos-wsl.inputs.flake-compat.follows = "";
     nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
     nur-packages.inputs.nixpkgs.follows = "nixpkgs";
-    rust-overlay.inputs.nixpkgs.follows = "nixpkgs";
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
     treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
     tsnsrv.inputs.flake-parts.follows = "flake-parts";

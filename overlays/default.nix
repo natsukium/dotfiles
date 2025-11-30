@@ -1,6 +1,10 @@
 { inputs }:
 {
   stable = final: prev: {
+    inherit (inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system})
+      # https://github.com/NixOS/nixpkgs/pull/463879
+      hercules-ci-agent
+      ;
   };
 
   temporary-fix = final: prev: {
