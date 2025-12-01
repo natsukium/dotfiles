@@ -267,6 +267,39 @@
                   ];
                   settings.configData = "{rules: {document-start: {present: false}}}";
                 };
+                # Prefixed with "00-" to ensure this hook runs before all other hooks
+                # (hooks are sorted alphabetically when no explicit before/after is specified)
+                "00-check-org-tangle" = {
+                  enable = true;
+                  name = "check-org-tangle";
+                  description = "Verify org files are tangled and synchronized";
+                  entry =
+                    let
+                      checkScript = pkgs.writeShellScript "check-org-tangle" ''
+                        set -euo pipefail
+
+                        ${pkgs.gnumake}/bin/make -B tangle
+
+                        # Check for differences using git diff
+                        changed=$(${pkgs.git}/bin/git diff --name-only)
+
+                        if [ -n "$changed" ]; then
+                          echo "Org files were out of sync and have been auto-tangled."
+                          echo "Changed files:"
+                          echo "$changed"
+                          echo ""
+                          echo "Please stage the changes and commit again:"
+                          echo "  git add $changed"
+                          exit 1
+                        fi
+
+                        exit 0
+                      '';
+                    in
+                    "${checkScript}";
+                  files = "\\.org$";
+                  pass_filenames = false;
+                };
               };
             };
           };
