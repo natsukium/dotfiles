@@ -336,7 +336,10 @@
                   p.oracle_oci
                 ]))
               ];
-              shellHook = config.pre-commit.installationScript;
+              shellHook = config.pre-commit.installationScript + ''
+                echo "Syncing CLAUDE.md..."
+                make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+              '';
             };
           };
         };

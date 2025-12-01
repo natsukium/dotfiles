@@ -52,3 +52,9 @@ tangle: overlays/default.nix
 
 overlays/default.nix: overlays/configuration.org
 	$(call tangle-org,$<)
+
+CLAUDE.md: README.org
+	$(EMACS) -l ox-md \
+	  --visit $< \
+	  --eval '(re-search-forward "^\\* Philosophy")' \
+	  --eval '(org-md-export-to-markdown nil t)'
