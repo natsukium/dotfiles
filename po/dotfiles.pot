@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-12-02 00:39+0900\n"
+"POT-Creation-Date: 2025-12-02 02:09+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -317,23 +317,32 @@ msgstr ""
 #: configuration.org:60
 #, no-wrap
 msgid ""
+"nixConfig = {\n"
+"  <<nix-config>>\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:64
+#, no-wrap
+msgid ""
 "  <<rest-of-flake>>\n"
 "}"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:64
+#: configuration.org:68
 #, no-wrap
 msgid "Inputs"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:66
+#: configuration.org:70
 msgid "External flake dependencies."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:68
+#: configuration.org:72
 msgid ""
 "To minimize evaluation time caused by dependency graph bloat, almost all "
 "flakes are configured to follow the same nixpkgs and other common inputs "
@@ -341,29 +350,29 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:71
+#: configuration.org:75
 #, no-wrap
 msgid "Core"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:73 configuration.org:92
+#: configuration.org:77 configuration.org:96
 #, no-wrap
 msgid "nixpkgs"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:75
+#: configuration.org:79
 msgid "https://github.com/NixOS/nixpkgs"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:78
+#: configuration.org:82
 msgid "Nix Packages collection & NixOS"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:81
+#: configuration.org:85
 msgid ""
 "The primary package set. Using =nixos-unstable-small= instead of "
 "=nixos-unstable= for faster channel updates. The =-small= variant skips some "
@@ -372,26 +381,26 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:85
+#: configuration.org:89
 msgid ""
 "For channel selection guidance, see "
 "https://nix.dev/concepts/faq.html#which-channel-branch-should-i-use"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:87
+#: configuration.org:91
 msgid "Channel status can be checked at https://status.nixos.org/"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:89
+#: configuration.org:93
 msgid ""
 "Using =git+https://= with =shallow=1= instead of =github:= for slightly "
 "faster file extraction on large repositories like nixpkgs."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:94
+#: configuration.org:98
 #, no-wrap
 msgid ""
 "nixpkgs.url = "
@@ -399,7 +408,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:97
+#: configuration.org:101
 msgid ""
 "The commented-out line is a workaround for Renovate, which cannot parse "
 "certain flake input formats. See "
@@ -407,19 +416,19 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:100
+#: configuration.org:104
 #, no-wrap
 msgid "nixpkgs-dummy"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:105 configuration.org:110
+#: configuration.org:109 configuration.org:114
 #, no-wrap
 msgid "nixpkgs-stable"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:107
+#: configuration.org:111
 msgid ""
 "Provides stable packages when unstable has build failures or "
 "regressions. Mainly used by the =stable= overlay (see "
@@ -428,7 +437,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:112
+#: configuration.org:116
 #, no-wrap
 msgid ""
 "nixpkgs-stable.url = "
@@ -436,29 +445,29 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:115
+#: configuration.org:119
 #, no-wrap
 msgid "Flake Infrastructure"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:117 configuration.org:128
+#: configuration.org:121 configuration.org:132
 #, no-wrap
 msgid "flake-parts"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:119
+#: configuration.org:123
 msgid "https://github.com/hercules-ci/flake-parts"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:122
+#: configuration.org:126
 msgid "Simplify Nix Flakes with the module system"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:125
+#: configuration.org:129
 msgid ""
 "Framework for organizing flake outputs. Provides module system for flakes, "
 "making complex configurations more maintainable through separation of "
@@ -466,7 +475,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:130
+#: configuration.org:134
 #, no-wrap
 msgid ""
 "flake-parts = {\n"
@@ -476,64 +485,64 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:136
+#: configuration.org:140
 #, no-wrap
 msgid "Transitive Dependencies"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:138 configuration.org:149
+#: configuration.org:142 configuration.org:153
 #, no-wrap
 msgid "flake-utils"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:140
+#: configuration.org:144
 msgid "https://github.com/numtide/flake-utils"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:143
+#: configuration.org:147
 msgid "Pure Nix flake utility functions"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:146
+#: configuration.org:150
 msgid ""
 "Common flake utilities. Only used transitively via =follows= to unify the "
 "flake-utils version across inputs that depend on it."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:151
+#: configuration.org:155
 #, no-wrap
 msgid "flake-utils.url = \"github:numtide/flake-utils\";"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:154
+#: configuration.org:158
 #, no-wrap
 msgid "System Configuration"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:156 configuration.org:167
+#: configuration.org:160 configuration.org:171
 #, no-wrap
 msgid "darwin"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:158
+#: configuration.org:162
 msgid "https://github.com/nix-darwin/nix-darwin"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:161
+#: configuration.org:165
 msgid "Manage your macOS using Nix"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:164
+#: configuration.org:168
 msgid ""
 "nix-darwin provides NixOS-style system configuration for macOS. Essential "
 "for managing macOS system settings, launchd services, and Homebrew "
@@ -541,7 +550,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:169
+#: configuration.org:173
 #, no-wrap
 msgid ""
 "darwin = {\n"
@@ -551,23 +560,23 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:175 configuration.org:186
+#: configuration.org:179 configuration.org:190
 #, no-wrap
 msgid "home-manager"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:177
+#: configuration.org:181
 msgid "https://github.com/nix-community/home-manager"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:180
+#: configuration.org:184
 msgid "Manage a user environment using Nix"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:183
+#: configuration.org:187
 msgid ""
 "User environment management. Manages dotfiles, user services, and per-user "
 "packages declaratively. The backbone of user-level configuration in this "
@@ -575,7 +584,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:188
+#: configuration.org:192
 #, no-wrap
 msgid ""
 "home-manager = {\n"
@@ -585,30 +594,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:194 configuration.org:205
+#: configuration.org:198 configuration.org:209
 #, no-wrap
 msgid "nixos-wsl"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:196
+#: configuration.org:200
 msgid "https://github.com/nix-community/nixos-wsl"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:199
+#: configuration.org:203
 msgid "NixOS on WSL"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:202
+#: configuration.org:206
 msgid ""
 "NixOS on Windows Subsystem for Linux. Provides NixOS experience within WSL2, "
 "useful for Windows machines that need Linux development environments."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:207
+#: configuration.org:211
 #, no-wrap
 msgid ""
 "nixos-wsl = {\n"
@@ -619,30 +628,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:214 configuration.org:225
+#: configuration.org:218 configuration.org:229
 #, no-wrap
 msgid "nix-on-droid"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:216
+#: configuration.org:220
 msgid "https://github.com/nix-community/nix-on-droid"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:219
+#: configuration.org:223
 msgid "Nix-enabled environment for your Android device."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:222
+#: configuration.org:226
 msgid ""
 "Nix environment for Android via Termux. Enables the same declarative "
 "configuration approach on mobile devices."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:227
+#: configuration.org:231
 #, no-wrap
 msgid ""
 "nix-on-droid = {\n"
@@ -657,30 +666,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:238 configuration.org:249
+#: configuration.org:242 configuration.org:253
 #, no-wrap
 msgid "disko"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:240
+#: configuration.org:244
 msgid "https://github.com/nix-community/disko"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:243
+#: configuration.org:247
 msgid "Declarative disk partitioning and formatting using nix"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:246
+#: configuration.org:250
 msgid ""
 "Used for reproducible NixOS installations with automated partition layout, "
 "filesystem creation, and encryption setup."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:251
+#: configuration.org:255
 #, no-wrap
 msgid ""
 "disko = {\n"
@@ -690,25 +699,25 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:257 configuration.org:268
+#: configuration.org:261 configuration.org:272
 #, no-wrap
 msgid "impermanence"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:259
+#: configuration.org:263
 msgid "https://github.com/nix-community/impermanence"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:262
+#: configuration.org:266
 msgid ""
 "Modules to help you handle persistent state on systems with ephemeral root "
 "storage"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:265
+#: configuration.org:269
 msgid ""
 "Manages stateful paths on systems with ephemeral root filesystems. Used with "
 "btrfs snapshots to ensure only explicitly declared state persists across "
@@ -716,36 +725,36 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:270
+#: configuration.org:274
 #, no-wrap
 msgid "impermanence.url = \"github:nix-community/impermanence\";"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:273 configuration.org:283
+#: configuration.org:277 configuration.org:287
 #, no-wrap
 msgid "lanzaboote"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:275
+#: configuration.org:279
 msgid "https://github.com/nix-community/lanzaboote"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:278
+#: configuration.org:282
 msgid "Secure Boot for NixOS"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:281
+#: configuration.org:285
 msgid ""
 "Signs boot components with custom keys, enabling Secure Boot on NixOS "
 "machines."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:285
+#: configuration.org:289
 #, no-wrap
 msgid ""
 "lanzaboote = {\n"
@@ -756,58 +765,58 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:292 configuration.org:303
+#: configuration.org:296 configuration.org:307
 #, no-wrap
 msgid "nixos-facter-modules"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:294
+#: configuration.org:298
 msgid "https://github.com/numtide/nixos-facter-modules"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:297
+#: configuration.org:301
 msgid "A series of NixOS modules to be used in conjunction with nixos-facter"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:300
+#: configuration.org:304
 msgid ""
 "Hardware detection for NixOS. Automatically generates hardware configuration "
 "based on detected hardware, simplifying initial system setup."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:305
+#: configuration.org:309
 #, no-wrap
 msgid "nixos-facter-modules.url = \"github:numtide/nixos-facter-modules\";"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:308
+#: configuration.org:312
 #, no-wrap
 msgid "Infrastructure"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:310 configuration.org:321
+#: configuration.org:314 configuration.org:325
 #, no-wrap
 msgid "comin"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:312
+#: configuration.org:316
 msgid "https://github.com/nlewo/comin"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:315
+#: configuration.org:319
 msgid "GitOps For NixOS Machines"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:318
+#: configuration.org:322
 msgid ""
 "Automatically deploys configuration changes when pushed to the repository, "
 "enabling continuous deployment for servers without manual =nixos-rebuild "
@@ -815,7 +824,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:323
+#: configuration.org:327
 #, no-wrap
 msgid ""
 "comin = {\n"
@@ -825,30 +834,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:329 configuration.org:340
+#: configuration.org:333 configuration.org:344
 #, no-wrap
 msgid "sops-nix"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:331
+#: configuration.org:335
 msgid "https://github.com/Mic92/sops-nix"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:334
+#: configuration.org:338
 msgid "Atomic secret provisioning for NixOS based on sops"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:337
+#: configuration.org:341
 msgid ""
 "Secrets management using Mozilla SOPS. Encrypts secrets in the repository "
 "that are decrypted at activation time using age keys."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:342
+#: configuration.org:346
 #, no-wrap
 msgid ""
 "sops-nix = {\n"
@@ -858,32 +867,32 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:348 configuration.org:359
+#: configuration.org:352 configuration.org:363
 #, no-wrap
 msgid "tsnsrv"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:350
+#: configuration.org:354
 msgid "https://github.com/boinkor-net/tsnsrv"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:353
+#: configuration.org:357
 msgid ""
 "A reverse proxy that exposes services on your tailnet (as their own "
 "tailscale participants)"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:356
+#: configuration.org:360
 msgid ""
 "Tailscale service proxy. Exposes local services to the Tailscale network "
 "with automatic HTTPS certificates."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:361
+#: configuration.org:365
 #, no-wrap
 msgid ""
 "tsnsrv = {\n"
@@ -894,29 +903,29 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:368
+#: configuration.org:372
 #, no-wrap
 msgid "Development Tools"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:370 configuration.org:383
+#: configuration.org:374 configuration.org:387
 #, no-wrap
 msgid "git-hooks"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:372
+#: configuration.org:376
 msgid "https://github.com/cachix/git-hooks.nix"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:375
+#: configuration.org:379
 msgid "Seamless integration of pre-commit.com git hooks with Nix."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:378
+#: configuration.org:382
 msgid ""
 "Pre-commit hooks as Nix derivations. Ensures code quality checks run "
 "consistently across all development environments without requiring global "
@@ -924,12 +933,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:381
+#: configuration.org:385
 msgid "Inputs that don't affect this flake are removed to prevent lockfile bloat."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:385
+#: configuration.org:389
 #, no-wrap
 msgid ""
 "git-hooks = {\n"
@@ -941,23 +950,23 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:393 configuration.org:404
+#: configuration.org:397 configuration.org:408
 #, no-wrap
 msgid "treefmt-nix"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:395
+#: configuration.org:399
 msgid "https://github.com/numtide/treefmt-nix"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:398
+#: configuration.org:402
 msgid "treefmt nix configuration"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:401
+#: configuration.org:405
 msgid ""
 "Unified code formatter configuration. Runs multiple formatters (nixfmt, "
 "shfmt, etc.)  through a single interface, ensuring consistent formatting "
@@ -965,7 +974,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:406
+#: configuration.org:410
 #, no-wrap
 msgid ""
 "treefmt-nix = {\n"
@@ -975,36 +984,36 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:412
+#: configuration.org:416
 #, no-wrap
 msgid "Desktop & Theming"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:414 configuration.org:425
+#: configuration.org:418 configuration.org:429
 #, no-wrap
 msgid "nix-colors"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:416
+#: configuration.org:420
 msgid "https://github.com/misterio77/nix-colors"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:419
+#: configuration.org:423
 msgid "Modules and schemes to make theming with Nix awesome."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:422
+#: configuration.org:426
 msgid ""
 "Base16 color scheme framework for Nix. Provides consistent theming across "
 "applications through a single color scheme definition."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:427
+#: configuration.org:431
 #, no-wrap
 msgid ""
 "nix-colors = {\n"
@@ -1014,30 +1023,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:433 configuration.org:444
+#: configuration.org:437 configuration.org:448
 #, no-wrap
 msgid "nix-wallpaper"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:435
+#: configuration.org:439
 msgid "https://github.com/natsukium/nix-wallpaper"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:438
+#: configuration.org:442
 msgid "A configurable wallpaper for nix systems"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:441
+#: configuration.org:445
 msgid ""
 "Generates Nix logo wallpapers. Using a custom branch (=custom-logo=) that "
 "supports additional logo variants."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:446
+#: configuration.org:450
 #, no-wrap
 msgid ""
 "nix-wallpaper = {\n"
@@ -1049,45 +1058,45 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:454
+#: configuration.org:458
 #, no-wrap
 msgid "Applications"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:456 configuration.org:470
+#: configuration.org:460 configuration.org:474
 #, no-wrap
 msgid "brew-nix"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:458
+#: configuration.org:462
 msgid "https://github.com/BatteredBunny/brew-nix"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:461
+#: configuration.org:465
 msgid ""
 "Experimental nix expression to package all MacOS casks from homebrew "
 "automatically"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:464
+#: configuration.org:468
 msgid ""
 "Provides Homebrew casks as Nix packages for darwin. Useful for proprietary "
 "macOS applications not available in nixpkgs."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:467
+#: configuration.org:471
 msgid ""
 "The =brew-api= input is marked as non-flake because it's just a data source "
 "(JSON API dump from Homebrew's API)."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:472
+#: configuration.org:476
 #, no-wrap
 msgid ""
 "brew-api = {\n"
@@ -1103,30 +1112,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:484 configuration.org:495
+#: configuration.org:488 configuration.org:499
 #, no-wrap
 msgid "claude-desktop"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:486
+#: configuration.org:490
 msgid "https://github.com/k3d3/claude-desktop-linux-flake"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:489
+#: configuration.org:493
 msgid "Nix Flake for Claude Desktop on Linux"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:492
+#: configuration.org:496
 msgid ""
 "Provides Claude Desktop for Linux. Using a community flake since Anthropic "
 "doesn't officially support Linux yet."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:497
+#: configuration.org:501
 #, no-wrap
 msgid ""
 "claude-desktop = {\n"
@@ -1137,18 +1146,18 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:504 configuration.org:512
+#: configuration.org:508 configuration.org:516
 #, no-wrap
 msgid "edgepkgs"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:506
+#: configuration.org:510
 msgid "https://github.com/natsukium/edgepkgs"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:508
+#: configuration.org:512
 msgid ""
 "Personal repository for bleeding-edge packages. Contains packages not yet in "
 "nixpkgs, those requiring modifications, or packages that wouldn't be "
@@ -1156,7 +1165,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:514
+#: configuration.org:518
 #, no-wrap
 msgid ""
 "edgepkgs = {\n"
@@ -1166,23 +1175,23 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:520 configuration.org:533
+#: configuration.org:524 configuration.org:537
 #, no-wrap
 msgid "emacs-overlay"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:522
+#: configuration.org:526
 msgid "https://github.com/nix-community/emacs-overlay"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:525
+#: configuration.org:529
 msgid "Bleeding edge emacs overlay"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:528
+#: configuration.org:532
 msgid ""
 "Provides latest Emacs builds including native compilation and pure GTK "
 "variants.  Also includes MELPA packages updated more frequently than "
@@ -1191,7 +1200,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:535
+#: configuration.org:539
 #, no-wrap
 msgid ""
 "emacs-overlay = {\n"
@@ -1202,30 +1211,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:542 configuration.org:553
+#: configuration.org:546 configuration.org:557
 #, no-wrap
 msgid "firefox-addons"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:544
+#: configuration.org:548
 msgid "https://gitlab.com/rycee/nur-expressions"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:547
+#: configuration.org:551
 msgid "A few Nix expressions suitable for inclusion in Nix User Repository"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:550
+#: configuration.org:554
 msgid ""
 "Firefox/browser extensions packaged for Nix. Allows declarative browser "
 "extension management through home-manager."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:555
+#: configuration.org:559
 #, no-wrap
 msgid ""
 "firefox-addons = {\n"
@@ -1235,32 +1244,32 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:561 configuration.org:572
+#: configuration.org:565 configuration.org:576
 #, no-wrap
 msgid "mcp-servers"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:563
+#: configuration.org:567
 msgid "https://github.com/natsukium/mcp-servers-nix"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:566
+#: configuration.org:570
 msgid ""
 "A Nix-based configuration framework for Model Control Protocol (MCP) servers "
 "with ready-to-use packages."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:569
+#: configuration.org:573
 msgid ""
 "Provides both a configuration framework and packaged MCP servers for Nix.  "
 "Used with Claude Code and other MCP-compatible AI assistants."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:574
+#: configuration.org:578
 #, no-wrap
 msgid ""
 "mcp-servers = {\n"
@@ -1270,30 +1279,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:580 configuration.org:591
+#: configuration.org:584 configuration.org:595
 #, no-wrap
 msgid "niri-flake"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:582
+#: configuration.org:586
 msgid "https://github.com/sodiboo/niri-flake"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:585
+#: configuration.org:589
 msgid "Nix-native configuration for niri"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:588
+#: configuration.org:592
 msgid ""
 "Niri is a scrollable-tiling Wayland compositor. This flake provides the "
 "compositor and related modules for NixOS/home-manager integration."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:593
+#: configuration.org:597
 #, no-wrap
 msgid ""
 "niri-flake = {\n"
@@ -1308,25 +1317,25 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:604 configuration.org:611
+#: configuration.org:608 configuration.org:615
 #, no-wrap
 msgid "nur-packages"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:606
+#: configuration.org:610
 msgid "https://github.com/natsukium/nur-packages"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:608
+#: configuration.org:612
 msgid ""
 "Personal NUR (Nix User Repository). Contains packages maintained personally "
 "that are either too niche for nixpkgs or require customizations."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:613
+#: configuration.org:617
 #, no-wrap
 msgid ""
 "nur-packages = {\n"
@@ -1336,30 +1345,30 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:619 configuration.org:630
+#: configuration.org:623 configuration.org:634
 #, no-wrap
 msgid "zen-browser"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:621
+#: configuration.org:625
 msgid "https://github.com/0xc000022070/zen-browser-flake"
 msgstr ""
 
 #. type: paragraph in QUOTE
-#: configuration.org:624
+#: configuration.org:628
 msgid "Community-driven Nix Flake for the Zen browser"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:627
+#: configuration.org:631
 msgid ""
 "Firefox-based browser focused on privacy. Community flake providing Nix "
 "packaging with home-manager integration."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:632
+#: configuration.org:636
 #, no-wrap
 msgid ""
 "zen-browser = {\n"
@@ -1370,43 +1379,146 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:639
+#: configuration.org:644
+#, no-wrap
+msgid "Nix Config"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:646
+msgid ""
+"Nix settings used by this flake. While these settings are already configured "
+"on all managed machines, documenting them here helps with initial setup and "
+"allows others to use this flake."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:649
+msgid ""
+"For detailed documentation on each setting, see "
+"https://nix.dev/manual/nix/latest/command-ref/conf-file.html"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:652
+msgid ""
+"Note: =flake.nix= uses a restricted subset of the Nix language that prevents "
+"code reuse (see https://github.com/NixOS/nix/issues/4945). The values below "
+"are currently hardcoded in this section. Once machine configurations are "
+"migrated to org-mode, noweb references will allow sharing these values "
+"across both the flake and machine-specific settings."
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:657
+#, no-wrap
+msgid "Binary Caches"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:659
+msgid ""
+"Binary cache (substituter) configuration for building this flake. While "
+"optional, configuring these caches significantly reduces build times by "
+"downloading pre-built binaries instead of compiling from source."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:663
+msgid ""
+"Using =extra-substituters= and =extra-trusted-public-keys= instead of "
+"=substituters= and =trusted-public-keys= ensures this flake's cache "
+"configuration is additive rather than replacing the user's existing "
+"settings. This respects any caches the user has already configured in their "
+"=nix.conf= or system configuration."
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:668
+#, no-wrap
+msgid "nix-config"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:670
+#, no-wrap
+msgid ""
+"extra-substituters = [\n"
+"  \"https://natsukium.cachix.org\"\n"
+"  \"https://nix-community.cachix.org\"\n"
+"];"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:675
+#, no-wrap
+msgid ""
+"extra-trusted-public-keys = [\n"
+"  \"natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI=\"\n"
+"  "
+"\"nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=\"\n"
+"];"
+msgstr ""
+
+#. type: heading *****
+#: configuration.org:681
+#, no-wrap
+msgid "nix-community.cachix.org"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:683
+msgid ""
+"Community binary cache, primarily used for CUDA-related packages. Since "
+"November 2024, CUDA binaries are distributed under the nix-community "
+"namespace. Build status can be monitored at "
+"https://hydra.nix-community.org/project/nixpkgs"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:687
+msgid ""
+"For more details, see "
+"https://discourse.nixos.org/t/cuda-cache-for-nix-community/56038"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:689
+msgid ""
+"Alternatively, Flox's binary cache can be used for CUDA packages. As of "
+"September 2025, Flox has partnered with NVIDIA to obtain redistribution "
+"rights. See "
+"https://discourse.nixos.org/t/nix-flox-nvidia-opening-up-cuda-redistribution-on-nix/69189"
+msgstr ""
+
+#. type: heading *****
+#: configuration.org:693
+#, no-wrap
+msgid "natsukium.cachix.org"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:695
+msgid ""
+"Personal binary cache containing outputs from this flake. Packages not "
+"available in the official =cache.nixos.org= or =nix-community.cachix.org= "
+"are built on GitHub Actions and pushed here."
+msgstr ""
+
+#. type: heading ***
+#: configuration.org:699
 #, no-wrap
 msgid "Rest of Flake"
 msgstr ""
 
 #. type: keyword NAME
-#: configuration.org:641
+#: configuration.org:701
 #, no-wrap
 msgid "rest-of-flake"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:643
-#, no-wrap
-msgid ""
-"nixConfig = {\n"
-"  extra-substituters = [\n"
-"    \"https://natsukium.cachix.org\"\n"
-"    \"https://nix-community.cachix.org\"\n"
-"  ];"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:649
-#, no-wrap
-msgid ""
-"  extra-trusted-public-keys = [\n"
-"    "
-"\"natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI=\"\n"
-"    "
-"\"nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=\"\n"
-"  ];\n"
-"};"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:655
+#: configuration.org:703
 #, no-wrap
 msgid ""
 "outputs =\n"
@@ -1420,7 +1532,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:664
+#: configuration.org:712
 #, no-wrap
 msgid ""
 "imports = [\n"
@@ -1431,7 +1543,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:670
+#: configuration.org:718
 #, no-wrap
 msgid ""
 "hosts = {\n"
@@ -1467,7 +1579,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:710
+#: configuration.org:758
 #, no-wrap
 msgid ""
 "flake = {\n"
@@ -1477,7 +1589,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:715
+#: configuration.org:763
 #, no-wrap
 msgid ""
 "perSystem =\n"
@@ -1498,7 +1610,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:730
+#: configuration.org:778
 #, no-wrap
 msgid ""
 "checks = import ./tests {\n"
@@ -1508,7 +1620,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:735
+#: configuration.org:783
 #, no-wrap
 msgid ""
 "packages = {\n"
@@ -1541,7 +1653,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:761
+#: configuration.org:809
 #, no-wrap
 msgid ""
 "(find-file \"README.org\")\n"
@@ -1549,7 +1661,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:764
+#: configuration.org:812
 #, no-wrap
 msgid ""
 "    (find-file \"README.ja.org\")\n"
@@ -1579,7 +1691,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:787
+#: configuration.org:835
 #, no-wrap
 msgid ""
 "      installPhase = ''\n"
@@ -1593,7 +1705,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:796
+#: configuration.org:844
 #, no-wrap
 msgid ""
 "pre-commit = {\n"
@@ -1638,19 +1750,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:837
+#: configuration.org:885
 #, no-wrap
 msgid "${pkgs.gnumake}/bin/make -B tangle"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:840
+#: configuration.org:888
 #, no-wrap
 msgid "changed=$(${pkgs.git}/bin/git diff --name-only)"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:842
+#: configuration.org:890
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -1665,7 +1777,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:852
+#: configuration.org:900
 #, no-wrap
 msgid ""
 "              exit 0\n"
@@ -1681,7 +1793,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:863
+#: configuration.org:911
 #, no-wrap
 msgid ""
 "treefmt = {\n"
@@ -1699,7 +1811,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:876
+#: configuration.org:924
 #, no-wrap
 msgid ""
 "      devShells = {\n"
@@ -1733,43 +1845,43 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:905
+#: configuration.org:953
 #, no-wrap
 msgid "Overlays"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:906
+#: configuration.org:954
 #, no-wrap
 msgid "\"./overlays/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:908
+#: configuration.org:956
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:909
+#: configuration.org:957
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:910
+#: configuration.org:958
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:911
+#: configuration.org:959
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:912
+#: configuration.org:960
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr ""

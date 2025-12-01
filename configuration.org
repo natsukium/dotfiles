@@ -57,6 +57,10 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<zen-browser>>
   };
 
+  nixConfig = {
+    <<nix-config>>
+  };
+
   <<rest-of-flake>>
 }
 #+end_src
@@ -636,22 +640,66 @@ zen-browser = {
 };
 #+end_src
 
+
+*** Nix Config
+
+Nix settings used by this flake. While these settings are already configured on all managed
+machines, documenting them here helps with initial setup and allows others to use this flake.
+
+For detailed documentation on each setting, see
+https://nix.dev/manual/nix/latest/command-ref/conf-file.html
+
+Note: =flake.nix= uses a restricted subset of the Nix language that prevents code reuse
+(see https://github.com/NixOS/nix/issues/4945). The values below are currently hardcoded in
+this section. Once machine configurations are migrated to org-mode, noweb references will
+allow sharing these values across both the flake and machine-specific settings.
+
+**** Binary Caches
+
+Binary cache (substituter) configuration for building this flake. While optional, configuring
+these caches significantly reduces build times by downloading pre-built binaries instead of
+compiling from source.
+
+Using =extra-substituters= and =extra-trusted-public-keys= instead of =substituters= and
+=trusted-public-keys= ensures this flake's cache configuration is additive rather than
+replacing the user's existing settings. This respects any caches the user has already
+configured in their =nix.conf= or system configuration.
+
+#+NAME: nix-config
+#+begin_src nix
+extra-substituters = [
+  "https://natsukium.cachix.org"
+  "https://nix-community.cachix.org"
+];
+
+extra-trusted-public-keys = [
+  "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
+  "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+];
+#+end_src
+
+***** nix-community.cachix.org
+
+Community binary cache, primarily used for CUDA-related packages. Since November 2024,
+CUDA binaries are distributed under the nix-community namespace. Build status can be
+monitored at https://hydra.nix-community.org/project/nixpkgs
+
+For more details, see https://discourse.nixos.org/t/cuda-cache-for-nix-community/56038
+
+Alternatively, Flox's binary cache can be used for CUDA packages. As of September 2025, Flox has
+partnered with NVIDIA to obtain redistribution rights. See
+https://discourse.nixos.org/t/nix-flox-nvidia-opening-up-cuda-redistribution-on-nix/69189
+
+***** natsukium.cachix.org
+
+Personal binary cache containing outputs from this flake. Packages not available in the
+official =cache.nixos.org= or =nix-community.cachix.org= are built on GitHub Actions and
+pushed here.
+
 *** Rest of Flake
 
 #+NAME: rest-of-flake
 #+begin_src nix
-nixConfig = {
-  extra-substituters = [
-    "https://natsukium.cachix.org"
-    "https://nix-community.cachix.org"
-  ];
-
-  extra-trusted-public-keys = [
-    "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
-    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-  ];
-};
-
 outputs =
   { self, flake-parts, ... }@inputs:
   flake-parts.lib.mkFlake { inherit inputs; } {
