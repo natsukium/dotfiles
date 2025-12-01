@@ -1,6 +1,907 @@
+#+TITLE: Nix Configuration
 #+STARTUP: overview
+#+PROPERTY: header-args:nix :mkdirp yes :noweb yes
+#+OPTIONS: ^:{}
 
-* Configuration
+** Flake
+
+This flake manages NixOS, nix-darwin, and home-manager configurations for multiple machines
+across different platforms (macOS, Linux, Android). It uses flake-parts for modular organization
+and includes tooling for development, code formatting, and pre-commit hooks.
+
+#+begin_src nix :tangle flake.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle flake.nix
+{
+  description = "dotfiles";
+
+  inputs = {
+    # Core
+    <<nixpkgs>>
+    <<nixpkgs-dummy>>
+    <<nixpkgs-stable>>
+    # Flake Infrastructure
+    <<flake-parts>>
+    # Transitive Dependencies
+    <<flake-utils>>
+    # System Configuration
+    <<darwin>>
+    <<home-manager>>
+    <<nixos-wsl>>
+    <<nix-on-droid>>
+    <<disko>>
+    <<impermanence>>
+    <<lanzaboote>>
+    <<nixos-facter-modules>>
+    # Infrastructure
+    <<comin>>
+    <<sops-nix>>
+    <<tsnsrv>>
+    # Development Tools
+    <<git-hooks>>
+    <<treefmt-nix>>
+    # Desktop & Theming
+    <<nix-colors>>
+    <<nix-wallpaper>>
+    # Applications
+    <<brew-nix>>
+    <<claude-desktop>>
+    <<edgepkgs>>
+    <<emacs-overlay>>
+    <<firefox-addons>>
+    <<mcp-servers>>
+    <<niri-flake>>
+    <<nur-packages>>
+    <<zen-browser>>
+  };
+
+  <<rest-of-flake>>
+}
+#+end_src
+
+*** Inputs
+
+External flake dependencies.
+
+To minimize evaluation time caused by dependency graph bloat, almost all flakes are configured
+to follow the same nixpkgs and other common inputs wherever possible.
+
+**** Core
+
+***** nixpkgs
+
+https://github.com/NixOS/nixpkgs
+
+#+BEGIN_QUOTE
+Nix Packages collection & NixOS
+#+END_QUOTE
+
+The primary package set. Using =nixos-unstable-small= instead of =nixos-unstable= for faster
+channel updates. The =-small= variant skips some less critical CI tests, allowing new package
+versions to propagate faster while maintaining stability for core packages.
+
+For channel selection guidance, see https://nix.dev/concepts/faq.html#which-channel-branch-should-i-use
+
+Channel status can be checked at https://status.nixos.org/
+
+Using =git+https://= with =shallow=1= instead of =github:= for slightly faster file extraction
+on large repositories like nixpkgs.
+
+#+NAME: nixpkgs
+#+begin_src nix
+nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
+#+end_src
+
+The commented-out line is a workaround for Renovate, which cannot parse certain flake input
+formats. See https://github.com/renovatebot/renovate/issues/29721
+
+#+NAME: nixpkgs-dummy
+#+begin_src nix
+# "github:NixOS/nixpkgs/trick-renovate-into-working"
+#+end_src
+
+***** nixpkgs-stable
+
+Provides stable packages when unstable has build failures or regressions. Mainly used by the
+=stable= overlay (see [[file:overlays/configuration.org][overlays/configuration.org]]) for packages that are broken in unstable.
+
+#+NAME: nixpkgs-stable
+#+begin_src nix
+nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";
+#+end_src
+
+**** Flake Infrastructure
+
+***** flake-parts
+
+https://github.com/hercules-ci/flake-parts
+
+#+BEGIN_QUOTE
+Simplify Nix Flakes with the module system
+#+END_QUOTE
+
+Framework for organizing flake outputs. Provides module system for flakes,
+making complex configurations more maintainable through separation of concerns.
+
+#+NAME: flake-parts
+#+begin_src nix
+flake-parts = {
+  url = "github:hercules-ci/flake-parts";
+  inputs.nixpkgs-lib.follows = "nixpkgs";
+};
+#+end_src
+
+**** Transitive Dependencies
+
+***** flake-utils
+
+https://github.com/numtide/flake-utils
+
+#+BEGIN_QUOTE
+Pure Nix flake utility functions
+#+END_QUOTE
+
+Common flake utilities. Only used transitively via =follows= to unify the
+flake-utils version across inputs that depend on it.
+
+#+NAME: flake-utils
+#+begin_src nix
+flake-utils.url = "github:numtide/flake-utils";
+#+end_src
+
+**** System Configuration
+
+***** darwin
+
+https://github.com/nix-darwin/nix-darwin
+
+#+BEGIN_QUOTE
+Manage your macOS using Nix
+#+END_QUOTE
+
+nix-darwin provides NixOS-style system configuration for macOS. Essential for managing
+macOS system settings, launchd services, and Homebrew declaratively.
+
+#+NAME: darwin
+#+begin_src nix
+darwin = {
+  url = "github:nix-darwin/nix-darwin";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** home-manager
+
+https://github.com/nix-community/home-manager
+
+#+BEGIN_QUOTE
+Manage a user environment using Nix
+#+END_QUOTE
+
+User environment management. Manages dotfiles, user services, and per-user packages
+declaratively. The backbone of user-level configuration in this repository.
+
+#+NAME: home-manager
+#+begin_src nix
+home-manager = {
+  url = "github:nix-community/home-manager";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** nixos-wsl
+
+https://github.com/nix-community/nixos-wsl
+
+#+BEGIN_QUOTE
+NixOS on WSL
+#+END_QUOTE
+
+NixOS on Windows Subsystem for Linux. Provides NixOS experience within WSL2,
+useful for Windows machines that need Linux development environments.
+
+#+NAME: nixos-wsl
+#+begin_src nix
+nixos-wsl = {
+  url = "github:nix-community/nixos-wsl";
+  inputs.flake-compat.follows = "";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** nix-on-droid
+
+https://github.com/nix-community/nix-on-droid
+
+#+BEGIN_QUOTE
+Nix-enabled environment for your Android device.
+#+END_QUOTE
+
+Nix environment for Android via Termux. Enables the same declarative configuration
+approach on mobile devices.
+
+#+NAME: nix-on-droid
+#+begin_src nix
+nix-on-droid = {
+  url = "github:nix-community/nix-on-droid";
+  inputs.home-manager.follows = "home-manager";
+  inputs.nix-formatter-pack.follows = "";
+  inputs.nixpkgs-docs.follows = "nixpkgs";
+  inputs.nixpkgs-for-bootstrap.follows = "nixpkgs";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.nmd.follows = "";
+};
+#+end_src
+
+***** disko
+
+https://github.com/nix-community/disko
+
+#+BEGIN_QUOTE
+Declarative disk partitioning and formatting using nix
+#+END_QUOTE
+
+Used for reproducible NixOS installations with automated partition layout, filesystem
+creation, and encryption setup.
+
+#+NAME: disko
+#+begin_src nix
+disko = {
+  url = "github:nix-community/disko";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** impermanence
+
+https://github.com/nix-community/impermanence
+
+#+BEGIN_QUOTE
+Modules to help you handle persistent state on systems with ephemeral root storage
+#+END_QUOTE
+
+Manages stateful paths on systems with ephemeral root filesystems. Used with btrfs
+snapshots to ensure only explicitly declared state persists across reboots.
+
+#+NAME: impermanence
+#+begin_src nix
+impermanence.url = "github:nix-community/impermanence";
+#+end_src
+
+***** lanzaboote
+
+https://github.com/nix-community/lanzaboote
+
+#+BEGIN_QUOTE
+Secure Boot for NixOS
+#+END_QUOTE
+
+Signs boot components with custom keys, enabling Secure Boot on NixOS machines.
+
+#+NAME: lanzaboote
+#+begin_src nix
+lanzaboote = {
+  url = "github:nix-community/lanzaboote";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.pre-commit.follows = "git-hooks";
+};
+#+end_src
+
+***** nixos-facter-modules
+
+https://github.com/numtide/nixos-facter-modules
+
+#+BEGIN_QUOTE
+A series of NixOS modules to be used in conjunction with nixos-facter
+#+END_QUOTE
+
+Hardware detection for NixOS. Automatically generates hardware configuration
+based on detected hardware, simplifying initial system setup.
+
+#+NAME: nixos-facter-modules
+#+begin_src nix
+nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
+#+end_src
+
+**** Infrastructure
+
+***** comin
+
+https://github.com/nlewo/comin
+
+#+BEGIN_QUOTE
+GitOps For NixOS Machines
+#+END_QUOTE
+
+Automatically deploys configuration changes when pushed to the repository,
+enabling continuous deployment for servers without manual =nixos-rebuild switch=.
+
+#+NAME: comin
+#+begin_src nix
+comin = {
+  url = "github:nlewo/comin";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** sops-nix
+
+https://github.com/Mic92/sops-nix
+
+#+BEGIN_QUOTE
+Atomic secret provisioning for NixOS based on sops
+#+END_QUOTE
+
+Secrets management using Mozilla SOPS. Encrypts secrets in the repository
+that are decrypted at activation time using age keys.
+
+#+NAME: sops-nix
+#+begin_src nix
+sops-nix = {
+  url = "github:Mic92/sops-nix";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** tsnsrv
+
+https://github.com/boinkor-net/tsnsrv
+
+#+BEGIN_QUOTE
+A reverse proxy that exposes services on your tailnet (as their own tailscale participants)
+#+END_QUOTE
+
+Tailscale service proxy. Exposes local services to the Tailscale network with
+automatic HTTPS certificates.
+
+#+NAME: tsnsrv
+#+begin_src nix
+tsnsrv = {
+  url = "github:boinkor-net/tsnsrv";
+  inputs.flake-parts.follows = "flake-parts";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+**** Development Tools
+
+***** git-hooks
+
+https://github.com/cachix/git-hooks.nix
+
+#+BEGIN_QUOTE
+Seamless integration of pre-commit.com git hooks with Nix.
+#+END_QUOTE
+
+Pre-commit hooks as Nix derivations. Ensures code quality checks run consistently
+across all development environments without requiring global tool installation.
+
+Inputs that don't affect this flake are removed to prevent lockfile bloat.
+
+#+NAME: git-hooks
+#+begin_src nix
+git-hooks = {
+  url = "github:cachix/git-hooks.nix";
+  inputs.flake-compat.follows = "";
+  inputs.gitignore.follows = "";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** treefmt-nix
+
+https://github.com/numtide/treefmt-nix
+
+#+BEGIN_QUOTE
+treefmt nix configuration
+#+END_QUOTE
+
+Unified code formatter configuration. Runs multiple formatters (nixfmt, shfmt, etc.)
+through a single interface, ensuring consistent formatting across the repository.
+
+#+NAME: treefmt-nix
+#+begin_src nix
+treefmt-nix = {
+  url = "github:numtide/treefmt-nix";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+**** Desktop & Theming
+
+***** nix-colors
+
+https://github.com/misterio77/nix-colors
+
+#+BEGIN_QUOTE
+Modules and schemes to make theming with Nix awesome.
+#+END_QUOTE
+
+Base16 color scheme framework for Nix. Provides consistent theming across
+applications through a single color scheme definition.
+
+#+NAME: nix-colors
+#+begin_src nix
+nix-colors = {
+  url = "github:misterio77/nix-colors";
+  inputs.nixpkgs-lib.follows = "nixpkgs";
+};
+#+end_src
+
+***** nix-wallpaper
+
+https://github.com/natsukium/nix-wallpaper
+
+#+BEGIN_QUOTE
+A configurable wallpaper for nix systems
+#+END_QUOTE
+
+Generates Nix logo wallpapers. Using a custom branch (=custom-logo=) that supports
+additional logo variants.
+
+#+NAME: nix-wallpaper
+#+begin_src nix
+nix-wallpaper = {
+  url = "github:natsukium/nix-wallpaper/custom-logo";
+  inputs.flake-utils.follows = "flake-utils";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.pre-commit-hooks.follows = "git-hooks";
+};
+#+end_src
+
+**** Applications
+
+***** brew-nix
+
+https://github.com/BatteredBunny/brew-nix
+
+#+BEGIN_QUOTE
+Experimental nix expression to package all MacOS casks from homebrew automatically
+#+END_QUOTE
+
+Provides Homebrew casks as Nix packages for darwin. Useful for proprietary macOS applications
+not available in nixpkgs.
+
+The =brew-api= input is marked as non-flake because it's just a data source (JSON API dump
+from Homebrew's API).
+
+#+NAME: brew-nix
+#+begin_src nix
+brew-api = {
+  url = "github:BatteredBunny/brew-api";
+  flake = false;
+};
+brew-nix = {
+  url = "github:BatteredBunny/brew-nix";
+  inputs.brew-api.follows = "brew-api";
+  inputs.nix-darwin.follows = "darwin";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** claude-desktop
+
+https://github.com/k3d3/claude-desktop-linux-flake
+
+#+BEGIN_QUOTE
+Nix Flake for Claude Desktop on Linux
+#+END_QUOTE
+
+Provides Claude Desktop for Linux. Using a community flake since Anthropic doesn't
+officially support Linux yet.
+
+#+NAME: claude-desktop
+#+begin_src nix
+claude-desktop = {
+  url = "github:k3d3/claude-desktop-linux-flake";
+  inputs.flake-utils.follows = "flake-utils";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** edgepkgs
+
+https://github.com/natsukium/edgepkgs
+
+Personal repository for bleeding-edge packages. Contains packages not yet in nixpkgs,
+those requiring modifications, or packages that wouldn't be accepted upstream
+(e.g., niche or experimental software).
+
+#+NAME: edgepkgs
+#+begin_src nix
+edgepkgs = {
+  url = "github:natsukium/edgepkgs";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** emacs-overlay
+
+https://github.com/nix-community/emacs-overlay
+
+#+BEGIN_QUOTE
+Bleeding edge emacs overlay
+#+END_QUOTE
+
+Provides latest Emacs builds including native compilation and pure GTK variants.
+Also includes MELPA packages updated more frequently than nixpkgs.
+Mainly used for the utility that parses org files and automatically configures
+dependency packages.
+
+#+NAME: emacs-overlay
+#+begin_src nix
+emacs-overlay = {
+  url = "github:nix-community/emacs-overlay";
+  inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** firefox-addons
+
+https://gitlab.com/rycee/nur-expressions
+
+#+BEGIN_QUOTE
+A few Nix expressions suitable for inclusion in Nix User Repository
+#+END_QUOTE
+
+Firefox/browser extensions packaged for Nix. Allows declarative browser extension
+management through home-manager.
+
+#+NAME: firefox-addons
+#+begin_src nix
+firefox-addons = {
+  url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** mcp-servers
+
+https://github.com/natsukium/mcp-servers-nix
+
+#+BEGIN_QUOTE
+A Nix-based configuration framework for Model Control Protocol (MCP) servers with ready-to-use packages.
+#+END_QUOTE
+
+Provides both a configuration framework and packaged MCP servers for Nix.
+Used with Claude Code and other MCP-compatible AI assistants.
+
+#+NAME: mcp-servers
+#+begin_src nix
+mcp-servers = {
+  url = "github:natsukium/mcp-servers-nix";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** niri-flake
+
+https://github.com/sodiboo/niri-flake
+
+#+BEGIN_QUOTE
+Nix-native configuration for niri
+#+END_QUOTE
+
+Niri is a scrollable-tiling Wayland compositor. This flake provides the compositor
+and related modules for NixOS/home-manager integration.
+
+#+NAME: niri-flake
+#+begin_src nix
+niri-flake = {
+  url = "github:sodiboo/niri-flake";
+  inputs.niri-stable.follows = "";
+  inputs.niri-unstable.follows = "";
+  inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.xwayland-satellite-stable.follows = "";
+  inputs.xwayland-satellite-unstable.follows = "";
+};
+#+end_src
+
+***** nur-packages
+
+https://github.com/natsukium/nur-packages
+
+Personal NUR (Nix User Repository). Contains packages maintained personally
+that are either too niche for nixpkgs or require customizations.
+
+#+NAME: nur-packages
+#+begin_src nix
+nur-packages = {
+  url = "github:natsukium/nur-packages";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** zen-browser
+
+https://github.com/0xc000022070/zen-browser-flake
+
+#+BEGIN_QUOTE
+Community-driven Nix Flake for the Zen browser
+#+END_QUOTE
+
+Firefox-based browser focused on privacy. Community flake providing Nix packaging
+with home-manager integration.
+
+#+NAME: zen-browser
+#+begin_src nix
+zen-browser = {
+  url = "github:0xc000022070/zen-browser-flake";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.home-manager.follows = "home-manager";
+};
+#+end_src
+
+*** Rest of Flake
+
+#+NAME: rest-of-flake
+#+begin_src nix
+nixConfig = {
+  extra-substituters = [
+    "https://natsukium.cachix.org"
+    "https://nix-community.cachix.org"
+  ];
+
+  extra-trusted-public-keys = [
+    "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  ];
+};
+
+outputs =
+  { self, flake-parts, ... }@inputs:
+  flake-parts.lib.mkFlake { inherit inputs; } {
+    systems = [
+      "x86_64-linux"
+      "aarch64-linux"
+      "aarch64-darwin"
+    ];
+
+    imports = [
+      ./flake-module.nix
+      inputs.git-hooks.flakeModule
+      inputs.treefmt-nix.flakeModule
+    ];
+
+    hosts = {
+      # main laptop (m1 macbook air)
+      katavi = {
+        system = "aarch64-darwin";
+      };
+      # build server (m1 mac mini)
+      mikumi = {
+        system = "aarch64-darwin";
+      };
+      # laptop for work (m4 macbook pro)
+      work = {
+        system = "aarch64-darwin";
+      };
+      # main desktop (intel core i5-12400F)
+      kilimanjaro = {
+        system = "x86_64-linux";
+      };
+      # WSL (dualboot with kilimanjaro)
+      arusha = {
+        system = "x86_64-linux";
+      };
+      # main server (intel N100)
+      manyara = {
+        system = "x86_64-linux";
+      };
+      # build server (OCI A1 Flex)
+      serengeti = {
+        system = "aarch64-linux";
+      };
+      # build server (Ryzen 9 9950X)
+      tarangire = {
+        system = "x86_64-linux";
+      };
+      # phone (pixel 7a)
+      android = {
+        system = "aarch64-linux";
+        platform = "android";
+      };
+    };
+
+    flake = {
+      overlays = import ./overlays { inherit inputs; };
+      templates = import ./templates;
+    };
+
+    perSystem =
+      {
+        self',
+        config,
+        pkgs,
+        system,
+        ...
+      }:
+      {
+        _module.args.pkgs = import self.inputs.nixpkgs {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = [ self.inputs.nur-packages.overlays.default ] ++ builtins.attrValues self.overlays;
+        };
+
+        checks = import ./tests {
+          inherit (self.inputs) nixpkgs;
+          inherit pkgs;
+        };
+
+        packages = {
+          fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
+          neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
+          po4a_0_74 = (
+            pkgs.po4a.overrideAttrs (oldAttrs: {
+              version = "0.74";
+              src = pkgs.fetchurl {
+                url = "https://github.com/mquinson/po4a/releases/download/v0.74/po4a-0.74.tar.gz";
+                hash = "sha256-JfwyPyuje71Iw68Ov0mVJkSw5GgmH5hjPpEhmoOP58I=";
+              };
+              patches = [ ];
+              nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.libxml2 ];
+              doCheck = false;
+            })
+          );
+          html =
+            with pkgs;
+            let
+              org-html-themes = fetchurl {
+                url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
+                hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
+              };
+              org-to-html = writeScript "org-to-html.el" ''
+                (require 'org)
+                (require 'htmlize)
+
+                (find-file "README.org")
+                (org-html-export-to-html)
+
+                (find-file "README.ja.org")
+                (org-html-export-to-html)
+              '';
+            in
+            stdenvNoCC.mkDerivation {
+              name = "dotfiles";
+              src = lib.cleanSource ./.;
+              postPatch = ''
+                substituteInPlace README.org \
+                  --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
+              '';
+              nativeBuildInputs = [
+                (emacs.pkgs.withPackages (epkgs: [ epkgs.htmlize ]))
+                gettext
+                self'.packages.po4a_0_74
+              ];
+              buildPhase = ''
+                runHook preBuild
+                po4a po4a.cfg
+                emacs --batch -l ${org-to-html}
+                runHook postBuild
+              '';
+
+              installPhase = ''
+                runHook preInstall
+                install -Dm644 README.html $out/index.html
+                install -Dm644 README.ja.html $out/ja/index.html
+                runHook postInstall
+              '';
+            };
+        };
+
+        pre-commit = {
+          check.enable = true;
+          settings = {
+            src = ./.;
+            hooks = {
+              actionlint.enable = true;
+              biome.enable = true;
+              lua-ls.enable = false;
+              nil.enable = true;
+              shellcheck.enable = true;
+              treefmt.enable = true;
+              typos = {
+                enable = true;
+                excludes = [
+                  "homes/shared/gpg/keys.txt"
+                  "secrets.yaml"
+                  "secrets/default.yaml"
+                  "systems/nixos/tarangire/facter.json"
+                  "systems/shared/hercules-ci/binary-caches.json"
+                ];
+                settings.configPath = "typos.toml";
+              };
+              yamllint = {
+                enable = true;
+                excludes = [
+                  "secrets/default.yaml"
+                  "secrets.yaml"
+                ];
+                settings.configData = "{rules: {document-start: {present: false}}}";
+              };
+              # Prefixed with "00-" to ensure this hook runs before all other hooks
+              # (hooks are sorted alphabetically when no explicit before/after is specified)
+              "00-check-org-tangle" = {
+                enable = true;
+                name = "check-org-tangle";
+                description = "Verify org files are tangled and synchronized";
+                entry =
+                  let
+                    checkScript = pkgs.writeShellScript "check-org-tangle" ''
+                      set -euo pipefail
+
+                      ${pkgs.gnumake}/bin/make -B tangle
+
+                      # Check for differences using git diff
+                      changed=$(${pkgs.git}/bin/git diff --name-only)
+
+                      if [ -n "$changed" ]; then
+                        echo "Org files were out of sync and have been auto-tangled."
+                        echo "Changed files:"
+                        echo "$changed"
+                        echo ""
+                        echo "Please stage the changes and commit again:"
+                        echo "  git add $changed"
+                        exit 1
+                      fi
+
+                      exit 0
+                    '';
+                  in
+                  "${checkScript}";
+                files = "\\.org$";
+                pass_filenames = false;
+              };
+            };
+          };
+        };
+
+        treefmt = {
+          projectRootFile = "flake.nix";
+          programs = {
+            biome.enable = true;
+            nixfmt.enable = true;
+            shfmt.enable = true;
+            stylua.enable = true;
+            taplo.enable = true;
+            terraform.enable = true;
+            yamlfmt.enable = true;
+          };
+        };
+
+        devShells = {
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              gettext
+              nix-fast-build
+              self'.packages.po4a_0_74
+              sops
+              ssh-to-age
+              (terraform.withPlugins (p: [
+                p.carlpett_sops
+                p.cloudflare_cloudflare
+                p.determinatesystems_hydra
+                p.hashicorp_aws
+                p.hashicorp_external
+                p.hashicorp_null
+                p.integrations_github
+                p.oracle_oci
+              ]))
+            ];
+            shellHook = config.pre-commit.installationScript + ''
+              echo "Syncing CLAUDE.md..."
+              make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+            '';
+          };
+        };
+      };
+  };
+#+end_src
 
 ** Overlays
 #+INCLUDE: "./overlays/configuration.org"

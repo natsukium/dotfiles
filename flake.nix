@@ -1,87 +1,142 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 {
   description = "dotfiles";
 
   inputs = {
+    # Core
     nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
-    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";
-    # see https://github.com/renovatebot/renovate/issues/29721
     # "github:NixOS/nixpkgs/trick-renovate-into-working"
-    brew-api.flake = false;
-    brew-api.url = "github:BatteredBunny/brew-api";
-    brew-nix.url = "github:BatteredBunny/brew-nix";
-    claude-desktop.url = "github:k3d3/claude-desktop-linux-flake";
-    comin.url = "github:nlewo/comin";
-    darwin.url = "github:nix-darwin/nix-darwin";
-    disko.url = "github:nix-community/disko";
-    edgepkgs.url = "github:natsukium/edgepkgs";
-    emacs-overlay.url = "github:nix-community/emacs-overlay";
-    firefox-addons.url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
-    flake-parts.url = "github:hercules-ci/flake-parts";
-    git-hooks.url = "github:cachix/git-hooks.nix";
-    home-manager.url = "github:nix-community/home-manager";
-    impermanence.url = "github:nix-community/impermanence";
-    lanzaboote.url = "github:nix-community/lanzaboote";
-    mcp-servers.url = "github:natsukium/mcp-servers-nix";
-    niri-flake.url = "github:sodiboo/niri-flake";
-    nix-colors.url = "github:misterio77/nix-colors";
-    nix-on-droid.url = "github:nix-community/nix-on-droid";
-    nix-wallpaper.url = "github:natsukium/nix-wallpaper/custom-logo";
-    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
-    nixos-wsl.url = "github:nix-community/nixos-wsl";
-    nur-packages.url = "github:natsukium/nur-packages";
-    sops-nix.url = "github:Mic92/sops-nix";
-    treefmt-nix.url = "github:numtide/treefmt-nix";
-    tsnsrv.url = "github:boinkor-net/tsnsrv";
-    zen-browser.url = "github:0xc000022070/zen-browser-flake";
-
-    # used in follows
+    nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";
+    # Flake Infrastructure
+    flake-parts = {
+      url = "github:hercules-ci/flake-parts";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    # Transitive Dependencies
     flake-utils.url = "github:numtide/flake-utils";
-
-    brew-nix.inputs.brew-api.follows = "brew-api";
-    brew-nix.inputs.nix-darwin.follows = "darwin";
-    brew-nix.inputs.nixpkgs.follows = "nixpkgs";
-    claude-desktop.inputs.flake-utils.follows = "flake-utils";
-    claude-desktop.inputs.nixpkgs.follows = "nixpkgs";
-    comin.inputs.nixpkgs.follows = "nixpkgs";
-    darwin.inputs.nixpkgs.follows = "nixpkgs";
-    disko.inputs.nixpkgs.follows = "nixpkgs";
-    edgepkgs.inputs.nixpkgs.follows = "nixpkgs";
-    emacs-overlay.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
-    emacs-overlay.inputs.nixpkgs.follows = "nixpkgs";
-    firefox-addons.inputs.nixpkgs.follows = "nixpkgs";
-    flake-parts.inputs.nixpkgs-lib.follows = "nixpkgs";
-    git-hooks.inputs.flake-compat.follows = "";
-    git-hooks.inputs.gitignore.follows = "";
-    git-hooks.inputs.nixpkgs.follows = "nixpkgs";
-    home-manager.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote.inputs.nixpkgs.follows = "nixpkgs";
-    lanzaboote.inputs.pre-commit.follows = "git-hooks";
-    mcp-servers.inputs.nixpkgs.follows = "nixpkgs";
-    niri-flake.inputs.niri-stable.follows = "";
-    niri-flake.inputs.niri-unstable.follows = "";
-    niri-flake.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
-    niri-flake.inputs.nixpkgs.follows = "nixpkgs";
-    niri-flake.inputs.xwayland-satellite-stable.follows = "";
-    niri-flake.inputs.xwayland-satellite-unstable.follows = "";
-    nix-colors.inputs.nixpkgs-lib.follows = "nixpkgs";
-    nix-on-droid.inputs.home-manager.follows = "home-manager";
-    nix-on-droid.inputs.nix-formatter-pack.follows = "";
-    nix-on-droid.inputs.nixpkgs-docs.follows = "nixpkgs";
-    nix-on-droid.inputs.nixpkgs-for-bootstrap.follows = "nixpkgs";
-    nix-on-droid.inputs.nixpkgs.follows = "nixpkgs";
-    nix-on-droid.inputs.nmd.follows = "";
-    nix-wallpaper.inputs.flake-utils.follows = "flake-utils";
-    nix-wallpaper.inputs.nixpkgs.follows = "nixpkgs";
-    nix-wallpaper.inputs.pre-commit-hooks.follows = "git-hooks";
-    nixos-wsl.inputs.flake-compat.follows = "";
-    nixos-wsl.inputs.nixpkgs.follows = "nixpkgs";
-    nur-packages.inputs.nixpkgs.follows = "nixpkgs";
-    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
-    treefmt-nix.inputs.nixpkgs.follows = "nixpkgs";
-    tsnsrv.inputs.flake-parts.follows = "flake-parts";
-    tsnsrv.inputs.nixpkgs.follows = "nixpkgs";
-    zen-browser.inputs.nixpkgs.follows = "nixpkgs";
-    zen-browser.inputs.home-manager.follows = "home-manager";
+    # System Configuration
+    darwin = {
+      url = "github:nix-darwin/nix-darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    home-manager = {
+      url = "github:nix-community/home-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nixos-wsl = {
+      url = "github:nix-community/nixos-wsl";
+      inputs.flake-compat.follows = "";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-on-droid = {
+      url = "github:nix-community/nix-on-droid";
+      inputs.home-manager.follows = "home-manager";
+      inputs.nix-formatter-pack.follows = "";
+      inputs.nixpkgs-docs.follows = "nixpkgs";
+      inputs.nixpkgs-for-bootstrap.follows = "nixpkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nmd.follows = "";
+    };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    impermanence.url = "github:nix-community/impermanence";
+    lanzaboote = {
+      url = "github:nix-community/lanzaboote";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.pre-commit.follows = "git-hooks";
+    };
+    nixos-facter-modules.url = "github:numtide/nixos-facter-modules";
+    # Infrastructure
+    comin = {
+      url = "github:nlewo/comin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    tsnsrv = {
+      url = "github:boinkor-net/tsnsrv";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Development Tools
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.flake-compat.follows = "";
+      inputs.gitignore.follows = "";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Desktop & Theming
+    nix-colors = {
+      url = "github:misterio77/nix-colors";
+      inputs.nixpkgs-lib.follows = "nixpkgs";
+    };
+    nix-wallpaper = {
+      url = "github:natsukium/nix-wallpaper/custom-logo";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.pre-commit-hooks.follows = "git-hooks";
+    };
+    # Applications
+    brew-api = {
+      url = "github:BatteredBunny/brew-api";
+      flake = false;
+    };
+    brew-nix = {
+      url = "github:BatteredBunny/brew-nix";
+      inputs.brew-api.follows = "brew-api";
+      inputs.nix-darwin.follows = "darwin";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    claude-desktop = {
+      url = "github:k3d3/claude-desktop-linux-flake";
+      inputs.flake-utils.follows = "flake-utils";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    edgepkgs = {
+      url = "github:natsukium/edgepkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    firefox-addons = {
+      url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    mcp-servers = {
+      url = "github:natsukium/mcp-servers-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    niri-flake = {
+      url = "github:sodiboo/niri-flake";
+      inputs.niri-stable.follows = "";
+      inputs.niri-unstable.follows = "";
+      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.xwayland-satellite-stable.follows = "";
+      inputs.xwayland-satellite-unstable.follows = "";
+    };
+    nur-packages = {
+      url = "github:natsukium/nur-packages";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   nixConfig = {

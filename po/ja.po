@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2025-12-01 17:59+0900\n"
+"POT-Creation-Date: 2025-12-02 00:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -23,7 +23,7 @@ msgid "My literate configurations with Org and Nix"
 msgstr "OrgとNixによる文芸的設定集"
 
 #. type: keyword STARTUP
-#: README.org:2 configuration.org:1 applications/emacs/init.org:1
+#: README.org:2 configuration.org:2 applications/emacs/init.org:1
 #: applications/emacs/early-init.org:1 overlays/configuration.org:2
 #, no-wrap
 msgid "overview"
@@ -103,15 +103,16 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: README.org:34 configuration.org:3
+#: README.org:34
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
 
 #. type: keyword INCLUDE
 #: README.org:36
-#, no-wrap
-msgid "\"./configuration.org\" :minlevel 1"
+#, fuzzy, no-wrap
+#| msgid "\"./configuration.org\" :minlevel 1"
+msgid "\"./configuration.org\""
 msgstr "\"./configuration.ja.org\" :minlevel 1"
 
 #. type: heading *
@@ -252,45 +253,1535 @@ msgstr ""
 msgid "po4a po4a.cfg"
 msgstr ""
 
+#. type: keyword TITLE
+#: configuration.org:1
+#, fuzzy, no-wrap
+#| msgid "Configuration"
+msgid "Nix Configuration"
+msgstr "設定"
+
+#. type: keyword PROPERTY
+#: configuration.org:3 overlays/configuration.org:3
+#, no-wrap
+msgid "header-args:nix :mkdirp yes :noweb yes"
+msgstr ""
+
+#. type: keyword OPTIONS
+#: configuration.org:4 overlays/configuration.org:4
+#, no-wrap
+msgid "^:{}"
+msgstr ""
+
 #. type: heading **
-#: configuration.org:5
+#: configuration.org:6
+#, no-wrap
+msgid "Flake"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:8
+msgid ""
+"This flake manages NixOS, nix-darwin, and home-manager configurations for "
+"multiple machines across different platforms (macOS, Linux, Android). It "
+"uses flake-parts for modular organization and includes tooling for "
+"development, code formatting, and pre-commit hooks."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:18
+#, no-wrap
+msgid ""
+"{\n"
+"  description = \"dotfiles\";"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:21
+#, no-wrap
+msgid ""
+"inputs = {\n"
+"  <<nixpkgs>>\n"
+"  <<nixpkgs-dummy>>\n"
+"  <<nixpkgs-stable>>\n"
+"  <<flake-parts>>\n"
+"  <<flake-utils>>\n"
+"  <<darwin>>\n"
+"  <<home-manager>>\n"
+"  <<nixos-wsl>>\n"
+"  <<nix-on-droid>>\n"
+"  <<disko>>\n"
+"  <<impermanence>>\n"
+"  <<lanzaboote>>\n"
+"  <<nixos-facter-modules>>\n"
+"  <<comin>>\n"
+"  <<sops-nix>>\n"
+"  <<tsnsrv>>\n"
+"  <<git-hooks>>\n"
+"  <<treefmt-nix>>\n"
+"  <<nix-colors>>\n"
+"  <<nix-wallpaper>>\n"
+"  <<brew-nix>>\n"
+"  <<claude-desktop>>\n"
+"  <<edgepkgs>>\n"
+"  <<emacs-overlay>>\n"
+"  <<firefox-addons>>\n"
+"  <<mcp-servers>>\n"
+"  <<niri-flake>>\n"
+"  <<nur-packages>>\n"
+"  <<zen-browser>>\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:61
+#, no-wrap
+msgid ""
+"  <<rest-of-flake>>\n"
+"}"
+msgstr ""
+
+#. type: heading ***
+#: configuration.org:65
+#, no-wrap
+msgid "Inputs"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:67
+msgid "External flake dependencies."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:69
+msgid ""
+"To minimize evaluation time caused by dependency graph bloat, almost all "
+"flakes are configured to follow the same nixpkgs and other common inputs "
+"wherever possible."
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:72
+#, no-wrap
+msgid "Core"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:74 configuration.org:93
+#, no-wrap
+msgid "nixpkgs"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:76
+msgid "https://github.com/NixOS/nixpkgs"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:79
+msgid "Nix Packages collection & NixOS"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:82
+msgid ""
+"The primary package set. Using =nixos-unstable-small= instead of =nixos-"
+"unstable= for faster channel updates. The =-small= variant skips some less "
+"critical CI tests, allowing new package versions to propagate faster while "
+"maintaining stability for core packages."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:86
+msgid ""
+"For channel selection guidance, see https://nix.dev/concepts/faq.html#which-"
+"channel-branch-should-i-use"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:88
+msgid "Channel status can be checked at https://status.nixos.org/"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:90
+msgid ""
+"Using =git+https://= with =shallow=1= instead of =github:= for slightly "
+"faster file extraction on large repositories like nixpkgs."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:95
+#, no-wrap
+msgid "nixpkgs.url = \"git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small\";"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:98
+msgid ""
+"The commented-out line is a workaround for Renovate, which cannot parse "
+"certain flake input formats. See https://github.com/renovatebot/renovate/"
+"issues/29721"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:101
+#, no-wrap
+msgid "nixpkgs-dummy"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:106 configuration.org:111
+#, no-wrap
+msgid "nixpkgs-stable"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:108
+msgid ""
+"Provides stable packages when unstable has build failures or regressions. "
+"Mainly used by the =stable= overlay (see [[file:overlays/configuration.org]"
+"[overlays/configuration.org]]) for packages that are broken in unstable."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:113
+#, no-wrap
+msgid "nixpkgs-stable.url = \"git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05\";"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:116
+#, no-wrap
+msgid "Flake Infrastructure"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:118 configuration.org:129
+#, no-wrap
+msgid "flake-parts"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:120
+msgid "https://github.com/hercules-ci/flake-parts"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:123
+msgid "Simplify Nix Flakes with the module system"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:126
+msgid ""
+"Framework for organizing flake outputs. Provides module system for flakes, "
+"making complex configurations more maintainable through separation of "
+"concerns."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:131
+#, no-wrap
+msgid ""
+"flake-parts = {\n"
+"  url = \"github:hercules-ci/flake-parts\";\n"
+"  inputs.nixpkgs-lib.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:137
+#, no-wrap
+msgid "Transitive Dependencies"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:139 configuration.org:150
+#, no-wrap
+msgid "flake-utils"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:141
+msgid "https://github.com/numtide/flake-utils"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:144
+msgid "Pure Nix flake utility functions"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:147
+msgid ""
+"Common flake utilities. Only used transitively via =follows= to unify the "
+"flake-utils version across inputs that depend on it."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:152
+#, no-wrap
+msgid "flake-utils.url = \"github:numtide/flake-utils\";"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:155
+#, fuzzy, no-wrap
+#| msgid "Configuration"
+msgid "System Configuration"
+msgstr "設定"
+
+#. type: keyword NAME
+#: configuration.org:157 configuration.org:168
+#, no-wrap
+msgid "darwin"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:159
+msgid "https://github.com/nix-darwin/nix-darwin"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:162
+msgid "Manage your macOS using Nix"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:165
+msgid ""
+"nix-darwin provides NixOS-style system configuration for macOS. Essential "
+"for managing macOS system settings, launchd services, and Homebrew "
+"declaratively."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:170
+#, no-wrap
+msgid ""
+"darwin = {\n"
+"  url = \"github:nix-darwin/nix-darwin\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:176 configuration.org:187
+#, no-wrap
+msgid "home-manager"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:178
+msgid "https://github.com/nix-community/home-manager"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:181
+msgid "Manage a user environment using Nix"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:184
+msgid ""
+"User environment management. Manages dotfiles, user services, and per-user "
+"packages declaratively. The backbone of user-level configuration in this "
+"repository."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:189
+#, no-wrap
+msgid ""
+"home-manager = {\n"
+"  url = \"github:nix-community/home-manager\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:195 configuration.org:206
+#, no-wrap
+msgid "nixos-wsl"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:197
+msgid "https://github.com/nix-community/nixos-wsl"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:200
+msgid "NixOS on WSL"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:203
+msgid ""
+"NixOS on Windows Subsystem for Linux. Provides NixOS experience within WSL2, "
+"useful for Windows machines that need Linux development environments."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:208
+#, no-wrap
+msgid ""
+"nixos-wsl = {\n"
+"  url = \"github:nix-community/nixos-wsl\";\n"
+"  inputs.flake-compat.follows = \"\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:215 configuration.org:226
+#, no-wrap
+msgid "nix-on-droid"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:217
+msgid "https://github.com/nix-community/nix-on-droid"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:220
+msgid "Nix-enabled environment for your Android device."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:223
+msgid ""
+"Nix environment for Android via Termux. Enables the same declarative "
+"configuration approach on mobile devices."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:228
+#, no-wrap
+msgid ""
+"nix-on-droid = {\n"
+"  url = \"github:nix-community/nix-on-droid\";\n"
+"  inputs.home-manager.follows = \"home-manager\";\n"
+"  inputs.nix-formatter-pack.follows = \"\";\n"
+"  inputs.nixpkgs-docs.follows = \"nixpkgs\";\n"
+"  inputs.nixpkgs-for-bootstrap.follows = \"nixpkgs\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"  inputs.nmd.follows = \"\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:239 configuration.org:250
+#, no-wrap
+msgid "disko"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:241
+msgid "https://github.com/nix-community/disko"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:244
+msgid "Declarative disk partitioning and formatting using nix"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:247
+msgid ""
+"Used for reproducible NixOS installations with automated partition layout, "
+"filesystem creation, and encryption setup."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:252
+#, no-wrap
+msgid ""
+"disko = {\n"
+"  url = \"github:nix-community/disko\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:258 configuration.org:269
+#, no-wrap
+msgid "impermanence"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:260
+msgid "https://github.com/nix-community/impermanence"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:263
+msgid ""
+"Modules to help you handle persistent state on systems with ephemeral root "
+"storage"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:266
+msgid ""
+"Manages stateful paths on systems with ephemeral root filesystems. Used with "
+"btrfs snapshots to ensure only explicitly declared state persists across "
+"reboots."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:271
+#, no-wrap
+msgid "impermanence.url = \"github:nix-community/impermanence\";"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:274 configuration.org:284
+#, no-wrap
+msgid "lanzaboote"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:276
+msgid "https://github.com/nix-community/lanzaboote"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:279
+msgid "Secure Boot for NixOS"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:282
+msgid ""
+"Signs boot components with custom keys, enabling Secure Boot on NixOS "
+"machines."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:286
+#, no-wrap
+msgid ""
+"lanzaboote = {\n"
+"  url = \"github:nix-community/lanzaboote\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"  inputs.pre-commit.follows = \"git-hooks\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:293 configuration.org:304
+#, no-wrap
+msgid "nixos-facter-modules"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:295
+msgid "https://github.com/numtide/nixos-facter-modules"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:298
+msgid "A series of NixOS modules to be used in conjunction with nixos-facter"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:301
+msgid ""
+"Hardware detection for NixOS. Automatically generates hardware configuration "
+"based on detected hardware, simplifying initial system setup."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:306
+#, no-wrap
+msgid "nixos-facter-modules.url = \"github:numtide/nixos-facter-modules\";"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:309
+#, no-wrap
+msgid "Infrastructure"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:311 configuration.org:322
+#, no-wrap
+msgid "comin"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:313
+msgid "https://github.com/nlewo/comin"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:316
+msgid "GitOps For NixOS Machines"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:319
+msgid ""
+"Automatically deploys configuration changes when pushed to the repository, "
+"enabling continuous deployment for servers without manual =nixos-rebuild "
+"switch=."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:324
+#, no-wrap
+msgid ""
+"comin = {\n"
+"  url = \"github:nlewo/comin\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:330 configuration.org:341
+#, no-wrap
+msgid "sops-nix"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:332
+msgid "https://github.com/Mic92/sops-nix"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:335
+msgid "Atomic secret provisioning for NixOS based on sops"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:338
+msgid ""
+"Secrets management using Mozilla SOPS. Encrypts secrets in the repository "
+"that are decrypted at activation time using age keys."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:343
+#, no-wrap
+msgid ""
+"sops-nix = {\n"
+"  url = \"github:Mic92/sops-nix\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:349 configuration.org:360
+#, no-wrap
+msgid "tsnsrv"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:351
+msgid "https://github.com/boinkor-net/tsnsrv"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:354
+msgid ""
+"A reverse proxy that exposes services on your tailnet (as their own "
+"tailscale participants)"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:357
+msgid ""
+"Tailscale service proxy. Exposes local services to the Tailscale network "
+"with automatic HTTPS certificates."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:362
+#, no-wrap
+msgid ""
+"tsnsrv = {\n"
+"  url = \"github:boinkor-net/tsnsrv\";\n"
+"  inputs.flake-parts.follows = \"flake-parts\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:369
+#, no-wrap
+msgid "Development Tools"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:371 configuration.org:384
+#, no-wrap
+msgid "git-hooks"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:373
+msgid "https://github.com/cachix/git-hooks.nix"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:376
+msgid "Seamless integration of pre-commit.com git hooks with Nix."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:379
+msgid ""
+"Pre-commit hooks as Nix derivations. Ensures code quality checks run "
+"consistently across all development environments without requiring global "
+"tool installation."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:382
+msgid ""
+"Inputs that don't affect this flake are removed to prevent lockfile bloat."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:386
+#, no-wrap
+msgid ""
+"git-hooks = {\n"
+"  url = \"github:cachix/git-hooks.nix\";\n"
+"  inputs.flake-compat.follows = \"\";\n"
+"  inputs.gitignore.follows = \"\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:394 configuration.org:405
+#, no-wrap
+msgid "treefmt-nix"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:396
+msgid "https://github.com/numtide/treefmt-nix"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:399
+#, fuzzy
+#| msgid "Create po4a configuration"
+msgid "treefmt nix configuration"
+msgstr "po4aを設定する"
+
+#. type: paragraph
+#: configuration.org:402
+msgid ""
+"Unified code formatter configuration. Runs multiple formatters (nixfmt, "
+"shfmt, etc.)  through a single interface, ensuring consistent formatting "
+"across the repository."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:407
+#, no-wrap
+msgid ""
+"treefmt-nix = {\n"
+"  url = \"github:numtide/treefmt-nix\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:413
+#, no-wrap
+msgid "Desktop & Theming"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:415 configuration.org:426
+#, no-wrap
+msgid "nix-colors"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:417
+msgid "https://github.com/misterio77/nix-colors"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:420
+msgid "Modules and schemes to make theming with Nix awesome."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:423
+msgid ""
+"Base16 color scheme framework for Nix. Provides consistent theming across "
+"applications through a single color scheme definition."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:428
+#, no-wrap
+msgid ""
+"nix-colors = {\n"
+"  url = \"github:misterio77/nix-colors\";\n"
+"  inputs.nixpkgs-lib.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:434 configuration.org:445
+#, no-wrap
+msgid "nix-wallpaper"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:436
+msgid "https://github.com/natsukium/nix-wallpaper"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:439
+msgid "A configurable wallpaper for nix systems"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:442
+msgid ""
+"Generates Nix logo wallpapers. Using a custom branch (=custom-logo=) that "
+"supports additional logo variants."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:447
+#, no-wrap
+msgid ""
+"nix-wallpaper = {\n"
+"  url = \"github:natsukium/nix-wallpaper/custom-logo\";\n"
+"  inputs.flake-utils.follows = \"flake-utils\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"  inputs.pre-commit-hooks.follows = \"git-hooks\";\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: configuration.org:455
+#, no-wrap
+msgid "Applications"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:457 configuration.org:471
+#, no-wrap
+msgid "brew-nix"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:459
+msgid "https://github.com/BatteredBunny/brew-nix"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:462
+msgid ""
+"Experimental nix expression to package all MacOS casks from homebrew "
+"automatically"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:465
+msgid ""
+"Provides Homebrew casks as Nix packages for darwin. Useful for proprietary "
+"macOS applications not available in nixpkgs."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:468
+msgid ""
+"The =brew-api= input is marked as non-flake because it's just a data source "
+"(JSON API dump from Homebrew's API)."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:473
+#, no-wrap
+msgid ""
+"brew-api = {\n"
+"  url = \"github:BatteredBunny/brew-api\";\n"
+"  flake = false;\n"
+"};\n"
+"brew-nix = {\n"
+"  url = \"github:BatteredBunny/brew-nix\";\n"
+"  inputs.brew-api.follows = \"brew-api\";\n"
+"  inputs.nix-darwin.follows = \"darwin\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:485 configuration.org:496
+#, no-wrap
+msgid "claude-desktop"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:487
+msgid "https://github.com/k3d3/claude-desktop-linux-flake"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:490
+msgid "Nix Flake for Claude Desktop on Linux"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:493
+msgid ""
+"Provides Claude Desktop for Linux. Using a community flake since Anthropic "
+"doesn't officially support Linux yet."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:498
+#, no-wrap
+msgid ""
+"claude-desktop = {\n"
+"  url = \"github:k3d3/claude-desktop-linux-flake\";\n"
+"  inputs.flake-utils.follows = \"flake-utils\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:505 configuration.org:513
+#, no-wrap
+msgid "edgepkgs"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:507
+msgid "https://github.com/natsukium/edgepkgs"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:509
+msgid ""
+"Personal repository for bleeding-edge packages. Contains packages not yet in "
+"nixpkgs, those requiring modifications, or packages that wouldn't be "
+"accepted upstream (e.g., niche or experimental software)."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:515
+#, no-wrap
+msgid ""
+"edgepkgs = {\n"
+"  url = \"github:natsukium/edgepkgs\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:521 configuration.org:534
+#, no-wrap
+msgid "emacs-overlay"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:523
+msgid "https://github.com/nix-community/emacs-overlay"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:526
+msgid "Bleeding edge emacs overlay"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:529
+msgid ""
+"Provides latest Emacs builds including native compilation and pure GTK "
+"variants.  Also includes MELPA packages updated more frequently than "
+"nixpkgs.  Mainly used for the utility that parses org files and "
+"automatically configures dependency packages."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:536
+#, no-wrap
+msgid ""
+"emacs-overlay = {\n"
+"  url = \"github:nix-community/emacs-overlay\";\n"
+"  inputs.nixpkgs-stable.follows = \"nixpkgs-stable\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:543 configuration.org:554
+#, no-wrap
+msgid "firefox-addons"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:545
+msgid "https://gitlab.com/rycee/nur-expressions"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:548
+msgid "A few Nix expressions suitable for inclusion in Nix User Repository"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:551
+msgid ""
+"Firefox/browser extensions packaged for Nix. Allows declarative browser "
+"extension management through home-manager."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:556
+#, no-wrap
+msgid ""
+"firefox-addons = {\n"
+"  url = \"gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:562 configuration.org:573
+#, no-wrap
+msgid "mcp-servers"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:564
+msgid "https://github.com/natsukium/mcp-servers-nix"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:567
+msgid ""
+"A Nix-based configuration framework for Model Control Protocol (MCP) servers "
+"with ready-to-use packages."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:570
+msgid ""
+"Provides both a configuration framework and packaged MCP servers for Nix.  "
+"Used with Claude Code and other MCP-compatible AI assistants."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:575
+#, no-wrap
+msgid ""
+"mcp-servers = {\n"
+"  url = \"github:natsukium/mcp-servers-nix\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:581 configuration.org:592
+#, no-wrap
+msgid "niri-flake"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:583
+msgid "https://github.com/sodiboo/niri-flake"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:586
+#, fuzzy
+#| msgid "Configuration"
+msgid "Nix-native configuration for niri"
+msgstr "設定"
+
+#. type: paragraph
+#: configuration.org:589
+msgid ""
+"Niri is a scrollable-tiling Wayland compositor. This flake provides the "
+"compositor and related modules for NixOS/home-manager integration."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:594
+#, no-wrap
+msgid ""
+"niri-flake = {\n"
+"  url = \"github:sodiboo/niri-flake\";\n"
+"  inputs.niri-stable.follows = \"\";\n"
+"  inputs.niri-unstable.follows = \"\";\n"
+"  inputs.nixpkgs-stable.follows = \"nixpkgs-stable\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"  inputs.xwayland-satellite-stable.follows = \"\";\n"
+"  inputs.xwayland-satellite-unstable.follows = \"\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:605 configuration.org:612
+#, no-wrap
+msgid "nur-packages"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:607
+msgid "https://github.com/natsukium/nur-packages"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:609
+msgid ""
+"Personal NUR (Nix User Repository). Contains packages maintained personally "
+"that are either too niche for nixpkgs or require customizations."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:614
+#, no-wrap
+msgid ""
+"nur-packages = {\n"
+"  url = \"github:natsukium/nur-packages\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:620 configuration.org:631
+#, no-wrap
+msgid "zen-browser"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:622
+msgid "https://github.com/0xc000022070/zen-browser-flake"
+msgstr ""
+
+#. type: paragraph in QUOTE
+#: configuration.org:625
+msgid "Community-driven Nix Flake for the Zen browser"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:628
+msgid ""
+"Firefox-based browser focused on privacy. Community flake providing Nix "
+"packaging with home-manager integration."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:633
+#, no-wrap
+msgid ""
+"zen-browser = {\n"
+"  url = \"github:0xc000022070/zen-browser-flake\";\n"
+"  inputs.nixpkgs.follows = \"nixpkgs\";\n"
+"  inputs.home-manager.follows = \"home-manager\";\n"
+"};"
+msgstr ""
+
+#. type: heading ***
+#: configuration.org:640
+#, no-wrap
+msgid "Rest of Flake"
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:642
+#, no-wrap
+msgid "rest-of-flake"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:644
+#, no-wrap
+msgid ""
+"nixConfig = {\n"
+"  extra-substituters = [\n"
+"    \"https://natsukium.cachix.org\"\n"
+"    \"https://nix-community.cachix.org\"\n"
+"  ];"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:650
+#, no-wrap
+msgid ""
+"  extra-trusted-public-keys = [\n"
+"    \"natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI=\"\n"
+"    \"nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=\"\n"
+"  ];\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:656
+#, no-wrap
+msgid ""
+"outputs =\n"
+"  { self, flake-parts, ... }@inputs:\n"
+"  flake-parts.lib.mkFlake { inherit inputs; } {\n"
+"    systems = [\n"
+"      \"x86_64-linux\"\n"
+"      \"aarch64-linux\"\n"
+"      \"aarch64-darwin\"\n"
+"    ];"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:665
+#, no-wrap
+msgid ""
+"imports = [\n"
+"  ./flake-module.nix\n"
+"  inputs.git-hooks.flakeModule\n"
+"  inputs.treefmt-nix.flakeModule\n"
+"];"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:671
+#, no-wrap
+msgid ""
+"hosts = {\n"
+"  katavi = {\n"
+"    system = \"aarch64-darwin\";\n"
+"  };\n"
+"  mikumi = {\n"
+"    system = \"aarch64-darwin\";\n"
+"  };\n"
+"  work = {\n"
+"    system = \"aarch64-darwin\";\n"
+"  };\n"
+"  kilimanjaro = {\n"
+"    system = \"x86_64-linux\";\n"
+"  };\n"
+"  arusha = {\n"
+"    system = \"x86_64-linux\";\n"
+"  };\n"
+"  manyara = {\n"
+"    system = \"x86_64-linux\";\n"
+"  };\n"
+"  serengeti = {\n"
+"    system = \"aarch64-linux\";\n"
+"  };\n"
+"  tarangire = {\n"
+"    system = \"x86_64-linux\";\n"
+"  };\n"
+"  android = {\n"
+"    system = \"aarch64-linux\";\n"
+"    platform = \"android\";\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:711
+#, no-wrap
+msgid ""
+"flake = {\n"
+"  overlays = import ./overlays { inherit inputs; };\n"
+"  templates = import ./templates;\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:716
+#, no-wrap
+msgid ""
+"perSystem =\n"
+"  {\n"
+"    self',\n"
+"    config,\n"
+"    pkgs,\n"
+"    system,\n"
+"    ...\n"
+"  }:\n"
+"  {\n"
+"    _module.args.pkgs = import self.inputs.nixpkgs {\n"
+"      inherit system;\n"
+"      config.allowUnfree = true;\n"
+"      overlays = [ self.inputs.nur-packages.overlays.default ] ++ builtins.attrValues self.overlays;\n"
+"    };"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:731
+#, no-wrap
+msgid ""
+"checks = import ./tests {\n"
+"  inherit (self.inputs) nixpkgs;\n"
+"  inherit pkgs;\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:736
+#, no-wrap
+msgid ""
+"packages = {\n"
+"  fastfetch = pkgs.callPackage ./pkgs/fastfetch { };\n"
+"  neovim = pkgs.callPackage ./pkgs/neovim-with-config { };\n"
+"  po4a_0_74 = (\n"
+"    pkgs.po4a.overrideAttrs (oldAttrs: {\n"
+"      version = \"0.74\";\n"
+"      src = pkgs.fetchurl {\n"
+"        url = \"https://github.com/mquinson/po4a/releases/download/v0.74/po4a-0.74.tar.gz\";\n"
+"        hash = \"sha256-JfwyPyuje71Iw68Ov0mVJkSw5GgmH5hjPpEhmoOP58I=\";\n"
+"      };\n"
+"      patches = [ ];\n"
+"      nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.libxml2 ];\n"
+"      doCheck = false;\n"
+"    })\n"
+"  );\n"
+"  html =\n"
+"    with pkgs;\n"
+"    let\n"
+"      org-html-themes = fetchurl {\n"
+"        url = \"https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup\";\n"
+"        hash = \"sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=\";\n"
+"      };\n"
+"      org-to-html = writeScript \"org-to-html.el\" ''\n"
+"        (require 'org)\n"
+"        (require 'htmlize)"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:762
+#, no-wrap
+msgid ""
+"(find-file \"README.org\")\n"
+"(org-html-export-to-html)"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:765
+#, no-wrap
+msgid ""
+"    (find-file \"README.ja.org\")\n"
+"    (org-html-export-to-html)\n"
+"  '';\n"
+"in\n"
+"stdenvNoCC.mkDerivation {\n"
+"  name = \"dotfiles\";\n"
+"  src = lib.cleanSource ./.;\n"
+"  postPatch = ''\n"
+"    substituteInPlace README.org \\\n"
+"      --replace-fail \"https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\" \"${org-html-themes}\"\n"
+"  '';\n"
+"  nativeBuildInputs = [\n"
+"    (emacs.pkgs.withPackages (epkgs: [ epkgs.htmlize ]))\n"
+"    gettext\n"
+"    self'.packages.po4a_0_74\n"
+"  ];\n"
+"  buildPhase = ''\n"
+"    runHook preBuild\n"
+"    po4a po4a.cfg\n"
+"    emacs --batch -l ${org-to-html}\n"
+"    runHook postBuild\n"
+"  '';"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:788
+#, no-wrap
+msgid ""
+"      installPhase = ''\n"
+"        runHook preInstall\n"
+"        install -Dm644 README.html $out/index.html\n"
+"        install -Dm644 README.ja.html $out/ja/index.html\n"
+"        runHook postInstall\n"
+"      '';\n"
+"    };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:797
+#, no-wrap
+msgid ""
+"pre-commit = {\n"
+"  check.enable = true;\n"
+"  settings = {\n"
+"    src = ./.;\n"
+"    hooks = {\n"
+"      actionlint.enable = true;\n"
+"      biome.enable = true;\n"
+"      lua-ls.enable = false;\n"
+"      nil.enable = true;\n"
+"      shellcheck.enable = true;\n"
+"      treefmt.enable = true;\n"
+"      typos = {\n"
+"        enable = true;\n"
+"        excludes = [\n"
+"          \"homes/shared/gpg/keys.txt\"\n"
+"          \"secrets.yaml\"\n"
+"          \"secrets/default.yaml\"\n"
+"          \"systems/nixos/tarangire/facter.json\"\n"
+"          \"systems/shared/hercules-ci/binary-caches.json\"\n"
+"        ];\n"
+"        settings.configPath = \"typos.toml\";\n"
+"      };\n"
+"      yamllint = {\n"
+"        enable = true;\n"
+"        excludes = [\n"
+"          \"secrets/default.yaml\"\n"
+"          \"secrets.yaml\"\n"
+"        ];\n"
+"        settings.configData = \"{rules: {document-start: {present: false}}}\";\n"
+"      };\n"
+"      \"00-check-org-tangle\" = {\n"
+"        enable = true;\n"
+"        name = \"check-org-tangle\";\n"
+"        description = \"Verify org files are tangled and synchronized\";\n"
+"        entry =\n"
+"          let\n"
+"            checkScript = pkgs.writeShellScript \"check-org-tangle\" ''\n"
+"              set -euo pipefail"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:838
+#, no-wrap
+msgid "${pkgs.gnumake}/bin/make -B tangle"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:841
+#, no-wrap
+msgid "changed=$(${pkgs.git}/bin/git diff --name-only)"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:843
+#, no-wrap
+msgid ""
+"if [ -n \"$changed\" ]; then\n"
+"  echo \"Org files were out of sync and have been auto-tangled.\"\n"
+"  echo \"Changed files:\"\n"
+"  echo \"$changed\"\n"
+"  echo \"\"\n"
+"  echo \"Please stage the changes and commit again:\"\n"
+"  echo \"  git add $changed\"\n"
+"  exit 1\n"
+"fi"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:853
+#, no-wrap
+msgid ""
+"              exit 0\n"
+"            '';\n"
+"          in\n"
+"          \"${checkScript}\";\n"
+"        files = \"\\\\.org$\";\n"
+"        pass_filenames = false;\n"
+"      };\n"
+"    };\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:864
+#, no-wrap
+msgid ""
+"treefmt = {\n"
+"  projectRootFile = \"flake.nix\";\n"
+"  programs = {\n"
+"    biome.enable = true;\n"
+"    nixfmt.enable = true;\n"
+"    shfmt.enable = true;\n"
+"    stylua.enable = true;\n"
+"    taplo.enable = true;\n"
+"    terraform.enable = true;\n"
+"    yamlfmt.enable = true;\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:877
+#, no-wrap
+msgid ""
+"      devShells = {\n"
+"        default = pkgs.mkShell {\n"
+"          packages = with pkgs; [\n"
+"            gettext\n"
+"            nix-fast-build\n"
+"            self'.packages.po4a_0_74\n"
+"            sops\n"
+"            ssh-to-age\n"
+"            (terraform.withPlugins (p: [\n"
+"              p.carlpett_sops\n"
+"              p.cloudflare_cloudflare\n"
+"              p.determinatesystems_hydra\n"
+"              p.hashicorp_aws\n"
+"              p.hashicorp_external\n"
+"              p.hashicorp_null\n"
+"              p.integrations_github\n"
+"              p.oracle_oci\n"
+"            ]))\n"
+"          ];\n"
+"          shellHook = config.pre-commit.installationScript + ''\n"
+"            echo \"Syncing CLAUDE.md...\"\n"
+"            make CLAUDE.md >/dev/null 2>&1 || echo \"Warning: Failed to generate CLAUDE.md\"\n"
+"          '';\n"
+"        };\n"
+"      };\n"
+"    };\n"
+"};"
+msgstr ""
+
+#. type: heading **
+#: configuration.org:906
 #, no-wrap
 msgid "Overlays"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:6
+#: configuration.org:907
 #, fuzzy, no-wrap
 #| msgid "\"./configuration.org\" :minlevel 1"
 msgid "\"./overlays/configuration.org\""
 msgstr "\"./configuration.ja.org\" :minlevel 1"
 
 #. type: heading **
-#: configuration.org:8
+#: configuration.org:909
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:9
+#: configuration.org:910
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:10
+#: configuration.org:911
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: configuration.org:11
+#: configuration.org:912
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:12
+#: configuration.org:913
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr "\"./applications/emacs/init.ja.org\""
@@ -1148,18 +2639,6 @@ msgstr ""
 msgid "Nix Overlays"
 msgstr ""
 
-#. type: keyword PROPERTY
-#: overlays/configuration.org:3
-#, no-wrap
-msgid "header-args:nix :mkdirp yes :noweb yes"
-msgstr ""
-
-#. type: keyword OPTIONS
-#: overlays/configuration.org:4
-#, no-wrap
-msgid "^:{}"
-msgstr ""
-
 #. type: heading *
 #: overlays/configuration.org:6
 #, no-wrap
@@ -1576,3 +3055,7 @@ msgstr ""
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
+
+#, no-wrap
+#~ msgid "\"./configuration.org\" :minlevel 1"
+#~ msgstr "\"./configuration.ja.org\" :minlevel 1"

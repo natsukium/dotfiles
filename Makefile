@@ -4,7 +4,7 @@
 EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t)'
 
 define tangle-org
-	$(EMACS) --eval '(org-babel-tangle-file "$(1)")'
+	$(EMACS) --eval '(dolist (file (org-babel-tangle-file "$(1)")) (with-current-buffer (find-file-noselect file) (delete-trailing-whitespace) (save-buffer)))'
 endef
 
 NIX := nom
@@ -48,7 +48,10 @@ aarch64-darwin:
 
 # tangle targets: configuration.org -> generated files
 # Each directory has a configuration.org that tangles to one or more .nix files
-tangle: overlays/default.nix
+tangle: flake.nix overlays/default.nix
+
+flake.nix: configuration.org
+	$(call tangle-org,$<)
 
 overlays/default.nix: overlays/configuration.org
 	$(call tangle-org,$<)
