@@ -195,6 +195,93 @@ An Emacs major mode for editing Nix expressions.
   :mode "\\.nix\\'")
 #+end_src
 
+** PO
+
+[[https://www.gnu.org/software/gettext/manual/html_node/PO-Mode.html][po-mode]] is Emacs's major mode for editing GNU gettext PO (Portable Object) files.
+PO files store translations for software internationalization.
+
+Editing PO files as plain text is error-prone
+because the format has strict requirements for escaping and structure.
+po-mode provides structured navigation between entries,
+automatic validation, and prevents common formatting errors.
+
+*** Common Operations
+
+PO mode is not derived from text mode.
+The buffer is read-only and has its own keymap,
+so standard text editing commands do not work directly.
+Translations must be edited through the subedit buffer (=RET=).
+
+**** Main Commands
+
+Commands for file operations, validation, and general PO mode management.
+
+| Key     | Function              | Description             |
+|---------+-----------------------+-------------------------|
+| =_=     | =po-undo=             | Undo last modification  |
+| =q=     | =po-confirm-and-quit= | Quit with confirmation  |
+| =?= =h= | =po-help=             | Show help about PO mode |
+
+Use or =q= to quit instead of =C-x k= (=kill-buffer=),
+as they properly handle unsaved changes and warn about untranslated entries.
+
+See [[https://www.gnu.org/software/gettext/manual/html_node/Main-PO-Commands.html][Main PO mode Commands]] for more details.
+
+**** Entry Positioning
+
+Commands for navigating between entries in the PO file.
+
+| Key | Function            | Description            |
+|-----+---------------------+------------------------|
+| =n= | =po-next-entry=     | Move to next entry     |
+| =p= | =po-previous-entry= | Move to previous entry |
+| =<= | =po-first-entry=    | Move to first entry    |
+| =>= | =po-last-entry=     | Move to last entry     |
+
+See [[https://www.gnu.org/software/gettext/manual/html_node/Entry-Positioning.html][Entry Positioning]] for more details.
+
+**** Modifying Translations
+
+Commands for editing translation strings.
+Press =RET= to open a subedit buffer where standard Emacs editing works normally.
+
+| Key       | Function            | Description                       |
+|-----------+---------------------+-----------------------------------|
+| =RET=     | =po-edit-msgstr=    | Open subedit buffer for editing   |
+| =C-c C-c= | =po-subedit-exit=   | Finish editing and apply changes  |
+| =C-c C-k= | =po-subedit-abort=  | Abort editing and discard changes |
+| =DEL=     | =po-fade-out-entry= | Delete the translation            |
+
+See [[https://www.gnu.org/software/gettext/manual/html_node/Modifying-Translations.html][Modifying Translations]] for more details.
+
+*** Configuration
+
+#+begin_src emacs-lisp
+(use-package po-mode
+  :ensure t)
+#+end_src
+
+The following configuration is based on
+[[https://www.gnu.org/software/gettext/manual/html_node/Installation.html][Completing GNU gettext Installation]].
+
+This registers =.po= files and files containing =.po.= in their name
+to automatically activate PO mode.
+
+#+begin_src emacs-lisp
+(setq auto-mode-alist
+      (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
+(autoload 'po-mode "po-mode" "Major mode for translators to edit PO files" t)
+#+end_src
+
+This enables automatic detection of the coding system for PO files,
+which allows Emacs to display international characters correctly.
+
+#+begin_src emacs-lisp
+(modify-coding-system-alist 'file "\\.po\\'\\|\\.po\\."
+                            'po-find-file-coding-system)
+(autoload 'po-find-file-coding-system "po-mode")
+#+end_src
+
 * org
 
 ** Semantic Line Breaks

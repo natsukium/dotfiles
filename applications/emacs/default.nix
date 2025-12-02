@@ -29,6 +29,7 @@ let
     extraEmacsPackages =
       epkgs: with epkgs; [
         treesit-grammars.with-all-grammars
+        pkgs.gettext
       ];
   };
 in
