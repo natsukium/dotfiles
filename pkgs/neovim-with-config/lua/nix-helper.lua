@@ -1,3 +1,84 @@
+-- Convert Nix flake references to browser-openable URLs
+-- Nix flakes use shorthand notation (e.g., github:owner/repo) that isn't recognized
+-- as a URL by default. This function translates these references to browser-openable URLs.
+-- See: https://nix.dev/manual/nix/latest/command-ref/new-cli/nix3-flake.html#url-like-syntax
+--
+-- Supported formats:
+--   github:owner/repo                         -> https://github.com/owner/repo
+--   github:owner/repo/ref                     -> https://github.com/owner/repo/tree/ref
+--   github:owner/repo?ref=main                -> https://github.com/owner/repo/tree/main
+--   gitlab:owner/repo                         -> https://gitlab.com/owner/repo
+--   gitlab:owner/repo?host=gitlab.example.com -> https://gitlab.example.com/owner/repo
+--   sourcehut:~user/repo                      -> https://git.sr.ht/~user/repo
+--   git+https://example.org/repo              -> https://example.org/repo
+--   git+ssh://git@github.com/owner/repo       -> https://github.com/owner/repo
+--   git://github.com/owner/repo               -> https://github.com/owner/repo
+--   hg+https://example.org/repo               -> https://example.org/repo
+--   tarball+https://example.org/file.tar.gz   -> https://example.org/file.tar.gz
+--   file+https://example.org/flake.nix        -> https://example.org/flake.nix
+local function flake_ref_to_url(text)
+	local base, query = text:match("^([^?]+)%??(.*)")
+	base = base or text
+
+	local params = {}
+	for k, v in (query or ""):gmatch("([^&=]+)=([^&]+)") do
+		params[k] = v
+	end
+
+	-- Forge hosting services: github:, gitlab:, sourcehut:
+	local forges = {
+		{ "github:", "github.com", "tree" },
+		{ "gitlab:", params.host or "gitlab.com", "-/tree" },
+		{ "sourcehut:", "git.sr.ht", nil },
+	}
+	for _, forge in ipairs(forges) do
+		local prefix, host, tree_path = forge[1], forge[2], forge[3]
+		local path = base:match("^" .. prefix:gsub("([%.%+])", "%%%1") .. "(.+)")
+		if path then
+			local owner, repo, ref = path:match("^([^/]+)/([^/]+)/?(.*)$")
+			if owner and repo and tree_path then
+				ref = (ref ~= "" and ref) or params.ref or params.rev
+				if ref and ref ~= "" then
+					return ("https://%s/%s/%s/%s/%s"):format(host, owner, repo, tree_path, ref)
+				end
+			end
+			return "https://" .. host .. "/" .. path
+		end
+	end
+
+	-- URL-like schemes: git+https://, hg+https://, tarball+https://, etc.
+	local schemes = {
+		"^git%+https://",
+		"^git%+ssh://git@",
+		"^git%+ssh://",
+		"^git://",
+		"^hg%+https?://",
+		"^tarball%+https?://",
+		"^file%+https?://",
+	}
+	for _, pattern in ipairs(schemes) do
+		local rest = base:match(pattern .. "(.+)")
+		if rest then
+			return "https://" .. rest
+		end
+	end
+
+	return nil
+end
+
+-- Add ':' to isfname so <cfile> captures flake refs like "github:owner/repo"
+vim.opt_local.isfname:append(":")
+
+vim.keymap.set("n", "gx", function()
+	local cfile = vim.fn.expand("<cfile>")
+	local url = flake_ref_to_url(cfile)
+	if url then
+		vim.ui.open(url)
+	else
+		vim.ui.open(cfile)
+	end
+end, { buffer = true, desc = "Open URL or Nix flake reference in browser" })
+
 -- Nurl command
 vim.api.nvim_create_user_command("Nurl", function(opts)
 	local args = vim.split(opts.args, " ")
