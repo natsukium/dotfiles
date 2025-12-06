@@ -27,20 +27,20 @@ build: $(SYSTEM)
 build-all: x86_64-linux aarch64-linux aarch64-darwin
 
 x86_64-linux:
-	$(NIX) build --impure --keep-going --no-link --show-trace --eval-system x86_64-linux \
+	$(NIX) build --impure --keep-going --no-link --show-trace --eval-system x86_64-linux --print-out-paths \
 		.#nixosConfigurations.arusha.config.system.build.toplevel \
 		.#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
 		.#nixosConfigurations.manyara.config.system.build.toplevel \
 		.#devShells.x86_64-linux.default \
 
 aarch64-linux:
-	$(NIX) build --impure --keep-going --no-link --show-trace --eval-system aarch64-linux \
+	$(NIX) build --impure --keep-going --no-link --show-trace --eval-system aarch64-linux --print-out-paths \
 		.#nixosConfigurations.serengeti.config.system.build.toplevel \
 		.#nixOnDroidConfigurations.default.config.environment.path \
 		.#devShells.aarch64-linux.default \
 
 aarch64-darwin:
-	$(NIX) build --keep-going --no-link --show-trace --eval-system aarch64-darwin --option extra-sandbox-paths /nix/store \
+	$(NIX) build --keep-going --no-link --show-trace --eval-system aarch64-darwin --option extra-sandbox-paths /nix/store --print-out-paths \
 		.#darwinConfigurations.katavi.system \
 		.#darwinConfigurations.mikumi.system \
 		.#darwinConfigurations.work.system \
