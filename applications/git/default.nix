@@ -27,6 +27,7 @@
       ".DS_Store"
       ".aider*"
       ".direnv"
+      ".envrc"
       ".ipynb_checkpoints"
       ".pre-commit-config.yaml"
       ".vscode/"
