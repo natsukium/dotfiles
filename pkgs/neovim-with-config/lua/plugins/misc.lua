@@ -141,7 +141,7 @@ return {
 		"overseer.nvim",
 		cmd = { "OverseerRun", "OverseerToggle" },
 		after = function()
-			require("oveseer").setup()
+			require("overseer").setup()
 		end,
 	},
 	{
