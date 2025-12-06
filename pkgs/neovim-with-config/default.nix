@@ -35,14 +35,11 @@
 let
   mapBuiltinPluginToPath = map (p: "$out/share/nvim/runtime/plugin/${p}");
   disabledBuiltinPluginPaths = mapBuiltinPluginToPath [
-    "gzip.vim"
     "matchit.vim"
     "matchparen.vim"
     "netrwPlugin.vim"
-    "tarPlugin.vim"
     "tohtml.lua"
     "tutor.vim"
-    "zipPlugin.vim"
   ];
 
   neovim-unwrapped' = neovim-unwrapped.overrideAttrs (oldAttrs: {
