@@ -19,6 +19,7 @@
   nurl,
   rubocop,
   ruff,
+  rust-analyzer,
   shellcheck,
   shfmt,
   solargraph,
@@ -75,6 +76,8 @@ let
     # ruby
     # solargraph
     rubocop
+    # rust
+    rust-analyzer
     # terraform
     terraform-ls
     # toml
