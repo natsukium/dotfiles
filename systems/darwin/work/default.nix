@@ -11,5 +11,5 @@
 
   my.services.timemachine.enableLocalSnapshot = true;
 
-  services.comin.hostname = "work";
+  networking.hostName = "work";
 }
