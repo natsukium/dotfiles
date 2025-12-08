@@ -23,6 +23,7 @@ in
 
   home.packages = with pkgs; [
     brewCasks.aqua-voice
+    battery-toolkit
     monitorcontrol
     nowplaying-cli
     shottr
