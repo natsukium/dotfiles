@@ -572,6 +572,7 @@ A Nix-based configuration framework for Model Control Protocol (MCP) servers wit
 
 Provides both a configuration framework and packaged MCP servers for Nix.
 Used with Claude Code and other MCP-compatible AI assistants.
+See [[*MCP Servers][MCP Servers]] for configuration details.
 
 #+NAME: mcp-servers
 #+begin_src nix
@@ -696,6 +697,44 @@ Personal binary cache containing outputs from this flake. Packages not available
 official =cache.nixos.org= or =nix-community.cachix.org= are built on GitHub Actions and
 pushed here.
 
+*** MCP Servers
+
+Configuration for [[https://github.com/natsukium/mcp-servers-nix][mcp-servers-nix]], enabled in the development shell.
+The =flavors.claude-code= preset generates a =.mcp.json= file compatible with Claude Code's expected format.
+
+Enabled servers:
+- =nixos=: NixOS package/option search and Home Manager documentation
+- =terraform=: Terraform registry lookup for providers, modules, and policies
+- =grafana=: Query dashboards, datasources, and metrics from the home server's Grafana instance
+
+The =passwordCommand= option retrieves secrets at runtime using =rbw= (Bitwarden CLI),
+avoiding plaintext credentials in the repository.
+
+#+NAME: mcp-servers-config
+#+begin_src nix
+mcp-servers = {
+  flavors.claude-code.enable = true;
+  programs = {
+    nixos.enable = true;
+    terraform.enable = true;
+    grafana = {
+      enable = true;
+      env = {
+        GRAFANA_URL = "http://manyara:3001";
+        GRAFANA_USERNAME = "admin";
+      };
+      passwordCommand = {
+        GRAFANA_PASSWORD = [
+          "rbw"
+          "get"
+          "grafana"
+        ];
+      };
+    };
+  };
+};
+#+end_src
+
 *** Rest of Flake
 
 #+NAME: rest-of-flake
@@ -712,6 +751,7 @@ outputs =
     imports = [
       ./flake-module.nix
       inputs.git-hooks.flakeModule
+      inputs.mcp-servers.flakeModule
       inputs.treefmt-nix.flakeModule
     ];
 
@@ -921,6 +961,8 @@ outputs =
           };
         };
 
+        <<mcp-servers-config>>
+
         devShells = {
           default = pkgs.mkShell {
             packages = with pkgs; [
@@ -940,10 +982,13 @@ outputs =
                 p.oracle_oci
               ]))
             ];
-            shellHook = config.pre-commit.installationScript + ''
-              echo "Syncing CLAUDE.md..."
-              make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
-            '';
+            shellHook =
+              config.pre-commit.installationScript
+              + config.mcp-servers.shellHook
+              + ''
+                echo "Syncing CLAUDE.md..."
+                make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+              '';
           };
         };
       };

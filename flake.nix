@@ -163,6 +163,7 @@
       imports = [
         ./flake-module.nix
         inputs.git-hooks.flakeModule
+        inputs.mcp-servers.flakeModule
         inputs.treefmt-nix.flakeModule
       ];
 
@@ -372,6 +373,28 @@
             };
           };
 
+          mcp-servers = {
+            flavors.claude-code.enable = true;
+            programs = {
+              nixos.enable = true;
+              terraform.enable = true;
+              grafana = {
+                enable = true;
+                env = {
+                  GRAFANA_URL = "http://manyara:3001";
+                  GRAFANA_USERNAME = "admin";
+                };
+                passwordCommand = {
+                  GRAFANA_PASSWORD = [
+                    "rbw"
+                    "get"
+                    "grafana"
+                  ];
+                };
+              };
+            };
+          };
+
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
@@ -391,10 +414,13 @@
                   p.oracle_oci
                 ]))
               ];
-              shellHook = config.pre-commit.installationScript + ''
-                echo "Syncing CLAUDE.md..."
-                make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
-              '';
+              shellHook =
+                config.pre-commit.installationScript
+                + config.mcp-servers.shellHook
+                + ''
+                  echo "Syncing CLAUDE.md..."
+                  make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+                '';
             };
           };
         };
