@@ -4,15 +4,18 @@
 		'config:best-practices',
 	],
 	timezone: 'Asia/Tokyo',
-	lockFileMaintenance: {
-		enabled: true,
-		schedule: [
-			'before 3:00am',
-		],
-	},
 	automerge: true,
 	automergeStrategy: 'rebase',
 	nix: {
 		enabled: true,
 	},
+	packageRules: [
+		{
+			// Group all nix inputs except edgepkgs, update once per day
+			matchManagers: ['nix'],
+			matchDepNames: ['!/^edgepkgs$/'],
+			groupName: 'nix flake inputs',
+			schedule: ['before 4:00am'],
+		},
+	],
 }
