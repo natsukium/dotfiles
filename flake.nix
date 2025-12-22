@@ -5,6 +5,7 @@
   description = "dotfiles";
 
   inputs = {
+    private-test.url = "github:natsukium/private-modules";
     # Core
     nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
     nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";

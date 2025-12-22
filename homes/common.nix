@@ -32,6 +32,7 @@ in
   imports = [
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
+    inputs.private-test.homeModules.default
     ../modules/home-manager
     ../applications/atuin
     ../applications/bash
