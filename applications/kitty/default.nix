@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, config, ... }:
 let
   inherit (pkgs) lib stdenv;
   tmux-prefix = "ctrl+j";
@@ -49,6 +49,16 @@ in
           background_opacity = 0.9;
         };
       keybindings = {
+        "ctrl+shift+l" =
+          "kitten hints --type regex --regex 'nix log (/nix/store/[a-z0-9]{32}-[^ ]+\\.drv)' --program 'launch --type=overlay ${
+            pkgs.writeShellApplication {
+              name = "nix-log-viewer";
+              runtimeInputs = [ config.nix.package ];
+              text = ''
+                nix log "$1" | less
+              '';
+            }
+          }/bin/nix-log-viewer'";
         "ctrl+shift+f" = "remote_control_script ${
           pkgs.writeShellApplication {
             name = "tab-finder";
