@@ -31,7 +31,7 @@ in
           let
             inherit (config.home-manager.users.${specialArgs.username}) programs;
           in
-          [ "${pkgs.zen-browser}/Applications/Zen.app" ]
+          [ "${programs.zen-browser.package}/Applications/Zen Browser (Beta).app" ]
           ++ lib.optional programs.kitty.enable "${programs.kitty.package}/Applications/kitty.app"
           ++ lib.optional programs.emacs.enable "${programs.emacs.package}/Applications/Emacs.app";
       };

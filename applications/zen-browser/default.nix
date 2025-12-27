@@ -1,20 +1,13 @@
 {
   inputs,
-  config,
   pkgs,
   ...
 }:
-let
-  inherit (pkgs) lib stdenv;
-in
 {
-  my.programs.zen-browser = {
+  imports = [ inputs.zen-browser.homeModules.beta ];
+
+  programs.zen-browser = {
     enable = true;
-    package =
-      if stdenv.hostPlatform.isDarwin then
-        pkgs.zen-browser
-      else
-        inputs.zen-browser.packages.${stdenv.hostPlatform.system}.default;
     profiles.natsukium = {
       settings = {
         "extensions.autoDisableScopes" = 0;
@@ -86,22 +79,5 @@ in
           ]);
       };
     };
-  };
-
-  home.activation = lib.optionalAttrs stdenv.hostPlatform.isDarwin {
-    zen-browser =
-      let
-        profiles-ini =
-          if stdenv.hostPlatform.isLinux then
-            "${config.xdg.configHome}/zen/profiles.ini"
-          else
-            "${config.home.homeDirectory}/Library/\"Application Support\"/zen/profiles.ini";
-      in
-      inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        rm ${profiles-ini}.backup
-        mv ${profiles-ini} ${profiles-ini}.generate
-        cat ${profiles-ini}.generate > ${profiles-ini}
-        echo ZenAvatarPath=chrome://browser/content/zen-avatars/avatar-01.svg >> ${profiles-ini}
-      '';
   };
 }
