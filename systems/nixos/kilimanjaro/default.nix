@@ -6,6 +6,7 @@
 {
   imports = [
     ../../../modules/profiles/nixos/base.nix
+    ../../../modules/profiles/nixos/desktop.nix
     ../../shared/hercules-ci/agent.nix
     ../common.nix
     ../desktop.nix

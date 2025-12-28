@@ -16,7 +16,6 @@ in
   imports = [
     ../../modules/nixos
     ../common.nix
-    ./services/tailscale
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
