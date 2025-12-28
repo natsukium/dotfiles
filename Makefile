@@ -48,12 +48,15 @@ aarch64-darwin:
 
 # tangle targets: configuration.org -> generated files
 # Each directory has a configuration.org that tangles to one or more .nix files
-tangle: flake.nix overlays/default.nix
+tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix
 
 flake.nix: configuration.org
 	$(call tangle-org,$<)
 
 overlays/default.nix: overlays/configuration.org
+	$(call tangle-org,$<)
+
+modules/nixos/tailscale.nix: modules/configuration.org
 	$(call tangle-org,$<)
 
 CLAUDE.md: README.org

@@ -1,0 +1,175 @@
+#+STARTUP: overview
+#+PROPERTY: header-args:nix :mkdirp yes :noweb yes
+#+OPTIONS: ^:{}
+
+* Overview
+
+This file defines custom NixOS and nix-darwin modules that extend the standard module system.
+Each module addresses specific use cases or provides opinionated defaults not available upstream.
+
+Modules are organized by platform:
+- *NixOS*: Linux-specific system modules
+- *darwin*: macOS-specific system modules (future)
+- *home-manager*: User-level modules (future)
+
+* NixOS
+
+NixOS-specific system modules.
+
+** Tailscale
+
+Opinionated Tailscale VPN configuration for NixOS systems. This module provides sensible defaults
+for running Tailscale with MagicDNS, SSH access, and proper firewall configuration.
+
+#+begin_src nix :tangle nixos/tailscale.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle nixos/tailscale.nix
+{ config, lib, ... }:
+let
+  cfg = config.my.services.tailscale;
+in
+{
+  <<tailscale-options>>
+
+  <<tailscale-config>>
+}
+#+end_src
+
+*** Options
+
+Module options for controlling Tailscale behavior.
+
+#+NAME: tailscale-options
+#+begin_src nix
+options.my.services.tailscale = {
+  enable = lib.mkEnableOption "Tailscale VPN";
+
+  <<configureResolver-option>>
+};
+#+end_src
+
+**** configureResolver
+
+Desktop systems may experience DNS resolution failures after suspend/resume. When the system
+resumes, external domain resolution (e.g., github.com) fails while Tailnet hostnames continue
+to work. This is a known issue with Tailscale's DNS state management during network transitions.
+
+Enabling =configureResolver= activates systemd-resolved, which helps mitigate DNS resolution
+issues after suspend/resume. While this doesn't completely eliminate the issue (the upstream
+bug remains open), it provides the most reliable MagicDNS experience.
+
+For headless servers, this option is typically unnecessary because servers don't suspend,
+and thus never encounter this resume-related DNS bug.
+
+See [[https://github.com/tailscale/tailscale/issues/4254][tailscale/tailscale#4254]] for the upstream discussion.
+
+#+NAME: configureResolver-option
+#+begin_src nix
+configureResolver = lib.mkOption {
+  type = lib.types.bool;
+  default = false;
+  description = ''
+    Enable systemd-resolved for Tailscale DNS.
+    Recommended for desktop systems to mitigate DNS failures after suspend/resume.
+    https://github.com/tailscale/tailscale/issues/4254
+  '';
+};
+#+end_src
+
+*** Configuration
+
+#+NAME: tailscale-config
+#+begin_src nix
+config = lib.mkIf cfg.enable (
+  lib.mkMerge [
+    {
+      <<tailscale-service>>
+
+      <<tailscale-networking>>
+
+      <<tailscale-secrets>>
+    }
+    <<tailscale-resolver>>
+  ]
+);
+#+end_src
+
+**** Service Settings
+
+Core Tailscale service configuration.
+
+=useRoutingFeatures = "server"= enables this machine to act as a subnet router or exit node.
+All machines in this configuration can potentially serve as exit nodes for other devices,
+providing flexibility when traveling or on restricted networks.
+
+=authKeyFile= points to a SOPS-managed secret containing a Tailscale auth key. Using auth keys
+enables unattended authentication, which is essential for automated deployments and GitOps
+workflows with tools like comin.
+
+=--ssh= enables Tailscale SSH, allowing SSH access over the Tailscale network without managing
+SSH keys or exposing port 22 to the public internet.
+
+#+NAME: tailscale-service
+#+begin_src nix
+services.tailscale = {
+  enable = true;
+  useRoutingFeatures = "server";
+  authKeyFile = config.sops.secrets.tailscale-authkey.path;
+  extraUpFlags = [ "--ssh" ];
+};
+#+end_src
+
+**** Networking
+
+Firewall and DNS configuration for Tailscale integration.
+
+The =tailscale0= interface is trusted because all traffic on this interface is authenticated
+by Tailscale. This allows services to be exposed only to the tailnet without additional
+firewall rules.
+
+=100.100.100.100= is Tailscale's MagicDNS resolver, enabling resolution of tailnet hostnames
+(e.g., =hostname.tail4108.ts.net=). =8.8.8.8= provides fallback for non-tailnet queries,
+though in practice MagicDNS handles forwarding to upstream resolvers.
+
+The search domain is the tailnet domain, allowing short hostnames (e.g., =ssh manyara=
+instead of =ssh manyara.tail4108.ts.net=).
+
+#+NAME: tailscale-networking
+#+begin_src nix
+networking = {
+  firewall = {
+    trustedInterfaces = [ "tailscale0" ];
+    allowedUDPPorts = [ config.services.tailscale.port ];
+  };
+  nameservers = [
+    "100.100.100.100"
+    "8.8.8.8"
+  ];
+  search = [ "tail4108.ts.net" ];
+};
+#+end_src
+
+**** Secrets
+
+SOPS secret declaration for the Tailscale auth key. The actual key is stored encrypted
+in the repository's secrets file and decrypted at activation time.
+
+#+NAME: tailscale-secrets
+#+begin_src nix
+sops.secrets.tailscale-authkey = { };
+#+end_src
+
+**** Resolver
+
+Conditional systemd-resolved configuration. Only enabled when =configureResolver= is true,
+typically on desktop systems that suspend/resume.
+
+#+NAME: tailscale-resolver
+#+begin_src nix
+(lib.mkIf cfg.configureResolver {
+  services.resolved.enable = cfg.configureResolver;
+})
+#+end_src

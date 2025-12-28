@@ -1,3 +1,6 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 { config, lib, ... }:
 let
   cfg = config.my.services.tailscale;
