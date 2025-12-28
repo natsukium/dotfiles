@@ -11,7 +11,10 @@ runs:
   using: composite
   steps:
     - name: Install Nix
-      uses: nixbuild/nix-quick-install-action@2c9db80fb984ceb1bcaa77cdda3fdf8cfba92035 # v34
+      # Installing Nix in single user mode causes `man-cache` build to fail on Linux,
+      # so nixbuild/nix-quick-install-action cannot be used
+      # https://github.com/nix-community/cache-nix-action/issues/60#issuecomment-3561402982
+      uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31.9.0
     - name: Setup cachix
       uses: cachix/cachix-action@0fc020193b5a1fa3ac4575aa3a7d3aa6a35435ad # v16
       with:
