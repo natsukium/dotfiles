@@ -55,7 +55,7 @@ in
               name = "nix-log-viewer";
               runtimeInputs = [ config.nix.package ];
               text = ''
-                nix log "$1" | less
+                nix log "$1" | less -R
               '';
             }
           }/bin/nix-log-viewer'";
