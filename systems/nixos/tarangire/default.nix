@@ -33,6 +33,7 @@
 
   networking = {
     hostName = "tarangire";
+    interfaces.enp111s0.wakeOnLan.enable = true;
   };
 
   nix.settings = {

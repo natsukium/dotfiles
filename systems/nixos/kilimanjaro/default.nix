@@ -37,6 +37,7 @@
 
   networking = {
     hostName = "kilimanjaro";
+    interfaces.enp5s0.wakeOnLan.enable = true;
     wireless = {
       enable = true;
       secretsFile = config.sops.secrets.wifi.path;
