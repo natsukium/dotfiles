@@ -726,6 +726,129 @@ mcp-servers = {
 };
 #+end_src
 
+*** Hosts
+
+Machine definitions for all managed systems.
+
+#+NAME: hosts
+#+begin_src nix
+hosts = {
+  <<host-katavi>>
+  <<host-mikumi>>
+  <<host-work>>
+  <<host-kilimanjaro>>
+  <<host-arusha>>
+  <<host-manyara>>
+  <<host-serengeti>>
+  <<host-tarangire>>
+  <<host-android>>
+};
+#+end_src
+
+**** katavi
+
+Main laptop (M1 MacBook Air).
+
+#+NAME: host-katavi
+#+begin_src nix
+katavi = {
+  system = "aarch64-darwin";
+};
+#+end_src
+
+**** mikumi
+
+Build server (M1 Mac mini).
+
+#+NAME: host-mikumi
+#+begin_src nix
+mikumi = {
+  system = "aarch64-darwin";
+};
+#+end_src
+
+**** work
+
+Laptop for work (M4 MacBook Pro).
+
+#+NAME: host-work
+#+begin_src nix
+work = {
+  system = "aarch64-darwin";
+};
+#+end_src
+
+**** kilimanjaro
+
+Main desktop (Intel Core i5-12400F).
+
+#+NAME: host-kilimanjaro
+#+begin_src nix
+kilimanjaro = {
+  system = "x86_64-linux";
+};
+#+end_src
+
+**** arusha
+
+WSL (dual boot with kilimanjaro).
+
+#+NAME: host-arusha
+#+begin_src nix
+arusha = {
+  system = "x86_64-linux";
+};
+#+end_src
+
+**** manyara
+
+A mini PC with Intel N100, serving as a lightweight home server.
+https://www.bee-link.com/products/beelink-mini-s12-pro-n100
+
+BIOS is configured with the following setting to automatically power on after an outage:
+=Chipset > PCH-IO Configuration > State After G3 > S0 State=
+
+#+NAME: host-manyara
+#+begin_src nix
+manyara = {
+  system = "x86_64-linux";
+};
+#+end_src
+
+**** serengeti
+
+Build server (OCI A1 Flex).
+
+#+NAME: host-serengeti
+#+begin_src nix
+serengeti = {
+  system = "aarch64-linux";
+};
+#+end_src
+
+**** tarangire
+
+Build server (Ryzen 9 9950X).
+
+#+NAME: host-tarangire
+#+begin_src nix
+tarangire = {
+  system = "x86_64-linux";
+};
+#+end_src
+
+**** android
+
+Phone (Pixel 7a).
+
+#+NAME: host-android
+#+begin_src nix
+android = {
+  system = "aarch64-linux";
+  platform = "android";
+};
+#+end_src
+
 *** Rest of Flake
 
 #+NAME: rest-of-flake
@@ -746,45 +869,7 @@ outputs =
       inputs.treefmt-nix.flakeModule
     ];
 
-    hosts = {
-      # main laptop (m1 macbook air)
-      katavi = {
-        system = "aarch64-darwin";
-      };
-      # build server (m1 mac mini)
-      mikumi = {
-        system = "aarch64-darwin";
-      };
-      # laptop for work (m4 macbook pro)
-      work = {
-        system = "aarch64-darwin";
-      };
-      # main desktop (intel core i5-12400F)
-      kilimanjaro = {
-        system = "x86_64-linux";
-      };
-      # WSL (dualboot with kilimanjaro)
-      arusha = {
-        system = "x86_64-linux";
-      };
-      # main server (intel N100)
-      manyara = {
-        system = "x86_64-linux";
-      };
-      # build server (OCI A1 Flex)
-      serengeti = {
-        system = "aarch64-linux";
-      };
-      # build server (Ryzen 9 9950X)
-      tarangire = {
-        system = "x86_64-linux";
-      };
-      # phone (pixel 7a)
-      android = {
-        system = "aarch64-linux";
-        platform = "android";
-      };
-    };
+    <<hosts>>
 
     flake = {
       overlays = import ./overlays { inherit inputs; };

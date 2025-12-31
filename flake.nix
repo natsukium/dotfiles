@@ -167,39 +167,30 @@
       ];
 
       hosts = {
-        # main laptop (m1 macbook air)
         katavi = {
           system = "aarch64-darwin";
         };
-        # build server (m1 mac mini)
         mikumi = {
           system = "aarch64-darwin";
         };
-        # laptop for work (m4 macbook pro)
         work = {
           system = "aarch64-darwin";
         };
-        # main desktop (intel core i5-12400F)
         kilimanjaro = {
           system = "x86_64-linux";
         };
-        # WSL (dualboot with kilimanjaro)
         arusha = {
           system = "x86_64-linux";
         };
-        # main server (intel N100)
         manyara = {
           system = "x86_64-linux";
         };
-        # build server (OCI A1 Flex)
         serengeti = {
           system = "aarch64-linux";
         };
-        # build server (Ryzen 9 9950X)
         tarangire = {
           system = "x86_64-linux";
         };
-        # phone (pixel 7a)
         android = {
           system = "aarch64-linux";
           platform = "android";
