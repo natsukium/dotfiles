@@ -131,6 +131,10 @@
       url = "github:natsukium/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    simple-wol-manager = {
+      url = "git+https://git.natsukium.com/natsukium/simple-wol-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";

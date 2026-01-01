@@ -53,6 +53,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<mcp-servers>>
     <<niri-flake>>
     <<nur-packages>>
+    <<simple-wol-manager>>
     <<zen-browser>>
   };
 
@@ -608,6 +609,25 @@ that are either too niche for nixpkgs or require customizations.
 #+begin_src nix
 nur-packages = {
   url = "github:natsukium/nur-packages";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** simple-wol-manager
+
+https://git.natsukium.com/natsukium/simple-wol-manager
+
+#+begin_quote
+A web-based application for managing Wake-on-LAN (WoL) devices
+#+end_quote
+
+Personal Wake-on-LAN management tool. Provides a web interface for sending WoL packets
+and managing device configurations.
+
+#+NAME: simple-wol-manager
+#+begin_src nix
+simple-wol-manager = {
+  url = "git+https://git.natsukium.com/natsukium/simple-wol-manager";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 #+end_src

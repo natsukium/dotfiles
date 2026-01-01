@@ -1,4 +1,5 @@
 {
+  inputs,
   config,
   pkgs,
   ...
@@ -17,6 +18,7 @@
     ../services/miniflux
     ../services/prometheus
     ./hardware-configuration.nix
+    inputs.simple-wol-manager.nixosModules.default
   ];
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
@@ -48,6 +50,11 @@
   ext.services.nixpkgs-review.autoDeleteLogs = {
     enable = true;
     environmentFile = config.sops.secrets.gh-token.path;
+  };
+
+  services.simple-wol-manager = {
+    enable = true;
+    host = "0.0.0.0";
   };
 
   sops.secrets.gh-token = { };
