@@ -100,6 +100,8 @@ in
 
       commandsDir = ./commands;
 
+      skillsDir = ../common/skills;
+
       mcpServers = import ../common/mcp-servers.nix { inherit inputs pkgs; };
     };
 

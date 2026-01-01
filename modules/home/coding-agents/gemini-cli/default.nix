@@ -7,6 +7,7 @@
 }:
 let
   cfg = config.my.programs.gemini-cli;
+  commonLib = import ../common/lib.nix { inherit pkgs; };
 in
 {
   options.my.programs.gemini-cli = {
@@ -38,6 +39,6 @@ in
       };
     };
 
-    home.file.".gemini/AGENTS.md".source = ../common/AGENTS.md;
+    home.file.".gemini/AGENTS.md".source = commonLib.rulesWithTools;
   };
 }

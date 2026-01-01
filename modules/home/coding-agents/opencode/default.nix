@@ -7,6 +7,7 @@
 }:
 let
   cfg = config.my.programs.opencode;
+  commonLib = import ../common/lib.nix { inherit pkgs; };
 
   # Transform MCP server config
   # - add type="local"
@@ -37,7 +38,7 @@ in
     programs.opencode = {
       enable = true;
 
-      rules = builtins.readFile ../common/AGENTS.md;
+      rules = builtins.readFile commonLib.rulesWithTools;
 
       settings = {
         instructions = [ "CLAUDE.md" ];
