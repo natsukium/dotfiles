@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-01-01 12:13+0900\n"
+"POT-Creation-Date: 2026-01-01 15:05+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -25,6 +25,7 @@ msgstr ""
 #. type: keyword STARTUP
 #: README.org:2 configuration.org:1 applications/emacs/init.org:1
 #: applications/emacs/early-init.org:1 overlays/configuration.org:1
+#: modules/configuration.org:1
 #, no-wrap
 msgid "overview"
 msgstr ""
@@ -102,7 +103,7 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: README.org:34 applications/emacs/init.org:257
+#: README.org:34 applications/emacs/init.org:257 modules/configuration.org:82
 #, no-wrap
 msgid "Configuration"
 msgstr ""
@@ -180,22 +181,24 @@ msgid ""
 "[type: org] applications/emacs/init.org "
 "$lang:applications/emacs/init.$lang.org opt:\"-k 0\"\n"
 "[type: org] applications/emacs/early-init.org "
-"$lang:applications/emacs/early-init.$lang.org opt:\"-k 0\""
+"$lang:applications/emacs/early-init.$lang.org opt:\"-k 0\"\n"
+"[type: org] modules/configuration.org $lang:modules/configuration.$lang.org "
+"opt:\"-k 0\""
 msgstr ""
 
 #. type: paragraph
-#: README.org:70
+#: README.org:71
 msgid "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr ""
 
 #. type: heading ****
-#: README.org:72
+#: README.org:73
 #, no-wrap
 msgid "Create/Update po"
 msgstr ""
 
 #. type: paragraph
-#: README.org:74
+#: README.org:75
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -203,32 +206,32 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: README.org:80
+#: README.org:81
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: README.org:83
+#: README.org:84
 #, no-wrap
 msgid "Translate"
 msgstr ""
 
 #. type: paragraph
-#: README.org:85
+#: README.org:86
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
 msgstr ""
 
 #. type: heading ****
-#: README.org:92
+#: README.org:93
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr ""
 
 #. type: paragraph
-#: README.org:94
+#: README.org:95
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -236,19 +239,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: README.org:100
+#: README.org:101
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""
 
 #. type: keyword PROPERTY
-#: configuration.org:2 overlays/configuration.org:2
+#: configuration.org:2 overlays/configuration.org:2 modules/configuration.org:2
 #, no-wrap
 msgid "header-args:nix :mkdirp yes :noweb yes"
 msgstr ""
 
 #. type: keyword OPTIONS
-#: configuration.org:3 overlays/configuration.org:3
+#: configuration.org:3 overlays/configuration.org:3 modules/configuration.org:3
 #, no-wrap
 msgid "^:{}"
 msgstr ""
@@ -3510,7 +3513,7 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: overlays/configuration.org:5
+#: overlays/configuration.org:5 modules/configuration.org:5
 #, no-wrap
 msgid "Overview"
 msgstr ""
@@ -3933,4 +3936,373 @@ msgstr ""
 #: overlays/configuration.org:207
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:7
+msgid ""
+"This file defines custom NixOS and nix-darwin modules that extend the "
+"standard module system.  Each module addresses specific use cases or "
+"provides opinionated defaults not available upstream."
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:12
+#, no-wrap
+msgid "*NixOS*: Linux-specific system modules"
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:13
+#, no-wrap
+msgid "*darwin*: macOS-specific system modules (future)"
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:14
+#, no-wrap
+msgid "*home-manager*: User-level modules (future)"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:10
+msgid "Modules are organized by platform:"
+msgstr ""
+
+#. type: heading *
+#: modules/configuration.org:15
+#, no-wrap
+msgid "NixOS"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:17
+msgid "NixOS-specific system modules."
+msgstr ""
+
+#. type: heading **
+#: modules/configuration.org:19
+#, no-wrap
+msgid "Tailscale"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:21
+msgid ""
+"Opinionated Tailscale VPN configuration for NixOS systems. This module "
+"provides sensible defaults for running Tailscale with MagicDNS, SSH access, "
+"and proper firewall configuration."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:30
+#, no-wrap
+msgid ""
+"{ config, lib, ... }:\n"
+"let\n"
+"  cfg = config.my.services.tailscale;\n"
+"in\n"
+"{\n"
+"  <<tailscale-options>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:37
+#, no-wrap
+msgid ""
+"  <<tailscale-config>>\n"
+"}"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:41
+#, no-wrap
+msgid "Options"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:43
+msgid "Module options for controlling Tailscale behavior."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:45
+#, no-wrap
+msgid "tailscale-options"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:47
+#, no-wrap
+msgid ""
+"options.my.services.tailscale = {\n"
+"  enable = lib.mkEnableOption \"Tailscale VPN\";"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:50
+#, no-wrap
+msgid ""
+"  <<configureResolver-option>>\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:54
+#, no-wrap
+msgid "configureResolver"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:56
+msgid ""
+"Desktop systems may experience DNS resolution failures after "
+"suspend/resume. When the system resumes, external domain resolution (e.g., "
+"github.com) fails while Tailnet hostnames continue to work. This is a known "
+"issue with Tailscale's DNS state management during network transitions."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:60
+msgid ""
+"Enabling =configureResolver= activates systemd-resolved, which helps "
+"mitigate DNS resolution issues after suspend/resume. While this doesn't "
+"completely eliminate the issue (the upstream bug remains open), it provides "
+"the most reliable MagicDNS experience."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:64
+msgid ""
+"For headless servers, this option is typically unnecessary because servers "
+"don't suspend, and thus never encounter this resume-related DNS bug."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:67
+msgid ""
+"See "
+"[[https://github.com/tailscale/tailscale/issues/4254][tailscale/tailscale#4254]] "
+"for the upstream discussion."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:69
+#, no-wrap
+msgid "configureResolver-option"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:71
+#, no-wrap
+msgid ""
+"configureResolver = lib.mkOption {\n"
+"  type = lib.types.bool;\n"
+"  default = false;\n"
+"  description = ''\n"
+"    Enable systemd-resolved for Tailscale DNS.\n"
+"    Recommended for desktop systems to mitigate DNS failures after "
+"suspend/resume.\n"
+"    https://github.com/tailscale/tailscale/issues/4254\n"
+"  '';\n"
+"};"
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:84
+#, no-wrap
+msgid "tailscale-config"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:86
+#, no-wrap
+msgid ""
+"config = lib.mkIf cfg.enable (\n"
+"  lib.mkMerge [\n"
+"    {\n"
+"      <<tailscale-service>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:91
+#, no-wrap
+msgid "<<tailscale-networking>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:93
+#, no-wrap
+msgid ""
+"      <<tailscale-secrets>>\n"
+"    }\n"
+"    <<tailscale-resolver>>\n"
+"  ]\n"
+");"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:100
+#, no-wrap
+msgid "Service Settings"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:102
+msgid "Core Tailscale service configuration."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:104
+msgid ""
+"=useRoutingFeatures = \"server\"= enables this machine to act as a subnet "
+"router or exit node.  All machines in this configuration can potentially "
+"serve as exit nodes for other devices, providing flexibility when traveling "
+"or on restricted networks."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:108
+msgid ""
+"=authKeyFile= points to a SOPS-managed secret containing a Tailscale auth "
+"key. Using auth keys enables unattended authentication, which is essential "
+"for automated deployments and GitOps workflows with tools like comin."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:112
+msgid ""
+"=--ssh= enables Tailscale SSH, allowing SSH access over the Tailscale "
+"network without managing SSH keys or exposing port 22 to the public "
+"internet."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:115
+#, no-wrap
+msgid "tailscale-service"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:117
+#, no-wrap
+msgid ""
+"services.tailscale = {\n"
+"  enable = true;\n"
+"  useRoutingFeatures = \"server\";\n"
+"  authKeyFile = config.sops.secrets.tailscale-authkey.path;\n"
+"  extraUpFlags = [ \"--ssh\" ];\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:125
+#, no-wrap
+msgid "Networking"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:127
+msgid "Firewall and DNS configuration for Tailscale integration."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:129
+msgid ""
+"The =tailscale0= interface is trusted because all traffic on this interface "
+"is authenticated by Tailscale. This allows services to be exposed only to "
+"the tailnet without additional firewall rules."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:133
+msgid ""
+"=100.100.100.100= is Tailscale's MagicDNS resolver, enabling resolution of "
+"tailnet hostnames (e.g., =hostname.tail4108.ts.net=). =8.8.8.8= provides "
+"fallback for non-tailnet queries, though in practice MagicDNS handles "
+"forwarding to upstream resolvers."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:137
+msgid ""
+"The search domain is the tailnet domain, allowing short hostnames (e.g., "
+"=ssh manyara= instead of =ssh manyara.tail4108.ts.net=)."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:140
+#, no-wrap
+msgid "tailscale-networking"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:142
+#, no-wrap
+msgid ""
+"networking = {\n"
+"  firewall = {\n"
+"    trustedInterfaces = [ \"tailscale0\" ];\n"
+"    allowedUDPPorts = [ config.services.tailscale.port ];\n"
+"  };\n"
+"  nameservers = [\n"
+"    \"100.100.100.100\"\n"
+"    \"8.8.8.8\"\n"
+"  ];\n"
+"  search = [ \"tail4108.ts.net\" ];\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:155
+#, no-wrap
+msgid "Secrets"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:157
+msgid ""
+"SOPS secret declaration for the Tailscale auth key. The actual key is stored "
+"encrypted in the repository's secrets file and decrypted at activation time."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:160
+#, no-wrap
+msgid "tailscale-secrets"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:162
+#, no-wrap
+msgid "sops.secrets.tailscale-authkey = { };"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:165
+#, no-wrap
+msgid "Resolver"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:167
+msgid ""
+"Conditional systemd-resolved configuration. Only enabled when "
+"=configureResolver= is true, typically on desktop systems that "
+"suspend/resume."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:170
+#, no-wrap
+msgid "tailscale-resolver"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:172
+#, no-wrap
+msgid ""
+"(lib.mkIf cfg.configureResolver {\n"
+"  services.resolved.enable = cfg.configureResolver;\n"
+"})"
 msgstr ""
