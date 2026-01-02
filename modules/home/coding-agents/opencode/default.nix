@@ -38,8 +38,6 @@ in
     programs.opencode = {
       enable = true;
 
-      rules = builtins.readFile commonLib.rulesWithTools;
-
       settings = {
         instructions = [ "CLAUDE.md" ];
 
@@ -52,6 +50,8 @@ in
         );
       };
     };
+
+    xdg.configFile."opencode/AGENTS.md".source = commonLib.rulesWithTools;
 
     home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   };
