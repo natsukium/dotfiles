@@ -4,6 +4,14 @@
     enable = true;
     port = 3333;
     settings = {
+      dns = {
+        upstream_dns = [
+          "https://dns.cloudflare.com/dns-query"
+          "https://dns.google/dns-query"
+          "https://dns10.quad9.net/dns-query"
+        ];
+        upstream_mode = "load_balance";
+      };
       filters = [
         {
           name = "AdGuard DNS filter";
