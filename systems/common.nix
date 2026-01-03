@@ -38,7 +38,13 @@ in
   # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
   # https://github.com/LnL7/nix-darwin/issues/663
   system.activationScripts.extraActivation.text = ''
-    # shellcheck disable=SC2046
-    ${lib.getExe pkgs.nix} --extra-experimental-features 'nix-command flakes' store diff-closures $(find /nix/var/nix/profiles/system-*-link | tail -2)
+    profiles=$(find /nix/var/nix/profiles/system-*-link 2>/dev/null | tail -2)
+    profile_count=$(echo "$profiles" | wc -l)
+    if [ "$profile_count" -ge 2 ]; then
+      # shellcheck disable=SC2086
+      ${lib.getExe pkgs.nix} --extra-experimental-features 'nix-command flakes' store diff-closures $profiles
+    else
+      echo "No previous generation to compare with."
+    fi
   '';
 }
