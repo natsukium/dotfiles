@@ -6,11 +6,21 @@
     settings = {
       dns = {
         upstream_dns = [
+          "[/ts.net/]100.100.100.100"
           "https://dns.cloudflare.com/dns-query"
           "https://dns.google/dns-query"
           "https://dns10.quad9.net/dns-query"
         ];
         upstream_mode = "load_balance";
+      };
+      filtering = {
+        rewrites = [
+          {
+            domain = "*.home.natsukium.com";
+            answer = "manyara.tail4108.ts.net";
+            enabled = true;
+          }
+        ];
       };
       filters = [
         {
