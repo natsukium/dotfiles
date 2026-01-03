@@ -6,9 +6,6 @@ terraform {
     sops = {
       source = "carlpett/sops"
     }
-    hydra = {
-      source = "DeterminateSystems/hydra"
-    }
   }
 }
 

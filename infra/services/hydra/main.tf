@@ -1,3 +1,22 @@
+terraform {
+  required_providers {
+    hydra = {
+      source = "DeterminateSystems/hydra"
+    }
+    sops = {
+      source = "carlpett/sops"
+    }
+  }
+
+  backend "s3" {
+    bucket       = "natsukium-tfstate"
+    encrypt      = true
+    key          = "global/services/hydra/terraform.tfstate"
+    region       = "us-east-2"
+    use_lockfile = true
+  }
+}
+
 data "sops_file" "hydra-secret" {
   source_file = "secrets.yaml"
 }
@@ -77,4 +96,3 @@ resource "hydra_jobset" "nixpkgs" {
   email_notifications = false
   email_override      = ""
 }
-
