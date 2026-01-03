@@ -8,4 +8,6 @@ in
   ];
 
   documentation.nixos.enable = mkDefault false;
+
+  services.caddy.enable = true;
 }

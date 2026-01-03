@@ -36,4 +36,8 @@
       ];
     };
   };
+
+  services.caddy.virtualHosts."http://adguard.home.natsukium.com".extraConfig = ''
+    reverse_proxy localhost:${toString config.services.adguardhome.port}
+  '';
 }
