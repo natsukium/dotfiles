@@ -8,11 +8,9 @@
     };
   };
 
-  services.tsnsrv.services.rss-reader = {
-    ephemeral = true;
-    authKeyPath = config.sops.secrets.tailscale-authkey.path;
-    toURL = "http://127.0.0.1:${config.services.miniflux.config.PORT}";
-  };
+  services.caddy.virtualHosts."http://rss.home.natsukium.com".extraConfig = ''
+    reverse_proxy localhost:${config.services.miniflux.config.PORT}
+  '';
 
   sops.secrets.miniflux = { };
 }
