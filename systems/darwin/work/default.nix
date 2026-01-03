@@ -11,5 +11,11 @@
 
   my.services.timemachine.enableLocalSnapshot = true;
 
-  networking.hostName = "work";
+  networking = {
+    hostName = "work";
+    knownNetworkServices = [
+      "USB 10/100/1G/2.5G LAN"
+      "Wi-Fi"
+    ];
+  };
 }

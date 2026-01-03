@@ -37,7 +37,10 @@ in
 
   system.primaryUser = username;
 
-  services.tailscale.enable = true;
+  services.tailscale = {
+    enable = true;
+    overrideLocalDns = true;
+  };
 
   services.openssh.enable = true;
 

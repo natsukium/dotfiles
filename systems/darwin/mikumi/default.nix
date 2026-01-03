@@ -7,7 +7,13 @@
     ../common.nix
   ];
 
-  networking.hostName = "mikumi";
+  networking = {
+    hostName = "mikumi";
+    knownNetworkServices = [
+      "Ethernet"
+      "Wi-Fi"
+    ];
+  };
 
   nix.settings = {
     max-jobs = 4;
