@@ -301,6 +301,7 @@
                 typos = {
                   enable = true;
                   excludes = [
+                    ".sops.yaml"
                     "homes/shared/gpg/keys.txt"
                     "secrets.yaml"
                     "secrets/default.yaml"
