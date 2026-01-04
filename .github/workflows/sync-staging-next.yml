@@ -1,0 +1,43 @@
+name: Sync staging-next branch
+on:
+  schedule:
+    - cron: "0 19 * * *"
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  sync-staging-next:
+    runs-on: ubuntu-slim
+    timeout-minutes: 15
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@8e8c483db84b4bee98b60c0593521ed34d9990e8 # v6.0.1
+        with:
+          fetch-depth: 0
+          ref: main
+      - name: Setup Nix
+        uses: cachix/install-nix-action@4e002c8ec80594ecd40e759629461e26c8abed15 # v31.9.0
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+      - name: Sync staging-next branch
+        run: |
+          if git ls-remote --exit-code --heads origin staging-next; then
+            git switch staging-next
+            git reset --hard origin/main
+          else
+            git switch -c staging-next
+          fi
+
+          sed -i 's|ref=nixos-unstable-small|ref=staging-next|g' flake.nix
+
+          nix flake update nixpkgs
+
+          if ! git diff --quiet; then
+            git add flake.nix flake.lock
+            git commit -m "chore: sync with main and update nixpkgs to staging-next"
+          fi
+
+          git push --force origin staging-next
