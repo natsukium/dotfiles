@@ -96,3 +96,31 @@ resource "hydra_jobset" "nixpkgs" {
   email_notifications = false
   email_override      = ""
 }
+
+resource "hydra_project" "dotfiles" {
+  name         = "dotfiles"
+  display_name = "dotfiles"
+  homepage     = "https://github.com/natsukium/dotfiles"
+  description  = "Personal NixOS/Darwin configurations"
+  owner        = "natsukium"
+  enabled      = true
+  visible      = true
+}
+
+resource "hydra_jobset" "dotfiles-staging-next" {
+  project     = hydra_project.dotfiles.name
+  state       = "enabled"
+  visible     = true
+  name        = "staging-next"
+  type        = "flake"
+  description = "Daily build with nixpkgs staging-next"
+
+  flake_uri = "github:natsukium/dotfiles/staging-next"
+
+  check_interval    = 43200
+  scheduling_shares = 10
+  keep_evaluations  = 14
+
+  email_notifications = false
+  email_override      = ""
+}
