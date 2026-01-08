@@ -1,7 +1,7 @@
 { pkgs, ... }:
 {
   wayland.windowManager.hyprland = {
-    enable = true;
+    enable = false;
     extraConfig = ''
       # See https://wiki.hyprland.org/Configuring/Monitors/
       monitor=,preferred,auto,1
