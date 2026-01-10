@@ -27,21 +27,9 @@ provider "cloudflare" {
 
 locals {
   records = {
-    blog = {
-      content = "natsukium-com.pages.dev"
-      name    = "natsukium.com"
-      proxied = true
-      type    = "CNAME"
-    }
     dotfiles = {
       content = "natsukium.github.io"
       name    = "dotfiles.natsukium.com"
-      proxied = true
-      type    = "CNAME"
-    }
-    www = {
-      content = "natsukium.com"
-      name    = "www.natsukium.com"
       proxied = true
       type    = "CNAME"
     }
