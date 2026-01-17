@@ -2,6 +2,9 @@
 {
   services.hydra = {
     enable = true;
+    package = pkgs.hydra.overrideAttrs (_: {
+      doCheck = false;
+    });
     hydraURL = "http://127.0.0.1";
     port = 3000;
     notificationSender = "";
