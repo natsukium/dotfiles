@@ -569,3 +569,24 @@ Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=.
 
 (my/sync-project-list)
 #+end_src
+
+Sort the project list by modification time, placing recently updated projects first.
+
+Using advice instead of sorting in =my/sync-project-list= ensures that projects
+are sorted by their current mtime at selection time, not at file generation time.
+This keeps the order fresh even during long Emacs sessions.
+
+#+begin_src emacs-lisp
+(defun my/sort-projects-by-mtime (projects)
+  "Sort PROJECTS by modification time, most recent first."
+  (sort projects
+        (lambda (a b)
+          (let ((time-a (file-attribute-modification-time
+                         (file-attributes a)))
+                (time-b (file-attribute-modification-time
+                         (file-attributes b))))
+            (time-less-p time-b time-a)))))
+
+(advice-add 'project-known-project-roots :filter-return
+            #'my/sort-projects-by-mtime)
+#+end_src
