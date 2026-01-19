@@ -40,6 +40,25 @@ macOSでは環境変数($PATH など)を読み込めないため[[https://github
     (exec-path-from-shell-initialize)))
 #+end_src
 
+** envrc
+
+[[https://github.com/purcell/envrc][envrc.el]] provides buffer-local environment variables
+based on direnv. This enables Emacs to recognize project-specific
+development environments managed by direnv.
+
+Unlike direnv.el which sets environment variables globally,
+envrc.el keeps them buffer-local. This is essential when working
+on multiple projects simultaneously, each with its own .envrc.
+
+The mode must be enabled early (via after-init hook) so that
+other packages can inherit the correct environment.
+
+#+begin_src emacs-lisp
+(use-package envrc
+  :ensure t
+  :hook (after-init . envrc-global-mode))
+#+end_src
+
 * UI
 ** mode-line
 #+begin_src emacs-lisp
