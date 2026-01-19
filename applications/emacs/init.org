@@ -370,6 +370,35 @@ Used when converting Org files to HTML with syntax highlighting for code blocks.
   :ensure t)
 #+end_src
 
+* terminal
+** vterm
+
+[[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] is a fully-fledged terminal emulator based on libvterm.
+It provides better performance and compatibility than pure Emacs Lisp alternatives,
+making it suitable for running interactive CLI tools like Claude Code.
+
+#+begin_src emacs-lisp
+(use-package vterm
+  :ensure t)
+#+end_src
+
+** claude-code-ide
+
+[[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide.el]] integrates Claude Code CLI with Emacs,
+enabling AI-powered code assistance directly in the editor.
+
+The package requires a terminal backend (vterm or eat) and the Claude Code CLI.
+Using vterm as the backend for better terminal compatibility.
+
+#+begin_src emacs-lisp
+(use-package claude-code-ide
+  :bind ("C-c C-'" . claude-code-ide-menu)
+  :custom
+  (claude-code-ide-term-backend 'vterm)
+  :config
+  (claude-code-ide-emacs-tools-setup))
+#+end_src
+
 * misc
 ** vundo
 #+begin_src emacs-lisp
