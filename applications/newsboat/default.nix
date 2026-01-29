@@ -1,6 +1,5 @@
 {
   inputs,
-  pkgs,
   ...
 }:
 let
@@ -9,9 +8,7 @@ let
 in
 {
   programs.newsboat = {
-    # broken on macos
-    # https://github.com/newsboat/newsboat/pull/3185
-    enable = pkgs.stdenv.hostPlatform.isLinux;
+    enable = true;
     autoReload = true;
     extraConfig = ''
       urls-source "miniflux"
