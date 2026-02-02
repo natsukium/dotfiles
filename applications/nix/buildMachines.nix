@@ -57,7 +57,7 @@ in
         supportedFeatures = serengeti.config.nix.settings.system-features;
         mandatoryFeatures = [ ];
       }
-      ++ lib.optional (config.networking.hostName != "mikumi") {
+      ++ lib.optional (config.networking.hostName != "mikumi" && config.networking.hostName != "work") {
         inherit (mikumi.config.networking) hostName;
         systems = [
           "aarch64-darwin"
