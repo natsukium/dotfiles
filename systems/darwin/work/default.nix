@@ -11,6 +11,11 @@
 
   my.services.timemachine.enableLocalSnapshot = true;
 
+  nix.settings = {
+    substituters = [ "https://attmcojp.cachix.org" ];
+    trusted-public-keys = [ "attmcojp.cachix.org-1:oru6oV4EttotACGO/YDhmsEyPlPSytG6zWUgTRH3BMQ=" ];
+  };
+
   networking = {
     hostName = "work";
     knownNetworkServices = [
