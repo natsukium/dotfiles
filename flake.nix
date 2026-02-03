@@ -393,6 +393,7 @@
           devShells = {
             default = pkgs.mkShell {
               packages = with pkgs; [
+                aws-vault
                 gettext
                 nix-fast-build
                 self'.packages.po4a_0_74
