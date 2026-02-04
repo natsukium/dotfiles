@@ -15,7 +15,7 @@
   hadolint,
   lua-language-server,
   nixd,
-  nixfmt-rfc-style,
+  nixfmt,
   nurl,
   rubocop,
   ruff,
@@ -69,7 +69,7 @@ let
     stylua
     # nix
     nixd
-    nixfmt-rfc-style
+    nixfmt
     # python
     basedpyright
     ruff
