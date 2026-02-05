@@ -20,6 +20,10 @@
     enableNvidia = true;
   };
 
+  # docker.enableNvidia enables nvidia-container-toolkit, which added an assertion
+  # requiring explicit driver configuration. On WSL, drivers come from Windows.
+  hardware.nvidia-container-toolkit.suppressNvidiaDriverAssertion = true;
+
   fonts.packages = with pkgs; [
     noto-fonts-cjk-sans
     noto-fonts-color-emoji
