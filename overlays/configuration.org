@@ -48,27 +48,7 @@ to patch locally.
 #+NAME: stable
 #+begin_src nix
 stable = final: prev: {
-  inherit (inputs.nixpkgs-stable.legacyPackages.${final.stdenv.hostPlatform.system})
-    <<hercules-ci-agent>>
-    ;
 };
-#+end_src
-
-*** hercules-ci-agent
-
-Build is broken on darwin in nixpkgs-unstable due to a dependency issue.
-A fix is proposed in [[https://github.com/NixOS/nixpkgs/pull/463879][NixOS/nixpkgs#463879]], but as of 2025-11-30, the PR targets
-the staging branch and is still under review.
-
-Cherry-picking this fix locally isn't practical because the PR touches core darwin
-infrastructure, which would trigger rebuilds of numerous packages. Using the stable
-branch package avoids this rebuild cascade while we wait for the fix to land in master.
-
-Remove this override once the PR is merged and propagates to the master branch.
-
-#+NAME: hercules-ci-agent
-#+begin_src nix
-hercules-ci-agent
 #+end_src
 
 ** temporary-fix
