@@ -17,7 +17,7 @@ in
     programs.claude-code = {
       enable = true;
 
-      package = pkgs.edge.claude-code;
+      package = pkgs.edge.claude-code-bin;
 
       settings = {
         includeCoAuthoredBy = false;
