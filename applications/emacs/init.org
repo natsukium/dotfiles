@@ -543,6 +543,17 @@ Using vterm as the backend for better terminal compatibility.
   (embark-collect-mode . consult-preview-at-point-mode))
 #+end_src
 
+** compilation
+
+The compilation buffer does not inherit from comint-mode,
+so ANSI escape sequences are displayed as raw text by default.
+Adding =ansi-color-compilation-filter= to the compilation filter
+hook interprets these sequences and renders them as colors.
+
+#+begin_src emacs-lisp
+(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
+#+end_src
+
 ** Others
 #+begin_src emacs-lisp
 (which-key-mode)
