@@ -389,6 +389,31 @@ Used when converting Org files to HTML with syntax highlighting for code blocks.
   :ensure t)
 #+end_src
 
+* document
+
+** pdf-tools
+
+Emacs's built-in DocView mode renders PDFs as rasterized images page-by-page,
+resulting in blurry text at most zoom levels
+and lacking interactive features like text selection, incremental search, and annotation.
+
+[[https://github.com/vedang/pdf-tools][pdf-tools]] replaces DocView with a viewer powered by =poppler=,
+providing sharp rendering, isearch integration, annotation support,
+and SyncTeX for LaTeX workflows.
+
+Using =pdf-loader-install= instead of =pdf-tools-install=
+to defer initialization until a PDF is actually opened.
+With Nix's pre-built =epdfinfo= binary, both functions behave identically,
+but the loader variant avoids unnecessary work at startup.
+
+#+begin_src emacs-lisp
+(use-package pdf-tools
+  :ensure t
+  :mode ("\\.pdf\\'" . pdf-view-mode)
+  :config
+  (pdf-loader-install))
+#+end_src
+
 * terminal
 ** vterm
 
