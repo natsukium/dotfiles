@@ -67,7 +67,7 @@ in
     package = pkgs.brewCasks.google-japanese-ime.overrideAttrs (oldAttrs: {
       src = pkgs.fetchurl {
         url = oldAttrs.src.url;
-        hash = "sha256-5uen/UgWF1ax04/beEvh24qBFGac6R+OnEdIhbcd1rs=";
+        hash = "sha256-AEWOEuWBoc+OEuixLUIWzqtpHKAWSX9IZW/SX3uvuKk=";
       };
       unpackPhase = ''
         runHook preUnpack
