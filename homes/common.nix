@@ -45,6 +45,5 @@ in
     ../applications/rbw
     ../applications/starship
     ../applications/tmux
-    ../applications/vim
   ];
 }

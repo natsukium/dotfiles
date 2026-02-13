@@ -82,10 +82,6 @@ in
     hlsearch = true;
     useSystemClipboard = true;
     visualstar = true;
-    vimrc = {
-      enable = true;
-      path = "~/.config/vim/vimrc";
-    };
     normalModeKeyBindings = [
       {
         before = [
