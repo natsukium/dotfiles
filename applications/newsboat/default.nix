@@ -1,5 +1,6 @@
 {
   inputs,
+  pkgs,
   ...
 }:
 let
@@ -8,7 +9,7 @@ let
 in
 {
   programs.newsboat = {
-    enable = true;
+    enable = if pkgs.stdenv.hostPlatform.isDarwin then false else true;
     autoReload = true;
     extraConfig = ''
       urls-source "miniflux"
