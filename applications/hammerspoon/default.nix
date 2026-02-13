@@ -8,8 +8,8 @@
         patches = (oldAttrs.patches or [ ]) ++ [
           (pkgs.fetchpatch2 {
             name = "window-offset-support.patch";
-            url = "https://github.com/natsukium/PaperWM.spoon/commit/b172a99fbf343bb356fe2debeb66a6eee2190570.patch";
-            hash = "sha256-tV+N9TO0kXFFhPbrDq8pTcG5oDEh2BQy1qZ3ga2KL9s=";
+            url = "https://github.com/natsukium/PaperWM.spoon/commit/054011baf09079ae6e49c01fa8b04dacda98eca7.patch";
+            hash = "sha256-1ps05ksquKq/rE7xJuxmL8EEx5aAqyB9E5HhxNCl6Hs=";
           })
         ];
       }))
