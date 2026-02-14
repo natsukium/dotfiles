@@ -27,13 +27,22 @@ with lib;
       '';
     })
     (mkIf pkgs.stdenv.isDarwin {
-      home.activation.set-wallpaper = inputs.home-manager.lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-        /usr/bin/osascript -e '
-          set desktopImage to POSIX file "${cfg.imagePath}"
-          tell application "Finder"
-          set desktop picture to desktopImage
-          end tell'
-      '';
+      launchd.agents.set-wallpaper = {
+        enable = true;
+        config = {
+          ProgramArguments = [
+            "/usr/bin/osascript"
+            "-e"
+            ''
+              set desktopImage to POSIX file "${cfg.imagePath}"
+              tell application "Finder"
+                set desktop picture to desktopImage
+              end tell
+            ''
+          ];
+          RunAtLoad = true;
+        };
+      };
     })
   ]);
 }
