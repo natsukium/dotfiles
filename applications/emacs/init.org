@@ -465,6 +465,24 @@ Using vterm as the backend for better terminal compatibility.
   (claude-code-ide-emacs-tools-setup))
 #+end_src
 
+* encryption
+
+[[https://github.com/anticomputer/age.el][age.el]] provides transparent encryption and decryption
+of =.age= files in Emacs using the [[https://age-encryption.org/][age]] encryption tool.
+
+Using SSH keys as identity/recipient
+so that no separate age keypair is needed.
+
+#+begin_src emacs-lisp
+(use-package age
+  :ensure t
+  :custom
+  (age-default-identity "~/.ssh/id_ed25519")
+  (age-default-recipient "~/.ssh/id_ed25519.pub")
+  :config
+  (age-file-enable))
+#+end_src
+
 * misc
 ** vundo
 #+begin_src emacs-lisp

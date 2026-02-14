@@ -48,8 +48,9 @@ let
     extraEmacsPackages =
       epkgs: with epkgs; [
         treesit-grammars.with-all-grammars
-        pkgs.gettext
         (claude-code-ide epkgs)
+        pkgs.age
+        pkgs.gettext
       ];
   };
 in
