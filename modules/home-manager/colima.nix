@@ -14,7 +14,7 @@ in
     enable = mkEnableOption "";
     enableXDG = mkOption {
       type = types.bool;
-      default = !(pkgs.stdenv.isDarwin && pkgs.stdenv.isx86_64);
+      default = !(pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isx86_64);
       description = "";
     };
     package = mkOption {
@@ -49,7 +49,8 @@ in
     };
     vmType = mkOption {
       type = types.str;
-      default = if (pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64) then "vz" else "qemu";
+      default =
+        if (pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64) then "vz" else "qemu";
       description = "Virtual Machine type (qemu, vz)";
     };
     mountType = mkOption {
@@ -59,7 +60,7 @@ in
     };
     enableRosetta = mkOption {
       type = types.bool;
-      default = pkgs.stdenv.isDarwin && pkgs.stdenv.isAarch64;
+      default = pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64;
       description = "Utilise rosetta for amd64 emulation (requires m1 mac and vmType `vz`)";
     };
     # TODO: enable profiles

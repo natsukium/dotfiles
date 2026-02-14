@@ -65,7 +65,7 @@ in
             "root"
             "@wheel"
           ]
-          ++ optional pkgs.stdenv.isDarwin "@admin";
+          ++ optional pkgs.stdenv.hostPlatform.isDarwin "@admin";
         };
 
         gc = {

@@ -20,13 +20,13 @@ with lib;
     };
   };
   config = mkIf cfg.enable (mkMerge [
-    (mkIf pkgs.stdenv.isLinux {
+    (mkIf pkgs.stdenv.hostPlatform.isLinux {
       home.packages = [ pkgs.swaybg ];
       wayland.windowManager.hyprland.extraConfig = ''
         exec-once = swaybg -i ${cfg.imagePath}
       '';
     })
-    (mkIf pkgs.stdenv.isDarwin {
+    (mkIf pkgs.stdenv.hostPlatform.isDarwin {
       launchd.agents.set-wallpaper = {
         enable = true;
         config = {
