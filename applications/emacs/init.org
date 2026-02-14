@@ -436,6 +436,42 @@ but the loader variant avoids unnecessary work at startup.
   (pdf-loader-install))
 #+end_src
 
+* RSS
+
+[[https://github.com/skeeto/elfeed][elfeed]] is a web feed reader for Emacs.
+Using it with [[https://github.com/fasheng/elfeed-protocol][elfeed-protocol]]
+to read feeds from Miniflux via the Fever API.
+This keeps feed management centralized in Miniflux
+and avoids duplicating the subscription list across devices.
+
+The Fever API must be enabled in Miniflux
+(Settings -> Integrations -> Fever API)
+before this configuration will work.
+
+Credentials are stored in =~/.authinfo.age=.
+
+#+begin_example
+machine rss.home.natsukium.com login natsukium password <fever-password>"
+#+end_example
+
+#+begin_src emacs-lisp
+(use-package elfeed
+  :ensure t
+  :bind ("C-x w" . elfeed))
+
+(use-package elfeed-protocol
+  :ensure t
+  :after elfeed
+  :config
+  (setq elfeed-use-curl t)
+  (setq elfeed-protocol-feeds
+        '(("fever+http://natsukium@rss.home.natsukium.com"
+           :api-url "http://rss.home.natsukium.com/fever/"
+           :use-authinfo t)))
+  (setq elfeed-protocol-enabled-protocols '(fever))
+  (elfeed-protocol-enable))
+#+end_src
+
 * terminal
 ** vterm
 
@@ -480,7 +516,8 @@ so that no separate age keypair is needed.
   (age-default-identity "~/.ssh/id_ed25519")
   (age-default-recipient "~/.ssh/id_ed25519.pub")
   :config
-  (age-file-enable))
+  (age-file-enable)
+  (setq auth-sources '("~/.authinfo.age")))
 #+end_src
 
 * misc
