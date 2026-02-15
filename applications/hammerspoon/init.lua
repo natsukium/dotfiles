@@ -3,7 +3,7 @@
 PaperWM = hs.loadSpoon("PaperWM")
 
 PaperWM.window_gap = 10
-PaperWM.window_offset = { left = 40, top = 0, right = 0, bottom = 0 }
+PaperWM.external_bar = { left = 40 }
 PaperWM.window_ratios = { 0.34, 0.50, 0.66 }
 PaperWM.window_filter:rejectApp("CopyQ")
 
