@@ -30,14 +30,23 @@ Highlight the cursor line.
 #+end_src
 
 ** Darwin
-macOSでは環境変数($PATH など)を読み込めないため[[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]]を使ったワークアランウドが必要。
-[[https://github.com/d12frosted/homebrew-emacs-plus/blob/3e61ee44f4cfc43dce292047aff5e9277e7d1bd4/Library/EmacsBase.rb#L33-L49][emacs-plus]]ではEmacsのInfo.plistにPATHを挿入しており、そのパッチを当てればこのパッケージは不要となるかもしれない。
+On macOS, Emacs cannot inherit environment variables (such as ~$PATH~) from the shell,
+so [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] is needed as a workaround.
+[[https://github.com/d12frosted/homebrew-emacs-plus/blob/3e61ee44f4cfc43dce292047aff5e9277e7d1bd4/Library/EmacsBase.rb#L33-L49][emacs-plus]] injects PATH into Emacs's Info.plist, so applying that patch might eliminate the need for this package.
+
+=exec-path-from-shell-initialize= replaces =exec-path= with the login shell's ~PATH~.
+Paths added by the Nix wrapper via =extraEmacsPackages= (e.g. age) are not present
+in the shell's ~PATH~ and would be lost.
+Saving =exec-path= before initialization and merging it back preserves wrapper-provided paths.
+
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :ensure t
   :config
   (when (memq window-system '(mac ns x))
-    (exec-path-from-shell-initialize)))
+    (let ((nix-exec-path exec-path))
+      (exec-path-from-shell-initialize)
+      (setq exec-path (delete-dups (append exec-path nix-exec-path))))))
 #+end_src
 
 ** envrc
