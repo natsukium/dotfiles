@@ -23,4 +23,9 @@
       "Wi-Fi"
     ];
   };
+
+  programs = {
+    _1password.enable = true; # Integration with the 1Password GUI
+    _1password-gui.enable = true;
+  };
 }
