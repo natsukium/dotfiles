@@ -20,7 +20,8 @@
       url."git@github.com:".pushInsteadOf = "https://github.com/";
     };
     signing = {
-      key = "2D5ADD7530F56A42";
+      format = "ssh";
+      key = "~/.ssh/id_ed25519.pub";
       signByDefault = true;
     };
     ignores = [
