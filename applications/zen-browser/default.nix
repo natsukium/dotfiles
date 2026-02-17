@@ -58,6 +58,13 @@
             definedAliases = [ "@crates" ];
           };
 
+          npm = {
+            name = "npm";
+            urls = [ { template = "https://www.npmjs.com/search?q={searchTerms}"; } ];
+            icon = "https://www.google.com/s2/favicons?domain=npmjs.com&sz=64";
+            definedAliases = [ "@npm" ];
+          };
+
           pypi = {
             name = "PyPI";
             urls = [ { template = "https://pypi.org/search/?q={searchTerms}"; } ];
