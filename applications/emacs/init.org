@@ -289,27 +289,6 @@ See [[https://www.gnu.org/software/gettext/manual/html_node/Modifying-Translatio
   :ensure t)
 #+end_src
 
-The following configuration is based on
-[[https://www.gnu.org/software/gettext/manual/html_node/Installation.html][Completing GNU gettext Installation]].
-
-This registers =.po= files and files containing =.po.= in their name
-to automatically activate PO mode.
-
-#+begin_src emacs-lisp
-(setq auto-mode-alist
-      (cons '("\\.po\\'\\|\\.po\\." . po-mode) auto-mode-alist))
-(autoload 'po-mode "po-mode" "Major mode for translators to edit PO files" t)
-#+end_src
-
-This enables automatic detection of the coding system for PO files,
-which allows Emacs to display international characters correctly.
-
-#+begin_src emacs-lisp
-(modify-coding-system-alist 'file "\\.po\\'\\|\\.po\\."
-                            'po-find-file-coding-system)
-(autoload 'po-find-file-coding-system "po-mode")
-#+end_src
-
 ** Protocol Buffers
 
 [[https://github.com/emacsattic/protobuf-ts-mode][protobuf-ts-mode]] is a tree-sitter-based major mode for editing proto3 files.
