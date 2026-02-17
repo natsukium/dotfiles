@@ -51,6 +51,13 @@
             definedAliases = [ "@noogle" ];
           };
 
+          crates-io = {
+            name = "crates.io";
+            urls = [ { template = "https://crates.io/search?q={searchTerms}"; } ];
+            icon = "https://crates.io/favicon.ico";
+            definedAliases = [ "@crates" ];
+          };
+
           pypi = {
             name = "PyPI";
             urls = [ { template = "https://pypi.org/search/?q={searchTerms}"; } ];
