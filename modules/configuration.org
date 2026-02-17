@@ -173,3 +173,226 @@ typically on desktop systems that suspend/resume.
   services.resolved.enable = cfg.configureResolver;
 })
 #+end_src
+
+* home-manager
+
+User-level modules managed by home-manager.
+
+** Zen Browser
+
+[[https://zen-browser.app/][Zen Browser]] is a Firefox-based browser with a focus on privacy and customization.
+Firefox derivatives were preferred over Chromium-based browsers because Firefox's extension
+ecosystem and =about:config= provide deeper control over browser behavior, and the Nix
+ecosystem has mature tooling for managing Firefox profiles declaratively via home-manager.
+
+Zen Browser was chosen over vanilla Firefox for its improved UI/UX while retaining full
+Firefox compatibility — extensions, search engines, and profile settings work identically.
+
+#+begin_src nix :tangle home/zen-browser/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/zen-browser/default.nix
+{
+  inputs,
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.my.programs.zen-browser;
+in
+{
+  imports = [ inputs.zen-browser.homeModules.beta ];
+
+  options.my.programs.zen-browser = {
+    enable = lib.mkEnableOption "Zen Browser";
+  };
+
+  config = lib.mkIf cfg.enable {
+    programs.zen-browser = {
+      enable = true;
+      profiles.natsukium = {
+        <<zen-browser-settings>>
+
+        <<zen-browser-search>>
+
+        <<zen-browser-extensions>>
+      };
+    };
+  };
+}
+#+end_src
+
+*** Settings
+
+Auto-install extensions without user prompts. By default, Firefox shows a confirmation dialog
+for each extension installed via the profile. Setting =extensions.autoDisableScopes= to 0
+disables this behavior, which is necessary for fully declarative extension management —
+otherwise the first launch after a profile rebuild would require manual approval for every
+extension.
+
+#+NAME: zen-browser-settings
+#+begin_src nix
+settings = {
+  "extensions.autoDisableScopes" = 0;
+};
+#+end_src
+
+*** Search Engines
+
+Custom search engines for quick access to development-related package registries and
+documentation. Each engine is assigned a short alias (e.g., =@np=) for use in the address bar,
+avoiding the need to navigate to each site manually.
+
+#+NAME: zen-browser-search
+#+begin_src nix
+search = {
+  force = true;
+  engines = {
+    <<zen-browser-search-engine-nix-packages>>
+
+    <<zen-browser-search-engine-nixos-wiki>>
+
+    <<zen-browser-search-engine-noogle>>
+
+    <<zen-browser-search-engine-crates-io>>
+
+    <<zen-browser-search-engine-npm>>
+
+    <<zen-browser-search-engine-pypi>>
+  };
+};
+#+end_src
+
+**** Nix Packages
+
+Search the official NixOS/nixpkgs repository. Uses =nixos-icons= from nixpkgs for the icon
+to avoid depending on an external URL that could change or become unavailable.
+
+#+NAME: zen-browser-search-engine-nix-packages
+#+begin_src nix
+nix-packages = {
+  name = "Nix Packages";
+  urls = [
+    {
+      template = "https://search.nixos.org/packages";
+      params = [
+        {
+          name = "type";
+          value = "packages";
+        }
+        {
+          name = "query";
+          value = "{searchTerms}";
+        }
+      ];
+    }
+  ];
+
+  icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
+  definedAliases = [ "@np" ];
+};
+#+end_src
+
+**** NixOS Wiki
+
+Search the NixOS community wiki for configuration examples and troubleshooting guides.
+
+#+NAME: zen-browser-search-engine-nixos-wiki
+#+begin_src nix
+nixos-wiki = {
+  name = "NixOS Wiki";
+  urls = [ { template = "https://wiki.nixos.org/w/index.php?search={searchTerms}"; } ];
+  icon = "https://wiki.nixos.org/favicon.ico";
+  definedAliases = [ "@nw" ];
+};
+#+end_src
+
+**** noogle
+
+[[https://noogle.dev/][noogle]] is a Nix function search engine — the equivalent of Hoogle for Haskell.
+Useful for discovering library functions by type signature or name when writing Nix expressions.
+
+#+NAME: zen-browser-search-engine-noogle
+#+begin_src nix
+noogle = {
+  name = "noogle";
+  urls = [ { template = "https://noogle.dev/q?term={searchTerms}"; } ];
+  icon = "https://noogle.dev/favicon.png";
+  definedAliases = [ "@noogle" ];
+};
+#+end_src
+
+**** crates.io
+
+Search the Rust package registry for crate discovery and version information.
+
+#+NAME: zen-browser-search-engine-crates-io
+#+begin_src nix
+crates-io = {
+  name = "crates.io";
+  urls = [ { template = "https://crates.io/search?q={searchTerms}"; } ];
+  icon = "https://crates.io/favicon.ico";
+  definedAliases = [ "@crates" ];
+};
+#+end_src
+
+**** npm
+
+Search the npm registry for JavaScript/TypeScript package discovery.
+
+#+NAME: zen-browser-search-engine-npm
+#+begin_src nix
+npm = {
+  name = "npm";
+  urls = [ { template = "https://www.npmjs.com/search?q={searchTerms}"; } ];
+  icon = "https://www.google.com/s2/favicons?domain=npmjs.com&sz=64";
+  definedAliases = [ "@npm" ];
+};
+#+end_src
+
+**** PyPI
+
+Search the Python Package Index for Python package discovery.
+
+#+NAME: zen-browser-search-engine-pypi
+#+begin_src nix
+pypi = {
+  name = "PyPI";
+  urls = [ { template = "https://pypi.org/search/?q={searchTerms}"; } ];
+  icon = "https://pypi.org/favicon.ico";
+  definedAliases = [ "@pypi" ];
+};
+#+end_src
+
+*** Extensions
+
+Browser extensions managed declaratively. Extensions are sourced from two overlay-provided
+sets: =firefox-addons= (from the NUR firefox-addons repository) and =my-firefox-addons=
+(custom additions not available upstream).
+
+#+NAME: zen-browser-extensions
+#+begin_src nix
+extensions = {
+  packages =
+    (with pkgs.firefox-addons; [
+      bitwarden
+      instapaper-official
+      keepa
+      onepassword-password-manager
+      refined-github
+      tampermonkey
+      vimium
+      wayback-machine
+      zotero-connector
+    ])
+    ++ (with pkgs.my-firefox-addons; [
+      adguard-adblocker
+      calilay
+      kiseppe-price-chart-kindle
+    ]);
+};
+#+end_src

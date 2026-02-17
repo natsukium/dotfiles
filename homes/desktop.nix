@@ -6,7 +6,6 @@
     ../applications/qutebrowser
     ../applications/vivaldi
     ../applications/vscode
-    ../applications/zen-browser
     ../applications/zotero
     ./shared/claude.nix
     ./shared/email.nix
