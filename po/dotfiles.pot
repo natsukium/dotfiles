@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-02-18 00:48+0900\n"
+"POT-Creation-Date: 2026-02-18 00:54+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2100,30 +2100,78 @@ msgid ""
 "        settings.configData = \"{rules: {document-start: {present: "
 "false}}}\";\n"
 "      };\n"
-"      \"00-check-org-tangle\" = {\n"
+"      po4a = {\n"
 "        enable = true;\n"
-"        name = \"check-org-tangle\";\n"
-"        description = \"Verify org files are tangled and synchronized\";\n"
+"        name = \"po4a\";\n"
+"        description = \"Update translations with po4a\";\n"
 "        entry =\n"
 "          let\n"
-"            checkScript = pkgs.writeShellScript \"check-org-tangle\" ''\n"
+"            po4aScript = pkgs.writeShellScript \"run-po4a\" ''\n"
 "              set -euo pipefail"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1026
+#, no-wrap
+msgid "${self'.packages.po4a_0_74}/bin/po4a po4a.cfg"
 msgstr ""
 
 #. type: paragraph in src
 #: configuration.org:1028
 #, no-wrap
+msgid "changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1030
+#, no-wrap
+msgid ""
+"if [ -n \"$changed\" ]; then\n"
+"  echo \"po4a updated translation files.\"\n"
+"  echo \"Changed files:\"\n"
+"  echo \"$changed\"\n"
+"  echo \"\"\n"
+"  echo \"Please stage the changes and commit again:\"\n"
+"  echo \"  git add $changed\"\n"
+"  exit 1\n"
+"fi"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1040
+#, no-wrap
+msgid ""
+"        exit 0\n"
+"      '';\n"
+"    in\n"
+"    \"${po4aScript}\";\n"
+"  files = \"(\\\\.org|po/.*\\\\.po)$\";\n"
+"  pass_filenames = false;\n"
+"};\n"
+"\"00-check-org-tangle\" = {\n"
+"  enable = true;\n"
+"  name = \"check-org-tangle\";\n"
+"  description = \"Verify org files are tangled and synchronized\";\n"
+"  entry =\n"
+"    let\n"
+"      checkScript = pkgs.writeShellScript \"check-org-tangle\" ''\n"
+"        set -euo pipefail"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1058
+#, no-wrap
 msgid "${pkgs.gnumake}/bin/make -B tangle"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1031
+#: configuration.org:1061
 #, no-wrap
 msgid "changed=$(${pkgs.git}/bin/git diff --name-only)"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1033
+#: configuration.org:1063
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -2138,7 +2186,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1043
+#: configuration.org:1073
 #, no-wrap
 msgid ""
 "              exit 0\n"
@@ -2154,7 +2202,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1054
+#: configuration.org:1084
 #, no-wrap
 msgid ""
 "treefmt = {\n"
@@ -2172,13 +2220,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1067
+#: configuration.org:1097
 #, no-wrap
 msgid "<<mcp-servers-config>>"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1069
+#: configuration.org:1099
 #, no-wrap
 msgid ""
 "      devShells = {\n"
@@ -2216,55 +2264,55 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1102
+#: configuration.org:1132
 #, no-wrap
 msgid "Overlays"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1103
+#: configuration.org:1133
 #, no-wrap
 msgid "\"./overlays/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1105
+#: configuration.org:1135
 #, no-wrap
 msgid "Modules"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1106
+#: configuration.org:1136
 #, no-wrap
 msgid "\"./modules/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1108
+#: configuration.org:1138
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1109
+#: configuration.org:1139
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1110
+#: configuration.org:1140
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1111
+#: configuration.org:1141
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1112
+#: configuration.org:1142
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr ""

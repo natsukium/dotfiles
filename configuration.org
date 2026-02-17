@@ -1014,6 +1014,36 @@ outputs =
                 ];
                 settings.configData = "{rules: {document-start: {present: false}}}";
               };
+              po4a = {
+                enable = true;
+                name = "po4a";
+                description = "Update translations with po4a";
+                entry =
+                  let
+                    po4aScript = pkgs.writeShellScript "run-po4a" ''
+                      set -euo pipefail
+
+                      ${self'.packages.po4a_0_74}/bin/po4a po4a.cfg
+
+                      changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')
+
+                      if [ -n "$changed" ]; then
+                        echo "po4a updated translation files."
+                        echo "Changed files:"
+                        echo "$changed"
+                        echo ""
+                        echo "Please stage the changes and commit again:"
+                        echo "  git add $changed"
+                        exit 1
+                      fi
+
+                      exit 0
+                    '';
+                  in
+                  "${po4aScript}";
+                files = "(\\.org|po/.*\\.po)$";
+                pass_filenames = false;
+              };
               # Prefixed with "00-" to ensure this hook runs before all other hooks
               # (hooks are sorted alphabetically when no explicit before/after is specified)
               "00-check-org-tangle" = {
