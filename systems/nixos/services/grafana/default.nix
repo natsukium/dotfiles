@@ -8,6 +8,7 @@
         http_port = 3001;
         enable_gzip = true;
       };
+      security.secret_key = "$__file{${config.sops.secrets.grafana-secret-key.path}}";
     };
     provision = {
       enable = true;
@@ -19,5 +20,10 @@
         }
       ];
     };
+  };
+
+  sops.secrets.grafana-secret-key = {
+    sopsFile = ./secrets.yaml;
+    owner = "grafana";
   };
 }
