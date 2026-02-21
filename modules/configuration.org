@@ -178,6 +178,349 @@ typically on desktop systems that suspend/resume.
 
 User-level modules managed by home-manager.
 
+** Git
+
+Git version control configuration. Git is configured directly through home-manager's
+=programs.git= module, which generates =~/.config/git/config= declaratively.
+
+#+begin_src nix :tangle home/development/git/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/development/git/default.nix
+{ pkgs, config, ... }:
+{
+  programs.git = {
+    enable = true;
+
+    <<git-settings>>
+
+    <<git-signing>>
+
+    <<git-ignores>>
+
+    <<git-scalar>>
+  };
+
+  <<git-gh>>
+
+  <<git-delta>>
+
+  <<git-fish-abbreviations>>
+}
+#+end_src
+
+*** Core Settings
+
+Basic git behavior settings.
+
+#+NAME: git-settings
+#+begin_src nix
+settings = {
+  <<git-user-identity>>
+  <<git-editor>>
+  <<git-color>>
+  <<git-default-branch>>
+  <<git-push-safety>>
+  <<git-url-rewrite>>
+};
+#+end_src
+
+**** User Identity
+
+#+NAME: git-user-identity
+#+begin_src nix
+user = {
+  name = "natsukium";
+  email = "tomoya.otabi@gmail.com";
+};
+#+end_src
+
+**** Editor
+
+=core.editor = "vim"= is set as the fallback editor for git operations. Although the
+=EDITOR= environment variable is set to =nvim= in the home configuration, some contexts
+(like =git commit= in a minimal environment) may not inherit the session's environment
+variables. Setting it explicitly in gitconfig ensures consistent behavior.
+
+#+NAME: git-editor
+#+begin_src nix
+core.editor = "vim";
+#+end_src
+
+**** Color
+
+Auto-detect terminal color support for all git subcommands.
+
+#+NAME: git-color
+#+begin_src nix
+color = {
+  status = "auto";
+  diff = "auto";
+  branch = "auto";
+  interactive = "auto";
+  grep = "auto";
+};
+#+end_src
+
+**** Default Branch
+
+#+NAME: git-default-branch
+#+begin_src nix
+init.defaultBranch = "main";
+#+end_src
+
+**** Force Push Safety
+
+=push.useForceIfIncludes= enables a safety check for force pushes: git verifies that
+the local branch includes the remote's current tip before allowing a force push. This
+prevents accidentally overwriting commits pushed by others since the last fetch, which
+=--force-with-lease= alone cannot catch if the remote ref was updated in the background
+(e.g., by lazygit's periodic fetch or a background =git fetch=).
+
+#+NAME: git-push-safety
+#+begin_src nix
+push.useForceIfIncludes = true;
+#+end_src
+
+**** URL Rewriting
+
+=url."git@github.com:".pushInsteadOf= rewrites push URLs from HTTPS to SSH. This allows
+=git clone https://github.com/...= to work without SSH (useful in CI or ephemeral
+environments) while ensuring pushes always use SSH authentication, avoiding the need
+for personal access tokens.
+
+In practice, [[*GitHub CLI][=gh=]] provides its own credential helper that handles HTTPS authentication
+transparently, so this rewrite rule may not be exercised for GitHub repositories. It is
+retained as an intentional fallback for environments where =gh= is not available.
+
+#+NAME: git-url-rewrite
+#+begin_src nix
+url."git@github.com:".pushInsteadOf = "https://github.com/";
+#+end_src
+
+*** Commit Signing
+
+SSH-based commit signing. SSH keys were chosen over GPG because SSH keys are already
+required for push authentication, eliminating the need to manage a separate GPG keychain.
+Git's SSH signing support (added in Git 2.34) provides the same integrity guarantees as
+GPG signing with simpler key management — one key pair for both authentication and signing.
+
+GitHub has [[https://github.blog/changelog/2022-08-23-ssh-commit-verification-now-supported/][supported SSH commit verification since August 2022]], and since
+[[https://github.blog/changelog/2024-11-12-persistent-commit-signature-verification-now-in-public-preview/][November 2024]] verification results are persisted server-side. This persistent verification
+eliminates the primary concern with SSH signing — that key rotation could invalidate
+historical signatures — which was GPG's main advantage for long-term identity assurance.
+
+In the future, migrating to a keyless solution like [[https://github.com/sigstore/gitsign][gitsign]] (Sigstore-based signing)
+would further simplify the workflow by removing key management entirely. This is pending
+GitHub's native support for Sigstore verification.
+
+=signByDefault = true= ensures all commits are signed without requiring =git commit -S=,
+preventing unsigned commits from slipping through.
+
+#+NAME: git-signing
+#+begin_src nix
+signing = {
+  format = "ssh";
+  key = "~/.ssh/id_ed25519.pub";
+  signByDefault = true;
+};
+#+end_src
+
+*** Global Ignores
+
+Patterns that should never be committed across all repositories. These are global ignores
+rather than per-repo =.gitignore= entries because they reflect personal tooling choices
+that should not be imposed on collaborators.
+
+#+NAME: git-ignores
+#+begin_src nix
+ignores = [
+  <<git-ignores-os>>
+  <<git-ignores-dev>>
+  <<git-ignores-workflow>>
+  <<git-ignores-private>>
+];
+#+end_src
+
+**** OS Artifacts
+
+macOS Finder metadata files. Present in the global ignore because this is a cross-platform
+dotfiles repository used on both Linux and macOS.
+
+#+NAME: git-ignores-os
+#+begin_src nix
+".DS_Store"
+#+end_src
+
+**** Development Environment
+
+Artifacts generated by development tools that should remain local:
+
+- =.aider*= matches aider's conversation history and configuration files. These contain
+  session-specific context and should not leak into repositories.
+- =.direnv=, =.envrc=: direnv state and configuration. Each project may define its own
+  =.envrc=, but since this repository uses flake-based devshells, the =.envrc= files are
+  auto-generated and should not be committed.
+- =.ipynb_checkpoints=: Jupyter Notebook autosave files.
+- =.pre-commit-config.yaml=: Managed per-project by devshell environments rather than committed,
+  to avoid version conflicts across contributors with different tool versions.
+- =.vscode/=: Editor-specific settings that vary per developer.
+- =__pycache__/=: Python bytecode cache, regenerated on each run.
+
+#+NAME: git-ignores-dev
+#+begin_src nix
+".aider*"
+".direnv"
+".envrc"
+".ipynb_checkpoints"
+".pre-commit-config.yaml"
+".vscode/"
+"__pycache__/"
+#+end_src
+
+**** Workflow
+
+- =.worktree=: Marker file used by git worktree workflows.
+
+#+NAME: git-ignores-workflow
+#+begin_src nix
+".worktree"
+#+end_src
+
+**** Private Notes
+
+=.private/= is a directory for personal notes, LLM context files, and other local-only
+documentation that should never be shared.
+
+#+NAME: git-ignores-private
+#+begin_src nix
+".private/"
+#+end_src
+
+*** Scalar
+
+[[https://git-scm.com/docs/scalar][Scalar]] optimizes git performance for large repositories. Enabled specifically for the
+nixpkgs repository, which contains over 600,000 commits and benefits significantly from
+Scalar's background maintenance (prefetch, commit-graph, loose-objects) and filesystem
+monitor integration.
+
+The Scalar module (=programs.git.scalar=) is a custom home-manager module defined in
+[[file:home-manager/git-scalar.nix][home-manager/git-scalar.nix]] that configures git's built-in performance optimizations
+(multipack index, preload index, untracked cache, fsmonitor).
+
+#+NAME: git-scalar
+#+begin_src nix
+scalar = {
+  enable = true;
+  repo = [ "${config.programs.git.settings.ghq.root}/github.com/natsukium/nixpkgs" ];
+};
+#+end_src
+
+*** GitHub CLI
+
+[[https://cli.github.com/][gh]] (GitHub CLI) is enabled alongside git because it provides a credential helper
+([[https://nix-community.github.io/home-manager/options.xhtml#opt-programs.gh.gitCredentialHelper.enable][=programs.gh.gitCredentialHelper.enable=]], on by default) that transparently handles
+HTTPS authentication for GitHub repositories. This is why the [[*URL Rewriting][=pushInsteadOf=]] setting
+may not be exercised in practice — =gh='s auth context covers both fetch and push over
+HTTPS.
+
+#+NAME: git-gh
+#+begin_src nix
+programs.gh.enable = true;
+#+end_src
+
+*** Delta
+
+[[https://github.com/dandavison/delta][delta]] provides syntax-highlighted diffs in the terminal with line numbers and side-by-side
+view support. Chosen for its clean visual presentation.
+
+#+NAME: git-delta
+#+begin_src nix
+programs.delta = {
+  enable = true;
+  enableGitIntegration = true;
+};
+#+end_src
+
+*** Fish Abbreviations
+
+Shell abbreviations for frequent git operations. Abbreviations (not aliases) are used
+because fish expands them inline before execution, making the actual command visible in
+history and allowing modification before running.
+
+#+NAME: git-fish-abbreviations
+#+begin_src nix
+programs.fish.shellAbbrs = {
+  <<git-abbr-push>>
+  <<git-abbr-pull>>
+  <<git-abbr-commit>>
+  <<git-abbr-status>>
+  <<git-abbr-stash>>
+  <<git-abbr-switch>>
+};
+#+end_src
+
+**** Push
+
+Force push with lease — safer than =--force= as it prevents overwriting remote changes
+not yet fetched.
+
+#+NAME: git-abbr-push
+#+begin_src nix
+gpf = "git push --force-with-lease";
+#+end_src
+
+**** Pull
+
+=gpm= pulls from the remote's default branch, dynamically detected via =git remote show=
+rather than hardcoding =main= or =master=. This handles repositories that still use =master=
+or other branch naming conventions.
+
+=gpu= pulls from upstream — used in fork workflows to sync with the original repository.
+
+#+NAME: git-abbr-pull
+#+begin_src nix
+gpm = "git pull (git remote show origin | sed -n '/HEAD branch/s/.*: //p')";
+gpu = "git pull upstream";
+#+end_src
+
+**** Commit
+
+=gci= creates a commit. The trailing space allows directly appending =-m "message"=.
+
+=gca= amends the last commit, frequently used during interactive rebase workflows.
+
+#+NAME: git-abbr-commit
+#+begin_src nix
+gci = "git commit ";
+gca = "git commit --amend";
+#+end_src
+
+**** Status
+
+#+NAME: git-abbr-status
+#+begin_src nix
+gs = "git status";
+#+end_src
+
+**** Stash
+
+#+NAME: git-abbr-stash
+#+begin_src nix
+gst = "git stash";
+gstp = "git stash pop";
+#+end_src
+
+**** Switch
+
+#+NAME: git-abbr-switch
+#+begin_src nix
+gsw = "git switch";
+gswc = "git switch -c";
+#+end_src
+
 ** Zen Browser
 
 [[https://zen-browser.app/][Zen Browser]] is a Firefox-based browser with a focus on privacy and customization.

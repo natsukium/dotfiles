@@ -1,7 +1,11 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 { pkgs, config, ... }:
 {
   programs.git = {
     enable = true;
+
     settings = {
       user = {
         name = "natsukium";
@@ -19,11 +23,13 @@
       push.useForceIfIncludes = true;
       url."git@github.com:".pushInsteadOf = "https://github.com/";
     };
+
     signing = {
       format = "ssh";
       key = "~/.ssh/id_ed25519.pub";
       signByDefault = true;
     };
+
     ignores = [
       ".DS_Store"
       ".aider*"
@@ -32,16 +38,18 @@
       ".ipynb_checkpoints"
       ".pre-commit-config.yaml"
       ".vscode/"
-      ".worktree"
       "__pycache__/"
-      # For personal notes and LLM instructions
+      ".worktree"
       ".private/"
     ];
+
     scalar = {
       enable = true;
       repo = [ "${config.programs.git.settings.ghq.root}/github.com/natsukium/nixpkgs" ];
     };
   };
+
+  programs.gh.enable = true;
 
   programs.delta = {
     enable = true;

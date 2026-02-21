@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-02-21 01:47+0900\n"
+"POT-Creation-Date: 2026-02-21 13:14+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4675,11 +4675,811 @@ msgstr ""
 #. type: heading **
 #: modules/configuration.org:181
 #, no-wrap
-msgid "Zen Browser"
+msgid "Git"
 msgstr ""
 
 #. type: paragraph
 #: modules/configuration.org:183
+msgid ""
+"Git version control configuration. Git is configured directly through "
+"home-manager's =programs.git= module, which generates =~/.config/git/config= "
+"declaratively."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:192
+#, no-wrap
+msgid ""
+"{ pkgs, config, ... }:\n"
+"{\n"
+"  programs.git = {\n"
+"    enable = true;"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:197
+#, no-wrap
+msgid "<<git-settings>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:199
+#, no-wrap
+msgid "<<git-signing>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:201
+#, no-wrap
+msgid "<<git-ignores>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:203
+#, no-wrap
+msgid ""
+"  <<git-scalar>>\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:206
+#, no-wrap
+msgid "<<git-gh>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:208
+#, no-wrap
+msgid "<<git-delta>>"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:210
+#, no-wrap
+msgid ""
+"  <<git-fish-abbreviations>>\n"
+"}"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:214
+#, no-wrap
+msgid "Core Settings"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:216
+msgid "Basic git behavior settings."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:218
+#, no-wrap
+msgid "git-settings"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:220
+#, no-wrap
+msgid ""
+"settings = {\n"
+"  <<git-user-identity>>\n"
+"  <<git-editor>>\n"
+"  <<git-color>>\n"
+"  <<git-default-branch>>\n"
+"  <<git-push-safety>>\n"
+"  <<git-url-rewrite>>\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:230
+#, no-wrap
+msgid "User Identity"
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:232
+#, no-wrap
+msgid "git-user-identity"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:234
+#, no-wrap
+msgid ""
+"user = {\n"
+"  name = \"natsukium\";\n"
+"  email = \"tomoya.otabi@gmail.com\";\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:240
+#, no-wrap
+msgid "Editor"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:242
+msgid ""
+"=core.editor = \"vim\"= is set as the fallback editor for git "
+"operations. Although the =EDITOR= environment variable is set to =nvim= in "
+"the home configuration, some contexts (like =git commit= in a minimal "
+"environment) may not inherit the session's environment variables. Setting it "
+"explicitly in gitconfig ensures consistent behavior."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:247
+#, no-wrap
+msgid "git-editor"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:249
+#, no-wrap
+msgid "core.editor = \"vim\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:252
+#, no-wrap
+msgid "Color"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:254
+msgid "Auto-detect terminal color support for all git subcommands."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:256
+#, no-wrap
+msgid "git-color"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:258
+#, no-wrap
+msgid ""
+"color = {\n"
+"  status = \"auto\";\n"
+"  diff = \"auto\";\n"
+"  branch = \"auto\";\n"
+"  interactive = \"auto\";\n"
+"  grep = \"auto\";\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:267
+#, no-wrap
+msgid "Default Branch"
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:269
+#, no-wrap
+msgid "git-default-branch"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:271
+#, no-wrap
+msgid "init.defaultBranch = \"main\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:274
+#, no-wrap
+msgid "Force Push Safety"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:276
+msgid ""
+"=push.useForceIfIncludes= enables a safety check for force pushes: git "
+"verifies that the local branch includes the remote's current tip before "
+"allowing a force push. This prevents accidentally overwriting commits pushed "
+"by others since the last fetch, which =--force-with-lease= alone cannot "
+"catch if the remote ref was updated in the background (e.g., by lazygit's "
+"periodic fetch or a background =git fetch=)."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:282
+#, no-wrap
+msgid "git-push-safety"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:284
+#, no-wrap
+msgid "push.useForceIfIncludes = true;"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:287
+#, no-wrap
+msgid "URL Rewriting"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:289
+msgid ""
+"=url.\"git@github.com:\".pushInsteadOf= rewrites push URLs from HTTPS to "
+"SSH. This allows =git clone https://github.com/...= to work without SSH "
+"(useful in CI or ephemeral environments) while ensuring pushes always use "
+"SSH authentication, avoiding the need for personal access tokens."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:294
+msgid ""
+"In practice, [[*GitHub CLI][=gh=]] provides its own credential helper that "
+"handles HTTPS authentication transparently, so this rewrite rule may not be "
+"exercised for GitHub repositories. It is retained as an intentional fallback "
+"for environments where =gh= is not available."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:298
+#, no-wrap
+msgid "git-url-rewrite"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:300
+#, no-wrap
+msgid "url.\"git@github.com:\".pushInsteadOf = \"https://github.com/\";"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:303
+#, no-wrap
+msgid "Commit Signing"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:305
+msgid ""
+"SSH-based commit signing. SSH keys were chosen over GPG because SSH keys are "
+"already required for push authentication, eliminating the need to manage a "
+"separate GPG keychain.  Git's SSH signing support (added in Git 2.34) "
+"provides the same integrity guarantees as GPG signing with simpler key "
+"management — one key pair for both authentication and signing."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:310
+msgid ""
+"GitHub has "
+"[[https://github.blog/changelog/2022-08-23-ssh-commit-verification-now-supported/][supported "
+"SSH commit verification since August 2022]], and since "
+"[[https://github.blog/changelog/2024-11-12-persistent-commit-signature-verification-now-in-public-preview/][November "
+"2024]] verification results are persisted server-side. This persistent "
+"verification eliminates the primary concern with SSH signing — that key "
+"rotation could invalidate historical signatures — which was GPG's main "
+"advantage for long-term identity assurance."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:315
+msgid ""
+"In the future, migrating to a keyless solution like "
+"[[https://github.com/sigstore/gitsign][gitsign]] (Sigstore-based signing)  "
+"would further simplify the workflow by removing key management "
+"entirely. This is pending GitHub's native support for Sigstore verification."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:319
+msgid ""
+"=signByDefault = true= ensures all commits are signed without requiring =git "
+"commit -S=, preventing unsigned commits from slipping through."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:322
+#, no-wrap
+msgid "git-signing"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:324
+#, no-wrap
+msgid ""
+"signing = {\n"
+"  format = \"ssh\";\n"
+"  key = \"~/.ssh/id_ed25519.pub\";\n"
+"  signByDefault = true;\n"
+"};"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:331
+#, no-wrap
+msgid "Global Ignores"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:333
+msgid ""
+"Patterns that should never be committed across all repositories. These are "
+"global ignores rather than per-repo =.gitignore= entries because they "
+"reflect personal tooling choices that should not be imposed on "
+"collaborators."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:337
+#, no-wrap
+msgid "git-ignores"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:339
+#, no-wrap
+msgid ""
+"ignores = [\n"
+"  <<git-ignores-os>>\n"
+"  <<git-ignores-dev>>\n"
+"  <<git-ignores-workflow>>\n"
+"  <<git-ignores-private>>\n"
+"];"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:347
+#, no-wrap
+msgid "OS Artifacts"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:349
+msgid ""
+"macOS Finder metadata files. Present in the global ignore because this is a "
+"cross-platform dotfiles repository used on both Linux and macOS."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:352
+#, no-wrap
+msgid "git-ignores-os"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:354
+#, no-wrap
+msgid "\".DS_Store\""
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:357
+#, no-wrap
+msgid "Development Environment"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:359
+msgid "Artifacts generated by development tools that should remain local:"
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:363
+#, no-wrap
+msgid ""
+"=.aider*= matches aider's conversation history and configuration "
+"files. These contain\n"
+"session-specific context and should not leak into repositories."
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:366
+#, no-wrap
+msgid ""
+"=.direnv=, =.envrc=: direnv state and configuration. Each project may define "
+"its own\n"
+"=.envrc=, but since this repository uses flake-based devshells, the =.envrc= "
+"files are\n"
+"auto-generated and should not be committed."
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:367
+#, no-wrap
+msgid "=.ipynb_checkpoints=: Jupyter Notebook autosave files."
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:369
+#, no-wrap
+msgid ""
+"=.pre-commit-config.yaml=: Managed per-project by devshell environments "
+"rather than committed,\n"
+"to avoid version conflicts across contributors with different tool versions."
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:370
+#, no-wrap
+msgid "=.vscode/=: Editor-specific settings that vary per developer."
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:371
+#, no-wrap
+msgid "=__pycache__/=: Python bytecode cache, regenerated on each run."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:372
+#, no-wrap
+msgid "git-ignores-dev"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:374
+#, no-wrap
+msgid ""
+"\".aider*\"\n"
+"\".direnv\"\n"
+"\".envrc\"\n"
+"\".ipynb_checkpoints\"\n"
+"\".pre-commit-config.yaml\"\n"
+"\".vscode/\"\n"
+"\"__pycache__/\""
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:383
+#, no-wrap
+msgid "Workflow"
+msgstr ""
+
+#. type: plain list -
+#: modules/configuration.org:386
+#, no-wrap
+msgid "=.worktree=: Marker file used by git worktree workflows."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:387
+#, no-wrap
+msgid "git-ignores-workflow"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:389
+#, no-wrap
+msgid "\".worktree\""
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:392
+#, no-wrap
+msgid "Private Notes"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:394
+msgid ""
+"=.private/= is a directory for personal notes, LLM context files, and other "
+"local-only documentation that should never be shared."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:397
+#, no-wrap
+msgid "git-ignores-private"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:399
+#, no-wrap
+msgid "\".private/\""
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:402
+#, no-wrap
+msgid "Scalar"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:404
+msgid ""
+"[[https://git-scm.com/docs/scalar][Scalar]] optimizes git performance for "
+"large repositories. Enabled specifically for the nixpkgs repository, which "
+"contains over 600,000 commits and benefits significantly from Scalar's "
+"background maintenance (prefetch, commit-graph, loose-objects) and "
+"filesystem monitor integration."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:409
+msgid ""
+"The Scalar module (=programs.git.scalar=) is a custom home-manager module "
+"defined in [[file:home-manager/git-scalar.nix][home-manager/git-scalar.nix]] "
+"that configures git's built-in performance optimizations (multipack index, "
+"preload index, untracked cache, fsmonitor)."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:413
+#, no-wrap
+msgid "git-scalar"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:415
+#, no-wrap
+msgid ""
+"scalar = {\n"
+"  enable = true;\n"
+"  repo = [ "
+"\"${config.programs.git.settings.ghq.root}/github.com/natsukium/nixpkgs\" "
+"];\n"
+"};"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:421
+#, no-wrap
+msgid "GitHub CLI"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:423
+msgid ""
+"[[https://cli.github.com/][gh]] (GitHub CLI) is enabled alongside git "
+"because it provides a credential helper "
+"([[https://nix-community.github.io/home-manager/options.xhtml#opt-programs.gh.gitCredentialHelper.enable][=programs.gh.gitCredentialHelper.enable=]], "
+"on by default) that transparently handles HTTPS authentication for GitHub "
+"repositories. This is why the [[*URL Rewriting][=pushInsteadOf=]] setting "
+"may not be exercised in practice — =gh='s auth context covers both fetch and "
+"push over HTTPS."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:429
+#, no-wrap
+msgid "git-gh"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:431
+#, no-wrap
+msgid "programs.gh.enable = true;"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:434
+#, no-wrap
+msgid "Delta"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:436
+msgid ""
+"[[https://github.com/dandavison/delta][delta]] provides syntax-highlighted "
+"diffs in the terminal with line numbers and side-by-side view "
+"support. Chosen for its clean visual presentation."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:439
+#, no-wrap
+msgid "git-delta"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:441
+#, no-wrap
+msgid ""
+"programs.delta = {\n"
+"  enable = true;\n"
+"  enableGitIntegration = true;\n"
+"};"
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:447
+#, no-wrap
+msgid "Fish Abbreviations"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:449
+msgid ""
+"Shell abbreviations for frequent git operations. Abbreviations (not aliases) "
+"are used because fish expands them inline before execution, making the "
+"actual command visible in history and allowing modification before running."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:453
+#, no-wrap
+msgid "git-fish-abbreviations"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:455
+#, no-wrap
+msgid ""
+"programs.fish.shellAbbrs = {\n"
+"  <<git-abbr-push>>\n"
+"  <<git-abbr-pull>>\n"
+"  <<git-abbr-commit>>\n"
+"  <<git-abbr-status>>\n"
+"  <<git-abbr-stash>>\n"
+"  <<git-abbr-switch>>\n"
+"};"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:465
+#, no-wrap
+msgid "Push"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:467
+msgid ""
+"Force push with lease — safer than =--force= as it prevents overwriting "
+"remote changes not yet fetched."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:470
+#, no-wrap
+msgid "git-abbr-push"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:472
+#, no-wrap
+msgid "gpf = \"git push --force-with-lease\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:475
+#, no-wrap
+msgid "Pull"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:477
+msgid ""
+"=gpm= pulls from the remote's default branch, dynamically detected via =git "
+"remote show= rather than hardcoding =main= or =master=. This handles "
+"repositories that still use =master= or other branch naming conventions."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:481
+msgid ""
+"=gpu= pulls from upstream — used in fork workflows to sync with the original "
+"repository."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:483
+#, no-wrap
+msgid "git-abbr-pull"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:485
+#, no-wrap
+msgid ""
+"gpm = \"git pull (git remote show origin | sed -n '/HEAD branch/s/.*: "
+"//p')\";\n"
+"gpu = \"git pull upstream\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:489
+#, no-wrap
+msgid "Commit"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:491
+msgid ""
+"=gci= creates a commit. The trailing space allows directly appending =-m "
+"\"message\"=."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:493
+msgid ""
+"=gca= amends the last commit, frequently used during interactive rebase "
+"workflows."
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:495
+#, no-wrap
+msgid "git-abbr-commit"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:497
+#, no-wrap
+msgid ""
+"gci = \"git commit \";\n"
+"gca = \"git commit --amend\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:501
+#, no-wrap
+msgid "Status"
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:503
+#, no-wrap
+msgid "git-abbr-status"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:505
+#, no-wrap
+msgid "gs = \"git status\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:508
+#, no-wrap
+msgid "Stash"
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:510
+#, no-wrap
+msgid "git-abbr-stash"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:512
+#, no-wrap
+msgid ""
+"gst = \"git stash\";\n"
+"gstp = \"git stash pop\";"
+msgstr ""
+
+#. type: heading ****
+#: modules/configuration.org:516
+#, no-wrap
+msgid "Switch"
+msgstr ""
+
+#. type: keyword NAME
+#: modules/configuration.org:518
+#, no-wrap
+msgid "git-abbr-switch"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:520
+#, no-wrap
+msgid ""
+"gsw = \"git switch\";\n"
+"gswc = \"git switch -c\";"
+msgstr ""
+
+#. type: heading **
+#: modules/configuration.org:524
+#, no-wrap
+msgid "Zen Browser"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:526
 msgid ""
 "[[https://zen-browser.app/][Zen Browser]] is a Firefox-based browser with a "
 "focus on privacy and customization.  Firefox derivatives were preferred over "
@@ -4690,7 +5490,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:188
+#: modules/configuration.org:531
 msgid ""
 "Zen Browser was chosen over vanilla Firefox for its improved UI/UX while "
 "retaining full Firefox compatibility — extensions, search engines, and "
@@ -4698,7 +5498,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:197
+#: modules/configuration.org:540
 #, no-wrap
 msgid ""
 "{\n"
@@ -4716,7 +5516,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:210
+#: modules/configuration.org:553
 #, no-wrap
 msgid ""
 "options.my.programs.zen-browser = {\n"
@@ -4725,7 +5525,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:214
+#: modules/configuration.org:557
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -4736,13 +5536,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:220
+#: modules/configuration.org:563
 #, no-wrap
 msgid "<<zen-browser-search>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:222
+#: modules/configuration.org:565
 #, no-wrap
 msgid ""
 "        <<zen-browser-extensions>>\n"
@@ -4753,13 +5553,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:229
+#: modules/configuration.org:572
 #, no-wrap
 msgid "Settings"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:231
+#: modules/configuration.org:574
 msgid ""
 "Auto-install extensions without user prompts. By default, Firefox shows a "
 "confirmation dialog for each extension installed via the profile. Setting "
@@ -4770,13 +5570,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:237
+#: modules/configuration.org:580
 #, no-wrap
 msgid "zen-browser-settings"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:239
+#: modules/configuration.org:582
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -4785,13 +5585,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:244
+#: modules/configuration.org:587
 #, no-wrap
 msgid "Search Engines"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:246
+#: modules/configuration.org:589
 msgid ""
 "Custom search engines for quick access to development-related package "
 "registries and documentation. Each engine is assigned a short alias (e.g., "
@@ -4800,13 +5600,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:250
+#: modules/configuration.org:593
 #, no-wrap
 msgid "zen-browser-search"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:252
+#: modules/configuration.org:595
 #, no-wrap
 msgid ""
 "search = {\n"
@@ -4816,31 +5616,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:257
+#: modules/configuration.org:600
 #, no-wrap
 msgid "<<zen-browser-search-engine-nixos-wiki>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:259
+#: modules/configuration.org:602
 #, no-wrap
 msgid "<<zen-browser-search-engine-noogle>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:261
+#: modules/configuration.org:604
 #, no-wrap
 msgid "<<zen-browser-search-engine-crates-io>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:263
+#: modules/configuration.org:606
 #, no-wrap
 msgid "<<zen-browser-search-engine-npm>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:265
+#: modules/configuration.org:608
 #, no-wrap
 msgid ""
 "    <<zen-browser-search-engine-pypi>>\n"
@@ -4849,13 +5649,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:270
+#: modules/configuration.org:613
 #, no-wrap
 msgid "Nix Packages"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:272
+#: modules/configuration.org:615
 msgid ""
 "Search the official NixOS/nixpkgs repository. Uses =nixos-icons= from "
 "nixpkgs for the icon to avoid depending on an external URL that could change "
@@ -4863,13 +5663,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:275
+#: modules/configuration.org:618
 #, no-wrap
 msgid "zen-browser-search-engine-nix-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:277
+#: modules/configuration.org:620
 #, no-wrap
 msgid ""
 "nix-packages = {\n"
@@ -4892,7 +5692,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:295
+#: modules/configuration.org:638
 #, no-wrap
 msgid ""
 "  icon = "
@@ -4902,26 +5702,26 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:300
+#: modules/configuration.org:643
 #, no-wrap
 msgid "NixOS Wiki"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:302
+#: modules/configuration.org:645
 msgid ""
 "Search the NixOS community wiki for configuration examples and "
 "troubleshooting guides."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:304
+#: modules/configuration.org:647
 #, no-wrap
 msgid "zen-browser-search-engine-nixos-wiki"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:306
+#: modules/configuration.org:649
 #, no-wrap
 msgid ""
 "nixos-wiki = {\n"
@@ -4934,13 +5734,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:314
+#: modules/configuration.org:657
 #, no-wrap
 msgid "noogle"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:316
+#: modules/configuration.org:659
 msgid ""
 "[[https://noogle.dev/][noogle]] is a Nix function search engine — the "
 "equivalent of Hoogle for Haskell.  Useful for discovering library functions "
@@ -4948,13 +5748,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:319
+#: modules/configuration.org:662
 #, no-wrap
 msgid "zen-browser-search-engine-noogle"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:321
+#: modules/configuration.org:664
 #, no-wrap
 msgid ""
 "noogle = {\n"
@@ -4966,26 +5766,26 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:329
+#: modules/configuration.org:672
 #, no-wrap
 msgid "crates.io"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:331
+#: modules/configuration.org:674
 msgid ""
 "Search the Rust package registry for crate discovery and version "
 "information."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:333
+#: modules/configuration.org:676
 #, no-wrap
 msgid "zen-browser-search-engine-crates-io"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:335
+#: modules/configuration.org:678
 #, no-wrap
 msgid ""
 "crates-io = {\n"
@@ -4997,24 +5797,24 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:343
+#: modules/configuration.org:686
 #, no-wrap
 msgid "npm"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:345
+#: modules/configuration.org:688
 msgid "Search the npm registry for JavaScript/TypeScript package discovery."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:347
+#: modules/configuration.org:690
 #, no-wrap
 msgid "zen-browser-search-engine-npm"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:349
+#: modules/configuration.org:692
 #, no-wrap
 msgid ""
 "npm = {\n"
@@ -5027,24 +5827,24 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:357
+#: modules/configuration.org:700
 #, no-wrap
 msgid "PyPI"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:359
+#: modules/configuration.org:702
 msgid "Search the Python Package Index for Python package discovery."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:361
+#: modules/configuration.org:704
 #, no-wrap
 msgid "zen-browser-search-engine-pypi"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:363
+#: modules/configuration.org:706
 #, no-wrap
 msgid ""
 "pypi = {\n"
@@ -5056,13 +5856,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:371
+#: modules/configuration.org:714
 #, no-wrap
 msgid "Extensions"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:373
+#: modules/configuration.org:716
 msgid ""
 "Browser extensions managed declaratively. Extensions are sourced from two "
 "overlay-provided sets: =firefox-addons= (from the NUR firefox-addons "
@@ -5071,13 +5871,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:377
+#: modules/configuration.org:720
 #, no-wrap
 msgid "zen-browser-extensions"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:379
+#: modules/configuration.org:722
 #, no-wrap
 msgid ""
 "extensions = {\n"

@@ -14,7 +14,6 @@
       nix-direnv.enable = true;
     };
     fzf.enable = true;
-    gh.enable = true;
     jq.enable = true;
     lsd.enable = true;
     nix-index.enable = true;

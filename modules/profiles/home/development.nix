@@ -4,6 +4,7 @@
     ../../home/coding-agents/gemini-cli
     ../../home/coding-agents/opencode
     ../../home/development/ghq
+    ../../home/development/git
   ];
 
   my.programs.claude-code.enable = true;

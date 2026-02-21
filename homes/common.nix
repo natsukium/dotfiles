@@ -37,7 +37,6 @@ in
     ../applications/bash
     ../applications/fish
     ../applications/gh-dash
-    ../applications/git
     ../applications/lazygit
     ../applications/misc
     ../applications/newsboat
