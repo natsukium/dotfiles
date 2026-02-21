@@ -47,16 +47,10 @@
     certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
   };
 
-  ext.services.nixpkgs-review.autoDeleteLogs = {
-    enable = true;
-    environmentFile = config.sops.secrets.gh-token.path;
-  };
-
   services.simple-wol-manager = {
     enable = true;
     host = "0.0.0.0";
   };
 
-  sops.secrets.gh-token = { };
   sops.secrets.cloudflared-tunnel-cert = { };
 }
