@@ -62,7 +62,7 @@ jobs:
         run: nix flake check --no-build --all-systems --keep-going
   build:
     needs: [changes, check]
-    if: ${{ !cancelled() && needs.check.result == 'success' }}
+    if: ${{ !cancelled() }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
@@ -72,7 +72,7 @@ jobs:
     steps:
       # workaround for "No space left on device"
       - name: Collect garbage
-        if: matrix.os == 'ubuntu-latest'
+        if: needs.check.result == 'success' && matrix.os == 'ubuntu-latest'
         uses: easimon/maximize-build-space@fc881a613ad2a34aca9c9624518214ebc21dfc0c # v10
         with:
           root-reserve-mb: 8192
@@ -84,16 +84,19 @@ jobs:
           remove-codeql: 'true'
           remove-docker-images: 'true'
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: needs.check.result == 'success'
       - uses: ./.github/actions/setup-nix
+        if: needs.check.result == 'success'
         with:
           signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
           authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Create /run for darwin
-        if: matrix.os == 'macos-14'
+        if: needs.check.result == 'success' && matrix.os == 'macos-14'
         run: |
           printf "run\tprivate/var/run\n" | sudo tee -a /etc/synthetic.conf
           /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
       - name: build
+        if: needs.check.result == 'success'
         run: |
           export MAKEFLAGS="NIX:=nix"
           make
