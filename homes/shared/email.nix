@@ -1,6 +1,7 @@
 { config, pkgs, ... }:
 let
   inherit (pkgs) lib stdenv;
+  isyncWithCyrusSaslXoauth2 = pkgs.isync.override { withCyrusSaslXoauth2 = true; };
 in
 {
   accounts.email = {
@@ -13,10 +14,11 @@ in
       address = "tomoya.otabi@gmail.com";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "${lib.getExe' pkgs.coreutils "cat"} ${config.sops.secrets.gmail-app-password.path}";
+      passwordCommand = "${lib.getExe pkgs.pizauth} show gmail";
       mbsync = {
         enable = true;
         create = "maildir";
+        extraConfig.account.AuthMechs = "XOAUTH2";
       };
       imapnotify = {
         enable = true;
@@ -27,9 +29,15 @@ in
             "${lib.getExe pkgs.libnotify} 'New mail arrived'"
           else
             ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
+        extraConfig.xoAuth2 = true;
       };
       notmuch.enable = true;
-      neomutt.enable = true;
+      neomutt = {
+        enable = true;
+        extraConfig = ''
+          set smtp_authenticators = "xoauth2"
+        '';
+      };
       # to sync with GMail's trash, I need to add the label like "+[Gmail]/ゴミ箱"
       # but labels with Japanese characters are not supported by neomutt
       # so I set the display language to English(US) in GMail settings
@@ -42,8 +50,14 @@ in
     };
   };
 
-  programs.mbsync.enable = true;
-  my.services.mbsync.enable = true;
+  programs.mbsync = {
+    enable = true;
+    package = isyncWithCyrusSaslXoauth2;
+  };
+  my.services.mbsync = {
+    enable = true;
+    package = isyncWithCyrusSaslXoauth2;
+  };
 
   services.imapnotify.enable = true;
 
@@ -100,9 +114,6 @@ in
     sopsFile = ./secrets.yaml;
   };
   sops.secrets.gmail-oauth-client-secret = {
-    sopsFile = ./secrets.yaml;
-  };
-  sops.secrets.gmail-app-password = {
     sopsFile = ./secrets.yaml;
   };
 }
