@@ -18,6 +18,11 @@ in
       mbsync = {
         enable = true;
         create = "maildir";
+        # without this, mbsync errors on mailboxes that were deleted or
+        # renamed on the remote side (e.g. after changing Gmail's display
+        # language) because it still tracks them in local state files
+        remove = "maildir";
+        expunge = "both";
         extraConfig.account.AuthMechs = "XOAUTH2";
       };
       imapnotify = {
