@@ -49,6 +49,7 @@ let
       epkgs: with epkgs; [
         treesit-grammars.with-all-grammars
         (claude-code-ide epkgs)
+        pkgs.notmuch.emacs
         pkgs.age
         pkgs.gettext
       ];

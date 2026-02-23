@@ -66,6 +66,11 @@ in
 
   services.imapnotify.enable = true;
 
+  programs.notmuch = {
+    enable = true;
+    hooks.preNew = "${lib.getExe config.my.services.mbsync.package} -a";
+  };
+
   programs.neomutt = {
     enable = true;
     sidebar = {

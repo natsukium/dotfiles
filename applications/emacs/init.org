@@ -467,6 +467,37 @@ machine rss.home.natsukium.com login natsukium password <fever-password>"
   (elfeed-protocol-enable))
 #+end_src
 
+* mail
+
+[[https://notmuchmail.org/][notmuch]] is a tag-based email indexer and searcher.
+[[https://notmuchmail.org/notmuch-emacs/][notmuch.el]] provides an Emacs interface for reading and organizing email.
+It reads mail from a local maildir synced by mbsync.
+
+notmuch was chosen over mu4e because the notmuch indexer
+is already configured for all email accounts.
+Adding notmuch.el only requires the Emacs frontend,
+avoiding a second indexer for the same maildir.
+
+#+begin_src emacs-lisp
+(use-package notmuch
+  :ensure nil
+  :bind ("C-c M" . notmuch)
+  :config
+  (setq notmuch-fcc-dirs nil)
+  (setq notmuch-search-oldest-first nil))
+#+end_src
+
+[[https://orgmode.org/manual/Protocols.html][ol-notmuch]] integrates notmuch with Org mode's link system.
+Calling =org-store-link= (=C-c l=) in a notmuch buffer
+stores a link to the current message or thread,
+which can then be inserted into org-capture templates via =%a=.
+
+#+begin_src emacs-lisp
+(use-package ol-notmuch
+  :ensure t
+  :after (notmuch org))
+#+end_src
+
 * terminal
 ** vterm
 
