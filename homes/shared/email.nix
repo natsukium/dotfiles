@@ -14,7 +14,7 @@ in
       address = "tomoya.otabi@gmail.com";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "${lib.getExe pkgs.pizauth} show gmail";
+      passwordCommand = "${lib.getExe config.my.services.pizauth.package} show gmail";
       mbsync = {
         enable = true;
         create = "maildir";
