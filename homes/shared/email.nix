@@ -2,6 +2,19 @@
 let
   inherit (pkgs) lib stdenv;
   isyncWithCyrusSaslXoauth2 = pkgs.isync.override { withCyrusSaslXoauth2 = true; };
+
+  # isync 1.5 drops the IMAP connection for the second account when
+  # multiple XOAUTH2 accounts share the same server, causing
+  # "read: unexpected EOF" with --all.  Running each channel in its
+  # own process avoids the bug.
+  # https://www.mail-archive.com/isync-devel@lists.sourceforge.net/msg04337.html
+  mbsyncChannels = lib.attrNames (
+    lib.filterAttrs (_: acc: acc.mbsync.enable) config.accounts.email.accounts
+  );
+  mbsyncCmd = lib.getExe config.my.services.mbsync.package;
+  mbsyncAllScript = pkgs.writeShellScript "mbsync-all" (
+    lib.concatMapStringsSep "\n" (channel: "${mbsyncCmd} ${lib.escapeShellArg channel}") mbsyncChannels
+  );
 in
 {
   accounts.email = {
@@ -28,7 +41,7 @@ in
       imapnotify = {
         enable = true;
         boxes = [ "Inbox" ];
-        onNotify = "${lib.getExe config.my.services.mbsync.package} -a";
+        onNotify = "${lib.getExe config.my.services.mbsync.package} gmail";
         onNotifyPost =
           if stdenv.hostPlatform.isLinux then
             "${lib.getExe pkgs.libnotify} 'New mail arrived'"
@@ -68,7 +81,7 @@ in
 
   programs.notmuch = {
     enable = true;
-    hooks.preNew = "${lib.getExe config.my.services.mbsync.package} -a";
+    hooks.preNew = "${mbsyncAllScript}";
   };
 
   programs.neomutt = {

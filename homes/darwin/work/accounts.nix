@@ -19,7 +19,7 @@ in
       imapnotify = {
         enable = true;
         boxes = [ "Inbox" ];
-        onNotify = "${lib.getExe config.my.services.mbsync.package} -a";
+        onNotify = "${lib.getExe config.my.services.mbsync.package} work";
         onNotifyPost = ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
         extraConfig.xoAuth2 = true;
       };
