@@ -10,7 +10,7 @@ in
       address = "tomoya.otabi@attm.co.jp";
       flavor = "gmail.com";
       realName = "OTABI Tomoya";
-      passwordCommand = "${lib.getExe pkgs.pizauth} show work";
+      passwordCommand = "${lib.getExe config.my.services.pizauth.package} show work";
       mbsync = {
         enable = true;
         create = "maildir";
