@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -8,26 +7,6 @@
 let
   cfg = config.my.programs.opencode;
   commonLib = import ../common/lib.nix { inherit pkgs; };
-
-  # Transform MCP server config
-  # - add type="local"
-  # - merge command+args into array
-  # - rename env->environment
-  transformMcpServerConfig =
-    _: v:
-    lib.removeAttrs
-      (
-        v
-        // {
-          type = "local";
-          command = [ v.command ] ++ (v.args or [ ]);
-          environment = v.env or { };
-        }
-      )
-      [
-        "args"
-        "env"
-      ];
 in
 {
   options.my.programs.opencode = {
@@ -37,6 +16,7 @@ in
   config = lib.mkIf cfg.enable {
     programs.opencode = {
       enable = true;
+      enableMcpIntegration = true;
 
       settings = {
         instructions = [ "CLAUDE.md" ];
@@ -44,10 +24,6 @@ in
         autoupdate = false;
 
         theme = "nord";
-
-        mcp = lib.mapAttrs transformMcpServerConfig (
-          import ../common/mcp-servers.nix { inherit inputs pkgs; }
-        );
       };
     };
 

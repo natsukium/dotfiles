@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -35,7 +34,7 @@ in
           "CLAUDE.md"
         ];
 
-        mcpServers = import ../common/mcp-servers.nix { inherit inputs pkgs; };
+        mcpServers = config.programs.mcp.servers;
       };
     };
 

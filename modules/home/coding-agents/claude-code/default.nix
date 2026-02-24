@@ -1,5 +1,4 @@
 {
-  inputs,
   config,
   lib,
   pkgs,
@@ -16,6 +15,7 @@ in
   config = lib.mkIf cfg.enable {
     programs.claude-code = {
       enable = true;
+      enableMcpIntegration = true;
 
       package = pkgs.edge.claude-code-bin;
 
@@ -102,7 +102,6 @@ in
 
       skillsDir = ../common/skills;
 
-      mcpServers = import ../common/mcp-servers.nix { inherit inputs pkgs; };
     };
 
     programs.git.ignores = [
