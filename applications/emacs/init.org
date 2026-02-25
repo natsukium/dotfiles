@@ -491,13 +491,42 @@ is already configured for all email accounts.
 Adding notmuch.el only requires the Emacs frontend,
 avoiding a second indexer for the same maildir.
 
+notmuch has no built-in delete operation; it manages metadata (tags)
+rather than maildir folder placement.
+Pressing =d= tags the message with =+deleted= and removes =inbox=.
+The actual deletion happens on the next =notmuch new=: a post-new hook
+moves tagged files to Gmail's Trash maildir folder after indexing,
+so the move is synced to the server on the next mbsync run.
+=D= reverses the operation, restoring =inbox= and removing =deleted=.
+This only works before the next =notmuch new= moves the file;
+once mbsync has synced the move, the message is in Gmail's Trash.
+
 #+begin_src emacs-lisp
 (use-package notmuch
   :ensure nil
   :bind ("C-c M" . notmuch)
   :custom
   (notmuch-fcc-dirs nil)
-  (notmuch-search-oldest-first nil))
+  (notmuch-search-oldest-first nil)
+  :config
+  (keymap-set notmuch-search-mode-map "d"
+    (lambda ()
+      (interactive)
+      (notmuch-search-tag '("+deleted" "-inbox"))
+      (notmuch-search-next-thread)))
+  (keymap-set notmuch-show-mode-map "d"
+    (lambda ()
+      (interactive)
+      (notmuch-show-tag '("+deleted" "-inbox"))))
+  (keymap-set notmuch-search-mode-map "D"
+    (lambda ()
+      (interactive)
+      (notmuch-search-tag '("-deleted" "+inbox"))
+      (notmuch-search-next-thread)))
+  (keymap-set notmuch-show-mode-map "D"
+    (lambda ()
+      (interactive)
+      (notmuch-show-tag '("-deleted" "+inbox")))))
 #+end_src
 
 [[https://orgmode.org/manual/Protocols.html][ol-notmuch]] integrates notmuch with Org mode's link system.
