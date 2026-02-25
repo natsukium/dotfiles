@@ -3,47 +3,9 @@ let
   inherit (pkgs) lib stdenv;
   isyncWithCyrusSaslXoauth2 = pkgs.isync.override { withCyrusSaslXoauth2 = true; };
 
-  # isync 1.5 drops the IMAP connection for the second account when
-  # multiple XOAUTH2 accounts share the same server, causing
-  # "read: unexpected EOF" with --all.  Running each channel in its
-  # own process avoids the bug.
-  # https://www.mail-archive.com/isync-devel@lists.sourceforge.net/msg04337.html
-  mbsyncChannels = lib.attrNames (
-    lib.filterAttrs (_: acc: acc.mbsync.enable) config.accounts.email.accounts
-  );
-  mbsyncCmd = lib.getExe config.my.services.mbsync.package;
-  mbsyncAllScript = pkgs.writeShellScript "mbsync-all" (
-    lib.concatMapStringsSep "\n" (channel: "${mbsyncCmd} ${lib.escapeShellArg channel}") mbsyncChannels
-  );
-
   notmuchCmd = lib.getExe pkgs.notmuch;
-  notmuchAccounts = lib.attrNames (
-    lib.filterAttrs (_: acc: acc.notmuch.enable) config.accounts.email.accounts
-  );
-  # notmuch alone only manages tags; it does not move files between
-  # maildir folders, so an explicit move is needed before sync.
-  # Running in postNew (not preNew) so that notmuch has already
-  # re-indexed the maildir and file paths in the database are fresh.
-  # In preNew the database still holds paths from the previous run,
-  # which become stale when mbsync renames files for flag changes.
-  moveDeletedToTrash = pkgs.writeShellScript "notmuch-move-deleted-to-trash" ''
-    db_path=$(${notmuchCmd} config get database.path)
-    ${lib.concatMapStrings (name: ''
-      mkdir -p "$db_path/${name}/[Gmail]/Trash/cur"
-    '') notmuchAccounts}
-    ${notmuchCmd} search --output=files tag:deleted -- ${
-      lib.concatMapStringsSep " " (name: "not 'folder:${name}/[Gmail]/Trash'") notmuchAccounts
-    } | while IFS= read -r file; do
-      # Strip mbsync UID (,U=<n>) so the Trash folder assigns its own
-      # UID instead of colliding with the source folder's numbering.
-      dest=$(basename "$file" | sed 's/,U=[0-9]*//')
-      case "$file" in
-      ${lib.concatMapStrings (name: ''
-        "$db_path"/${name}/*) mv -- "$file" "$db_path/${name}/[Gmail]/Trash/cur/$dest" ;;
-      '') notmuchAccounts}
-      esac
-    done
-  '';
+  afewCmd = lib.getExe pkgs.afew;
+  postSyncCmd = "${notmuchCmd} new && ${afewCmd} --move-mails";
 in
 {
   accounts.email = {
@@ -72,10 +34,14 @@ in
         boxes = [ "Inbox" ];
         onNotify = "${lib.getExe config.my.services.mbsync.package} gmail";
         onNotifyPost =
-          if stdenv.hostPlatform.isLinux then
-            "${lib.getExe pkgs.libnotify} 'New mail arrived'"
-          else
-            ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
+          let
+            notification =
+              if stdenv.hostPlatform.isLinux then
+                "${lib.getExe pkgs.libnotify} 'New mail arrived'"
+              else
+                ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
+          in
+          "${postSyncCmd}; ${notification}";
         extraConfig.xoAuth2 = true;
       };
       notmuch.enable = true;
@@ -104,17 +70,25 @@ in
   my.services.mbsync = {
     enable = true;
     package = isyncWithCyrusSaslXoauth2;
+    postExec = postSyncCmd;
   };
 
   services.imapnotify.enable = true;
 
-  programs.notmuch = {
+  programs.notmuch.enable = true;
+
+  programs.afew = {
     enable = true;
-    hooks.preNew = ''
-      ${mbsyncAllScript}
-    '';
-    hooks.postNew = ''
-      ${moveDeletedToTrash}
+    extraConfig = ''
+      [MailMover]
+      folders = gmail/Inbox "gmail/[Gmail]/All Mail" "gmail/[Gmail]/Sent Mail" gmail/[Gmail]/Drafts gmail/[Gmail]/Starred
+      rename = true
+
+      gmail/Inbox = 'tag:deleted':'gmail/[Gmail]/Trash'
+      gmail/[Gmail]/All Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
+      gmail/[Gmail]/Sent Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
+      gmail/[Gmail]/Drafts = 'tag:deleted':'gmail/[Gmail]/Trash'
+      gmail/[Gmail]/Starred = 'tag:deleted':'gmail/[Gmail]/Trash'
     '';
   };
 

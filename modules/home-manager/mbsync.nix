@@ -25,6 +25,16 @@ let
   mbsyncAllScript = pkgs.writeShellScript "mbsync-all" (
     lib.concatMapStringsSep "\n" (channel: "${mbsyncCmd} ${lib.escapeShellArg channel}") mbsyncChannels
   );
+
+  # launchd has no ExecStartPre/ExecStartPost equivalent,
+  # so pre/post hooks are composed into a single wrapper script.
+  syncScript = pkgs.writeShellScript "mbsync-sync" (
+    lib.concatStringsSep "\n" (
+      lib.optional (cfg.preExec != null) cfg.preExec
+      ++ [ "${mbsyncAllScript}" ]
+      ++ lib.optional (cfg.postExec != null) cfg.postExec
+    )
+  );
 in
 {
   options.my.services = { inherit (options.services) mbsync; };
@@ -38,7 +48,10 @@ in
         launchd.agents.mbsync = {
           enable = true;
           config = {
-            ProgramArguments = [ "${mbsyncAllScript}" ];
+            ProgramArguments = [ "${syncScript}" ];
+            EnvironmentVariables = lib.optionalAttrs config.programs.notmuch.enable {
+              NOTMUCH_CONFIG = "${config.xdg.configHome}/notmuch/default/config";
+            };
             RunAtLoad = true;
             StartInterval = 300;
             StandardOutPath = "${config.home.homeDirectory}/Library/Logs/mbsync/stdout";
