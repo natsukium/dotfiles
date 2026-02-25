@@ -34,9 +34,12 @@ let
     ${notmuchCmd} search --output=files tag:deleted -- ${
       lib.concatMapStringsSep " " (name: "not 'folder:${name}/[Gmail]/Trash'") notmuchAccounts
     } | while IFS= read -r file; do
+      # Strip mbsync UID (,U=<n>) so the Trash folder assigns its own
+      # UID instead of colliding with the source folder's numbering.
+      dest=$(basename "$file" | sed 's/,U=[0-9]*//')
       case "$file" in
       ${lib.concatMapStrings (name: ''
-        "$db_path"/${name}/*) mv -- "$file" "$db_path/${name}/[Gmail]/Trash/cur/" ;;
+        "$db_path"/${name}/*) mv -- "$file" "$db_path/${name}/[Gmail]/Trash/cur/$dest" ;;
       '') notmuchAccounts}
       esac
     done
