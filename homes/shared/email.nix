@@ -81,7 +81,7 @@ in
     enable = true;
     extraConfig = ''
       [MailMover]
-      folders = gmail/Inbox "gmail/[Gmail]/All Mail" "gmail/[Gmail]/Sent Mail" gmail/[Gmail]/Drafts gmail/[Gmail]/Starred
+      folders = gmail/Inbox "gmail/[Gmail]/All Mail" "gmail/[Gmail]/Sent Mail" gmail/[Gmail]/Drafts gmail/[Gmail]/Starred work/Inbox "work/[Gmail]/All Mail" "work/[Gmail]/Sent Mail" work/[Gmail]/Drafts work/[Gmail]/Starred
       rename = true
 
       gmail/Inbox = 'tag:deleted':'gmail/[Gmail]/Trash'
@@ -89,6 +89,11 @@ in
       gmail/[Gmail]/Sent Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Drafts = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Starred = 'tag:deleted':'gmail/[Gmail]/Trash'
+      work/Inbox = 'tag:deleted':'work/[Gmail]/Trash'
+      work/[Gmail]/All Mail = 'tag:deleted':'work/[Gmail]/Trash'
+      work/[Gmail]/Sent Mail = 'tag:deleted':'work/[Gmail]/Trash'
+      work/[Gmail]/Drafts = 'tag:deleted':'work/[Gmail]/Trash'
+      work/[Gmail]/Starred = 'tag:deleted':'work/[Gmail]/Trash'
     '';
   };
 
