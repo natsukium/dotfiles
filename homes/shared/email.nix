@@ -5,7 +5,7 @@ let
 
   notmuchCmd = lib.getExe pkgs.notmuch;
   afewCmd = lib.getExe pkgs.afew;
-  postSyncCmd = "${notmuchCmd} new && ${afewCmd} --move-mails";
+  postSyncCmd = "${notmuchCmd} new && ${afewCmd} --tag --new && ${afewCmd} --move-mails";
 in
 {
   accounts.email = {
@@ -75,21 +75,47 @@ in
 
   services.imapnotify.enable = true;
 
-  programs.notmuch.enable = true;
+  programs.notmuch = {
+    enable = true;
+    # afew's --tag --new identifies unprocessed messages by the 'new' tag;
+    # InboxFilter then replaces it with 'inbox' so the end result is the
+    # same as before (inbox + unread) while allowing filters to run first
+    new.tags = [
+      "new"
+      "unread"
+    ];
+  };
 
   programs.afew = {
     enable = true;
     extraConfig = ''
+      [HeaderMatchingFilter.0]
+      header = From
+      pattern = notifications@github.com
+      tags = +github;-new
+
+      [HeaderMatchingFilter.1]
+      header = X-GitHub-Reason
+      pattern = review_requested|mention
+      tags = +github::action-required
+
+      [HeaderMatchingFilter.2]
+      header = List-Id
+      pattern = \.attmcojp\.github\.com
+      tags = +github::attmcojp
+
+      [InboxFilter]
+
       [MailMover]
       folders = gmail/Inbox "gmail/[Gmail]/All Mail" "gmail/[Gmail]/Sent Mail" gmail/[Gmail]/Drafts gmail/[Gmail]/Starred work/Inbox "work/[Gmail]/All Mail" "work/[Gmail]/Sent Mail" work/[Gmail]/Drafts work/[Gmail]/Starred
       rename = true
 
-      gmail/Inbox = 'tag:deleted':'gmail/[Gmail]/Trash'
+      gmail/Inbox = 'tag:deleted':'gmail/[Gmail]/Trash' 'tag:github':'gmail/[Gmail]/All Mail'
       gmail/[Gmail]/All Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Sent Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Drafts = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Starred = 'tag:deleted':'gmail/[Gmail]/Trash'
-      work/Inbox = 'tag:deleted':'work/[Gmail]/Trash'
+      work/Inbox = 'tag:deleted':'work/[Gmail]/Trash' 'tag:github':'work/[Gmail]/All Mail'
       work/[Gmail]/All Mail = 'tag:deleted':'work/[Gmail]/Trash'
       work/[Gmail]/Sent Mail = 'tag:deleted':'work/[Gmail]/Trash'
       work/[Gmail]/Drafts = 'tag:deleted':'work/[Gmail]/Trash'
