@@ -6,7 +6,7 @@
 
   inputs = {
     # Core
-    nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
+    nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=staging-next";
     nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-25.05";
     # Flake Infrastructure
     flake-parts = {
