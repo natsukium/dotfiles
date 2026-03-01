@@ -70,19 +70,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, ubuntu-24.04-arm, macos-14]
     steps:
-      # workaround for "No space left on device"
-      - name: Collect garbage
-        if: needs.check.result == 'success' && matrix.os == 'ubuntu-latest'
-        uses: easimon/maximize-build-space@fc881a613ad2a34aca9c9624518214ebc21dfc0c # v10
-        with:
-          root-reserve-mb: 8192
-          swap-size-mb: 1024
-          build-mount-path: "/nix"
-          remove-dotnet: 'true'
-          remove-android: 'true'
-          remove-haskell: 'true'
-          remove-codeql: 'true'
-          remove-docker-images: 'true'
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         if: needs.check.result == 'success'
       - uses: ./.github/actions/setup-nix
