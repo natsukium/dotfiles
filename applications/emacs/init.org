@@ -3,9 +3,6 @@
 * basic
 
 #+begin_src emacs-lisp
-(set-face-attribute 'default nil
-                    :family "Liga HackGen Console NF"
-                    :height 140)
 (add-to-list 'default-frame-alist
 '(undecorated-round . t))
 (use-package doom-themes
@@ -35,6 +32,36 @@ instead of requiring the full word =yes= / =no=.
 #+begin_src emacs-lisp
 (setq use-short-answers t)
 #+end_src
+
+** Font
+[[https://github.com/yuru7/moralerspace][Moralerspace]] is a [[https://github.com/githubnext/monaspace][monaspace]]-based composite font family that pairs a Latin
+programming typeface with Japanese glyphs. Each variant—Argon, Krypton,
+Radon, Xenon—has its own typographic character, so assigning a different
+variant to each face produces visually distinct bold, italic, and bold-italic
+rendering without relying on Emacs's synthetic transformations.
+=:weight 'normal= and =:slant 'normal= prevent Emacs from further
+synthesizing bold or italic on top of the variant's own design.
+
+=font-lock-comment-face= uses Radon (the italic variant) to give code
+comments a softer, visually distinct appearance.
+
+#+begin_src emacs-lisp
+(set-face-attribute 'default nil :family "Moralerspace Argon HW" :height 140)
+(set-face-attribute 'bold nil :family "Moralerspace Krypton HW" :weight 'normal)
+(set-face-attribute 'italic nil :family "Moralerspace Radon HW" :slant 'normal)
+(set-face-attribute 'bold-italic nil :family "Moralerspace Xenon HW" :weight 'normal :slant 'normal)
+(set-face-attribute 'font-lock-comment-face nil :family "Moralerspace Radon HW" :slant 'normal)
+#+end_src
+
+Without an explicit =set-language-environment=, Emacs may select a Chinese font
+for CJK characters based on locale order, causing Japanese text to render with
+Chinese glyphs.
+
+#+begin_src emacs-lisp
+(set-language-environment "Japanese")
+#+end_src
+
+*** TODO Enable texture healing
 
 ** Darwin
 On macOS, Emacs cannot inherit environment variables (such as ~$PATH~) from the shell,
