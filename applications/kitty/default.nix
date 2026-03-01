@@ -42,6 +42,7 @@ in
           cursor_blink_interval = "1 ease-out";
           cursor_stop_blinking_after = 20;
           inactive_text_alpha = 0.6;
+          allow_remote_control = "yes";
         }
         // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
           # these effects are available only on macOS or KDE
