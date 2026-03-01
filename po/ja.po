@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-01 13:52+0900\n"
+"POT-Creation-Date: 2026-03-01 14:11+0900\n"
 "PO-Revision-Date: 2026-02-21 00:30+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -4028,8 +4028,19 @@ msgstr ""
 msgid "disable some bars"
 msgstr "不要なバーを消す"
 
-#. type: paragraph in src
+#. type: paragraph
 #: applications/emacs/early-init.org:5
+msgid ""
+"The tool bar duplicates functionality already accessible via keybindings and "
+"the menu bar, while the vertical scroll bar wastes horizontal space without "
+"providing useful navigation—line numbers and modeline indicators are more "
+"precise.  Setting these in ~default-frame-alist~ rather than calling ~tool-"
+"bar-mode~ / ~scroll-bar-mode~ avoids a brief flash of the bars during "
+"startup before the modes disable them."
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/early-init.org:13
 #, no-wrap
 msgid ""
 "(push '(tool-bar-lines . 0) default-frame-alist)\n"
@@ -4037,29 +4048,70 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/early-init.org:9
+#: applications/emacs/early-init.org:17
 #, no-wrap
 msgid "turn off the annoying bell"
 msgstr "煩わしいベルが鳴らないようにする"
 
+#. type: paragraph
+#: applications/emacs/early-init.org:19
+msgid ""
+"The default audible bell is distracting and provides no actionable "
+"information.  Replacing it with ~ignore~ silences it entirely; a visual bell "
+"(~visible-bell~) was not chosen because the screen flash is equally "
+"disruptive."
+msgstr ""
+
 #. type: paragraph in src
-#: applications/emacs/early-init.org:11
+#: applications/emacs/early-init.org:25
 #, no-wrap
 msgid "(setq ring-bell-function 'ignore)"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/early-init.org:14
+#: applications/emacs/early-init.org:28
 #, no-wrap
 msgid "disable backup files"
 msgstr "ファイルのバックアップを作らないようにする"
 
+#. type: paragraph
+#: applications/emacs/early-init.org:30
+msgid ""
+"Emacs already skips backup files for version-controlled files by default "
+"(~vc-make-backup-files~ is ~nil~), but files outside of a repository still "
+"produce backups.  Since virtually all editing happens in Git-managed trees, "
+"the remaining cases are rare enough that the clutter outweighs the safety "
+"net.  Auto-save files are likewise redundant when unsaved work can be "
+"recovered through Git stashes or reflog."
+msgstr ""
+
 #. type: paragraph in src
-#: applications/emacs/early-init.org:16
+#: applications/emacs/early-init.org:38
 #, no-wrap
 msgid ""
 "(setq make-backup-files nil)\n"
 "(setq auto-save-default nil)"
+msgstr ""
+
+#. type: heading **
+#: applications/emacs/early-init.org:42
+#, fuzzy, no-wrap
+#| msgid "disable backup files"
+msgid "disable lock files"
+msgstr "ファイルのバックアップを作らないようにする"
+
+#. type: paragraph
+#: applications/emacs/early-init.org:44
+msgid ""
+"Lock files (~.#filename~) prevent concurrent editing across multiple Emacs "
+"instances, but in a single-instance workflow they only clutter the working "
+"directory and interfere with file watchers and build tools."
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/early-init.org:49
+#, no-wrap
+msgid "(setq create-lockfiles nil)"
 msgstr ""
 
 #. type: heading *

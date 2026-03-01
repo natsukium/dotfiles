@@ -1,18 +1,50 @@
 #+STARTUP: overview
 
 ** disable some bars
+
+The tool bar duplicates functionality already accessible via keybindings and
+the menu bar, while the vertical scroll bar wastes horizontal space without
+providing useful navigation—line numbers and modeline indicators are more
+precise.  Setting these in ~default-frame-alist~ rather than calling
+~tool-bar-mode~ / ~scroll-bar-mode~ avoids a brief flash of the bars during
+startup before the modes disable them.
+
 #+begin_src emacs-lisp
 (push '(tool-bar-lines . 0) default-frame-alist)
 (push '(vertical-scroll-bars) default-frame-alist)
 #+end_src
 
 ** turn off the annoying bell
+
+The default audible bell is distracting and provides no actionable
+information.  Replacing it with ~ignore~ silences it entirely; a visual
+bell (~visible-bell~) was not chosen because the screen flash is equally
+disruptive.
+
 #+begin_src emacs-lisp
 (setq ring-bell-function 'ignore)
 #+end_src
 
 ** disable backup files
+
+Emacs already skips backup files for version-controlled files by default
+(~vc-make-backup-files~ is ~nil~), but files outside of a repository still
+produce backups.  Since virtually all editing happens in Git-managed trees,
+the remaining cases are rare enough that the clutter outweighs the safety
+net.  Auto-save files are likewise redundant when unsaved work can be
+recovered through Git stashes or reflog.
+
 #+begin_src emacs-lisp
 (setq make-backup-files nil)
 (setq auto-save-default nil)
+#+end_src
+
+** disable lock files
+
+Lock files (~.#filename~) prevent concurrent editing across multiple Emacs
+instances, but in a single-instance workflow they only clutter the working
+directory and interfere with file watchers and build tools.
+
+#+begin_src emacs-lisp
+(setq create-lockfiles nil)
 #+end_src
