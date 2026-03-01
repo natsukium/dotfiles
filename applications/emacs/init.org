@@ -236,6 +236,33 @@ The built-in savehist package keeps a record of user inputs and stores them acro
   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+end_src
+
+*** forge
+
+[[https://github.com/magit/forge][Forge]] extends Magit to work with GitHub, GitLab, and other forges
+directly from Emacs—browsing issues, reviewing pull requests,
+and managing notifications without leaving the editor.
+
+Forge authenticates via =ghub=, which reads credentials from =auth-sources=.
+The =authinfo.age= file should contain a GitHub API token entry:
+
+#+begin_example
+machine api.github.com login <username>^forge password <token>
+#+end_example
+
+The token is a fine-grained personal access token
+with a 6-month expiration that requires periodic regeneration.
+The required permissions are:
+
+- Issues: Read and Write
+- Pull requests: Read and Write
+
+#+begin_src emacs-lisp
+(use-package forge
+  :ensure t
+  :after magit)
+#+end_src
+
 * language support
 
 ** Markdown

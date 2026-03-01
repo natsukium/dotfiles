@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-01 14:11+0900\n"
+"POT-Creation-Date: 2026-03-01 22:32+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -103,7 +103,7 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: README.org:34 applications/emacs/init.org:331 modules/configuration.org:82
+#: README.org:34 applications/emacs/init.org:358 modules/configuration.org:82
 #, no-wrap
 msgid "Configuration"
 msgstr ""
@@ -2778,30 +2778,86 @@ msgid ""
 "  (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))"
 msgstr ""
 
+#. type: heading ***
+#: applications/emacs/init.org:240
+#, no-wrap
+msgid "forge"
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:242
+msgid ""
+"[[https://github.com/magit/forge][Forge]] extends Magit to work with GitHub, "
+"GitLab, and other forges directly from Emacs—browsing issues, reviewing pull "
+"requests, and managing notifications without leaving the editor."
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:246
+msgid ""
+"Forge authenticates via =ghub=, which reads credentials from "
+"=auth-sources=.  The =authinfo.age= file should contain a GitHub API token "
+"entry:"
+msgstr ""
+
+#. type: paragraph in example
+#: applications/emacs/init.org:250
+#, no-wrap
+msgid "machine api.github.com login <username>^forge password <token>"
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:253
+msgid ""
+"The token is a fine-grained personal access token with a 6-month expiration "
+"that requires periodic regeneration.  The required permissions are:"
+msgstr ""
+
+#. type: plain list -
+#: applications/emacs/init.org:258
+#, no-wrap
+msgid "Issues: Read and Write"
+msgstr ""
+
+#. type: plain list -
+#: applications/emacs/init.org:259
+#, no-wrap
+msgid "Pull requests: Read and Write"
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:261
+#, no-wrap
+msgid ""
+"(use-package forge\n"
+"  :ensure t\n"
+"  :after magit)"
+msgstr ""
+
 #. type: heading *
-#: applications/emacs/init.org:239
+#: applications/emacs/init.org:266
 #, no-wrap
 msgid "language support"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:241
+#: applications/emacs/init.org:268
 #, no-wrap
 msgid "Markdown"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:243
+#: applications/emacs/init.org:270
 msgid "https://github.com/jrblevin/markdown-mode"
 msgstr ""
 
 #. type: paragraph in quote
-#: applications/emacs/init.org:246
+#: applications/emacs/init.org:273
 msgid "markdown-mode is a major mode for editing Markdown-formatted text."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:250
+#: applications/emacs/init.org:277
 #, no-wrap
 msgid ""
 "(use-package markdown-mode\n"
@@ -2813,23 +2869,23 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:258
+#: applications/emacs/init.org:285
 #, no-wrap
 msgid "Nix"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:260
+#: applications/emacs/init.org:287
 msgid "https://github.com/NixOS/nix-mode"
 msgstr ""
 
 #. type: paragraph in quote
-#: applications/emacs/init.org:263
+#: applications/emacs/init.org:290
 msgid "An Emacs major mode for editing Nix expressions."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:267
+#: applications/emacs/init.org:294
 #, no-wrap
 msgid ""
 "(use-package nix-mode\n"
@@ -2838,13 +2894,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:272
+#: applications/emacs/init.org:299
 #, no-wrap
 msgid "PO"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:274
+#: applications/emacs/init.org:301
 msgid ""
 "[[https://www.gnu.org/software/gettext/manual/html_node/PO-Mode.html][po-mode]] "
 "is Emacs's major mode for editing GNU gettext PO (Portable Object) files.  "
@@ -2852,7 +2908,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:277
+#: applications/emacs/init.org:304
 msgid ""
 "Editing PO files as plain text is error-prone because the format has strict "
 "requirements for escaping and structure.  po-mode provides structured "
@@ -2861,13 +2917,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: applications/emacs/init.org:282
+#: applications/emacs/init.org:309
 #, no-wrap
 msgid "Common Operations"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:284
+#: applications/emacs/init.org:311
 msgid ""
 "PO mode is not derived from text mode.  The buffer is read-only and has its "
 "own keymap, so standard text editing commands do not work directly.  "
@@ -2875,100 +2931,100 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: applications/emacs/init.org:289
+#: applications/emacs/init.org:316
 #, no-wrap
 msgid "Main Commands"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:291
+#: applications/emacs/init.org:318
 msgid "Commands for file operations, validation, and general PO mode management."
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:293 applications/emacs/init.org:308
-#: applications/emacs/init.org:322
+#: applications/emacs/init.org:320 applications/emacs/init.org:335
+#: applications/emacs/init.org:349
 #, no-wrap
 msgid "Key"
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:293 applications/emacs/init.org:308
-#: applications/emacs/init.org:322
+#: applications/emacs/init.org:320 applications/emacs/init.org:335
+#: applications/emacs/init.org:349
 #, no-wrap
 msgid "Function"
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:293 applications/emacs/init.org:308
-#: applications/emacs/init.org:322
+#: applications/emacs/init.org:320 applications/emacs/init.org:335
+#: applications/emacs/init.org:349
 #, no-wrap
 msgid "Description"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:295
+#: applications/emacs/init.org:322
 #, no-wrap
 msgid "=_="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:295
+#: applications/emacs/init.org:322
 #, no-wrap
 msgid "=po-undo="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:295
+#: applications/emacs/init.org:322
 #, no-wrap
 msgid "Undo last modification"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:296
+#: applications/emacs/init.org:323
 #, no-wrap
 msgid "=q="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:296
+#: applications/emacs/init.org:323
 #, no-wrap
 msgid "=po-confirm-and-quit="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:296
+#: applications/emacs/init.org:323
 #, no-wrap
 msgid "Quit with confirmation"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:297
+#: applications/emacs/init.org:324
 #, no-wrap
 msgid "=?= =h="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:297
+#: applications/emacs/init.org:324
 #, no-wrap
 msgid "=po-help="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:297
+#: applications/emacs/init.org:324
 #, no-wrap
 msgid "Show help about PO mode"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:299
+#: applications/emacs/init.org:326
 msgid ""
 "Use or =q= to quit instead of =C-x k= (=kill-buffer=), as they properly "
 "handle unsaved changes and warn about untranslated entries."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:302
+#: applications/emacs/init.org:329
 msgid ""
 "See "
 "[[https://www.gnu.org/software/gettext/manual/html_node/Main-PO-Commands.html][Main "
@@ -2976,90 +3032,90 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: applications/emacs/init.org:304
+#: applications/emacs/init.org:331
 #, no-wrap
 msgid "Entry Positioning"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:306
+#: applications/emacs/init.org:333
 msgid "Commands for navigating between entries in the PO file."
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:310
+#: applications/emacs/init.org:337
 #, no-wrap
 msgid "=n="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:310
+#: applications/emacs/init.org:337
 #, no-wrap
 msgid "=po-next-entry="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:310
+#: applications/emacs/init.org:337
 #, no-wrap
 msgid "Move to next entry"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:311
+#: applications/emacs/init.org:338
 #, no-wrap
 msgid "=p="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:311
+#: applications/emacs/init.org:338
 #, no-wrap
 msgid "=po-previous-entry="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:311
+#: applications/emacs/init.org:338
 #, no-wrap
 msgid "Move to previous entry"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:312
+#: applications/emacs/init.org:339
 #, no-wrap
 msgid "=<="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:312
+#: applications/emacs/init.org:339
 #, no-wrap
 msgid "=po-first-entry="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:312
+#: applications/emacs/init.org:339
 #, no-wrap
 msgid "Move to first entry"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:313
+#: applications/emacs/init.org:340
 #, no-wrap
 msgid "=>="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:313
+#: applications/emacs/init.org:340
 #, no-wrap
 msgid "=po-last-entry="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:313
+#: applications/emacs/init.org:340
 #, no-wrap
 msgid "Move to last entry"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:315
+#: applications/emacs/init.org:342
 msgid ""
 "See "
 "[[https://www.gnu.org/software/gettext/manual/html_node/Entry-Positioning.html][Entry "
@@ -3067,92 +3123,92 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: applications/emacs/init.org:317
+#: applications/emacs/init.org:344
 #, no-wrap
 msgid "Modifying Translations"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:319
+#: applications/emacs/init.org:346
 msgid ""
 "Commands for editing translation strings.  Press =RET= to open a subedit "
 "buffer where standard Emacs editing works normally."
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:324
+#: applications/emacs/init.org:351
 #, no-wrap
 msgid "=RET="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:324
+#: applications/emacs/init.org:351
 #, no-wrap
 msgid "=po-edit-msgstr="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:324
+#: applications/emacs/init.org:351
 #, no-wrap
 msgid "Open subedit buffer for editing"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:325
+#: applications/emacs/init.org:352
 #, no-wrap
 msgid "=C-c C-c="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:325
+#: applications/emacs/init.org:352
 #, no-wrap
 msgid "=po-subedit-exit="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:325
+#: applications/emacs/init.org:352
 #, no-wrap
 msgid "Finish editing and apply changes"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:326
+#: applications/emacs/init.org:353
 #, no-wrap
 msgid "=C-c C-k="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:326
+#: applications/emacs/init.org:353
 #, no-wrap
 msgid "=po-subedit-abort="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:326
+#: applications/emacs/init.org:353
 #, no-wrap
 msgid "Abort editing and discard changes"
 msgstr ""
 
 #. type: cell column 0
-#: applications/emacs/init.org:327
+#: applications/emacs/init.org:354
 #, no-wrap
 msgid "=DEL="
 msgstr ""
 
 #. type: cell column 1
-#: applications/emacs/init.org:327
+#: applications/emacs/init.org:354
 #, no-wrap
 msgid "=po-fade-out-entry="
 msgstr ""
 
 #. type: cell column 2
-#: applications/emacs/init.org:327
+#: applications/emacs/init.org:354
 #, no-wrap
 msgid "Delete the translation"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:329
+#: applications/emacs/init.org:356
 msgid ""
 "See "
 "[[https://www.gnu.org/software/gettext/manual/html_node/Modifying-Translations.html][Modifying "
@@ -3160,7 +3216,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:334
+#: applications/emacs/init.org:361
 #, no-wrap
 msgid ""
 "(use-package po-mode\n"
@@ -3168,27 +3224,27 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:338
+#: applications/emacs/init.org:365
 #, no-wrap
 msgid "Protocol Buffers"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:340
+#: applications/emacs/init.org:367
 msgid ""
 "[[https://github.com/emacsattic/protobuf-ts-mode][protobuf-ts-mode]] is a "
 "tree-sitter-based major mode for editing proto3 files."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:342
+#: applications/emacs/init.org:369
 msgid ""
 "The mode auto-registers =.proto= files when the =proto= grammar is "
 "available."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:345
+#: applications/emacs/init.org:372
 #, no-wrap
 msgid ""
 "(use-package protobuf-ts-mode\n"
@@ -3196,13 +3252,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:349
+#: applications/emacs/init.org:376
 #, no-wrap
 msgid "Justfile"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:351
+#: applications/emacs/init.org:378
 msgid ""
 "[[https://github.com/leon-barrett/just-ts-mode.el][just-ts-mode]] is a "
 "tree-sitter-based major mode for editing "
@@ -3212,7 +3268,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:356
+#: applications/emacs/init.org:383
 #, no-wrap
 msgid ""
 "(use-package just-ts-mode\n"
@@ -3220,19 +3276,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:360
+#: applications/emacs/init.org:387
 #, no-wrap
 msgid "org"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:362
+#: applications/emacs/init.org:389
 #, no-wrap
 msgid "Semantic Line Breaks"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:364
+#: applications/emacs/init.org:391
 msgid ""
 "[[https://sembr.org/][Semantic Line Breaks (SemBr)]] is a writing convention "
 "where line breaks are placed at logical boundaries in sentences, such as "
@@ -3242,14 +3298,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:370
+#: applications/emacs/init.org:397
 msgid ""
 "The recommended line length is around 80 characters.  I set this as an upper "
 "limit in the editor to prevent lines from becoming unnecessarily long."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:375
+#: applications/emacs/init.org:402
 #, no-wrap
 msgid ""
 "(add-hook 'text-mode-hook\n"
@@ -3259,13 +3315,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:381
+#: applications/emacs/init.org:408
 #, no-wrap
 msgid "org-capture"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:383
+#: applications/emacs/init.org:410
 #, no-wrap
 msgid ""
 "(global-set-key (kbd \"C-c c\") 'org-capture)\n"
@@ -3273,13 +3329,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:386
+#: applications/emacs/init.org:413
 #, no-wrap
 msgid "(setq org-root \"~/dropbox/org/\")"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:388
+#: applications/emacs/init.org:415
 #, no-wrap
 msgid ""
 "(setq org-capture-templates\n"
@@ -3295,31 +3351,31 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:400
+#: applications/emacs/init.org:427
 #, no-wrap
 msgid "org-agenda"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:402
+#: applications/emacs/init.org:429
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c a\") 'org-agenda)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:404
+#: applications/emacs/init.org:431
 #, no-wrap
 msgid "(setq org-agenda-files '(\"~/dropbox/org\"))"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:407
+#: applications/emacs/init.org:434
 #, no-wrap
 msgid "org-roam"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:409
+#: applications/emacs/init.org:436
 #, no-wrap
 msgid ""
 "(use-package org-roam\n"
@@ -3353,25 +3409,25 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:438
+#: applications/emacs/init.org:465
 #, no-wrap
 msgid "htmlize"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:440
+#: applications/emacs/init.org:467
 msgid ""
 "Used when converting Org files to HTML with syntax highlighting for code "
 "blocks."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:442
+#: applications/emacs/init.org:469
 msgid "=C-c C-e h h= exports the current Org buffer to HTML."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:445
+#: applications/emacs/init.org:472
 #, no-wrap
 msgid ""
 "(use-package htmlize\n"
@@ -3379,19 +3435,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:449
+#: applications/emacs/init.org:476
 #, no-wrap
 msgid "document"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:451
+#: applications/emacs/init.org:478
 #, no-wrap
 msgid "pdf-tools"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:453
+#: applications/emacs/init.org:480
 msgid ""
 "Emacs's built-in DocView mode renders PDFs as rasterized images "
 "page-by-page, resulting in blurry text at most zoom levels and lacking "
@@ -3400,7 +3456,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:457
+#: applications/emacs/init.org:484
 msgid ""
 "[[https://github.com/vedang/pdf-tools][pdf-tools]] replaces DocView with a "
 "viewer powered by =poppler=, providing sharp rendering, isearch integration, "
@@ -3408,7 +3464,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:461
+#: applications/emacs/init.org:488
 msgid ""
 "Using =pdf-loader-install= instead of =pdf-tools-install= to defer "
 "initialization until a PDF is actually opened.  With Nix's pre-built "
@@ -3417,7 +3473,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:467
+#: applications/emacs/init.org:494
 #, no-wrap
 msgid ""
 "(use-package pdf-tools\n"
@@ -3428,13 +3484,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:474
+#: applications/emacs/init.org:501
 #, no-wrap
 msgid "RSS"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:476
+#: applications/emacs/init.org:503
 msgid ""
 "[[https://github.com/skeeto/elfeed][elfeed]] is a web feed reader for "
 "Emacs.  Using it with "
@@ -3445,25 +3501,25 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:482
+#: applications/emacs/init.org:509
 msgid ""
 "The Fever API must be enabled in Miniflux (Settings -> Integrations -> Fever "
 "API)  before this configuration will work."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:486
+#: applications/emacs/init.org:513
 msgid "Credentials are stored in =~/.authinfo.age=."
 msgstr ""
 
 #. type: paragraph in example
-#: applications/emacs/init.org:489
+#: applications/emacs/init.org:516
 #, no-wrap
 msgid "machine rss.home.natsukium.com login natsukium password <fever-password>\""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:493
+#: applications/emacs/init.org:520
 #, no-wrap
 msgid ""
 "(use-package elfeed\n"
@@ -3472,7 +3528,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:497
+#: applications/emacs/init.org:524
 #, no-wrap
 msgid ""
 "(use-package elfeed-protocol\n"
@@ -3489,13 +3545,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:510
+#: applications/emacs/init.org:537
 #, no-wrap
 msgid "mail"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:512
+#: applications/emacs/init.org:539
 msgid ""
 "[[https://notmuchmail.org/][notmuch]] is a tag-based email indexer and "
 "searcher.  [[https://notmuchmail.org/notmuch-emacs/][notmuch.el]] provides "
@@ -3504,7 +3560,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:516
+#: applications/emacs/init.org:543
 msgid ""
 "notmuch was chosen over mu4e because the notmuch indexer is already "
 "configured for all email accounts.  Adding notmuch.el only requires the "
@@ -3512,7 +3568,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:521
+#: applications/emacs/init.org:548
 msgid ""
 "notmuch has no built-in delete operation; it manages metadata (tags)  rather "
 "than maildir folder placement.  Pressing =d= tags the message with "
@@ -3525,7 +3581,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:532
+#: applications/emacs/init.org:559
 #, no-wrap
 msgid ""
 "(use-package notmuch\n"
@@ -3556,7 +3612,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:559
+#: applications/emacs/init.org:586
 msgid ""
 "[[https://orgmode.org/manual/Protocols.html][ol-notmuch]] integrates notmuch "
 "with Org mode's link system.  Calling =org-store-link= (=C-c l=) in a "
@@ -3565,7 +3621,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:565
+#: applications/emacs/init.org:592
 #, no-wrap
 msgid ""
 "(use-package ol-notmuch\n"
@@ -3574,19 +3630,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:570
+#: applications/emacs/init.org:597
 #, no-wrap
 msgid "terminal"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:571
+#: applications/emacs/init.org:598
 #, no-wrap
 msgid "vterm"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:573
+#: applications/emacs/init.org:600
 msgid ""
 "[[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] is a "
 "fully-fledged terminal emulator based on libvterm.  It provides better "
@@ -3595,7 +3651,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:578
+#: applications/emacs/init.org:605
 #, no-wrap
 msgid ""
 "(use-package vterm\n"
@@ -3603,13 +3659,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:582
+#: applications/emacs/init.org:609
 #, no-wrap
 msgid "claude-code-ide"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:584
+#: applications/emacs/init.org:611
 msgid ""
 "[[https://github.com/manzaltu/claude-code-ide.el][claude-code-ide.el]] "
 "integrates Claude Code CLI with Emacs, enabling AI-powered code assistance "
@@ -3617,14 +3673,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:587
+#: applications/emacs/init.org:614
 msgid ""
 "The package requires a terminal backend (vterm or eat) and the Claude Code "
 "CLI.  Using vterm as the backend for better terminal compatibility."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:591
+#: applications/emacs/init.org:618
 #, no-wrap
 msgid ""
 "(use-package claude-code-ide\n"
@@ -3636,13 +3692,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:599
+#: applications/emacs/init.org:626
 #, no-wrap
 msgid "encryption"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:601
+#: applications/emacs/init.org:628
 msgid ""
 "[[https://github.com/anticomputer/age.el][age.el]] provides transparent "
 "encryption and decryption of =.age= files in Emacs using the "
@@ -3650,14 +3706,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:604
+#: applications/emacs/init.org:631
 msgid ""
 "Using SSH keys as identity/recipient so that no separate age keypair is "
 "needed."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:608
+#: applications/emacs/init.org:635
 #, no-wrap
 msgid ""
 "(use-package age\n"
@@ -3671,19 +3727,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: applications/emacs/init.org:618
+#: applications/emacs/init.org:645
 #, no-wrap
 msgid "misc"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:619
+#: applications/emacs/init.org:646
 #, no-wrap
 msgid "vundo"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:621
+#: applications/emacs/init.org:648
 #, no-wrap
 msgid ""
 "(use-package vundo\n"
@@ -3694,13 +3750,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:628
+#: applications/emacs/init.org:655
 #, no-wrap
 msgid "consult"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:630
+#: applications/emacs/init.org:657
 #, no-wrap
 msgid ""
 ";; Example configuration for Consult\n"
@@ -3779,7 +3835,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:687
+#: applications/emacs/init.org:714
 #, no-wrap
 msgid ""
 ";; Enable automatic preview at point in the *Completions* buffer. This is\n"
@@ -3788,7 +3844,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:691
+#: applications/emacs/init.org:718
 #, no-wrap
 msgid ""
 ";; The :init configuration is always executed (Not lazy)\n"
@@ -3796,7 +3852,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:694
+#: applications/emacs/init.org:721
 #, no-wrap
 msgid ""
 ";; Tweak the register preview for `consult-register-load',\n"
@@ -3809,7 +3865,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:701
+#: applications/emacs/init.org:728
 #, no-wrap
 msgid ""
 ";; Use Consult to select xref locations with preview\n"
@@ -3818,7 +3874,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:705
+#: applications/emacs/init.org:732
 #, no-wrap
 msgid ""
 ";; Configure other variables and modes in the :config section,\n"
@@ -3827,7 +3883,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:709
+#: applications/emacs/init.org:736
 #, no-wrap
 msgid ""
 ";; Optionally configure preview. The default value\n"
@@ -3849,7 +3905,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:725
+#: applications/emacs/init.org:752
 #, no-wrap
 msgid ""
 ";; Optionally configure the narrowing key.\n"
@@ -3858,7 +3914,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:729
+#: applications/emacs/init.org:756
 #, no-wrap
 msgid ""
 "  ;; Optionally make narrowing help available in the minibuffer.\n"
@@ -3870,7 +3926,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:736
+#: applications/emacs/init.org:763
 #, no-wrap
 msgid ""
 ";; Consult users will also want the embark-consult package.\n"
@@ -3882,13 +3938,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:743
+#: applications/emacs/init.org:770
 #, no-wrap
 msgid "compilation"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:745
+#: applications/emacs/init.org:772
 msgid ""
 "The compilation buffer does not inherit from comint-mode, so ANSI escape "
 "sequences are displayed as raw text by default.  Adding "
@@ -3897,37 +3953,37 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:751
+#: applications/emacs/init.org:778
 #, no-wrap
 msgid "(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)"
 msgstr ""
 
 #. type: heading **
-#: applications/emacs/init.org:754
+#: applications/emacs/init.org:781
 #, no-wrap
 msgid "Others"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:756
+#: applications/emacs/init.org:783
 #, no-wrap
 msgid "(which-key-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:758
+#: applications/emacs/init.org:785
 #, no-wrap
 msgid "(setq-default indent-tabs-mode nil)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:760
+#: applications/emacs/init.org:787
 #, no-wrap
 msgid "(require 'org-tempo)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:762
+#: applications/emacs/init.org:789
 #, no-wrap
 msgid ""
 "(org-babel-do-load-languages\n"
@@ -3936,31 +3992,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:766
+#: applications/emacs/init.org:793
 #, no-wrap
 msgid "(setq org-src-preserve-indentation t)"
 msgstr ""
 
 #. type: heading ***
-#: applications/emacs/init.org:769
+#: applications/emacs/init.org:796
 #, no-wrap
 msgid "project.el"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:771
+#: applications/emacs/init.org:798
 msgid ""
 "Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) "
 "as projects."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:773
+#: applications/emacs/init.org:800
 msgid "Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:776
+#: applications/emacs/init.org:803
 #, no-wrap
 msgid ""
 "(defun my/sync-project-list ()\n"
@@ -3976,7 +4032,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:786
+#: applications/emacs/init.org:813
 #, no-wrap
 msgid ""
 ";; 3. Build file contents in a temporary buffer\n"
@@ -3989,7 +4045,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:794
+#: applications/emacs/init.org:821
 #, no-wrap
 msgid ""
 ";; 4. Write the built contents to file\n"
@@ -3997,20 +4053,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:797
+#: applications/emacs/init.org:824
 #, no-wrap
 msgid "(my/sync-project-list)"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:800
+#: applications/emacs/init.org:827
 msgid ""
 "Sort the project list by modification time, placing recently updated "
 "projects first."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:802
+#: applications/emacs/init.org:829
 msgid ""
 "Using advice instead of sorting in =my/sync-project-list= ensures that "
 "projects are sorted by their current mtime at selection time, not at file "
@@ -4019,7 +4075,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:807
+#: applications/emacs/init.org:834
 #, no-wrap
 msgid ""
 "(defun my/sort-projects-by-mtime (projects)\n"
@@ -4034,7 +4090,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:817
+#: applications/emacs/init.org:844
 #, no-wrap
 msgid "(advice-add 'project-known-project-roots :filter-return"
 msgstr ""
