@@ -290,16 +290,36 @@
           pre-commit = {
             check.enable = true;
             settings = {
+              package = pkgs.prek;
               src = ./.;
               hooks = {
-                actionlint.enable = true;
-                biome.enable = true;
-                lua-ls.enable = false;
-                nil.enable = true;
-                shellcheck.enable = true;
-                treefmt.enable = true;
+                actionlint = {
+                  enable = true;
+                  priority = 10;
+                };
+                biome = {
+                  enable = true;
+                  priority = 10;
+                };
+                lua-ls = {
+                  enable = false;
+                  priority = 10;
+                };
+                nil = {
+                  enable = true;
+                  priority = 10;
+                };
+                shellcheck = {
+                  enable = true;
+                  priority = 10;
+                };
+                treefmt = {
+                  enable = true;
+                  priority = 10;
+                };
                 typos = {
                   enable = true;
+                  priority = 10;
                   excludes = [
                     ".sops.yaml"
                     "homes/shared/gpg/keys.txt"
@@ -312,6 +332,7 @@
                 };
                 yamllint = {
                   enable = true;
+                  priority = 10;
                   excludes = [
                     "secrets/default.yaml"
                     "secrets.yaml"
@@ -322,6 +343,7 @@
                   enable = true;
                   name = "po4a";
                   description = "Update translations with po4a";
+                  priority = 10;
                   entry =
                     let
                       po4aScript = pkgs.writeShellScript "run-po4a" ''
@@ -348,12 +370,12 @@
                   files = "(\\.org|po/.*\\.po)$";
                   pass_filenames = false;
                 };
-                # Prefixed with "00-" to ensure this hook runs before all other hooks
-                # (hooks are sorted alphabetically when no explicit before/after is specified)
-                "00-check-org-tangle" = {
+                "check-org-tangle" = {
                   enable = true;
                   name = "check-org-tangle";
                   description = "Verify org files are tangled and synchronized";
+                  # Ensure this hook runs before all other hooks
+                  priority = 0;
                   entry =
                     let
                       checkScript = pkgs.writeShellScript "check-org-tangle" ''

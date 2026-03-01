@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-01 22:32+0900\n"
+"POT-Creation-Date: 2026-03-01 23:21+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2071,16 +2071,36 @@ msgid ""
 "pre-commit = {\n"
 "  check.enable = true;\n"
 "  settings = {\n"
+"    package = pkgs.prek;\n"
 "    src = ./.;\n"
 "    hooks = {\n"
-"      actionlint.enable = true;\n"
-"      biome.enable = true;\n"
-"      lua-ls.enable = false;\n"
-"      nil.enable = true;\n"
-"      shellcheck.enable = true;\n"
-"      treefmt.enable = true;\n"
+"      actionlint = {\n"
+"        enable = true;\n"
+"        priority = 10;\n"
+"      };\n"
+"      biome = {\n"
+"        enable = true;\n"
+"        priority = 10;\n"
+"      };\n"
+"      lua-ls = {\n"
+"        enable = false;\n"
+"        priority = 10;\n"
+"      };\n"
+"      nil = {\n"
+"        enable = true;\n"
+"        priority = 10;\n"
+"      };\n"
+"      shellcheck = {\n"
+"        enable = true;\n"
+"        priority = 10;\n"
+"      };\n"
+"      treefmt = {\n"
+"        enable = true;\n"
+"        priority = 10;\n"
+"      };\n"
 "      typos = {\n"
 "        enable = true;\n"
+"        priority = 10;\n"
 "        excludes = [\n"
 "          \".sops.yaml\"\n"
 "          \"homes/shared/gpg/keys.txt\"\n"
@@ -2093,6 +2113,7 @@ msgid ""
 "      };\n"
 "      yamllint = {\n"
 "        enable = true;\n"
+"        priority = 10;\n"
 "        excludes = [\n"
 "          \"secrets/default.yaml\"\n"
 "          \"secrets.yaml\"\n"
@@ -2104,6 +2125,7 @@ msgid ""
 "        enable = true;\n"
 "        name = \"po4a\";\n"
 "        description = \"Update translations with po4a\";\n"
+"        priority = 10;\n"
 "        entry =\n"
 "          let\n"
 "            po4aScript = pkgs.writeShellScript \"run-po4a\" ''\n"
@@ -2111,19 +2133,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1026
+#: configuration.org:1048
 #, no-wrap
 msgid "${self'.packages.po4a_0_74}/bin/po4a po4a.cfg"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1028
+#: configuration.org:1050
 #, no-wrap
 msgid "changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1030
+#: configuration.org:1052
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -2138,7 +2160,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1040
+#: configuration.org:1062
 #, no-wrap
 msgid ""
 "        exit 0\n"
@@ -2148,10 +2170,11 @@ msgid ""
 "  files = \"(\\\\.org|po/.*\\\\.po)$\";\n"
 "  pass_filenames = false;\n"
 "};\n"
-"\"00-check-org-tangle\" = {\n"
+"\"check-org-tangle\" = {\n"
 "  enable = true;\n"
 "  name = \"check-org-tangle\";\n"
 "  description = \"Verify org files are tangled and synchronized\";\n"
+"  priority = 0;\n"
 "  entry =\n"
 "    let\n"
 "      checkScript = pkgs.writeShellScript \"check-org-tangle\" ''\n"
@@ -2159,19 +2182,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1058
+#: configuration.org:1080
 #, no-wrap
 msgid "${pkgs.gnumake}/bin/make -B tangle"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1061
+#: configuration.org:1083
 #, no-wrap
 msgid "changed=$(${pkgs.git}/bin/git diff --name-only)"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1063
+#: configuration.org:1085
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -2186,7 +2209,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1073
+#: configuration.org:1095
 #, no-wrap
 msgid ""
 "              exit 0\n"
@@ -2202,7 +2225,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1084
+#: configuration.org:1106
 #, no-wrap
 msgid ""
 "treefmt = {\n"
@@ -2220,13 +2243,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1097
+#: configuration.org:1119
 #, no-wrap
 msgid "<<mcp-servers-config>>"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1099
+#: configuration.org:1121
 #, no-wrap
 msgid ""
 "      devShells = {\n"
@@ -2264,55 +2287,55 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1132
+#: configuration.org:1154
 #, no-wrap
 msgid "Overlays"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1133
+#: configuration.org:1155
 #, no-wrap
 msgid "\"./overlays/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1135
+#: configuration.org:1157
 #, no-wrap
 msgid "Modules"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1136
+#: configuration.org:1158
 #, no-wrap
 msgid "\"./modules/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1138
+#: configuration.org:1160
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1139
+#: configuration.org:1161
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1140
+#: configuration.org:1162
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1141
+#: configuration.org:1163
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1142
+#: configuration.org:1164
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr ""
