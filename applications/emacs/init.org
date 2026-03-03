@@ -63,24 +63,34 @@ Chinese glyphs.
 
 *** TODO Enable texture healing
 
+** Nix wrapper paths
+
+The Nix Emacs wrapper (=extraEmacsPackages=) adds binaries to =exec-path=
+that are absent from the shell's =PATH=.
+Both exec-path-from-shell and envrc replace =exec-path= during operation,
+losing these entries.
+Capturing them once at init allows both packages to merge them back.
+
+#+begin_src emacs-lisp
+(setq my/nix-exec-path exec-path)
+#+end_src
+
 ** Darwin
 On macOS, Emacs cannot inherit environment variables (such as ~$PATH~) from the shell,
 so [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] is needed as a workaround.
 [[https://github.com/d12frosted/homebrew-emacs-plus/blob/3e61ee44f4cfc43dce292047aff5e9277e7d1bd4/Library/EmacsBase.rb#L33-L49][emacs-plus]] injects PATH into Emacs's Info.plist, so applying that patch might eliminate the need for this package.
 
 =exec-path-from-shell-initialize= replaces =exec-path= with the login shell's ~PATH~.
-Paths added by the Nix wrapper via =extraEmacsPackages= (e.g. age) are not present
-in the shell's ~PATH~ and would be lost.
-Saving =exec-path= before initialization and merging it back preserves wrapper-provided paths.
+Merging =my/nix-exec-path= back after initialization
+preserves wrapper-provided paths.
 
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :ensure t
   :config
   (when (memq window-system '(mac ns x))
-    (let ((nix-exec-path exec-path))
-      (exec-path-from-shell-initialize)
-      (setq exec-path (delete-dups (append exec-path nix-exec-path))))))
+    (exec-path-from-shell-initialize)
+    (setq exec-path (delete-dups (append exec-path my/nix-exec-path)))))
 #+end_src
 
 ** envrc
@@ -96,10 +106,24 @@ on multiple projects simultaneously, each with its own .envrc.
 The mode must be enabled early (via after-init hook) so that
 other packages can inherit the correct environment.
 
+When envrc updates a buffer's environment,
+it replaces =exec-path= with values from =direnv export=,
+losing the Nix wrapper paths.
+([[https://github.com/purcell/envrc/issues/9][envrc#9]])
+Merging =my/nix-exec-path= back after each update
+preserves access to wrapper-provided executables (e.g. yaml-language-server)
+inside direnv-managed buffers.
+
 #+begin_src emacs-lisp
 (use-package envrc
   :ensure t
-  :hook (after-init . envrc-global-mode))
+  :hook (after-init . envrc-global-mode)
+  :config
+  (advice-add 'envrc--update :after
+    (defun my/envrc-preserve-nix-path (&rest _)
+      (when (local-variable-p 'exec-path)
+        (setq-local exec-path
+                    (delete-dups (append exec-path my/nix-exec-path)))))))
 #+end_src
 
 * UI
