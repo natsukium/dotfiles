@@ -350,10 +350,20 @@ https://github.com/nix-community/nix-ts-mode
 
 Tree-sitter based major mode for Nix expressions.
 
+[[https://github.com/nix-community/nixd][nixd]] (configured via lsp-mode) provides IDE features
+for Nix expressions by interoperating with the C++ Nix evaluator.
+Unlike nil which relies on static analysis,
+nixd performs actual Nix evaluation,
+enabling accurate completion for attribute paths (e.g. =pkgs.=),
+NixOS options, and flake inputs.
+
 #+begin_src emacs-lisp
 (use-package nix-ts-mode
   :ensure t
-  :mode "\\.nix\\'")
+  :mode "\\.nix\\'"
+  :hook (nix-ts-mode . lsp-deferred)
+  :config
+  (setq lsp-nix-nixd-formatting-command ["nixfmt"]))
 #+end_src
 
 ** PO

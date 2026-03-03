@@ -52,6 +52,8 @@ let
         pkgs.notmuch.emacs
         pkgs.age
         pkgs.gettext
+        pkgs.nixd
+        pkgs.nixfmt
         pkgs.yaml-language-server
       ];
   };
