@@ -444,6 +444,25 @@ with automatic shebang-based language detection.
   :ensure t)
 #+end_src
 
+** YAML
+
+=yaml-ts-mode= is a built-in tree-sitter-based major mode for YAML files.
+The tree-sitter grammar is already available via =treesit-grammars.with-all-grammars=,
+so the mode activates automatically when the grammar is present.
+
+yaml-language-server (configured via lsp-mode) provides schema validation
+using [[https://www.schemastore.org/][SchemaStore]].
+For example, files under =.github/workflows/= are automatically matched
+to the GitHub Actions workflow schema,
+enabling completion and diagnostics for workflow definitions.
+
+#+begin_src emacs-lisp
+(use-package yaml-ts-mode
+  :ensure nil
+  :mode ("\\.ya?ml\\'")
+  :hook (yaml-ts-mode . lsp-deferred))
+#+end_src
+
 * org
 
 ** Semantic Line Breaks

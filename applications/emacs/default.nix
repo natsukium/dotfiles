@@ -52,6 +52,7 @@ let
         pkgs.notmuch.emacs
         pkgs.age
         pkgs.gettext
+        pkgs.yaml-language-server
       ];
   };
 in
