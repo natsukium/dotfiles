@@ -287,6 +287,36 @@ The required permissions are:
   :after magit)
 #+end_src
 
+* LSP
+
+[[https://emacs-lsp.github.io/lsp-mode/][lsp-mode]] is a Language Server Protocol client for Emacs.
+It provides IDE-like features (completion, diagnostics, navigation)
+by communicating with external language servers.
+
+Eglot is built into Emacs 29+ as a lighter alternative,
+but it assumes one server per major mode,
+making it cumbersome to run multiple servers simultaneously
+on the same buffer (e.g. a language server alongside a linter or formatter).
+lsp-mode handles multiple concurrent servers natively
+and provides more granular control over LSP behavior.
+
+Using =lsp-deferred= instead of =lsp= to delay server startup
+until the buffer is visible,
+avoiding unnecessary processes for buffers opened in the background.
+
+Disabling =lsp-headerline-breadcrumb-mode=
+to avoid conflict with the existing =breadcrumb= package in the header line.
+
+#+begin_src emacs-lisp
+(use-package lsp-mode
+  :ensure t
+  :commands (lsp lsp-deferred)
+  :init
+  (setq lsp-keymap-prefix "C-c l")
+  :config
+  (setq lsp-headerline-breadcrumb-enable nil))
+#+end_src
+
 * language support
 
 ** tree-sitter
