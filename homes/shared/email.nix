@@ -92,7 +92,7 @@ in
       [HeaderMatchingFilter.0]
       header = From
       pattern = notifications@github.com
-      tags = +github;-new
+      tags = +github
 
       [HeaderMatchingFilter.1]
       header = X-GitHub-Reason
