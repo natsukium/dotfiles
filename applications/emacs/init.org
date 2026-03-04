@@ -84,11 +84,31 @@ so [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] is 
 Merging =my/nix-exec-path= back after initialization
 preserves wrapper-provided paths.
 
+When launched from an application launcher (Dock, Spotlight), Emacs
+inherits only the minimal launchd environment, which lacks Nix-related
+variables. Without these, =direnv export= may produce incomplete
+results. ([[https://github.com/purcell/envrc/issues/92][envrc#92]])
+
+Separately, fish sources =conf.d/*.fish= even for non-interactive
+invocations (=fish -c "..."=). nix-darwin places environment setup
+scripts there that re-initialize PATH from system profiles when guard
+variables (=__fish_nixos_env_preinit_sourced=,
+=__NIX_DARWIN_SET_ENVIRONMENT_DONE=, =__HM_SESS_VARS_SOURCED=) are
+absent. Without propagating these guards, subprocesses spawned by
+=compile= or =shell-command= lose the buffer-local PATH that envrc
+constructed—even though envrc itself applied the correct environment.
+
 #+begin_src emacs-lisp
 (use-package exec-path-from-shell
   :ensure t
   :config
   (when (memq window-system '(mac ns x))
+    (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO"
+                   "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"
+                   "__fish_nixos_env_preinit_sourced"
+                   "__NIX_DARWIN_SET_ENVIRONMENT_DONE"
+                   "__HM_SESS_VARS_SOURCED"))
+      (add-to-list 'exec-path-from-shell-variables var))
     (exec-path-from-shell-initialize)
     (setq exec-path (delete-dups (append exec-path my/nix-exec-path)))))
 #+end_src
