@@ -55,6 +55,7 @@ let
         pkgs.nixd
         pkgs.nixfmt
         pkgs.yaml-language-server
+        pkgs.terraform-ls
       ];
   };
 in

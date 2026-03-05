@@ -386,6 +386,23 @@ NixOS options, and flake inputs.
   (setq lsp-nix-nixd-formatting-command ["nixfmt"]))
 #+end_src
 
+** Terraform
+
+[[https://github.com/hcl-emacs/terraform-mode][terraform-mode]] provides syntax highlighting and indentation for Terraform (HCL) files.
+
+No tree-sitter variant is available in MELPA,
+so using the traditional major mode.
+
+[[https://github.com/hashicorp/terraform-ls][terraform-ls]] (configured via lsp-mode) provides IDE features
+such as completion, diagnostics via =terraform validate=,
+and go-to-definition for Terraform configurations.
+
+#+begin_src emacs-lisp
+(use-package terraform-mode
+  :ensure t
+  :hook (terraform-mode . lsp-deferred))
+#+end_src
+
 ** PO
 
 [[https://www.gnu.org/software/gettext/manual/html_node/PO-Mode.html][po-mode]] is Emacs's major mode for editing GNU gettext PO (Portable Object) files.
