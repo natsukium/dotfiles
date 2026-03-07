@@ -48,9 +48,12 @@ aarch64-darwin:
 
 # tangle targets: configuration.org -> generated files
 # Each directory has a configuration.org that tangles to one or more .nix files
-tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix .github/README.org CLAUDE.md
+tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix .github/README.org CLAUDE.md po4a.cfg
 
 flake.nix: configuration.org
+	$(call tangle-org,$<)
+
+po4a.cfg: configuration.org
 	$(call tangle-org,$<)
 
 overlays/default.nix: overlays/configuration.org
