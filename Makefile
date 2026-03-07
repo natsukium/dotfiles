@@ -78,4 +78,4 @@ CLAUDE.md: configuration.org
 	@mkdir -p .github
 	$(EMACS) -l ox-org \
 	  --visit $< \
-	  --eval '(let ((org-export-select-tags (list "readme")) (org-export-with-tags nil)) (org-export-to-file (quote org) "$@"))'
+	  --eval '(let ((org-export-select-tags (list "readme")) (org-export-with-tags nil) (org-export-time-stamp-file nil)) (org-export-to-file (quote org) "$@"))'
