@@ -203,7 +203,6 @@
 
       flake = {
         overlays = import ./overlays { inherit inputs; };
-        templates = import ./templates;
       };
 
       perSystem =
