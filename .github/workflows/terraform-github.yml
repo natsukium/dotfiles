@@ -1,0 +1,84 @@
+name: terraform github
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'infra/services/github/**'
+      - '.github/workflows/terraform-github.yml'
+      - 'flake.lock'
+  push:
+    branches:
+      - main
+    paths:
+      - 'infra/services/github/**'
+      - '.github/workflows/terraform-github.yml'
+      - 'flake.lock'
+permissions:
+  id-token: write
+  contents: read
+  pull-requests: write
+jobs:
+  terraform:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
+    defaults:
+      run:
+        working-directory: infra/services/github
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: ./.github/actions/setup-nix
+        with:
+          signingKey: ${{ secrets.CACHIX_SIGNING_KEY }}
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
+        with:
+          role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
+          aws-region: us-east-2
+      - name: Terraform Init
+        run: nix develop -c terraform init
+      - name: Terraform Format
+        run: nix develop -c terraform fmt -check
+      - name: Terraform Plan
+        id: plan
+        run: |
+          set +e
+          nix develop -c terraform plan -no-color -lock=false -out=tfplan > plan.txt 2>&1
+          exit_code=$?
+          {
+            echo "stdout<<EOF"
+            sed -n '/Terraform used the selected providers/,$ p' plan.txt || cat plan.txt
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          exit $exit_code
+        continue-on-error: true
+      - name: Comment PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
+        with:
+          script: |
+            const output = `#### Terraform Plan 📖
+            \`\`\`
+            ${{ steps.plan.outputs.stdout }}
+            \`\`\`
+            `;
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: output,
+            });
+      - name: Terraform Plan Status
+        if: steps.plan.outcome == 'failure'
+        run: exit 1
+      - name: Configure AWS Credentials for Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        uses: aws-actions/configure-aws-credentials@8df5847569e6427dd6c4fb1cf565c83acfa8afa7 # v6.0.0
+        with:
+          role-to-assume: ${{ vars.AWS_APPLY_ROLE_ARN }}
+          aws-region: us-east-2
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: nix develop -c terraform apply tfplan

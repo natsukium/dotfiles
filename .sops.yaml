@@ -10,6 +10,8 @@ keys:
   - &work-user age17n2a8jrv3jqdcadhlyy44n9vj73x0w4h3h0xcqm6k9gaknkt53rs9qv3j7
   - &katavi-user age18y3exmqczgeq7x5ns0zgnda93et0nmmgsusgpxs4hgej8cqsyv8qclaf8m
   - &kilimanjaro-user age1d75d5z05vm9t6gen6qwrmpkzhzmt6rv4d34x0z8v7wqrf24jq92qpklrjf
+  # ci
+  - &github-actions age1pk0z5nauz3extrv3kqqksl6yf433nk66jq9s3kk6xz07nnwxcddq9z7vhc
 creation_rules:
   - path_regex: secrets/[^/]+\.yaml$
     key_groups:
@@ -25,6 +27,8 @@ creation_rules:
     key_groups:
       - pgp:
           - *admin
+        age:
+          - *github-actions
   - path_regex: systems/nixos/services/hydra/secrets.yaml$
     key_groups:
       - pgp:
