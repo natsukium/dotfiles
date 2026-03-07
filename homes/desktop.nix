@@ -4,7 +4,6 @@
     ../applications/emacs
     ../applications/kitty
     ../applications/qutebrowser
-    ../applications/vivaldi
     ../applications/vscode
     ../applications/zotero
     ./shared/claude.nix
