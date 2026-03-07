@@ -39,7 +39,6 @@ in
     ../applications/gh-dash
     ../applications/lazygit
     ../applications/misc
-    ../applications/newsboat
     ../applications/nushell
     ../applications/rbw
     ../applications/starship
