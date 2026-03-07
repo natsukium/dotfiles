@@ -1,7 +1,7 @@
 .PHONY: build build-all x86_64-linux aarch64-linux aarch64-darwin tangle
 
 # org-babel tangle
-EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t)'
+EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t org-resource-download-policy t)'
 
 define tangle-org
 	$(EMACS) --eval '(dolist (file (org-babel-tangle-file "$(1)")) (with-current-buffer (find-file-noselect file) (delete-trailing-whitespace) (save-buffer)))'
@@ -48,7 +48,7 @@ aarch64-darwin:
 
 # tangle targets: configuration.org -> generated files
 # Each directory has a configuration.org that tangles to one or more .nix files
-tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix
+tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix .github/README.org CLAUDE.md
 
 flake.nix: configuration.org
 	$(call tangle-org,$<)
@@ -65,8 +65,14 @@ modules/home/development/git/default.nix: modules/configuration.org
 modules/home/zen-browser/default.nix: modules/configuration.org
 	$(call tangle-org,$<)
 
-CLAUDE.md: README.org
+CLAUDE.md: configuration.org
 	$(EMACS) -l ox-md \
 	  --visit $< \
 	  --eval '(re-search-forward "^\\* Philosophy")' \
 	  --eval '(org-md-export-to-markdown nil t)'
+
+.github/README.org: configuration.org
+	@mkdir -p .github
+	$(EMACS) -l ox-org \
+	  --visit $< \
+	  --eval '(let ((org-export-select-tags (list "readme")) (org-export-with-tags nil)) (org-export-to-file (quote org) "$@"))'

@@ -251,10 +251,10 @@
                   (require 'org)
                   (require 'htmlize)
 
-                  (find-file "README.org")
+                  (find-file "configuration.org")
                   (org-html-export-to-html)
 
-                  (find-file "README.ja.org")
+                  (find-file "configuration.ja.org")
                   (org-html-export-to-html)
                 '';
               in
@@ -262,7 +262,7 @@
                 name = "dotfiles";
                 src = lib.cleanSource ./.;
                 postPatch = ''
-                  substituteInPlace README.org \
+                  substituteInPlace configuration.org \
                     --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
                 '';
                 nativeBuildInputs = [
@@ -279,8 +279,8 @@
 
                 installPhase = ''
                   runHook preInstall
-                  install -Dm644 README.html $out/index.html
-                  install -Dm644 README.ja.html $out/ja/index.html
+                  install -Dm644 configuration.html $out/index.html
+                  install -Dm644 configuration.ja.html $out/ja/index.html
                   runHook postInstall
                 '';
               };

@@ -1,15 +1,8 @@
-#+TITLE: My literate configurations with Org and Nix
-#+STARTUP: overview
-#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
-
+# Created 2026-03-07 Sat 16:41
+#+title: My literate configurations with Org and Nix
 * About
 
 * Philosophy
-:PROPERTIES:
-:EXPORT_FILE_NAME: CLAUDE
-:EXPORT_OPTIONS: toc:nil
-:END:
-
 ** Literate Configuration
 
 Nix is declarative. Reading a Nix expression reveals what the system should become,
@@ -30,22 +23,15 @@ why this approach was chosen, and why alternatives were not.
 Configurations are documented with the problem that motivated them, the alternatives
 considered, and the reasoning behind the final choice. For temporary workarounds,
 the conditions for removal are also noted.
-
-* Configuration
-
-#+INCLUDE: "./configuration.org"
-
 * Development
 
 ** Translation
 
 This project uses po4a to manage translations.
-
 *** Requirements
 
 - gettext
 - po4a >= 0.74 (required for Org mode support)
-
 *** Translation workflow
 
 **** Create po4a configuration
@@ -61,15 +47,14 @@ even if the translation is incomplete
 #+begin_src
 [po4a_langs] ja
 [po4a_paths] po/dotfiles.pot $lang:po/$lang.po
-[type: org] README.org $lang:README.$lang.org opt:"-k 0"
 [type: org] configuration.org $lang:configuration.$lang.org opt:"-k 0"
 [type: org] applications/emacs/init.org $lang:applications/emacs/init.$lang.org opt:"-k 0"
 [type: org] applications/emacs/early-init.org $lang:applications/emacs/early-init.$lang.org opt:"-k 0"
 [type: org] modules/configuration.org $lang:modules/configuration.$lang.org opt:"-k 0"
+[type: org] overlays/configuration.org $lang:overlays/configuration.$lang.org opt:"-k 0"
 #+end_src
 
 For detailed information about =po4a.cfg= configuration, see =man po4a=.
-
 **** Create/Update po
 
 When documents are updated and you need to create/update po files,
@@ -80,7 +65,6 @@ at the paths configured in =po4a.cfg=.
 #+begin_src bash
 po4a --no-translations po4a.cfg
 #+end_src
-
 **** Translate
 
 Edit the target language po using a po editor.
@@ -89,7 +73,6 @@ Emacs po-mode,
 poedit,
 GNOME's Gtranslator,
 and KDE's Lokalize.
-
 **** Create/Update translation file
 
 After completing translations,

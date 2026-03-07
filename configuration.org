@@ -1,6 +1,39 @@
+#+TITLE: My literate configurations with Org and Nix
 #+STARTUP: overview
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
 #+PROPERTY: header-args:nix :mkdirp yes :noweb tangle
-#+OPTIONS: ^:{}
+#+OPTIONS: ^:{} tags:nil
+
+* About                                                              :readme:
+
+* Philosophy                                                         :readme:
+:PROPERTIES:
+:EXPORT_FILE_NAME: CLAUDE
+:EXPORT_OPTIONS: toc:nil
+:END:
+
+** Literate Configuration
+
+Nix is declarative. Reading a Nix expression reveals what the system should become,
+and Nix itself handles how to get there. But neither the code nor the build system
+captures why a particular configuration exists, or why alternatives were rejected.
+
+Why was fish chosen over zsh or bash? Why does the desktop profile enable this
+specific set of services? Why was a particular package pinned to an older version?
+The code shows the decision, but not the reasoning behind it.
+Without this context, future changes risk undoing intentional tradeoffs or
+repeating previously rejected approaches.
+
+This repository uses literate programming to preserve intent. Configuration lives
+in Org mode documents where prose surrounds code. Each decision—from high-level
+architecture to individual package overrides—is accompanied by its rationale:
+why this approach was chosen, and why alternatives were not.
+
+Configurations are documented with the problem that motivated them, the alternatives
+considered, and the reasoning behind the final choice. For temporary workarounds,
+the conditions for removal are also noted.
+
+* Configuration
 
 ** Flake
 
@@ -947,10 +980,10 @@ outputs =
                 (require 'org)
                 (require 'htmlize)
 
-                (find-file "README.org")
+                (find-file "configuration.org")
                 (org-html-export-to-html)
 
-                (find-file "README.ja.org")
+                (find-file "configuration.ja.org")
                 (org-html-export-to-html)
               '';
             in
@@ -958,7 +991,7 @@ outputs =
               name = "dotfiles";
               src = lib.cleanSource ./.;
               postPatch = ''
-                substituteInPlace README.org \
+                substituteInPlace configuration.org \
                   --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
               '';
               nativeBuildInputs = [
@@ -975,8 +1008,8 @@ outputs =
 
               installPhase = ''
                 runHook preInstall
-                install -Dm644 README.html $out/index.html
-                install -Dm644 README.ja.html $out/ja/index.html
+                install -Dm644 configuration.html $out/index.html
+                install -Dm644 configuration.ja.html $out/ja/index.html
                 runHook postInstall
               '';
             };
@@ -1161,3 +1194,69 @@ outputs =
 #+INCLUDE: "./applications/emacs/early-init.org"
 *** init.org
 #+INCLUDE: "./applications/emacs/init.org"
+
+* Development                                                        :readme:
+
+** Translation
+
+This project uses po4a to manage translations.
+
+*** Requirements
+
+- gettext
+- po4a >= 0.74 (required for Org mode support)
+
+*** Translation workflow
+
+**** Create po4a configuration
+
+Configure the target language,
+location for generated po files,
+and documents
+to translate as follows.
+The =-k 0= option forces output of translated files
+even if the translation is incomplete
+(default threshold is 80%).
+
+#+begin_src
+[po4a_langs] ja
+[po4a_paths] po/dotfiles.pot $lang:po/$lang.po
+[type: org] configuration.org $lang:configuration.$lang.org opt:"-k 0"
+[type: org] applications/emacs/init.org $lang:applications/emacs/init.$lang.org opt:"-k 0"
+[type: org] applications/emacs/early-init.org $lang:applications/emacs/early-init.$lang.org opt:"-k 0"
+[type: org] modules/configuration.org $lang:modules/configuration.$lang.org opt:"-k 0"
+[type: org] overlays/configuration.org $lang:overlays/configuration.$lang.org opt:"-k 0"
+#+end_src
+
+For detailed information about =po4a.cfg= configuration, see =man po4a=.
+
+**** Create/Update po
+
+When documents are updated and you need to create/update po files,
+run the following command.
+This generates template (pot) and po files for each language
+at the paths configured in =po4a.cfg=.
+
+#+begin_src bash
+po4a --no-translations po4a.cfg
+#+end_src
+
+**** Translate
+
+Edit the target language po using a po editor.
+Popular options include
+Emacs po-mode,
+poedit,
+GNOME's Gtranslator,
+and KDE's Lokalize.
+
+**** Create/Update translation file
+
+After completing translations,
+generate files with the following command.
+Since po files are also updated at this time,
+in practice you only need to run this command.
+
+#+begin_src bash
+po4a po4a.cfg
+#+end_src
