@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-07 17:12+0900\n"
+"POT-Creation-Date: 2026-03-07 21:21+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -1887,11 +1887,46 @@ msgid ""
 "      };\n"
 "      org-to-html = writeScript \"org-to-html.el\" ''\n"
 "        (require 'org)\n"
-"        (require 'htmlize)"
+"        (require 'htmlize)\n"
+"        (require 'nix-ts-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:983
+#: configuration.org:984
+#, no-wrap
+msgid ""
+"(add-to-list 'org-src-lang-modes '(\"nix\" . nix-ts))\n"
+"(setq treesit-font-lock-level 4)"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:987
+#, no-wrap
+msgid ""
+";; In batch mode, faces lack color attributes. Explicitly set\n"
+";; foreground colors so htmlize emits colored inline CSS.\n"
+"(set-face-attribute 'font-lock-keyword-face nil :foreground \"#5317ac\")\n"
+"(set-face-attribute 'font-lock-string-face nil :foreground \"#2544bb\")\n"
+"(set-face-attribute 'font-lock-comment-face nil :foreground \"#505050\")\n"
+"(set-face-attribute 'font-lock-function-name-face nil :foreground \"#721045\")\n"
+"(set-face-attribute 'font-lock-function-call-face nil :foreground \"#721045\")\n"
+"(set-face-attribute 'font-lock-variable-name-face nil :foreground \"#00538b\")\n"
+"(set-face-attribute 'font-lock-variable-use-face nil :foreground \"#005077\")\n"
+"(set-face-attribute 'font-lock-type-face nil :foreground \"#005a5f\")\n"
+"(set-face-attribute 'font-lock-constant-face nil :foreground \"#0000c0\")\n"
+"(set-face-attribute 'font-lock-builtin-face nil :foreground \"#8f0075\")\n"
+"(set-face-attribute 'font-lock-property-name-face nil :foreground \"#00538b\")\n"
+"(set-face-attribute 'font-lock-property-use-face nil :foreground \"#005077\")\n"
+"(set-face-attribute 'font-lock-number-face nil :foreground \"#0000c0\")\n"
+"(set-face-attribute 'font-lock-operator-face nil :foreground \"#813e00\")\n"
+"(set-face-attribute 'font-lock-bracket-face nil :foreground \"#5f5f5f\")\n"
+"(set-face-attribute 'font-lock-delimiter-face nil :foreground \"#5f5f5f\")\n"
+"(set-face-attribute 'font-lock-punctuation-face nil :foreground \"#5f5f5f\")\n"
+"(set-face-attribute 'font-lock-escape-face nil :foreground \"#a0132f\")"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1008
 #, no-wrap
 msgid ""
 "(find-file \"configuration.org\")\n"
@@ -1899,7 +1934,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:986
+#: configuration.org:1011
 #, no-wrap
 msgid ""
 "    (find-file \"configuration.ja.org\")\n"
@@ -1914,7 +1949,11 @@ msgid ""
 "      --replace-fail \"https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\" \"${org-html-themes}\"\n"
 "  '';\n"
 "  nativeBuildInputs = [\n"
-"    (emacs.pkgs.withPackages (epkgs: [ epkgs.htmlize ]))\n"
+"    (emacs.pkgs.withPackages (epkgs: [\n"
+"      epkgs.htmlize\n"
+"      epkgs.nix-ts-mode\n"
+"      (epkgs.treesit-grammars.with-grammars (g: [ g.tree-sitter-nix ]))\n"
+"    ]))\n"
 "    gettext\n"
 "    self'.packages.po4a_0_74\n"
 "  ];\n"
@@ -1927,7 +1966,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1009
+#: configuration.org:1038
 #, no-wrap
 msgid ""
 "      installPhase = ''\n"
@@ -1941,7 +1980,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1018
+#: configuration.org:1047
 #, no-wrap
 msgid ""
 "pre-commit = {\n"
@@ -2008,19 +2047,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1080
+#: configuration.org:1109
 #, no-wrap
 msgid "${self'.packages.po4a_0_74}/bin/po4a po4a.cfg"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1082
+#: configuration.org:1111
 #, no-wrap
 msgid "changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1084
+#: configuration.org:1113
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -2035,7 +2074,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1094
+#: configuration.org:1123
 #, no-wrap
 msgid ""
 "        exit 0\n"
@@ -2057,19 +2096,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1112
+#: configuration.org:1141
 #, no-wrap
 msgid "${pkgs.gnumake}/bin/make -B tangle"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1115
+#: configuration.org:1144
 #, no-wrap
 msgid "changed=$(${pkgs.git}/bin/git diff --name-only)"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1117
+#: configuration.org:1146
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -2084,7 +2123,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1127
+#: configuration.org:1156
 #, no-wrap
 msgid ""
 "              exit 0\n"
@@ -2100,7 +2139,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1138
+#: configuration.org:1167
 #, no-wrap
 msgid ""
 "treefmt = {\n"
@@ -2118,13 +2157,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1151
+#: configuration.org:1180
 #, no-wrap
 msgid "<<mcp-servers-config>>"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1153
+#: configuration.org:1182
 #, no-wrap
 msgid ""
 "      <<dev-shells>>\n"
@@ -2133,80 +2172,80 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1158
+#: configuration.org:1187
 #, no-wrap
 msgid "Overlays"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1159
+#: configuration.org:1188
 #, no-wrap
 msgid "\"./overlays/configuration.org\""
 msgstr "\"./overlays/configuration.ja.org\""
 
 #. type: heading **
-#: configuration.org:1161
+#: configuration.org:1190
 #, no-wrap
 msgid "Modules"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1162
+#: configuration.org:1191
 #, no-wrap
 msgid "\"./modules/configuration.org\""
 msgstr "\"./modules/configuration.ja.org\""
 
 #. type: heading **
-#: configuration.org:1164
+#: configuration.org:1193
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1165
+#: configuration.org:1194
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1166
+#: configuration.org:1195
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: configuration.org:1167
+#: configuration.org:1196
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1168
+#: configuration.org:1197
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr "\"./applications/emacs/init.ja.org\""
 
 #. type: heading *
-#: configuration.org:1170 .github/README.org:26
+#: configuration.org:1199 .github/README.org:26
 #, no-wrap
 msgid "Development"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1172 .github/README.org:28
+#: configuration.org:1201 .github/README.org:28
 msgid ""
 "This repository provides a Nix development shell with all the tools needed "
 "for working on the configurations. Enter the shell by running:"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1176 .github/README.org:32
+#: configuration.org:1205 .github/README.org:32
 #, no-wrap
 msgid "nix develop"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1179 .github/README.org:35
+#: configuration.org:1208 .github/README.org:35
 msgid ""
 "The shell includes infrastructure tools (Terraform, sops, ssh-to-age), "
 "translation tools (po4a, gettext), and build utilities (nix-fast-build).  On "
@@ -2215,13 +2254,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:1184 .github/README.org:40
+#: configuration.org:1213 .github/README.org:40
 #, no-wrap
 msgid "dev-shells"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1186 .github/README.org:42
+#: configuration.org:1215 .github/README.org:42
 #, no-wrap
 msgid ""
 "devShells = {\n"
@@ -2255,36 +2294,36 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1216 .github/README.org:71
+#: configuration.org:1245 .github/README.org:71
 #, no-wrap
 msgid "Translation"
 msgstr "翻訳"
 
 #. type: paragraph
-#: configuration.org:1218 .github/README.org:73
+#: configuration.org:1247 .github/README.org:73
 msgid "This project uses po4a to manage translations."
 msgstr "このプロジェクトでは翻訳にpo4aを使っています。"
 
 #. type: heading ***
-#: configuration.org:1220 .github/README.org:74
+#: configuration.org:1249 .github/README.org:74
 #, no-wrap
 msgid "Requirements"
 msgstr "必要なソフトウェア"
 
 #. type: paragraph
-#: configuration.org:1222 .github/README.org:76
+#: configuration.org:1251 .github/README.org:76
 msgid "The required packages are included in the development shell."
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:1224 .github/README.org:78
+#: configuration.org:1253 .github/README.org:78
 #, fuzzy, no-wrap
 #| msgid "Translation"
 msgid "translation-packages"
 msgstr "翻訳"
 
 #. type: paragraph in src
-#: configuration.org:1226 .github/README.org:80
+#: configuration.org:1255 .github/README.org:80
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -2292,13 +2331,13 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1231 .github/README.org:85
+#: configuration.org:1260 .github/README.org:85
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1233 .github/README.org:87
+#: configuration.org:1262 .github/README.org:87
 #, no-wrap
 msgid ""
 "=po4a_0_74=: po4a >= 0.74 is required for Org mode support.\n"
@@ -2306,19 +2345,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1234 .github/README.org:87
+#: configuration.org:1263 .github/README.org:87
 #, no-wrap
 msgid "Translation workflow"
 msgstr "翻訳作業"
 
 #. type: heading ****
-#: configuration.org:1236 .github/README.org:89
+#: configuration.org:1265 .github/README.org:89
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr "po4aを設定する"
 
 #. type: paragraph
-#: configuration.org:1238 .github/README.org:91
+#: configuration.org:1267 .github/README.org:91
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -2331,7 +2370,7 @@ msgstr ""
 "いるときのみ出力されます。)"
 
 #. type: paragraph in src
-#: configuration.org:1247 .github/README.org:100
+#: configuration.org:1276 .github/README.org:100
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -2345,19 +2384,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1257 .github/README.org:110
+#: configuration.org:1286 .github/README.org:110
 msgid ""
 "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr "=po4a.cfg=について、詳しくは=man po4a=を参照してください。"
 
 #. type: heading ****
-#: configuration.org:1259 .github/README.org:111
+#: configuration.org:1288 .github/README.org:111
 #, no-wrap
 msgid "Create/Update po"
 msgstr "poを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:1261 .github/README.org:113
+#: configuration.org:1290 .github/README.org:113
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -2368,19 +2407,19 @@ msgstr ""
 "に生成します。"
 
 #. type: paragraph in src
-#: configuration.org:1267 .github/README.org:119
+#: configuration.org:1296 .github/README.org:119
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1270 .github/README.org:121
+#: configuration.org:1299 .github/README.org:121
 #, no-wrap
 msgid "Translate"
 msgstr "翻訳する"
 
 #. type: paragraph
-#: configuration.org:1272 .github/README.org:123
+#: configuration.org:1301 .github/README.org:123
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
@@ -2389,13 +2428,13 @@ msgstr ""
 "Gtranslator、KDEのLokalizeが有名です。"
 
 #. type: heading ****
-#: configuration.org:1279 .github/README.org:129
+#: configuration.org:1308 .github/README.org:129
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr "翻訳ファイルを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:1281 .github/README.org:131
+#: configuration.org:1310 .github/README.org:131
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -2405,7 +2444,7 @@ msgstr ""
 "め、実運用上はこのコマンドを実行するだけで良いでしょう。"
 
 #. type: paragraph in src
-#: configuration.org:1287 .github/README.org:137
+#: configuration.org:1316 .github/README.org:137
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""
