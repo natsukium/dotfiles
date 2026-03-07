@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-07 16:48+0900\n"
+"POT-Creation-Date: 2026-03-07 17:12+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2116,143 +2116,199 @@ msgstr ""
 #: configuration.org:1153
 #, no-wrap
 msgid ""
-"      devShells = {\n"
-"        default = pkgs.mkShell {\n"
-"          packages = with pkgs; [\n"
-"            aws-vault\n"
-"            gettext\n"
-"            nix-fast-build\n"
-"            self'.packages.po4a_0_74\n"
-"            sops\n"
-"            ssh-to-age\n"
-"            (terraform.withPlugins (p: [\n"
-"              p.carlpett_sops\n"
-"              p.cloudflare_cloudflare\n"
-"              p.determinatesystems_hydra\n"
-"              p.hashicorp_aws\n"
-"              p.hashicorp_external\n"
-"              p.hashicorp_null\n"
-"              p.integrations_github\n"
-"              p.oracle_oci\n"
-"            ]))\n"
-"          ];\n"
-"          shellHook =\n"
-"            config.pre-commit.installationScript\n"
-"            + config.mcp-servers.shellHook\n"
-"            + ''\n"
-"              echo \"Syncing CLAUDE.md...\"\n"
-"              make CLAUDE.md >/dev/null 2>&1 || echo \"Warning: Failed to "
-"generate CLAUDE.md\"\n"
-"            '';\n"
-"        };\n"
-"      };\n"
+"      <<dev-shells>>\n"
 "    };\n"
 "};"
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1186
+#: configuration.org:1158
 #, no-wrap
 msgid "Overlays"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1187
+#: configuration.org:1159
 #, no-wrap
 msgid "\"./overlays/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1189
+#: configuration.org:1161
 #, no-wrap
 msgid "Modules"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1190
+#: configuration.org:1162
 #, no-wrap
 msgid "\"./modules/configuration.org\""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1192
+#: configuration.org:1164
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1193
+#: configuration.org:1165
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1194
+#: configuration.org:1166
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1195
+#: configuration.org:1167
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: configuration.org:1196
+#: configuration.org:1168
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr ""
 
 #. type: heading *
-#: configuration.org:1198 .github/README.org:26
+#: configuration.org:1170 .github/README.org:26
 #, no-wrap
 msgid "Development"
 msgstr ""
 
+#. type: paragraph
+#: configuration.org:1172 .github/README.org:28
+msgid ""
+"This repository provides a Nix development shell with all the tools needed "
+"for working on the configurations. Enter the shell by running:"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1176 .github/README.org:32
+#, no-wrap
+msgid "nix develop"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:1179 .github/README.org:35
+msgid ""
+"The shell includes infrastructure tools (Terraform, sops, ssh-to-age), "
+"translation tools (po4a, gettext), and build utilities (nix-fast-build).  On "
+"entry, it automatically sets up pre-commit hooks, configures MCP servers, "
+"and syncs =CLAUDE.md= from the literate source."
+msgstr ""
+
+#. type: keyword name
+#: configuration.org:1184 .github/README.org:40
+#, no-wrap
+msgid "dev-shells"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1186 .github/README.org:42
+#, no-wrap
+msgid ""
+"devShells = {\n"
+"  default = pkgs.mkShell {\n"
+"    packages = with pkgs; [\n"
+"      aws-vault\n"
+"      nix-fast-build\n"
+"      sops\n"
+"      ssh-to-age\n"
+"      (terraform.withPlugins (p: [\n"
+"        p.carlpett_sops\n"
+"        p.cloudflare_cloudflare\n"
+"        p.determinatesystems_hydra\n"
+"        p.hashicorp_aws\n"
+"        p.hashicorp_external\n"
+"        p.hashicorp_null\n"
+"        p.integrations_github\n"
+"        p.oracle_oci\n"
+"      ]))\n"
+"      <<translation-packages>>\n"
+"    ];\n"
+"    shellHook =\n"
+"      config.pre-commit.installationScript\n"
+"      + config.mcp-servers.shellHook\n"
+"      + ''\n"
+"        echo \"Syncing CLAUDE.md...\"\n"
+"        make CLAUDE.md >/dev/null 2>&1 || echo \"Warning: Failed to generate "
+"CLAUDE.md\"\n"
+"      '';\n"
+"  };\n"
+"};"
+msgstr ""
+
 #. type: heading **
-#: configuration.org:1200 .github/README.org:28
+#: configuration.org:1216 .github/README.org:71
 #, no-wrap
 msgid "Translation"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1202 .github/README.org:30
+#: configuration.org:1218 .github/README.org:73
 msgid "This project uses po4a to manage translations."
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1204 .github/README.org:31
+#: configuration.org:1220 .github/README.org:74
 #, no-wrap
 msgid "Requirements"
 msgstr ""
 
-#. type: plain list -
-#: configuration.org:1207 .github/README.org:34
+#. type: paragraph
+#: configuration.org:1222 .github/README.org:76
+msgid "The required packages are included in the development shell."
+msgstr ""
+
+#. type: keyword name
+#: configuration.org:1224 .github/README.org:78
 #, no-wrap
-msgid "gettext"
+msgid "translation-packages"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1226 .github/README.org:80
+#, no-wrap
+msgid ""
+"gettext\n"
+"self'.packages.po4a_0_74"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1208 .github/README.org:35
+#: configuration.org:1231 .github/README.org:85
 #, no-wrap
-msgid "po4a >= 0.74 (required for Org mode support)"
+msgid "=gettext=: provides msgfmt and other internationalization utilities"
+msgstr ""
+
+#. type: plain list -
+#: configuration.org:1233 .github/README.org:87
+#, no-wrap
+msgid ""
+"=po4a_0_74=: po4a >= 0.74 is required for Org mode support.\n"
+"Using a pinned derivation since nixpkgs ships an older version (see [[*Rest "
+"of Flake][packages]])."
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1209 .github/README.org:35
+#: configuration.org:1234 .github/README.org:87
 #, no-wrap
 msgid "Translation workflow"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1211 .github/README.org:37
+#: configuration.org:1236 .github/README.org:89
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1213 .github/README.org:39
+#: configuration.org:1238 .github/README.org:91
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -2261,7 +2317,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1222 .github/README.org:48
+#: configuration.org:1247 .github/README.org:100
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -2279,18 +2335,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1232 .github/README.org:58
+#: configuration.org:1257 .github/README.org:110
 msgid "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1234 .github/README.org:59
+#: configuration.org:1259 .github/README.org:111
 #, no-wrap
 msgid "Create/Update po"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1236 .github/README.org:61
+#: configuration.org:1261 .github/README.org:113
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -2298,32 +2354,32 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1242 .github/README.org:67
+#: configuration.org:1267 .github/README.org:119
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1245 .github/README.org:69
+#: configuration.org:1270 .github/README.org:121
 #, no-wrap
 msgid "Translate"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1247 .github/README.org:71
+#: configuration.org:1272 .github/README.org:123
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1254 .github/README.org:77
+#: configuration.org:1279 .github/README.org:129
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1256 .github/README.org:79
+#: configuration.org:1281 .github/README.org:131
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -2331,7 +2387,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1262 .github/README.org:85
+#: configuration.org:1287 .github/README.org:137
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""

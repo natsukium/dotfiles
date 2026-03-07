@@ -1150,35 +1150,7 @@ outputs =
 
         <<mcp-servers-config>>
 
-        devShells = {
-          default = pkgs.mkShell {
-            packages = with pkgs; [
-              aws-vault
-              gettext
-              nix-fast-build
-              self'.packages.po4a_0_74
-              sops
-              ssh-to-age
-              (terraform.withPlugins (p: [
-                p.carlpett_sops
-                p.cloudflare_cloudflare
-                p.determinatesystems_hydra
-                p.hashicorp_aws
-                p.hashicorp_external
-                p.hashicorp_null
-                p.integrations_github
-                p.oracle_oci
-              ]))
-            ];
-            shellHook =
-              config.pre-commit.installationScript
-              + config.mcp-servers.shellHook
-              + ''
-                echo "Syncing CLAUDE.md..."
-                make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
-              '';
-          };
-        };
+        <<dev-shells>>
       };
   };
 #+end_src
@@ -1197,14 +1169,67 @@ outputs =
 
 * Development                                                        :readme:
 
+This repository provides a Nix development shell with all the tools needed
+for working on the configurations. Enter the shell by running:
+
+#+begin_src bash
+nix develop
+#+end_src
+
+The shell includes infrastructure tools (Terraform, sops, ssh-to-age),
+translation tools (po4a, gettext), and build utilities (nix-fast-build).
+On entry, it automatically sets up pre-commit hooks, configures MCP servers,
+and syncs =CLAUDE.md= from the literate source.
+
+#+NAME: dev-shells
+#+begin_src nix
+devShells = {
+  default = pkgs.mkShell {
+    packages = with pkgs; [
+      aws-vault
+      nix-fast-build
+      sops
+      ssh-to-age
+      (terraform.withPlugins (p: [
+        p.carlpett_sops
+        p.cloudflare_cloudflare
+        p.determinatesystems_hydra
+        p.hashicorp_aws
+        p.hashicorp_external
+        p.hashicorp_null
+        p.integrations_github
+        p.oracle_oci
+      ]))
+      <<translation-packages>>
+    ];
+    shellHook =
+      config.pre-commit.installationScript
+      + config.mcp-servers.shellHook
+      + ''
+        echo "Syncing CLAUDE.md..."
+        make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+      '';
+  };
+};
+#+end_src
+
 ** Translation
 
 This project uses po4a to manage translations.
 
 *** Requirements
 
-- gettext
-- po4a >= 0.74 (required for Org mode support)
+The required packages are included in the development shell.
+
+#+NAME: translation-packages
+#+begin_src nix
+gettext
+self'.packages.po4a_0_74
+#+end_src
+
+- =gettext=: provides msgfmt and other internationalization utilities
+- =po4a_0_74=: po4a >= 0.74 is required for Org mode support.
+  Using a pinned derivation since nixpkgs ships an older version (see [[*Rest of Flake][packages]]).
 
 *** Translation workflow
 

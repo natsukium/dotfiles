@@ -445,9 +445,7 @@
             default = pkgs.mkShell {
               packages = with pkgs; [
                 aws-vault
-                gettext
                 nix-fast-build
-                self'.packages.po4a_0_74
                 sops
                 ssh-to-age
                 (terraform.withPlugins (p: [
@@ -460,6 +458,8 @@
                   p.integrations_github
                   p.oracle_oci
                 ]))
+                gettext
+                self'.packages.po4a_0_74
               ];
               shellHook =
                 config.pre-commit.installationScript
