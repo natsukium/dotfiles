@@ -90,10 +90,11 @@ jobs:
             sed -n '/Terraform used the selected providers/,$ p' plan.txt || cat plan.txt
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+          echo "has_changes=$( ! grep -q 'No changes' plan.txt && echo true || echo false)" >> "$GITHUB_OUTPUT"
           exit $exit_code
         continue-on-error: true
       - name: Comment PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.plan.outputs.has_changes == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
