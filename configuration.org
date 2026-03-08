@@ -131,7 +131,11 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<nix-config>>
   };
 
-  <<rest-of-flake>>
+  outputs =
+    { self, flake-parts, ... }@inputs:
+    flake-parts.lib.mkFlake { inherit inputs; } {
+      <<outputs>>
+    };
 }
 #+end_src
 
@@ -945,279 +949,275 @@ android = {
 };
 #+end_src
 
-*** Rest of Flake
+*** Outputs
 
-#+NAME: rest-of-flake
+#+NAME: outputs
 #+begin_src nix
-outputs =
-  { self, flake-parts, ... }@inputs:
-  flake-parts.lib.mkFlake { inherit inputs; } {
-    systems = [
-      "x86_64-linux"
-      "aarch64-linux"
-      "aarch64-darwin"
-    ];
+systems = [
+  "x86_64-linux"
+  "aarch64-linux"
+  "aarch64-darwin"
+];
 
-    imports = [
-      ./flake-module.nix
-      inputs.git-hooks.flakeModule
-      inputs.mcp-servers.flakeModule
-      inputs.treefmt-nix.flakeModule
-    ];
+imports = [
+  ./flake-module.nix
+  inputs.git-hooks.flakeModule
+  inputs.mcp-servers.flakeModule
+  inputs.treefmt-nix.flakeModule
+];
 
-    <<hosts>>
+<<hosts>>
 
-    flake = {
-      overlays = import ./overlays { inherit inputs; };
+flake = {
+  overlays = import ./overlays { inherit inputs; };
+};
+
+perSystem =
+  {
+    self',
+    config,
+    pkgs,
+    system,
+    ...
+  }:
+  {
+    _module.args.pkgs = import self.inputs.nixpkgs {
+      inherit system;
+      config.allowUnfree = true;
+      overlays = [ self.inputs.nur-packages.overlays.default ] ++ builtins.attrValues self.overlays;
     };
 
-    perSystem =
-      {
-        self',
-        config,
-        pkgs,
-        system,
-        ...
-      }:
-      {
-        _module.args.pkgs = import self.inputs.nixpkgs {
-          inherit system;
-          config.allowUnfree = true;
-          overlays = [ self.inputs.nur-packages.overlays.default ] ++ builtins.attrValues self.overlays;
+    checks = import ./tests {
+      inherit (self.inputs) nixpkgs;
+      inherit pkgs;
+    };
+
+    packages = {
+      fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
+      neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
+      po4a_0_74 = (
+        pkgs.po4a.overrideAttrs (oldAttrs: {
+          version = "0.74";
+          src = pkgs.fetchurl {
+            url = "https://github.com/mquinson/po4a/releases/download/v0.74/po4a-0.74.tar.gz";
+            hash = "sha256-JfwyPyuje71Iw68Ov0mVJkSw5GgmH5hjPpEhmoOP58I=";
+          };
+          patches = [ ];
+          nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.libxml2 ];
+          doCheck = false;
+        })
+      );
+      html =
+        with pkgs;
+        let
+          org-html-themes = fetchurl {
+            url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
+            hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
+          };
+          org-to-html = writeScript "org-to-html.el" ''
+            (require 'org)
+            (require 'htmlize)
+            (require 'nix-ts-mode)
+
+            (add-to-list 'org-src-lang-modes '("nix" . nix-ts))
+            (setq treesit-font-lock-level 4)
+
+            ;; In batch mode, faces lack color attributes. Explicitly set
+            ;; foreground colors so htmlize emits colored inline CSS.
+            (set-face-attribute 'font-lock-keyword-face nil :foreground "#5317ac")
+            (set-face-attribute 'font-lock-string-face nil :foreground "#2544bb")
+            (set-face-attribute 'font-lock-comment-face nil :foreground "#505050")
+            (set-face-attribute 'font-lock-function-name-face nil :foreground "#721045")
+            (set-face-attribute 'font-lock-function-call-face nil :foreground "#721045")
+            (set-face-attribute 'font-lock-variable-name-face nil :foreground "#00538b")
+            (set-face-attribute 'font-lock-variable-use-face nil :foreground "#005077")
+            (set-face-attribute 'font-lock-type-face nil :foreground "#005a5f")
+            (set-face-attribute 'font-lock-constant-face nil :foreground "#0000c0")
+            (set-face-attribute 'font-lock-builtin-face nil :foreground "#8f0075")
+            (set-face-attribute 'font-lock-property-name-face nil :foreground "#00538b")
+            (set-face-attribute 'font-lock-property-use-face nil :foreground "#005077")
+            (set-face-attribute 'font-lock-number-face nil :foreground "#0000c0")
+            (set-face-attribute 'font-lock-operator-face nil :foreground "#813e00")
+            (set-face-attribute 'font-lock-bracket-face nil :foreground "#5f5f5f")
+            (set-face-attribute 'font-lock-delimiter-face nil :foreground "#5f5f5f")
+            (set-face-attribute 'font-lock-punctuation-face nil :foreground "#5f5f5f")
+            (set-face-attribute 'font-lock-escape-face nil :foreground "#a0132f")
+
+            (find-file "configuration.org")
+            (org-html-export-to-html)
+
+            (find-file "configuration.ja.org")
+            (org-html-export-to-html)
+          '';
+        in
+        stdenvNoCC.mkDerivation {
+          name = "dotfiles";
+          src = lib.cleanSource ./.;
+          postPatch = ''
+            substituteInPlace configuration.org \
+              --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
+          '';
+          nativeBuildInputs = [
+            (emacs.pkgs.withPackages (epkgs: [
+              epkgs.htmlize
+              epkgs.nix-ts-mode
+              (epkgs.treesit-grammars.with-grammars (g: [ g.tree-sitter-nix ]))
+            ]))
+            gettext
+            self'.packages.po4a_0_74
+          ];
+          buildPhase = ''
+            runHook preBuild
+            po4a po4a.cfg
+            emacs --batch -l ${org-to-html}
+            runHook postBuild
+          '';
+
+          installPhase = ''
+            runHook preInstall
+            install -Dm644 configuration.html $out/index.html
+            install -Dm644 configuration.ja.html $out/ja/index.html
+            runHook postInstall
+          '';
         };
+    };
 
-        checks = import ./tests {
-          inherit (self.inputs) nixpkgs;
-          inherit pkgs;
-        };
+    pre-commit = {
+      check.enable = true;
+      settings = {
+        package = pkgs.prek;
+        src = ./.;
+        hooks = {
+          actionlint = {
+            enable = true;
+            priority = 10;
+          };
+          biome = {
+            enable = true;
+            priority = 10;
+          };
+          lua-ls = {
+            enable = false;
+            priority = 10;
+          };
+          nil = {
+            enable = true;
+            priority = 10;
+          };
+          shellcheck = {
+            enable = true;
+            priority = 10;
+          };
+          treefmt = {
+            enable = true;
+            priority = 10;
+          };
+          typos = {
+            enable = true;
+            priority = 10;
+            excludes = [
+              ".sops.yaml"
+              "homes/shared/gpg/keys.txt"
+              "secrets.yaml"
+              "secrets/default.yaml"
+              "systems/nixos/tarangire/facter.json"
+              "systems/shared/hercules-ci/binary-caches.json"
+            ];
+            settings.configPath = "typos.toml";
+          };
+          yamllint = {
+            enable = true;
+            priority = 10;
+            excludes = [
+              "secrets/default.yaml"
+              "secrets.yaml"
+            ];
+            settings.configData = "{rules: {document-start: {present: false}}}";
+          };
+          po4a = {
+            enable = true;
+            name = "po4a";
+            description = "Update translations with po4a";
+            priority = 10;
+            entry =
+              let
+                po4aScript = pkgs.writeShellScript "run-po4a" ''
+                  set -euo pipefail
 
-        packages = {
-          fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
-          neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
-          po4a_0_74 = (
-            pkgs.po4a.overrideAttrs (oldAttrs: {
-              version = "0.74";
-              src = pkgs.fetchurl {
-                url = "https://github.com/mquinson/po4a/releases/download/v0.74/po4a-0.74.tar.gz";
-                hash = "sha256-JfwyPyuje71Iw68Ov0mVJkSw5GgmH5hjPpEhmoOP58I=";
-              };
-              patches = [ ];
-              nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.libxml2 ];
-              doCheck = false;
-            })
-          );
-          html =
-            with pkgs;
-            let
-              org-html-themes = fetchurl {
-                url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
-                hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
-              };
-              org-to-html = writeScript "org-to-html.el" ''
-                (require 'org)
-                (require 'htmlize)
-                (require 'nix-ts-mode)
+                  ${self'.packages.po4a_0_74}/bin/po4a po4a.cfg
 
-                (add-to-list 'org-src-lang-modes '("nix" . nix-ts))
-                (setq treesit-font-lock-level 4)
+                  changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')
 
-                ;; In batch mode, faces lack color attributes. Explicitly set
-                ;; foreground colors so htmlize emits colored inline CSS.
-                (set-face-attribute 'font-lock-keyword-face nil :foreground "#5317ac")
-                (set-face-attribute 'font-lock-string-face nil :foreground "#2544bb")
-                (set-face-attribute 'font-lock-comment-face nil :foreground "#505050")
-                (set-face-attribute 'font-lock-function-name-face nil :foreground "#721045")
-                (set-face-attribute 'font-lock-function-call-face nil :foreground "#721045")
-                (set-face-attribute 'font-lock-variable-name-face nil :foreground "#00538b")
-                (set-face-attribute 'font-lock-variable-use-face nil :foreground "#005077")
-                (set-face-attribute 'font-lock-type-face nil :foreground "#005a5f")
-                (set-face-attribute 'font-lock-constant-face nil :foreground "#0000c0")
-                (set-face-attribute 'font-lock-builtin-face nil :foreground "#8f0075")
-                (set-face-attribute 'font-lock-property-name-face nil :foreground "#00538b")
-                (set-face-attribute 'font-lock-property-use-face nil :foreground "#005077")
-                (set-face-attribute 'font-lock-number-face nil :foreground "#0000c0")
-                (set-face-attribute 'font-lock-operator-face nil :foreground "#813e00")
-                (set-face-attribute 'font-lock-bracket-face nil :foreground "#5f5f5f")
-                (set-face-attribute 'font-lock-delimiter-face nil :foreground "#5f5f5f")
-                (set-face-attribute 'font-lock-punctuation-face nil :foreground "#5f5f5f")
-                (set-face-attribute 'font-lock-escape-face nil :foreground "#a0132f")
+                  if [ -n "$changed" ]; then
+                    echo "po4a updated translation files."
+                    echo "Changed files:"
+                    echo "$changed"
+                    echo ""
+                    echo "Please stage the changes and commit again:"
+                    echo "  git add $changed"
+                    exit 1
+                  fi
 
-                (find-file "configuration.org")
-                (org-html-export-to-html)
+                  exit 0
+                '';
+              in
+              "${po4aScript}";
+            files = "(\\.org|po/.*\\.po)$";
+            pass_filenames = false;
+          };
+          "check-org-tangle" = {
+            enable = true;
+            name = "check-org-tangle";
+            description = "Verify org files are tangled and synchronized";
+            # Ensure this hook runs before all other hooks
+            priority = 0;
+            entry =
+              let
+                checkScript = pkgs.writeShellScript "check-org-tangle" ''
+                  set -euo pipefail
 
-                (find-file "configuration.ja.org")
-                (org-html-export-to-html)
-              '';
-            in
-            stdenvNoCC.mkDerivation {
-              name = "dotfiles";
-              src = lib.cleanSource ./.;
-              postPatch = ''
-                substituteInPlace configuration.org \
-                  --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
-              '';
-              nativeBuildInputs = [
-                (emacs.pkgs.withPackages (epkgs: [
-                  epkgs.htmlize
-                  epkgs.nix-ts-mode
-                  (epkgs.treesit-grammars.with-grammars (g: [ g.tree-sitter-nix ]))
-                ]))
-                gettext
-                self'.packages.po4a_0_74
-              ];
-              buildPhase = ''
-                runHook preBuild
-                po4a po4a.cfg
-                emacs --batch -l ${org-to-html}
-                runHook postBuild
-              '';
+                  ${pkgs.gnumake}/bin/make -B tangle
 
-              installPhase = ''
-                runHook preInstall
-                install -Dm644 configuration.html $out/index.html
-                install -Dm644 configuration.ja.html $out/ja/index.html
-                runHook postInstall
-              '';
-            };
-        };
+                  # Check for differences using git diff
+                  changed=$(${pkgs.git}/bin/git diff --name-only)
 
-        pre-commit = {
-          check.enable = true;
-          settings = {
-            package = pkgs.prek;
-            src = ./.;
-            hooks = {
-              actionlint = {
-                enable = true;
-                priority = 10;
-              };
-              biome = {
-                enable = true;
-                priority = 10;
-              };
-              lua-ls = {
-                enable = false;
-                priority = 10;
-              };
-              nil = {
-                enable = true;
-                priority = 10;
-              };
-              shellcheck = {
-                enable = true;
-                priority = 10;
-              };
-              treefmt = {
-                enable = true;
-                priority = 10;
-              };
-              typos = {
-                enable = true;
-                priority = 10;
-                excludes = [
-                  ".sops.yaml"
-                  "homes/shared/gpg/keys.txt"
-                  "secrets.yaml"
-                  "secrets/default.yaml"
-                  "systems/nixos/tarangire/facter.json"
-                  "systems/shared/hercules-ci/binary-caches.json"
-                ];
-                settings.configPath = "typos.toml";
-              };
-              yamllint = {
-                enable = true;
-                priority = 10;
-                excludes = [
-                  "secrets/default.yaml"
-                  "secrets.yaml"
-                ];
-                settings.configData = "{rules: {document-start: {present: false}}}";
-              };
-              po4a = {
-                enable = true;
-                name = "po4a";
-                description = "Update translations with po4a";
-                priority = 10;
-                entry =
-                  let
-                    po4aScript = pkgs.writeShellScript "run-po4a" ''
-                      set -euo pipefail
+                  if [ -n "$changed" ]; then
+                    echo "Org files were out of sync and have been auto-tangled."
+                    echo "Changed files:"
+                    echo "$changed"
+                    echo ""
+                    echo "Please stage the changes and commit again:"
+                    echo "  git add $changed"
+                    exit 1
+                  fi
 
-                      ${self'.packages.po4a_0_74}/bin/po4a po4a.cfg
-
-                      changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')
-
-                      if [ -n "$changed" ]; then
-                        echo "po4a updated translation files."
-                        echo "Changed files:"
-                        echo "$changed"
-                        echo ""
-                        echo "Please stage the changes and commit again:"
-                        echo "  git add $changed"
-                        exit 1
-                      fi
-
-                      exit 0
-                    '';
-                  in
-                  "${po4aScript}";
-                files = "(\\.org|po/.*\\.po)$";
-                pass_filenames = false;
-              };
-              "check-org-tangle" = {
-                enable = true;
-                name = "check-org-tangle";
-                description = "Verify org files are tangled and synchronized";
-                # Ensure this hook runs before all other hooks
-                priority = 0;
-                entry =
-                  let
-                    checkScript = pkgs.writeShellScript "check-org-tangle" ''
-                      set -euo pipefail
-
-                      ${pkgs.gnumake}/bin/make -B tangle
-
-                      # Check for differences using git diff
-                      changed=$(${pkgs.git}/bin/git diff --name-only)
-
-                      if [ -n "$changed" ]; then
-                        echo "Org files were out of sync and have been auto-tangled."
-                        echo "Changed files:"
-                        echo "$changed"
-                        echo ""
-                        echo "Please stage the changes and commit again:"
-                        echo "  git add $changed"
-                        exit 1
-                      fi
-
-                      exit 0
-                    '';
-                  in
-                  "${checkScript}";
-                files = "\\.org$";
-                pass_filenames = false;
-              };
-            };
+                  exit 0
+                '';
+              in
+              "${checkScript}";
+            files = "\\.org$";
+            pass_filenames = false;
           };
         };
-
-        treefmt = {
-          projectRootFile = "flake.nix";
-          programs = {
-            biome.enable = true;
-            nixfmt.enable = true;
-            shfmt.enable = true;
-            stylua.enable = true;
-            taplo.enable = true;
-            terraform.enable = true;
-            yamlfmt.enable = true;
-          };
-        };
-
-        <<mcp-servers-config>>
-
-        <<dev-shells>>
       };
+    };
+
+    treefmt = {
+      projectRootFile = "flake.nix";
+      programs = {
+        biome.enable = true;
+        nixfmt.enable = true;
+        shfmt.enable = true;
+        stylua.enable = true;
+        taplo.enable = true;
+        terraform.enable = true;
+        yamlfmt.enable = true;
+      };
+    };
+
+    <<mcp-servers-config>>
+
+    <<dev-shells>>
   };
 #+end_src
 
@@ -1295,7 +1295,7 @@ self'.packages.po4a_0_74
 
 - =gettext=: provides msgfmt and other internationalization utilities
 - =po4a_0_74=: po4a >= 0.74 is required for Org mode support.
-  Using a pinned derivation since nixpkgs ships an older version (see [[*Rest of Flake][packages]]).
+  Using a pinned derivation since nixpkgs ships an older version (see [[*Outputs][packages]]).
 
 *** Translation workflow
 
