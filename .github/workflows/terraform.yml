@@ -1,32 +1,71 @@
-name: terraform github
+name: terraform
 on:
   pull_request:
     branches:
       - main
     paths:
-      - 'infra/services/github/**'
-      - '.github/workflows/terraform-github.yml'
+      - 'infra/**'
+      - '.github/workflows/terraform.yml'
       - 'flake.lock'
   push:
     branches:
       - main
     paths:
-      - 'infra/services/github/**'
-      - '.github/workflows/terraform-github.yml'
+      - 'infra/**'
+      - '.github/workflows/terraform.yml'
       - 'flake.lock'
 permissions:
   id-token: write
   contents: read
   pull-requests: write
 jobs:
+  detect:
+    runs-on: ubuntu-slim
+    timeout-minutes: 5
+    outputs:
+      directories: ${{ steps.build-matrix.outputs.directories }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
+        id: filter
+        with:
+          filters: |
+            github:
+              - 'infra/services/github/**'
+            cloudflare:
+              - 'infra/global/domains/natsukium-com/**'
+            shared:
+              - 'flake.lock'
+              - '.github/workflows/terraform.yml'
+      - id: build-matrix
+        run: |
+          directories='[]'
+          if [[ "${{ steps.filter.outputs.shared }}" == "true" ]]; then
+            directories='["infra/services/github","infra/global/domains/natsukium-com"]'
+          else
+            dirs=()
+            if [[ "${{ steps.filter.outputs.github }}" == "true" ]]; then
+              dirs+=("infra/services/github")
+            fi
+            if [[ "${{ steps.filter.outputs.cloudflare }}" == "true" ]]; then
+              dirs+=("infra/global/domains/natsukium-com")
+            fi
+            directories=$(printf '%s\n' "${dirs[@]}" | jq -R . | jq -sc .)
+          fi
+          echo "directories=$directories" >> "$GITHUB_OUTPUT"
   terraform:
+    needs: detect
+    if: needs.detect.outputs.directories != '[]'
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.detect.outputs.directories) }}
     env:
       SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
     defaults:
       run:
-        working-directory: infra/services/github
+        working-directory: ${{ matrix.directory }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-nix
@@ -51,14 +90,15 @@ jobs:
             sed -n '/Terraform used the selected providers/,$ p' plan.txt || cat plan.txt
             echo "EOF"
           } >> "$GITHUB_OUTPUT"
+          echo "has_changes=$( ! grep -q 'No changes' plan.txt && echo true || echo false)" >> "$GITHUB_OUTPUT"
           exit $exit_code
         continue-on-error: true
       - name: Comment PR
-        if: github.event_name == 'pull_request'
+        if: github.event_name == 'pull_request' && steps.plan.outputs.has_changes == 'true'
         uses: actions/github-script@ed597411d8f924073f98dfc5c65a23a2325f34cd # v8
         with:
           script: |
-            const output = `#### Terraform Plan 📖
+            const output = `#### Terraform Plan: \`${{ matrix.directory }}\` 📖
             \`\`\`
             ${{ steps.plan.outputs.stdout }}
             \`\`\`
