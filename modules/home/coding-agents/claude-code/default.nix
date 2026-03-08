@@ -6,6 +6,34 @@
 }:
 let
   cfg = config.my.programs.claude-code;
+
+  # Standard Claude Code plugin directory with .lsp.json containing all language
+  # servers. replaceVars substitutes @pkg@ placeholders with /nix/store paths.
+  lspPlugin = pkgs.runCommandLocal "claude-lsp" { } ''
+    cp -r ${./plugins/lsp} $out
+    chmod -R u+w $out
+    cp ${
+      pkgs.replaceVars ./plugins/lsp/.lsp.json {
+        nixd = "${pkgs.nixd}/bin/nixd";
+        yaml_language_server = "${pkgs.yaml-language-server}/bin/yaml-language-server";
+        just_lsp = "${pkgs.just-lsp}/bin/just-lsp";
+        terraform_ls = "${pkgs.terraform-ls}/bin/terraform-ls";
+        rust_analyzer = "${pkgs.rust-analyzer}/bin/rust-analyzer";
+        typescript_language_server = "${pkgs.typescript-language-server}/bin/typescript-language-server";
+      }
+    } $out/.lsp.json
+  '';
+
+  # Re-wrap the upstream binary to inject --plugin-dir flags for each LSP plugin.
+  # Cannot use wrapProgram twice because makeBinaryWrapper would overwrite
+  # .claude-wrapped; instead, manually rename and call makeBinaryWrapper.
+  claudeWithLsp = pkgs.edge.claude-code-bin.overrideAttrs (prev: {
+    postInstall = (prev.postInstall or "") + ''
+      mv $out/bin/claude $out/bin/.claude-lsp-wrapped
+      makeBinaryWrapper $out/bin/.claude-lsp-wrapped $out/bin/claude \
+        --add-flags '--plugin-dir ${lspPlugin}'
+    '';
+  });
 in
 {
   options.my.programs.claude-code = {
@@ -17,7 +45,7 @@ in
       enable = true;
       enableMcpIntegration = true;
 
-      package = pkgs.edge.claude-code-bin;
+      package = claudeWithLsp;
 
       settings = {
         includeCoAuthoredBy = false;
