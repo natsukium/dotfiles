@@ -50,25 +50,13 @@ aarch64-darwin:
 # Each directory has a configuration.org that tangles to one or more .nix files
 tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix .github/README.org CLAUDE.md po4a.cfg scripts/org-to-html.el scripts/check-po4a.sh scripts/check-org-tangle.sh scripts/check-git-changes.sh scripts/export-claude-md.el scripts/export-readme-org.el
 
-flake.nix: configuration.org
+flake.nix po4a.cfg scripts/org-to-html.el scripts/check-po4a.sh scripts/check-org-tangle.sh scripts/check-git-changes.sh scripts/export-claude-md.el scripts/export-readme-org.el &: configuration.org
 	$(call tangle-org,$<)
 
-po4a.cfg: configuration.org
+overlays/default.nix &: overlays/configuration.org
 	$(call tangle-org,$<)
 
-overlays/default.nix: overlays/configuration.org
-	$(call tangle-org,$<)
-
-modules/nixos/tailscale.nix: modules/configuration.org
-	$(call tangle-org,$<)
-
-modules/home/development/git/default.nix: modules/configuration.org
-	$(call tangle-org,$<)
-
-modules/home/zen-browser/default.nix: modules/configuration.org
-	$(call tangle-org,$<)
-
-scripts/org-to-html.el scripts/check-po4a.sh scripts/check-org-tangle.sh scripts/check-git-changes.sh scripts/export-claude-md.el scripts/export-readme-org.el: configuration.org
+modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix &: modules/configuration.org
 	$(call tangle-org,$<)
 
 CLAUDE.md: configuration.org scripts/export-claude-md.el
