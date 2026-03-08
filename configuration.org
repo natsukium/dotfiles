@@ -1266,9 +1266,18 @@ check-git-changes "Org files were out of sync and have been auto-tangled."
 (org-md-export-to-markdown nil t)
 #+end_src
 
+The =org-export-with-author= setting is explicitly disabled because
+=configuration.org= has no =#+AUTHOR:= keyword, so Org falls back to the
+Emacs variable =user-full-name=. On macOS, this variable is populated from
+the system directory service (=dscl= / =getpwuid=), producing an unwanted
+=#+author:= line. On Linux, especially in CI environments, the value is
+typically empty, so the line is omitted. Disabling the setting ensures
+consistent output across platforms.
+
 #+begin_src emacs-lisp :tangle scripts/export-readme-org.el :mkdirp yes
 (require 'ox-org)
 (let ((org-export-select-tags (list "readme"))
+      (org-export-with-author nil)
       (org-export-with-tags nil)
       (org-export-time-stamp-file nil))
   (org-export-to-file 'org export-readme-dest))

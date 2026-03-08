@@ -1,5 +1,6 @@
 (require 'ox-org)
 (let ((org-export-select-tags (list "readme"))
+      (org-export-with-author nil)
       (org-export-with-tags nil)
       (org-export-time-stamp-file nil))
   (org-export-to-file 'org export-readme-dest))

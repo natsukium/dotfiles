@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-08 15:38+0900\n"
+"POT-Creation-Date: 2026-03-09 00:26+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2488,38 +2488,51 @@ msgid ""
 "(org-md-export-to-markdown nil t)"
 msgstr ""
 
+#. type: paragraph
+#: configuration.org:1269
+msgid ""
+"The =org-export-with-author= setting is explicitly disabled because "
+"=configuration.org= has no =#+AUTHOR:= keyword, so Org falls back to the "
+"Emacs variable =user-full-name=. On macOS, this variable is populated from "
+"the system directory service (=dscl= / =getpwuid=), producing an unwanted "
+"=#+author:= line. On Linux, especially in CI environments, the value is "
+"typically empty, so the line is omitted. Disabling the setting ensures "
+"consistent output across platforms."
+msgstr ""
+
 #. type: paragraph in src
-#: configuration.org:1270
+#: configuration.org:1278
 #, no-wrap
 msgid ""
 "(require 'ox-org)\n"
 "(let ((org-export-select-tags (list \"readme\"))\n"
+"      (org-export-with-author nil)\n"
 "      (org-export-with-tags nil)\n"
 "      (org-export-time-stamp-file nil))\n"
 "  (org-export-to-file 'org export-readme-dest))"
 msgstr ""
 
 #. type: heading *
-#: configuration.org:1277 .github/README.org:58
+#: configuration.org:1286 .github/README.org:58
 #, no-wrap
 msgid "Development"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1279 .github/README.org:60
+#: configuration.org:1288 .github/README.org:60
 msgid ""
 "This repository provides a Nix development shell with all the tools needed "
 "for working on the configurations. Enter the shell by running:"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1283 .github/README.org:64
+#: configuration.org:1292 .github/README.org:64
 #, no-wrap
 msgid "nix develop"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1286 .github/README.org:67
+#: configuration.org:1295 .github/README.org:67
 msgid ""
 "The shell includes infrastructure tools (Terraform, sops, ssh-to-age), "
 "translation tools (po4a, gettext), and build utilities (nix-fast-build).  On "
@@ -2528,13 +2541,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:1291 .github/README.org:72
+#: configuration.org:1300 .github/README.org:72
 #, no-wrap
 msgid "dev-shells"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1293 .github/README.org:74
+#: configuration.org:1302 .github/README.org:74
 #, no-wrap
 msgid ""
 "devShells = {\n"
@@ -2569,35 +2582,35 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1323 .github/README.org:103
+#: configuration.org:1332 .github/README.org:103
 #, no-wrap
 msgid "Translation"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1325 .github/README.org:105
+#: configuration.org:1334 .github/README.org:105
 msgid "This project uses po4a to manage translations."
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1327 .github/README.org:106
+#: configuration.org:1336 .github/README.org:106
 #, no-wrap
 msgid "Requirements"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1329 .github/README.org:108
+#: configuration.org:1338 .github/README.org:108
 msgid "The required packages are included in the development shell."
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:1331 .github/README.org:110
+#: configuration.org:1340 .github/README.org:110
 #, no-wrap
 msgid "translation-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1333 .github/README.org:112
+#: configuration.org:1342 .github/README.org:112
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -2605,13 +2618,13 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1338 .github/README.org:117
+#: configuration.org:1347 .github/README.org:117
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1340 .github/README.org:119
+#: configuration.org:1349 .github/README.org:119
 #, no-wrap
 msgid ""
 "=po4a_0_74=: po4a >= 0.74 is required for Org mode support.\n"
@@ -2620,19 +2633,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1341 .github/README.org:119
+#: configuration.org:1350 .github/README.org:119
 #, no-wrap
 msgid "Translation workflow"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1343 .github/README.org:121
+#: configuration.org:1352 .github/README.org:121
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1345 .github/README.org:123
+#: configuration.org:1354 .github/README.org:123
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -2641,7 +2654,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1354 .github/README.org:132
+#: configuration.org:1363 .github/README.org:132
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -2659,18 +2672,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1364 .github/README.org:142
+#: configuration.org:1373 .github/README.org:142
 msgid "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1366 .github/README.org:143
+#: configuration.org:1375 .github/README.org:143
 #, no-wrap
 msgid "Create/Update po"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1368 .github/README.org:145
+#: configuration.org:1377 .github/README.org:145
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -2678,32 +2691,32 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1374 .github/README.org:151
+#: configuration.org:1383 .github/README.org:151
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1377 .github/README.org:153
+#: configuration.org:1386 .github/README.org:153
 #, no-wrap
 msgid "Translate"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1379 .github/README.org:155
+#: configuration.org:1388 .github/README.org:155
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1386 .github/README.org:161
+#: configuration.org:1395 .github/README.org:161
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1388 .github/README.org:163
+#: configuration.org:1397 .github/README.org:163
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -2711,7 +2724,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1394 .github/README.org:169
+#: configuration.org:1403 .github/README.org:169
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""
