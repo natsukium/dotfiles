@@ -247,41 +247,7 @@
                   url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
                   hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
                 };
-                org-to-html = writeScript "org-to-html.el" ''
-                  (require 'org)
-                  (require 'htmlize)
-                  (require 'nix-ts-mode)
-
-                  (add-to-list 'org-src-lang-modes '("nix" . nix-ts))
-                  (setq treesit-font-lock-level 4)
-
-                  ;; In batch mode, faces lack color attributes. Explicitly set
-                  ;; foreground colors so htmlize emits colored inline CSS.
-                  (set-face-attribute 'font-lock-keyword-face nil :foreground "#5317ac")
-                  (set-face-attribute 'font-lock-string-face nil :foreground "#2544bb")
-                  (set-face-attribute 'font-lock-comment-face nil :foreground "#505050")
-                  (set-face-attribute 'font-lock-function-name-face nil :foreground "#721045")
-                  (set-face-attribute 'font-lock-function-call-face nil :foreground "#721045")
-                  (set-face-attribute 'font-lock-variable-name-face nil :foreground "#00538b")
-                  (set-face-attribute 'font-lock-variable-use-face nil :foreground "#005077")
-                  (set-face-attribute 'font-lock-type-face nil :foreground "#005a5f")
-                  (set-face-attribute 'font-lock-constant-face nil :foreground "#0000c0")
-                  (set-face-attribute 'font-lock-builtin-face nil :foreground "#8f0075")
-                  (set-face-attribute 'font-lock-property-name-face nil :foreground "#00538b")
-                  (set-face-attribute 'font-lock-property-use-face nil :foreground "#005077")
-                  (set-face-attribute 'font-lock-number-face nil :foreground "#0000c0")
-                  (set-face-attribute 'font-lock-operator-face nil :foreground "#813e00")
-                  (set-face-attribute 'font-lock-bracket-face nil :foreground "#5f5f5f")
-                  (set-face-attribute 'font-lock-delimiter-face nil :foreground "#5f5f5f")
-                  (set-face-attribute 'font-lock-punctuation-face nil :foreground "#5f5f5f")
-                  (set-face-attribute 'font-lock-escape-face nil :foreground "#a0132f")
-
-                  (find-file "configuration.org")
-                  (org-html-export-to-html)
-
-                  (find-file "configuration.ja.org")
-                  (org-html-export-to-html)
-                '';
+                org-to-html = ./scripts/org-to-html.el;
               in
               stdenvNoCC.mkDerivation {
                 name = "dotfiles";
@@ -320,118 +286,99 @@
             settings = {
               package = pkgs.prek;
               src = ./.;
-              hooks = {
-                actionlint = {
-                  enable = true;
-                  priority = 10;
+              hooks =
+                let
+                  check-git-changes = pkgs.writeShellApplication {
+                    name = "check-git-changes";
+                    runtimeInputs = [ pkgs.git ];
+                    text = builtins.readFile ./scripts/check-git-changes.sh;
+                  };
+                in
+                {
+                  actionlint = {
+                    enable = true;
+                    priority = 10;
+                  };
+                  biome = {
+                    enable = true;
+                    priority = 10;
+                  };
+                  lua-ls = {
+                    enable = false;
+                    priority = 10;
+                  };
+                  nil = {
+                    enable = true;
+                    priority = 10;
+                  };
+                  shellcheck = {
+                    enable = true;
+                    priority = 10;
+                  };
+                  treefmt = {
+                    enable = true;
+                    priority = 10;
+                  };
+                  typos = {
+                    enable = true;
+                    priority = 10;
+                    excludes = [
+                      ".sops.yaml"
+                      "homes/shared/gpg/keys.txt"
+                      "secrets.yaml"
+                      "secrets/default.yaml"
+                      "systems/nixos/tarangire/facter.json"
+                      "systems/shared/hercules-ci/binary-caches.json"
+                    ];
+                    settings.configPath = "typos.toml";
+                  };
+                  yamllint = {
+                    enable = true;
+                    priority = 10;
+                    excludes = [
+                      "secrets/default.yaml"
+                      "secrets.yaml"
+                    ];
+                    settings.configData = "{rules: {document-start: {present: false}}}";
+                  };
+                  po4a = {
+                    enable = true;
+                    name = "po4a";
+                    description = "Update translations with po4a";
+                    priority = 10;
+                    entry = pkgs.lib.getExe (
+                      pkgs.writeShellApplication {
+                        name = "check-po4a";
+                        runtimeInputs = [
+                          self'.packages.po4a_0_74
+                          check-git-changes
+                        ];
+                        text = builtins.readFile ./scripts/check-po4a.sh;
+                      }
+                    );
+                    files = "(\\.org|po/.*\\.po)$";
+                    pass_filenames = false;
+                  };
+                  "check-org-tangle" = {
+                    enable = true;
+                    name = "check-org-tangle";
+                    description = "Verify org files are tangled and synchronized";
+                    # Ensure this hook runs before all other hooks
+                    priority = 0;
+                    entry = pkgs.lib.getExe (
+                      pkgs.writeShellApplication {
+                        name = "check-org-tangle";
+                        runtimeInputs = [
+                          pkgs.gnumake
+                          check-git-changes
+                        ];
+                        text = builtins.readFile ./scripts/check-org-tangle.sh;
+                      }
+                    );
+                    files = "\\.org$";
+                    pass_filenames = false;
+                  };
                 };
-                biome = {
-                  enable = true;
-                  priority = 10;
-                };
-                lua-ls = {
-                  enable = false;
-                  priority = 10;
-                };
-                nil = {
-                  enable = true;
-                  priority = 10;
-                };
-                shellcheck = {
-                  enable = true;
-                  priority = 10;
-                };
-                treefmt = {
-                  enable = true;
-                  priority = 10;
-                };
-                typos = {
-                  enable = true;
-                  priority = 10;
-                  excludes = [
-                    ".sops.yaml"
-                    "homes/shared/gpg/keys.txt"
-                    "secrets.yaml"
-                    "secrets/default.yaml"
-                    "systems/nixos/tarangire/facter.json"
-                    "systems/shared/hercules-ci/binary-caches.json"
-                  ];
-                  settings.configPath = "typos.toml";
-                };
-                yamllint = {
-                  enable = true;
-                  priority = 10;
-                  excludes = [
-                    "secrets/default.yaml"
-                    "secrets.yaml"
-                  ];
-                  settings.configData = "{rules: {document-start: {present: false}}}";
-                };
-                po4a = {
-                  enable = true;
-                  name = "po4a";
-                  description = "Update translations with po4a";
-                  priority = 10;
-                  entry =
-                    let
-                      po4aScript = pkgs.writeShellScript "run-po4a" ''
-                        set -euo pipefail
-
-                        ${self'.packages.po4a_0_74}/bin/po4a po4a.cfg
-
-                        changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')
-
-                        if [ -n "$changed" ]; then
-                          echo "po4a updated translation files."
-                          echo "Changed files:"
-                          echo "$changed"
-                          echo ""
-                          echo "Please stage the changes and commit again:"
-                          echo "  git add $changed"
-                          exit 1
-                        fi
-
-                        exit 0
-                      '';
-                    in
-                    "${po4aScript}";
-                  files = "(\\.org|po/.*\\.po)$";
-                  pass_filenames = false;
-                };
-                "check-org-tangle" = {
-                  enable = true;
-                  name = "check-org-tangle";
-                  description = "Verify org files are tangled and synchronized";
-                  # Ensure this hook runs before all other hooks
-                  priority = 0;
-                  entry =
-                    let
-                      checkScript = pkgs.writeShellScript "check-org-tangle" ''
-                        set -euo pipefail
-
-                        ${pkgs.gnumake}/bin/make -B tangle
-
-                        # Check for differences using git diff
-                        changed=$(${pkgs.git}/bin/git diff --name-only)
-
-                        if [ -n "$changed" ]; then
-                          echo "Org files were out of sync and have been auto-tangled."
-                          echo "Changed files:"
-                          echo "$changed"
-                          echo ""
-                          echo "Please stage the changes and commit again:"
-                          echo "  git add $changed"
-                          exit 1
-                        fi
-
-                        exit 0
-                      '';
-                    in
-                    "${checkScript}";
-                  files = "\\.org$";
-                  pass_filenames = false;
-                };
-              };
             };
           };
 

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-08 12:47+0900\n"
+"POT-Creation-Date: 2026-03-08 15:38+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -2105,14 +2105,266 @@ msgid ""
 "\"https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup\";\n"
 "        hash = \"sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=\";\n"
 "      };\n"
-"      org-to-html = writeScript \"org-to-html.el\" ''\n"
-"        (require 'org)\n"
-"        (require 'htmlize)\n"
-"        (require 'nix-ts-mode)"
+"      org-to-html = ./scripts/org-to-html.el;\n"
+"    in\n"
+"    stdenvNoCC.mkDerivation {\n"
+"      name = \"dotfiles\";\n"
+"      src = lib.cleanSource ./.;\n"
+"      postPatch = ''\n"
+"        substituteInPlace configuration.org \\\n"
+"          --replace-fail "
+"\"https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\" "
+"\"${org-html-themes}\"\n"
+"      '';\n"
+"      nativeBuildInputs = [\n"
+"        (emacs.pkgs.withPackages (epkgs: [\n"
+"          epkgs.htmlize\n"
+"          epkgs.nix-ts-mode\n"
+"          (epkgs.treesit-grammars.with-grammars (g: [ g.tree-sitter-nix "
+"]))\n"
+"        ]))\n"
+"        gettext\n"
+"        self'.packages.po4a_0_74\n"
+"      ];\n"
+"      buildPhase = ''\n"
+"        runHook preBuild\n"
+"        po4a po4a.cfg\n"
+"        emacs --batch -l ${org-to-html}\n"
+"        runHook postBuild\n"
+"      '';"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1022
+#: configuration.org:1042
+#, no-wrap
+msgid ""
+"      installPhase = ''\n"
+"        runHook preInstall\n"
+"        install -Dm644 configuration.html $out/index.html\n"
+"        install -Dm644 configuration.ja.html $out/ja/index.html\n"
+"        runHook postInstall\n"
+"      '';\n"
+"    };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1051
+#, no-wrap
+msgid ""
+"pre-commit = {\n"
+"  check.enable = true;\n"
+"  settings = {\n"
+"    package = pkgs.prek;\n"
+"    src = ./.;\n"
+"    hooks =\n"
+"      let\n"
+"        check-git-changes = pkgs.writeShellApplication {\n"
+"          name = \"check-git-changes\";\n"
+"          runtimeInputs = [ pkgs.git ];\n"
+"          text = builtins.readFile ./scripts/check-git-changes.sh;\n"
+"        };\n"
+"      in\n"
+"      {\n"
+"        actionlint = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"        };\n"
+"        biome = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"        };\n"
+"        lua-ls = {\n"
+"          enable = false;\n"
+"          priority = 10;\n"
+"        };\n"
+"        nil = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"        };\n"
+"        shellcheck = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"        };\n"
+"        treefmt = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"        };\n"
+"        typos = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"          excludes = [\n"
+"            \".sops.yaml\"\n"
+"            \"homes/shared/gpg/keys.txt\"\n"
+"            \"secrets.yaml\"\n"
+"            \"secrets/default.yaml\"\n"
+"            \"systems/nixos/tarangire/facter.json\"\n"
+"            \"systems/shared/hercules-ci/binary-caches.json\"\n"
+"          ];\n"
+"          settings.configPath = \"typos.toml\";\n"
+"        };\n"
+"        yamllint = {\n"
+"          enable = true;\n"
+"          priority = 10;\n"
+"          excludes = [\n"
+"            \"secrets/default.yaml\"\n"
+"            \"secrets.yaml\"\n"
+"          ];\n"
+"          settings.configData = \"{rules: {document-start: {present: "
+"false}}}\";\n"
+"        };\n"
+"        po4a = {\n"
+"          enable = true;\n"
+"          name = \"po4a\";\n"
+"          description = \"Update translations with po4a\";\n"
+"          priority = 10;\n"
+"          entry = pkgs.lib.getExe (\n"
+"            pkgs.writeShellApplication {\n"
+"              name = \"check-po4a\";\n"
+"              runtimeInputs = [\n"
+"                self'.packages.po4a_0_74\n"
+"                check-git-changes\n"
+"              ];\n"
+"              text = builtins.readFile ./scripts/check-po4a.sh;\n"
+"            }\n"
+"          );\n"
+"          files = \"(\\\\.org|po/.*\\\\.po)$\";\n"
+"          pass_filenames = false;\n"
+"        };\n"
+"        \"check-org-tangle\" = {\n"
+"          enable = true;\n"
+"          name = \"check-org-tangle\";\n"
+"          description = \"Verify org files are tangled and synchronized\";\n"
+"          priority = 0;\n"
+"          entry = pkgs.lib.getExe (\n"
+"            pkgs.writeShellApplication {\n"
+"              name = \"check-org-tangle\";\n"
+"              runtimeInputs = [\n"
+"                pkgs.gnumake\n"
+"                check-git-changes\n"
+"              ];\n"
+"              text = builtins.readFile ./scripts/check-org-tangle.sh;\n"
+"            }\n"
+"          );\n"
+"          files = \"\\\\.org$\";\n"
+"          pass_filenames = false;\n"
+"        };\n"
+"      };\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1152
+#, no-wrap
+msgid ""
+"treefmt = {\n"
+"  projectRootFile = \"flake.nix\";\n"
+"  programs = {\n"
+"    biome.enable = true;\n"
+"    nixfmt.enable = true;\n"
+"    shfmt.enable = true;\n"
+"    stylua.enable = true;\n"
+"    taplo.enable = true;\n"
+"    terraform.enable = true;\n"
+"    yamlfmt.enable = true;\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1165
+#, no-wrap
+msgid "<<mcp-servers-config>>"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1167
+#, no-wrap
+msgid ""
+"  <<dev-shells>>\n"
+"};"
+msgstr ""
+
+#. type: heading **
+#: configuration.org:1171
+#, no-wrap
+msgid "Overlays"
+msgstr ""
+
+#. type: keyword INCLUDE
+#: configuration.org:1172
+#, no-wrap
+msgid "\"./overlays/configuration.org\""
+msgstr ""
+
+#. type: heading **
+#: configuration.org:1174
+#, no-wrap
+msgid "Modules"
+msgstr ""
+
+#. type: keyword INCLUDE
+#: configuration.org:1175
+#, no-wrap
+msgid "\"./modules/configuration.org\""
+msgstr ""
+
+#. type: heading **
+#: configuration.org:1177
+#, no-wrap
+msgid "Emacs"
+msgstr ""
+
+#. type: heading ***
+#: configuration.org:1178
+#, no-wrap
+msgid "early-init.org"
+msgstr ""
+
+#. type: keyword INCLUDE
+#: configuration.org:1179
+#, no-wrap
+msgid "\"./applications/emacs/early-init.org\""
+msgstr ""
+
+#. type: heading ***
+#: configuration.org:1180
+#, no-wrap
+msgid "init.org"
+msgstr ""
+
+#. type: keyword INCLUDE
+#: configuration.org:1181
+#, no-wrap
+msgid "\"./applications/emacs/init.org\""
+msgstr ""
+
+#. type: heading **
+#: configuration.org:1183
+#, no-wrap
+msgid "Scripts"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:1185
+msgid ""
+"Scripts used in flake derivations, pre-commit hooks, and Makefile recipes.  "
+"Extracted to separate files for proper syntax highlighting and independent "
+"invocability."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1189
+#, no-wrap
+msgid ""
+"(require 'org)\n"
+"(require 'htmlize)\n"
+"(require 'nix-ts-mode)"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1193
 #, no-wrap
 msgid ""
 "(add-to-list 'org-src-lang-modes '(\"nix\" . nix-ts))\n"
@@ -2120,7 +2372,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1025
+#: configuration.org:1196
 #, no-wrap
 msgid ""
 ";; In batch mode, faces lack color attributes. Explicitly set\n"
@@ -2153,7 +2405,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1046
+#: configuration.org:1217
 #, no-wrap
 msgid ""
 "(find-file \"configuration.org\")\n"
@@ -2161,320 +2413,113 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1049
-#, no-wrap
-msgid ""
-"    (find-file \"configuration.ja.org\")\n"
-"    (org-html-export-to-html)\n"
-"  '';\n"
-"in\n"
-"stdenvNoCC.mkDerivation {\n"
-"  name = \"dotfiles\";\n"
-"  src = lib.cleanSource ./.;\n"
-"  postPatch = ''\n"
-"    substituteInPlace configuration.org \\\n"
-"      --replace-fail "
-"\"https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup\" "
-"\"${org-html-themes}\"\n"
-"  '';\n"
-"  nativeBuildInputs = [\n"
-"    (emacs.pkgs.withPackages (epkgs: [\n"
-"      epkgs.htmlize\n"
-"      epkgs.nix-ts-mode\n"
-"      (epkgs.treesit-grammars.with-grammars (g: [ g.tree-sitter-nix ]))\n"
-"    ]))\n"
-"    gettext\n"
-"    self'.packages.po4a_0_74\n"
-"  ];\n"
-"  buildPhase = ''\n"
-"    runHook preBuild\n"
-"    po4a po4a.cfg\n"
-"    emacs --batch -l ${org-to-html}\n"
-"    runHook postBuild\n"
-"  '';"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1076
-#, no-wrap
-msgid ""
-"      installPhase = ''\n"
-"        runHook preInstall\n"
-"        install -Dm644 configuration.html $out/index.html\n"
-"        install -Dm644 configuration.ja.html $out/ja/index.html\n"
-"        runHook postInstall\n"
-"      '';\n"
-"    };\n"
-"};"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1085
-#, no-wrap
-msgid ""
-"pre-commit = {\n"
-"  check.enable = true;\n"
-"  settings = {\n"
-"    package = pkgs.prek;\n"
-"    src = ./.;\n"
-"    hooks = {\n"
-"      actionlint = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"      };\n"
-"      biome = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"      };\n"
-"      lua-ls = {\n"
-"        enable = false;\n"
-"        priority = 10;\n"
-"      };\n"
-"      nil = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"      };\n"
-"      shellcheck = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"      };\n"
-"      treefmt = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"      };\n"
-"      typos = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"        excludes = [\n"
-"          \".sops.yaml\"\n"
-"          \"homes/shared/gpg/keys.txt\"\n"
-"          \"secrets.yaml\"\n"
-"          \"secrets/default.yaml\"\n"
-"          \"systems/nixos/tarangire/facter.json\"\n"
-"          \"systems/shared/hercules-ci/binary-caches.json\"\n"
-"        ];\n"
-"        settings.configPath = \"typos.toml\";\n"
-"      };\n"
-"      yamllint = {\n"
-"        enable = true;\n"
-"        priority = 10;\n"
-"        excludes = [\n"
-"          \"secrets/default.yaml\"\n"
-"          \"secrets.yaml\"\n"
-"        ];\n"
-"        settings.configData = \"{rules: {document-start: {present: "
-"false}}}\";\n"
-"      };\n"
-"      po4a = {\n"
-"        enable = true;\n"
-"        name = \"po4a\";\n"
-"        description = \"Update translations with po4a\";\n"
-"        priority = 10;\n"
-"        entry =\n"
-"          let\n"
-"            po4aScript = pkgs.writeShellScript \"run-po4a\" ''\n"
-"              set -euo pipefail"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1147
-#, no-wrap
-msgid "${self'.packages.po4a_0_74}/bin/po4a po4a.cfg"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1149
-#, no-wrap
-msgid "changed=$(${pkgs.git}/bin/git diff --name-only -- po/ '*.ja.org')"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1151
-#, no-wrap
-msgid ""
-"if [ -n \"$changed\" ]; then\n"
-"  echo \"po4a updated translation files.\"\n"
-"  echo \"Changed files:\"\n"
-"  echo \"$changed\"\n"
-"  echo \"\"\n"
-"  echo \"Please stage the changes and commit again:\"\n"
-"  echo \"  git add $changed\"\n"
-"  exit 1\n"
-"fi"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1161
-#, no-wrap
-msgid ""
-"        exit 0\n"
-"      '';\n"
-"    in\n"
-"    \"${po4aScript}\";\n"
-"  files = \"(\\\\.org|po/.*\\\\.po)$\";\n"
-"  pass_filenames = false;\n"
-"};\n"
-"\"check-org-tangle\" = {\n"
-"  enable = true;\n"
-"  name = \"check-org-tangle\";\n"
-"  description = \"Verify org files are tangled and synchronized\";\n"
-"  priority = 0;\n"
-"  entry =\n"
-"    let\n"
-"      checkScript = pkgs.writeShellScript \"check-org-tangle\" ''\n"
-"        set -euo pipefail"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1179
-#, no-wrap
-msgid "${pkgs.gnumake}/bin/make -B tangle"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1182
-#, no-wrap
-msgid "changed=$(${pkgs.git}/bin/git diff --name-only)"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1184
-#, no-wrap
-msgid ""
-"if [ -n \"$changed\" ]; then\n"
-"  echo \"Org files were out of sync and have been auto-tangled.\"\n"
-"  echo \"Changed files:\"\n"
-"  echo \"$changed\"\n"
-"  echo \"\"\n"
-"  echo \"Please stage the changes and commit again:\"\n"
-"  echo \"  git add $changed\"\n"
-"  exit 1\n"
-"fi"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1194
-#, no-wrap
-msgid ""
-"              exit 0\n"
-"            '';\n"
-"          in\n"
-"          \"${checkScript}\";\n"
-"        files = \"\\\\.org$\";\n"
-"        pass_filenames = false;\n"
-"      };\n"
-"    };\n"
-"  };\n"
-"};"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1205
-#, no-wrap
-msgid ""
-"treefmt = {\n"
-"  projectRootFile = \"flake.nix\";\n"
-"  programs = {\n"
-"    biome.enable = true;\n"
-"    nixfmt.enable = true;\n"
-"    shfmt.enable = true;\n"
-"    stylua.enable = true;\n"
-"    taplo.enable = true;\n"
-"    terraform.enable = true;\n"
-"    yamlfmt.enable = true;\n"
-"  };\n"
-"};"
-msgstr ""
-
-#. type: paragraph in src
-#: configuration.org:1218
-#, no-wrap
-msgid "<<mcp-servers-config>>"
-msgstr ""
-
-#. type: paragraph in src
 #: configuration.org:1220
 #, no-wrap
 msgid ""
-"  <<dev-shells>>\n"
-"};"
+"(find-file \"configuration.ja.org\")\n"
+"(org-html-export-to-html)"
 msgstr ""
 
-#. type: heading **
+#. type: paragraph
 #: configuration.org:1224
-#, no-wrap
-msgid "Overlays"
+msgid ""
+"The two pre-commit hook scripts share a common pattern: run a command, then "
+"check =git diff= for changes and fail with instructions if any are "
+"found. This shared logic lives in =check-git-changes.sh=."
 msgstr ""
 
-#. type: keyword INCLUDE
-#: configuration.org:1225
+#. type: paragraph in src
+#: configuration.org:1231 configuration.org:1250 configuration.org:1257
 #, no-wrap
-msgid "\"./overlays/configuration.org\""
+msgid "set -euo pipefail"
 msgstr ""
 
-#. type: heading **
-#: configuration.org:1227
-#, no-wrap
-msgid "Modules"
-msgstr ""
-
-#. type: keyword INCLUDE
-#: configuration.org:1228
-#, no-wrap
-msgid "\"./modules/configuration.org\""
-msgstr ""
-
-#. type: heading **
-#: configuration.org:1230
-#, no-wrap
-msgid "Emacs"
-msgstr ""
-
-#. type: heading ***
-#: configuration.org:1231
-#, no-wrap
-msgid "early-init.org"
-msgstr ""
-
-#. type: keyword INCLUDE
-#: configuration.org:1232
-#, no-wrap
-msgid "\"./applications/emacs/early-init.org\""
-msgstr ""
-
-#. type: heading ***
+#. type: paragraph in src
 #: configuration.org:1233
 #, no-wrap
-msgid "init.org"
+msgid ""
+"message=\"$1\"\n"
+"shift"
 msgstr ""
 
-#. type: keyword INCLUDE
-#: configuration.org:1234
+#. type: paragraph in src
+#: configuration.org:1236
 #, no-wrap
-msgid "\"./applications/emacs/init.org\""
+msgid "changed=$(git diff --name-only \"$@\")"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1238
+#, no-wrap
+msgid ""
+"if [ -n \"$changed\" ]; then\n"
+"  echo \"$message\"\n"
+"  echo \"Changed files:\"\n"
+"  echo \"$changed\"\n"
+"  echo \"\"\n"
+"  echo \"Please stage the changes and commit again:\"\n"
+"  echo \"  git add $changed\"\n"
+"  exit 1\n"
+"fi"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1252
+#, no-wrap
+msgid ""
+"po4a po4a.cfg\n"
+"check-git-changes \"po4a updated translation files.\" -- po/ '*.ja.org'"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1259
+#, no-wrap
+msgid ""
+"make -B tangle -j\n"
+"check-git-changes \"Org files were out of sync and have been auto-tangled.\""
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1264
+#, no-wrap
+msgid ""
+"(require 'ox-md)\n"
+"(re-search-forward \"^\\\\* Philosophy\")\n"
+"(org-md-export-to-markdown nil t)"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1270
+#, no-wrap
+msgid ""
+"(require 'ox-org)\n"
+"(let ((org-export-select-tags (list \"readme\"))\n"
+"      (org-export-with-tags nil)\n"
+"      (org-export-time-stamp-file nil))\n"
+"  (org-export-to-file 'org export-readme-dest))"
 msgstr ""
 
 #. type: heading *
-#: configuration.org:1236 .github/README.org:58
+#: configuration.org:1277 .github/README.org:58
 #, no-wrap
 msgid "Development"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1238 .github/README.org:60
+#: configuration.org:1279 .github/README.org:60
 msgid ""
 "This repository provides a Nix development shell with all the tools needed "
 "for working on the configurations. Enter the shell by running:"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1242 .github/README.org:64
+#: configuration.org:1283 .github/README.org:64
 #, no-wrap
 msgid "nix develop"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1245 .github/README.org:67
+#: configuration.org:1286 .github/README.org:67
 msgid ""
 "The shell includes infrastructure tools (Terraform, sops, ssh-to-age), "
 "translation tools (po4a, gettext), and build utilities (nix-fast-build).  On "
@@ -2483,13 +2528,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:1250 .github/README.org:72
+#: configuration.org:1291 .github/README.org:72
 #, no-wrap
 msgid "dev-shells"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1252 .github/README.org:74
+#: configuration.org:1293 .github/README.org:74
 #, no-wrap
 msgid ""
 "devShells = {\n"
@@ -2524,35 +2569,35 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1282 .github/README.org:103
+#: configuration.org:1323 .github/README.org:103
 #, no-wrap
 msgid "Translation"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1284 .github/README.org:105
+#: configuration.org:1325 .github/README.org:105
 msgid "This project uses po4a to manage translations."
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1286 .github/README.org:106
+#: configuration.org:1327 .github/README.org:106
 #, no-wrap
 msgid "Requirements"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1288 .github/README.org:108
+#: configuration.org:1329 .github/README.org:108
 msgid "The required packages are included in the development shell."
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:1290 .github/README.org:110
+#: configuration.org:1331 .github/README.org:110
 #, no-wrap
 msgid "translation-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1292 .github/README.org:112
+#: configuration.org:1333 .github/README.org:112
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -2560,13 +2605,13 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1297 .github/README.org:117
+#: configuration.org:1338 .github/README.org:117
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1299 .github/README.org:119
+#: configuration.org:1340 .github/README.org:119
 #, no-wrap
 msgid ""
 "=po4a_0_74=: po4a >= 0.74 is required for Org mode support.\n"
@@ -2575,19 +2620,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1300 .github/README.org:119
+#: configuration.org:1341 .github/README.org:119
 #, no-wrap
 msgid "Translation workflow"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1302 .github/README.org:121
+#: configuration.org:1343 .github/README.org:121
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1304 .github/README.org:123
+#: configuration.org:1345 .github/README.org:123
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -2596,7 +2641,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1313 .github/README.org:132
+#: configuration.org:1354 .github/README.org:132
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -2614,18 +2659,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1323 .github/README.org:142
+#: configuration.org:1364 .github/README.org:142
 msgid "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1325 .github/README.org:143
+#: configuration.org:1366 .github/README.org:143
 #, no-wrap
 msgid "Create/Update po"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1327 .github/README.org:145
+#: configuration.org:1368 .github/README.org:145
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -2633,32 +2678,32 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1333 .github/README.org:151
+#: configuration.org:1374 .github/README.org:151
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1336 .github/README.org:153
+#: configuration.org:1377 .github/README.org:153
 #, no-wrap
 msgid "Translate"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1338 .github/README.org:155
+#: configuration.org:1379 .github/README.org:155
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1345 .github/README.org:161
+#: configuration.org:1386 .github/README.org:161
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1347 .github/README.org:163
+#: configuration.org:1388 .github/README.org:163
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -2666,7 +2711,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1353 .github/README.org:169
+#: configuration.org:1394 .github/README.org:169
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""

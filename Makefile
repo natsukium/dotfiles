@@ -48,7 +48,7 @@ aarch64-darwin:
 
 # tangle targets: configuration.org -> generated files
 # Each directory has a configuration.org that tangles to one or more .nix files
-tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix .github/README.org CLAUDE.md po4a.cfg
+tangle: flake.nix overlays/default.nix modules/nixos/tailscale.nix modules/home/development/git/default.nix modules/home/zen-browser/default.nix .github/README.org CLAUDE.md po4a.cfg scripts/org-to-html.el scripts/check-po4a.sh scripts/check-org-tangle.sh scripts/check-git-changes.sh scripts/export-claude-md.el scripts/export-readme-org.el
 
 flake.nix: configuration.org
 	$(call tangle-org,$<)
@@ -68,14 +68,12 @@ modules/home/development/git/default.nix: modules/configuration.org
 modules/home/zen-browser/default.nix: modules/configuration.org
 	$(call tangle-org,$<)
 
-CLAUDE.md: configuration.org
-	$(EMACS) -l ox-md \
-	  --visit $< \
-	  --eval '(re-search-forward "^\\* Philosophy")' \
-	  --eval '(org-md-export-to-markdown nil t)'
+scripts/org-to-html.el scripts/check-po4a.sh scripts/check-org-tangle.sh scripts/check-git-changes.sh scripts/export-claude-md.el scripts/export-readme-org.el: configuration.org
+	$(call tangle-org,$<)
 
-.github/README.org: configuration.org
+CLAUDE.md: configuration.org scripts/export-claude-md.el
+	$(EMACS) --visit $< -l scripts/export-claude-md.el
+
+.github/README.org: configuration.org scripts/export-readme-org.el
 	@mkdir -p .github
-	$(EMACS) -l ox-org \
-	  --visit $< \
-	  --eval '(let ((org-export-select-tags (list "readme")) (org-export-with-tags nil) (org-export-time-stamp-file nil)) (org-export-to-file (quote org) "$@"))'
+	$(EMACS) --visit $< --eval '(setq export-readme-dest "$@")' -l scripts/export-readme-org.el
