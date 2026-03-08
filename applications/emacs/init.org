@@ -385,7 +385,9 @@ NixOS options, and flake inputs.
   :mode "\\.nix\\'"
   :hook (nix-ts-mode . lsp-deferred)
   :init
-  (add-to-list 'org-src-lang-modes '("nix" . nix-ts))
+  ;; org-src-lang-modes is defined in org-src, which may not be loaded yet at init time
+  (with-eval-after-load 'org-src
+    (add-to-list 'org-src-lang-modes '("nix" . nix-ts)))
   :config
   (setq lsp-nix-nixd-formatting-command ["nixfmt"]))
 #+end_src
