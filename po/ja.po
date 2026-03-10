@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-09 01:21+0900\n"
+"POT-Creation-Date: 2026-03-10 12:40+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -4561,29 +4561,65 @@ msgstr ""
 #. type: heading **
 #: applications/emacs/init.org:920
 #, no-wrap
+msgid "copy-region-reference"
+msgstr ""
+
+#. type: paragraph
+#: applications/emacs/init.org:922
+msgid ""
+"Copy the absolute path and line range of the selected region in =file:start-"
+"end= format (e.g. =/path/to/file.el:10-20=).  Pasting the result into a "
+"coding agent's prompt gives it an unambiguous file reference to work with."
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:928
+#, no-wrap
+msgid ""
+"(defun my/copy-region-reference (start end)\n"
+"  \"Copy the file path and line range of the current region to the clipboard.\n"
+"The format is \\\"/path/to/file:START-END\\\".\"\n"
+"  (interactive \"r\")\n"
+"  (let* ((file (buffer-file-name))\n"
+"         (line-start (line-number-at-pos start))\n"
+"         (line-end (line-number-at-pos (1- end)))\n"
+"         (ref (format \"%s:%d-%d\" file line-start line-end)))\n"
+"    (kill-new ref)\n"
+"    (message \"%s\" ref)))"
+msgstr ""
+
+#. type: paragraph in src
+#: applications/emacs/init.org:939
+#, no-wrap
+msgid "(global-set-key (kbd \"C-c l\") #'my/copy-region-reference)"
+msgstr ""
+
+#. type: heading **
+#: applications/emacs/init.org:942
+#, no-wrap
 msgid "Others"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:922
+#: applications/emacs/init.org:944
 #, no-wrap
 msgid "(which-key-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:924
+#: applications/emacs/init.org:946
 #, no-wrap
 msgid "(setq-default indent-tabs-mode nil)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:926
+#: applications/emacs/init.org:948
 #, no-wrap
 msgid "(require 'org-tempo)"
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:928
+#: applications/emacs/init.org:950
 #, no-wrap
 msgid ""
 "(org-babel-do-load-languages\n"
@@ -4592,32 +4628,32 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:932
+#: applications/emacs/init.org:954
 #, no-wrap
 msgid "(setq org-src-preserve-indentation t)"
 msgstr ""
 
 #. type: heading ***
-#: applications/emacs/init.org:935
+#: applications/emacs/init.org:957
 #, no-wrap
 msgid "project.el"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:937
+#: applications/emacs/init.org:959
 msgid ""
 "Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) "
 "as projects."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:939
+#: applications/emacs/init.org:961
 msgid ""
 "Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=."
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:942
+#: applications/emacs/init.org:964
 #, no-wrap
 msgid ""
 "(defun my/sync-project-list ()\n"
@@ -4632,7 +4668,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:952
+#: applications/emacs/init.org:974
 #, no-wrap
 msgid ""
 ";; 3. Build file contents in a temporary buffer\n"
@@ -4645,7 +4681,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:960
+#: applications/emacs/init.org:982
 #, no-wrap
 msgid ""
 ";; 4. Write the built contents to file\n"
@@ -4653,20 +4689,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:963
+#: applications/emacs/init.org:985
 #, no-wrap
 msgid "(my/sync-project-list)"
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:966
+#: applications/emacs/init.org:988
 msgid ""
 "Sort the project list by modification time, placing recently updated "
 "projects first."
 msgstr ""
 
 #. type: paragraph
-#: applications/emacs/init.org:968
+#: applications/emacs/init.org:990
 msgid ""
 "Using advice instead of sorting in =my/sync-project-list= ensures that "
 "projects are sorted by their current mtime at selection time, not at file "
@@ -4674,7 +4710,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:973
+#: applications/emacs/init.org:995
 #, no-wrap
 msgid ""
 "(defun my/sort-projects-by-mtime (projects)\n"
@@ -4689,7 +4725,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: applications/emacs/init.org:983
+#: applications/emacs/init.org:1005
 #, no-wrap
 msgid "(advice-add 'project-known-project-roots :filter-return"
 msgstr ""

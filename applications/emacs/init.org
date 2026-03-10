@@ -917,6 +917,28 @@ hook interprets these sequences and renders them as colors.
 (add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)
 #+end_src
 
+** copy-region-reference
+
+Copy the absolute path and line range of the selected region
+in =file:start-end= format (e.g. =/path/to/file.el:10-20=).
+Pasting the result into a coding agent's prompt gives it
+an unambiguous file reference to work with.
+
+#+begin_src emacs-lisp
+(defun my/copy-region-reference (start end)
+  "Copy the file path and line range of the current region to the clipboard.
+The format is \"/path/to/file:START-END\"."
+  (interactive "r")
+  (let* ((file (buffer-file-name))
+         (line-start (line-number-at-pos start))
+         (line-end (line-number-at-pos (1- end)))
+         (ref (format "%s:%d-%d" file line-start line-end)))
+    (kill-new ref)
+    (message "%s" ref)))
+
+(global-set-key (kbd "C-c l") #'my/copy-region-reference)
+#+end_src
+
 ** Others
 #+begin_src emacs-lisp
 (which-key-mode)
