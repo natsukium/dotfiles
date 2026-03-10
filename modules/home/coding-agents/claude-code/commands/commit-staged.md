@@ -1,8 +1,8 @@
 ---
-allowed-tools: Bash(git diff:*), Bash(git log:*), Bash(git status:*), Bash(git commit:*)
+allowed-tools: Bash(git diff:*), Bash(git log:*), Bash(git status:*), Bash(git commit:*), Bash(git add:*)
 argument-hint: intention
 description: Review staged changes and create commit with appropriate message
-model: claude-haiku-4-5-20251001
+model: haiku
 ---
 
 ## Context
@@ -14,12 +14,19 @@ model: claude-haiku-4-5-20251001
 
 ## Your task
 
-Based on the staged changes above, create a commit with an appropriate message that:
-1. Follows the repository's existing commit message style (refer to recent commits)
-2. Explains WHY the change was made, not just what changed
-3. Is concise but informative
-4. If no staged changes exist, inform the user and do not create an empty commit
+Based on the staged changes above, create a commit with an appropriate message.
 
-## Additinoal Instructions
+If no staged changes exist, inform the user and do not create an empty commit.
+
+Otherwise, you MUST execute `git commit -m "..."` using the Bash tool to actually create the commit. Do NOT just output the commit message — you must run the command.
+
+If the commit fails because a pre-commit hook modified files (e.g. formatters, linters), re-stage the modified files with `git add` and retry the same `git commit` command. Do NOT amend the previous commit — the failed commit was never created.
+
+The commit message should:
+1. Follow the repository's existing commit message style (refer to recent commits)
+2. Explain WHY the change was made, not just what changed
+3. Be concise but informative
+
+## Additional Instructions
 
 $ARGUMENTS
