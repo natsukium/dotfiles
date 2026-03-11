@@ -61,6 +61,8 @@ in
             "Bash(deno check:*)"
             "Bash(docker compose logs:*)"
             "Bash(find:*)"
+            "Bash(gh api repos/attmcojp/*/comments *)"
+            "Bash(gh api repos/attmcojp/*/reviews *)"
             "Bash(gh pr diff:*)"
             "Bash(gh pr list:*)"
             "Bash(gh pr view:*)"
