@@ -38,7 +38,6 @@ in
     ../applications/lazygit
     ../applications/misc
     ../applications/rbw
-    ../applications/starship
     ../applications/tmux
   ];
 }

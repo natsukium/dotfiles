@@ -1,3 +1,6 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 # cherry picked from https://gist.github.com/duament/bac0181935953b97ca71640727c9c029
 status is-interactive
 or exit 0

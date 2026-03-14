@@ -981,6 +981,210 @@ use, and committing to Nushell-specific workflows would be premature.
 }
 #+end_src
 
+*** Starship
+
+[[https://starship.rs/][Starship]] is a cross-shell prompt written in Rust, used across all shells configured
+here to provide a consistent prompt experience. It has been used since its predecessor
+[[https://github.com/matchai/spacefish][spacefish]], and its easy TOML-based configuration is the main reason it has been kept.
+
+Starship does not natively support asynchronous prompt rendering, so this section also
+includes a custom async prompt module for fish.
+
+#+begin_src nix :tangle home/starship/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/starship/default.nix
+{ pkgs, ... }:
+{
+  programs.starship = {
+    enable = true;
+    settings = builtins.fromTOML (builtins.readFile ./starship.toml);
+  };
+  my.programs.starship.enableFishAsyncPrompt = true;
+}
+#+end_src
+
+#+begin_src toml :tangle home/starship/starship.toml :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+**** Prompt Format
+
+The prompt format prepends a shell indicator before the default modules.
+This makes it immediately visible which shell is active, useful when switching
+between fish and bash for testing or debugging.
+
+#+begin_src toml :tangle home/starship/starship.toml
+"$schema" = "https://starship.rs/config-schema.json"
+
+format = "$shell$all$line_break$character"
+#+end_src
+
+**** Shell Indicator
+
+Each shell has a distinct icon: =󰈺= (fish icon) for fish. Bash and nushell
+use the default indicator.
+
+#+begin_src toml :tangle home/starship/starship.toml
+[shell]
+fish_indicator = "󰈺"
+powershell_indicator = "󰨊"
+disabled = false
+#+end_src
+
+**** Remote Container Detection
+
+A custom module detects when running inside a VS Code Remote Container
+(Dev Container) by checking the =REMOTE_CONTAINERS= environment variable,
+displaying a whale emoji (🐋) as a visual reminder. This has not been used for
+several years and may no longer be relevant.
+
+#+begin_src toml :tangle home/starship/starship.toml
+[custom.remote-container]
+when = """ test "$REMOTE_CONTAINERS" """
+symbol = "🐋"
+format = " in $symbol "
+#+end_src
+
+**** Disabled Modules
+
+=gcloud= is disabled because it reads the active GCP configuration from the
+home directory (=~/.config/gcloud/=), causing it to appear in every repository
+regardless of whether the project uses GCP.
+
+#+begin_src toml :tangle home/starship/starship.toml
+[gcloud]
+disabled = true
+#+end_src
+
+**** Async Prompt Module
+
+A custom home-manager module that replaces starship's default fish integration with
+an asynchronous variant. The async prompt script is cherry-picked from
+[[https://gist.github.com/duament/bac0181935953b97ca71640727c9c029][duament's gist]], based on [[https://github.com/acomagu/fish-async-prompt][fish-async-prompt]].
+See also [[https://github.com/fish-shell/fish-shell/issues/8223][fish-shell#8223]] for upstream discussion on async prompt support.
+
+#+begin_src nix :tangle home-manager/starship/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home-manager/starship/default.nix
+{
+  config,
+  lib,
+  ...
+}:
+let
+  inherit (lib)
+    mkForce
+    mkIf
+    mkOption
+    types
+    ;
+  cfg = config.my.programs.starship;
+in
+{
+  options = {
+    my.programs.starship = {
+      enableFishAsyncPrompt = mkOption {
+        type = types.bool;
+        default = false;
+      };
+    };
+  };
+  config = mkIf cfg.enableFishAsyncPrompt {
+    # use my own script to ensure the execution order
+    programs.starship.enableFishIntegration = mkForce false;
+
+    programs.fish.interactiveShellInit = ''
+      if test "$TERM" != dumb
+          ${lib.getExe config.programs.starship.package} init fish | source
+          source ${./async_prompt.fish}
+      end
+    '';
+  };
+}
+#+end_src
+
+***** Async Prompt Script
+
+#+begin_src fish :tangle home-manager/starship/async_prompt.fish :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src fish :tangle home-manager/starship/async_prompt.fish
+# cherry picked from https://gist.github.com/duament/bac0181935953b97ca71640727c9c029
+status is-interactive
+or exit 0
+
+if test -n "$XDG_RUNTIME_DIR"
+    set -g __starship_async_tmpdir "$XDG_RUNTIME_DIR"/fish-async-prompt
+else
+    set -g __starship_async_tmpdir /tmp/fish-async-prompt
+end
+mkdir -p "$__starship_async_tmpdir"
+set -g __starship_async_signal SIGUSR1
+
+# Starship
+set -g VIRTUAL_ENV_DISABLE_PROMPT 1
+builtin functions -e fish_mode_prompt
+set -gx STARSHIP_SHELL fish
+set -gx STARSHIP_SESSION_KEY (random 10000000000000 9999999999999999)
+
+# Prompt
+function fish_prompt
+    printf '\e[0J' # Clear from cursor to end of screen
+    if test -e "$__starship_async_tmpdir"/"$fish_pid"_fish_prompt
+        cat "$__starship_async_tmpdir"/"$fish_pid"_fish_prompt
+    else
+        __starship_async_simple_prompt
+    end
+end
+
+# Async task
+function __starship_async_fire --on-event fish_prompt
+    switch "$fish_key_bindings"
+        case fish_hybrid_key_bindings fish_vi_key_bindings
+            set STARSHIP_KEYMAP "$fish_bind_mode"
+        case '*'
+            set STARSHIP_KEYMAP insert
+    end
+    set STARSHIP_CMD_PIPESTATUS $pipestatus
+    set STARSHIP_CMD_STATUS $status
+    set STARSHIP_DURATION "$CMD_DURATION"
+    set STARSHIP_JOBS (count (jobs -p))
+
+    set -l tmpfile "$__starship_async_tmpdir"/"$fish_pid"_fish_prompt
+    fish -c '
+starship prompt --terminal-width="'$COLUMNS'" --status='$STARSHIP_CMD_STATUS' --pipestatus="'$STARSHIP_CMD_PIPESTATUS'" --keymap='$STARSHIP_KEYMAP' --cmd-duration='$STARSHIP_DURATION' --jobs='$STARSHIP_JOBS' > '$tmpfile'
+kill -s "'$__starship_async_signal'" '$fish_pid &
+    disown
+end
+
+function __starship_async_simple_prompt
+    set_color brgreen
+    echo -n '❯'
+    set_color normal
+    echo ' '
+end
+
+function __starship_async_repaint_prompt --on-signal "$__starship_async_signal"
+    commandline -f repaint
+end
+
+function __starship_async_cleanup --on-event fish_exit
+    rm -f "$__starship_async_tmpdir"/"$fish_pid"_fish_prompt
+end
+
+# https://github.com/acomagu/fish-async-prompt
+# https://github.com/fish-shell/fish-shell/issues/8223
+#+end_src
+
 ** Git
 
 Git version control configuration. Git is configured directly through home-manager's

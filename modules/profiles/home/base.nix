@@ -4,5 +4,6 @@
     ../../home/fish
     ../../home/nix
     ../../home/nushell
+    ../../home/starship
   ];
 }
