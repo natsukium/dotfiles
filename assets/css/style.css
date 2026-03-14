@@ -1,0 +1,320 @@
+/* --- Custom properties --- */
+:root {
+	--bg: #fff;
+	--bg-secondary: #f6f8fa;
+	--bg-code: #f4f4f4;
+	--text: #24292f;
+	--text-secondary: #57606a;
+	--border: #d0d7de;
+	--link: #0969da;
+	--link-hover: #0550ae;
+	--accent: #0969da;
+	--toc-width: 280px;
+	--toc-bg: #f6f8fa;
+	--toc-active: #0969da;
+	--kbd-bg: #f6f8fa;
+	--kbd-border: #d0d7de;
+	--kbd-shadow: #b1b8c0;
+	--copy-success: #1a7f37;
+	--font-sans:
+		-apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+	--font-mono:
+		ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
+		monospace;
+}
+
+/* --- Reset & base --- */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: 0;
+	font-family: var(--font-sans);
+	font-size: 16px;
+	line-height: 1.6;
+	color: var(--text);
+	background: var(--bg);
+}
+
+/* --- Layout: sidebar + content --- */
+#table-of-contents {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: var(--toc-width);
+	height: 100vh;
+	overflow-y: auto;
+	background: var(--toc-bg);
+	border-right: 1px solid var(--border);
+	padding: 1.5rem 0;
+	z-index: 10;
+}
+
+#table-of-contents > h2 {
+	font-size: 0.85rem;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--text-secondary);
+	padding: 0 1rem;
+	margin: 0 0 0.75rem;
+}
+
+#content {
+	margin-left: var(--toc-width);
+	max-width: 52rem;
+	padding: 2rem 2.5rem;
+}
+
+.title {
+	margin-left: var(--toc-width);
+	padding: 2rem 2.5rem 0;
+	font-size: 1.75rem;
+	font-weight: 600;
+}
+
+/* --- TOC links --- */
+#text-table-of-contents ul {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+}
+
+#text-table-of-contents li {
+	margin: 0;
+}
+
+#text-table-of-contents a {
+	display: block;
+	padding: 0.25rem 1rem;
+	color: var(--text-secondary);
+	text-decoration: none;
+	font-size: 0.85rem;
+	line-height: 1.4;
+	border-left: 3px solid transparent;
+	transition:
+		color 0.15s,
+		border-color 0.15s,
+		background 0.15s;
+}
+
+#text-table-of-contents a:hover {
+	color: var(--text);
+	background: rgba(0, 0, 0, 0.04);
+}
+
+#text-table-of-contents a.active {
+	color: var(--toc-active);
+	border-left-color: var(--toc-active);
+	font-weight: 500;
+}
+
+/* Indentation per level */
+#text-table-of-contents > ul > li > ul a {
+	padding-left: 1.75rem;
+}
+
+#text-table-of-contents > ul > li > ul > li > ul a {
+	padding-left: 2.5rem;
+}
+
+#text-table-of-contents > ul > li > ul > li > ul > li > ul a {
+	padding-left: 3.25rem;
+}
+
+/* --- Headings --- */
+h2,
+h3,
+h4 {
+	margin-top: 2rem;
+	margin-bottom: 0.75rem;
+	font-weight: 600;
+	line-height: 1.3;
+}
+
+h2 {
+	font-size: 1.5rem;
+	padding-bottom: 0.3rem;
+	border-bottom: 1px solid var(--border);
+}
+
+h3 {
+	font-size: 1.25rem;
+}
+
+h4 {
+	font-size: 1.1rem;
+}
+
+.section-number-2,
+.section-number-3,
+.section-number-4 {
+	color: var(--text-secondary);
+	margin-right: 0.3em;
+}
+
+/* --- Links --- */
+a {
+	color: var(--link);
+	text-decoration: none;
+}
+
+a:hover {
+	color: var(--link-hover);
+	text-decoration: underline;
+}
+
+/* --- Code blocks --- */
+.org-src-container {
+	position: relative;
+	margin: 1rem 0;
+}
+
+pre.src {
+	background: var(--bg-code);
+	border: 1px solid var(--border);
+	border-radius: 6px;
+	padding: 1rem;
+	overflow-x: auto;
+	font-family: var(--font-mono);
+	font-size: 0.875rem;
+	line-height: 1.5;
+	margin: 0;
+}
+
+/* Language label */
+.org-src-container .code-lang-label {
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: var(--border);
+	color: var(--text-secondary);
+	font-family: var(--font-mono);
+	font-size: 0.7rem;
+	padding: 0.15rem 0.5rem;
+	border-radius: 0 6px 0 4px;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	user-select: none;
+}
+
+/* Copy button */
+.org-src-container .code-copy-btn {
+	position: absolute;
+	top: 0.4rem;
+	right: 0.4rem;
+	background: var(--bg);
+	border: 1px solid var(--border);
+	border-radius: 4px;
+	padding: 0.2rem 0.45rem;
+	cursor: pointer;
+	font-size: 0.75rem;
+	line-height: 1;
+	color: var(--text-secondary);
+	opacity: 0;
+	transition: opacity 0.15s;
+}
+
+.org-src-container:hover .code-copy-btn {
+	opacity: 1;
+}
+
+.org-src-container .code-copy-btn:hover {
+	background: var(--bg-secondary);
+}
+
+.org-src-container .code-copy-btn.copied {
+	color: var(--copy-success);
+	border-color: var(--copy-success);
+}
+
+/* When label is present, push copy button below it */
+.org-src-container .code-lang-label + .code-copy-btn {
+	top: 1.6rem;
+}
+
+/* --- Inline code --- */
+code {
+	background: var(--bg-code);
+	padding: 0.15em 0.35em;
+	border-radius: 4px;
+	font-family: var(--font-mono);
+	font-size: 0.875em;
+}
+
+pre code {
+	background: none;
+	padding: 0;
+}
+
+/* --- kbd keycap styling --- */
+kbd {
+	display: inline-block;
+	padding: 0.15em 0.4em;
+	font-family: var(--font-mono);
+	font-size: 0.85em;
+	line-height: 1;
+	color: var(--text);
+	background: var(--kbd-bg);
+	border: 1px solid var(--kbd-border);
+	border-radius: 4px;
+	box-shadow: 0 1px 0 var(--kbd-shadow);
+	vertical-align: baseline;
+	white-space: nowrap;
+}
+
+/* --- Tables --- */
+table {
+	border-collapse: collapse;
+	margin: 1rem 0;
+}
+
+th,
+td {
+	border: 1px solid var(--border);
+	padding: 0.4rem 0.75rem;
+	text-align: left;
+}
+
+th {
+	background: var(--bg-secondary);
+	font-weight: 600;
+}
+
+/* --- Lists --- */
+ul,
+ol {
+	padding-left: 1.5rem;
+}
+
+li {
+	margin: 0.25rem 0;
+}
+
+/* --- Blockquote --- */
+blockquote {
+	margin: 1rem 0;
+	padding: 0.5rem 1rem;
+	border-left: 3px solid var(--border);
+	color: var(--text-secondary);
+}
+
+/* --- Responsive: narrow screens --- */
+@media (max-width: 768px) {
+	#table-of-contents {
+		position: static;
+		width: 100%;
+		height: auto;
+		max-height: 50vh;
+		border-right: none;
+		border-bottom: 1px solid var(--border);
+	}
+
+	#content,
+	.title {
+		margin-left: 0;
+		padding: 1rem;
+	}
+}

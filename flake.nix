@@ -243,18 +243,15 @@
             html =
               with pkgs;
               let
-                org-html-themes = fetchurl {
-                  url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
-                  hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
-                };
                 org-to-html = ./scripts/org-to-html.el;
+                assets = ./assets;
               in
               stdenvNoCC.mkDerivation {
                 name = "dotfiles";
                 src = lib.cleanSource ./.;
                 postPatch = ''
                   substituteInPlace configuration.org \
-                    --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
+                    --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "./assets/setup.org"
                 '';
                 nativeBuildInputs = [
                   (emacs.pkgs.withPackages (epkgs: [
@@ -276,6 +273,7 @@
                   runHook preInstall
                   install -Dm644 configuration.html $out/index.html
                   install -Dm644 configuration.ja.html $out/ja/index.html
+                  cp -r ${assets}/css ${assets}/js $out/
                   runHook postInstall
                 '';
               };
