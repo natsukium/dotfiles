@@ -34,12 +34,9 @@ in
     sops-nix.homeManagerModules.sops
     ../modules/home-manager
     ../applications/atuin
-    ../applications/bash
-    ../applications/fish
     ../applications/gh-dash
     ../applications/lazygit
     ../applications/misc
-    ../applications/nushell
     ../applications/rbw
     ../applications/starship
     ../applications/tmux

@@ -1,3 +1,6 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 {
   pkgs,
   lib,
@@ -8,14 +11,18 @@
   home.packages = with pkgs; [ bashInteractive ];
   programs.bash = {
     enable = true;
+
     historyFile = "$XDG_CONFIG_HOME/bash/history";
+
     enableCompletion = false;
+
     shellAliases = {
       l = "ls -CF";
       grep = "grep --color=auto";
       fgrep = "fgrep --color=auto";
       egrep = "egrep --color=auto";
     };
+
     initExtra = ''
       stty stop undef  # Ctrl-s
       stty werase undef

@@ -1,9 +1,14 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 { pkgs, ... }:
 {
   programs.fish = {
     enable = true;
+
     interactiveShellInit = ''
       bind \cs zi
+
       # set done's variable
       set -U __done_min_cmd_duration 15000
 
@@ -25,7 +30,6 @@
       # spellchecker:off
       l = "ls";
 
-      # for Nix
       "--sxl" = {
         position = "anywhere";
         expansion =
@@ -60,6 +64,7 @@
       _abbr_extract_tar_gz = "echo tar avfx $argv";
       _abbr_multicd = "echo cd (string repeat -n (math (string length -- $argv[1]) - 1) ../)";
     };
+
     plugins = [
       {
         name = "done";

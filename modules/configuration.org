@@ -612,6 +612,375 @@ typically on desktop systems that suspend/resume.
 
 User-level modules managed by home-manager.
 
+** Shell
+
+Interactive shells and scripting shells serve different purposes. An interactive shell
+does not need to be POSIX-compatible — what matters is usability, broad environment
+support, and extensibility.
+
+*** Fish
+
+Fish is the primary interactive shell, chosen for its out-of-the-box experience:
+syntax highlighting, autosuggestions, and tab completions work without configuration
+or plugins. Among shells with broad environment and software support, fish provides the
+most convenient and extensible interactive experience with the least setup effort.
+
+#+begin_src nix :tangle home/fish/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/fish/default.nix
+{ pkgs, ... }:
+{
+  programs.fish = {
+    enable = true;
+
+    <<fish-interactive-shell-init>>
+
+    <<fish-abbreviations>>
+
+    <<fish-functions>>
+
+    <<fish-plugins>>
+  };
+}
+#+end_src
+
+**** Interactive Shell Init
+
+Settings applied when fish starts an interactive session: keybindings, plugin
+configuration, environment variables, and shell integrations.
+
+#+NAME: fish-interactive-shell-init
+#+begin_src nix
+interactiveShellInit = ''
+  <<fish-keybindings>>
+
+  <<fish-done-config>>
+
+  <<fish-pinentry>>
+
+  <<fish-extra-abbrs>>
+
+  <<fish-any-nix-shell>>
+'';
+#+end_src
+
+***** Keybindings
+
+=Ctrl+S= is bound to =zi= ([[https://github.com/ajeetdsouza/zoxide][zoxide]] interactive mode) for fuzzy directory jumping.
+
+#+NAME: fish-keybindings
+#+begin_src nix :noweb no
+bind \cs zi
+#+end_src
+
+***** Pinentry
+
+When connected via SSH, GPG's pinentry is switched to the curses (terminal) variant.
+The default graphical pinentry cannot display on a remote session without X11/Wayland
+forwarding, so the TUI fallback is necessary for signing commits and decrypting
+secrets over SSH. See [[https://wiki.gentoo.org/wiki/GnuPG#Changing_pinentry_for_SSH_logins][Gentoo Wiki: GnuPG - Changing pinentry for SSH logins]].
+
+#+NAME: fish-pinentry
+#+begin_src nix :noweb no
+# set environment variable for pinentry
+if test "$SSH_CONNECTION" != ""
+  set -x PINENTRY_USER_DATA "USE_CURSES"
+end
+#+end_src
+
+***** Extra Abbreviations
+
+Position-aware [[https://fishshell.com/docs/current/cmds/abbr.html][abbreviations]] that use fish's advanced features (=--position anywhere=,
+=--regex=, =--function=) which are not available through home-manager's =shellAbbrs= option.
+
+#+NAME: fish-extra-abbrs
+#+begin_src nix :noweb no
+# extra abbrs
+abbr -a L --position anywhere --set-cursor "% | less"
+abbr -a !! --position anywhere --function _abbr_last_history_item
+abbr -a extract_tar_gz --position command --regex ".+\.tar\.gz" --function _abbr_extract_tar_gz
+abbr -a dotdot --regex '^\.\.+$' --function _abbr_multicd
+#+end_src
+
+***** any-nix-shell
+
+[[https://github.com/haslersn/any-nix-shell][any-nix-shell]] keeps fish as the interactive shell inside =nix shell= and =nix develop=
+environments. Without it, entering a Nix shell drops into bash (the default builder
+shell), losing fish's interactive features. This is sourced at the end of
+=interactiveShellInit= so it can wrap the shell entry point after all other
+configuration is applied.
+
+#+NAME: fish-any-nix-shell
+#+begin_src nix :noweb no
+${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
+#+end_src
+
+**** Abbreviations
+
+#+NAME: fish-abbreviations
+#+begin_src nix
+shellAbbrs = {
+  <<fish-abbr-general>>
+
+  <<fish-abbr-nix>>
+};
+#+end_src
+
+***** General
+
+#+NAME: fish-abbr-general
+#+begin_src nix
+# spellchecker:off
+l = "ls";
+#+end_src
+
+***** Nix Remote Build
+
+Abbreviations for specifying Nix build target systems, primarily used when working on
+nixpkgs. Each abbreviation expands to =--system <triple>= and conditionally appends
+=-j0= when the target system differs from the current host. =-j0= sets the local job
+limit to zero, forcing all builds to be delegated to remote builders (see
+[[*Distributed Builds][Distributed Builds]]). This prevents Nix from accidentally attempting to build on the
+host, which would fail with an architecture mismatch.
+
+#+NAME: fish-abbr-nix
+#+begin_src nix
+"--sxl" = {
+  position = "anywhere";
+  expansion =
+    "--system x86_64-linux"
+    + pkgs.lib.optionalString (
+      pkgs.stdenv.hostPlatform.isDarwin || pkgs.stdenv.hostPlatform.isAarch64
+    ) " -j0";
+};
+"--sal" = {
+  position = "anywhere";
+  expansion =
+    "--system aarch64-linux"
+    + pkgs.lib.optionalString (
+      pkgs.stdenv.hostPlatform.isDarwin || pkgs.stdenv.hostPlatform.isx86_64
+    ) " -j0";
+};
+"--sxd" = {
+  position = "anywhere";
+  expansion =
+    "--system x86_64-darwin" + pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux " -j0";
+};
+"--sad" = {
+  position = "anywhere";
+  expansion =
+    "--system aarch64-darwin" + pkgs.lib.optionalString pkgs.stdenv.hostPlatform.isLinux " -j0";
+};
+# spellchecker:on
+#+end_src
+
+**** Functions
+
+Helper functions used by the abbreviation system. These are separated from the
+abbreviation definitions because fish requires functions to be defined before they
+can be referenced by =--function= abbreviations.
+
+#+NAME: fish-functions
+#+begin_src nix
+functions = {
+  _abbr_last_history_item = "echo $history[1]";
+  _abbr_extract_tar_gz = "echo tar avfx $argv";
+  _abbr_multicd = "echo cd (string repeat -n (math (string length -- $argv[1]) - 1) ../)";
+};
+#+end_src
+
+**** Plugins
+
+#+NAME: fish-plugins
+#+begin_src nix
+plugins = [
+  {
+    name = "done";
+    src = pkgs.fishPlugins.done.src;
+  }
+  {
+    name = "fzf-fish";
+    src = pkgs.fishPlugins.fzf-fish.src;
+  }
+];
+#+end_src
+
+The [[https://github.com/franciscolourenco/done][done]] plugin provides desktop notifications for long-running commands.
+The threshold is set to 15 seconds — commands shorter than this are typically
+interactive and do not benefit from notifications, while longer commands (builds,
+test suites, large file operations) are often run in the background where a
+notification is valuable.
+
+#+NAME: fish-done-config
+#+begin_src nix :noweb no
+# set done's variable
+set -U __done_min_cmd_duration 15000
+#+end_src
+
+[[https://github.com/PatrickF1/fzf.fish][fzf-fish]] integrates fzf with fish's tab completion, history search, and file/directory
+navigation. It replaces fish's built-in history search (=Ctrl+R=) with fzf's fuzzy
+finder, which handles large histories more effectively.
+
+*** Bash
+
+Bash is configured as a minimal fallback shell rather than a full interactive
+environment. The primary use case is ensuring a usable shell exists when fish is
+unavailable, and providing a POSIX-compatible shell for scripts and tools that
+assume bash. It also serves as a testing environment when fish exhibits unexpected
+behaviour — having a clean bash available helps isolate whether an issue is
+fish-specific.
+
+#+begin_src nix :tangle home/bash/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/bash/default.nix
+{
+  pkgs,
+  lib,
+  config,
+  ...
+}:
+{
+  home.packages = with pkgs; [ bashInteractive ];
+  programs.bash = {
+    enable = true;
+
+    <<bash-history>>
+
+    <<bash-completion>>
+
+    <<bash-aliases>>
+
+    <<bash-init>>
+  };
+}
+#+end_src
+
+**** History
+
+History is stored under =XDG_CONFIG_HOME= to keep =$HOME= clean, consistent with
+the repository's preference for XDG base directories (see [[*User-Level Settings][User-Level Settings]]).
+
+#+NAME: bash-history
+#+begin_src nix
+historyFile = "$XDG_CONFIG_HOME/bash/history";
+#+end_src
+
+**** Completion
+
+Bash completion is disabled because bash is not used as the primary interactive
+shell. Loading completion scripts adds startup time (~100ms+) with no benefit when
+the shell is only used as a fallback or for running scripts.
+
+#+NAME: bash-completion
+#+begin_src nix
+enableCompletion = false;
+#+end_src
+
+**** Aliases
+
+Basic aliases that provide a minimal quality-of-life improvement if bash is used
+interactively. These are intentionally simple — fish handles the rich interactive
+experience.
+
+#+NAME: bash-aliases
+#+begin_src nix
+shellAliases = {
+  l = "ls -CF";
+  grep = "grep --color=auto";
+  fgrep = "fgrep --color=auto";
+  egrep = "egrep --color=auto";
+};
+#+end_src
+
+**** Init
+
+This configuration is a remnant from before fish was set as the default login shell.
+Previously, bash was the login shell and =.bashrc= launched fish, so these settings
+were needed in every interactive session. They are retained because bash is still
+used as a fallback.
+
+#+NAME: bash-init
+#+begin_src nix
+initExtra = ''
+  <<bash-terminal-settings>>
+''
++ lib.optionalString (!config.programs.kitty.enable) ''
+  <<bash-tmux-autostart>>
+'';
+#+end_src
+
+***** Terminal Settings
+
+- =stty stop undef=: Disables =Ctrl+S= from sending =XOFF= (terminal pause), freeing
+  it for use as a keybinding in fish and other TUI applications. Without this, pressing
+  =Ctrl+S= freezes the terminal until =Ctrl+Q= is pressed — a legacy flow control
+  mechanism that is rarely useful on modern terminals.
+- =stty werase undef= + =bind "\C-w":unix-filename-rubout=: Rebinds =Ctrl+W= to delete
+  the previous path component (stopping at =/=) rather than the entire word. This is
+  more useful when editing file paths, which is the common case in a shell.
+
+#+NAME: bash-terminal-settings
+#+begin_src nix :noweb no
+stty stop undef  # Ctrl-s
+stty werase undef
+bind "\C-w":unix-filename-rubout  # Ctrl-w
+#+end_src
+
+***** TMUX Auto-attach
+
+Automatically starts or attaches to a tmux session when bash is the interactive shell,
+but only when kitty is not the terminal emulator. Kitty has its own tab/window
+management (splits, layouts, tabs) that conflicts with tmux's multiplexing — running
+tmux inside kitty creates redundant nesting. When using a simpler terminal (e.g.,
+=xterm=, =alacritty=, or a Linux console), tmux provides the session persistence and
+window management that would otherwise be missing.
+
+#+NAME: bash-tmux-autostart
+#+begin_src nix :noweb no
+# TMUX (from ArchWiki)
+if type tmux > /dev/null 2>&1; then
+  # if no session is started, start a new session
+  test -z $TMUX && tmux
+
+  # when quitting tmux, try to attach
+  while test -z $TMUX; do
+    tmux attach || break
+  done
+fi
+#+end_src
+
+*** Nushell
+
+Nushell is enabled for its ability to handle structured data natively, similar to
+PowerShell. Where traditional shells pipe text between commands, Nushell operates on
+serialised data formats (JSON, YAML, CSV, etc.) as first-class tables and records,
+making simple data manipulation possible without reaching for external tools like =jq=.
+Like fish, it is non-POSIX, but POSIX compatibility is not a requirement for an
+interactive shell.
+
+No custom configuration is added yet — the defaults are sufficient for exploratory
+use, and committing to Nushell-specific workflows would be premature.
+
+#+begin_src nix :tangle home/nushell/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/nushell/default.nix
+{ config, ... }:
+{
+  programs.nushell = {
+    enable = true;
+  };
+}
+#+end_src
+
 ** Git
 
 Git version control configuration. Git is configured directly through home-manager's
