@@ -293,6 +293,7 @@
                     runtimeInputs = [ pkgs.git ];
                     text = builtins.readFile ./scripts/check-git-changes.sh;
                   };
+                  emacs-with-org = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.org ]);
                 in
                 {
                   actionlint = {
@@ -351,6 +352,7 @@
                         name = "check-po4a";
                         runtimeInputs = [
                           self'.packages.po4a_0_74
+                          pkgs.gettext
                           check-git-changes
                         ];
                         text = builtins.readFile ./scripts/check-po4a.sh;
@@ -369,6 +371,7 @@
                       pkgs.writeShellApplication {
                         name = "check-org-tangle";
                         runtimeInputs = [
+                          emacs-with-org
                           pkgs.gnumake
                           check-git-changes
                         ];
