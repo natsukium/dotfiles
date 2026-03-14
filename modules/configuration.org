@@ -12,6 +12,440 @@ Modules are organized by platform:
 - *darwin*: macOS-specific system modules (future)
 - *home-manager*: User-level modules (future)
 
+* Nix
+
+Nix package manager and nixpkgs configuration. These modules are shared across NixOS and
+nix-darwin, providing consistent Nix behavior on all machines.
+
+** Core Settings
+
+Core Nix daemon configuration including flakes, garbage collection, binary caches,
+and sandbox settings.
+
+#+begin_src nix :tangle shared/nix/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle shared/nix/default.nix
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.my.nix;
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkMerge
+    mkOption
+    optional
+    types
+    ;
+in
+{
+  <<nix-options>>
+
+  <<nix-config>>
+}
+#+end_src
+
+*** Options
+
+#+NAME: nix-options
+#+begin_src nix
+options.my.nix = {
+  enable = mkEnableOption "Nix configuration";
+
+  enableFlakes = mkOption {
+    default = true;
+    example = false;
+    description = "Whether to enable flakes.";
+    type = types.bool;
+  };
+};
+#+end_src
+
+*** Configuration
+
+#+NAME: nix-config
+#+begin_src nix
+config = mkIf cfg.enable (mkMerge [
+  <<nix-flakes>>
+  {
+    <<nix-store-optimisation>>
+
+    <<nix-warn-dirty>>
+
+    <<nix-substituters>>
+
+    <<nix-sandbox>>
+
+    <<nix-trusted-users>>
+
+    <<nix-gc>>
+
+    <<nix-extra-options>>
+  }
+]);
+#+end_src
+
+**** Flakes
+
+Flakes are the de facto standard for Nix project management and are used throughout this
+repository.
+
+Channels are disabled because they introduce mutable state (=/nix/var/nix/profiles/per-user/*/channels=)
+that is difficult to reproduce across machines. However, this does not break legacy
+commands like =nix-shell= — NixOS and nix-darwin automatically set =NIX_PATH= from the
+flake's inputs by default (see [[https://search.nixos.org/options?query=nixpkgs.flake.setNixPath][=nixpkgs.flake.setNixPath=]]), so =<nixpkgs>= lookups
+continue to work on all machines managed by this dotfiles repository.
+
+#+NAME: nix-flakes
+#+begin_src nix
+(mkIf cfg.enableFlakes {
+  nix = {
+    settings.experimental-features = [
+      "flakes"
+      "nix-command"
+    ];
+    channel.enable = false;
+  };
+})
+#+end_src
+
+**** Store Optimisation
+
+Two complementary deduplication mechanisms are enabled:
+
+- =nix.optimise.automatic= periodically runs =nix-store --optimise= to hard-link identical
+  files already in the store.
+- =nix.settings.auto-optimise-store= deduplicates at build time as new paths are added.
+
+=auto-optimise-store= is Linux-only because enabling it on macOS corrupts the store —
+the build fails with =error: cannot link '/nix/store/.tmp-link' to '/nix/store/.links/...':
+File exists=. See [[https://github.com/NixOS/nix/issues/7273][NixOS/nix#7273]].
+
+#+NAME: nix-store-optimisation
+#+begin_src nix
+nix.optimise.automatic = true;
+nix.settings.auto-optimise-store = pkgs.stdenv.hostPlatform.isLinux;
+#+end_src
+
+**** Garbage Collection
+
+Periodically runs =nix-collect-garbage= to reclaim disk space. Generations older than
+7 days are deleted automatically — keeping old builds beyond that provides little value
+since they can always be rebuilt from the flake lock file.
+
+#+NAME: nix-gc
+#+begin_src nix
+nix.gc = {
+  automatic = true;
+  options = "--delete-older-than 7d";
+};
+#+end_src
+
+**** Dirty Warning
+
+Suppress the "Git tree is dirty" warning during flake evaluation. This warning fires on
+every build when there are uncommitted changes, which is the normal state during development.
+
+#+NAME: nix-warn-dirty
+#+begin_src nix
+nix.settings.warn-dirty = false;
+#+end_src
+
+**** Binary Caches
+
+Two binary caches are configured: =natsukium= holds pre-built artifacts for this dotfiles
+repository (CI-built system closures and custom packages), and =nix-community= provides
+caches for community projects including NVIDIA/CUDA packages and other
+nix-community-maintained derivations.
+
+#+NAME: nix-substituters
+#+begin_src nix
+nix.settings = {
+  substituters = [
+    "https://natsukium.cachix.org"
+    "https://nix-community.cachix.org"
+  ];
+
+  trusted-public-keys = [
+    "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
+    "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  ];
+};
+#+end_src
+
+**** Sandbox
+
+The sandbox is set to ="relaxed"= on Darwin to avoid unexpected build failures. With
+=sandbox = true=, some packages fail to build on macOS due to sandbox restrictions —
+likely related to localhost networking required by test suites that start local servers,
+though the exact mechanism is not fully understood. Nixpkgs provides
+=__darwinAllowLocalNetworking= to allow localhost access within the sandbox, which may
+address the same class of issues. ="relaxed"= keeps normal derivations sandboxed while
+allowing derivations with =__noChroot = true= to bypass the sandbox, preventing these
+failures.
+
+#+NAME: nix-sandbox
+#+begin_src nix
+nix.settings.sandbox = if pkgs.stdenv.hostPlatform.isDarwin then "relaxed" else true;
+#+end_src
+
+**** Trusted Users
+
+On macOS, administrative users belong to the =admin= group, not =wheel= (which only
+contains =root=). Without =@admin=, the primary user would not be trusted by the Nix
+daemon on Darwin.
+
+#+NAME: nix-trusted-users
+#+begin_src nix
+nix.settings.trusted-users = [
+  "root"
+  "@wheel"
+]
+++ optional pkgs.stdenv.hostPlatform.isDarwin "@admin";
+#+end_src
+
+**** Extra Options
+
+Terminates builds that produce no output for 3600 seconds (1 hour). Some heavy builds
+(e.g., Chromium, kernel compilation, CUDA-based deep learning libraries) can be silent
+for extended periods, so the timeout is set generously to avoid false positives while
+still catching genuinely hung builds.
+
+#+NAME: nix-extra-options
+#+begin_src nix
+nix.extraOptions = ''
+  max-silent-time = 3600
+'';
+#+end_src
+
+** Nixpkgs
+
+Nixpkgs configuration. =allowUnfree= is enabled by default. While free software is
+preferred where possible, strictly enforcing it is impractical — NVIDIA hardware requires
+unfree drivers and CUDA libraries, and specifying each unfree package individually via
+=allowUnfreePredicate= would be prohibitively tedious for the number of transitive
+dependencies involved.
+
+#+begin_src nix :tangle shared/nixpkgs/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle shared/nixpkgs/default.nix
+{ config, lib, ... }:
+let
+  cfg = config.my.nixpkgs;
+  inherit (lib)
+    mkEnableOption
+    mkIf
+    mkOption
+    types
+    ;
+in
+{
+  options.my.nixpkgs = {
+    enable = mkEnableOption "Nixpkgs configuration";
+
+    allowUnfree = mkOption {
+      default = true;
+      example = false;
+      description = "Whether to allow unfree packages.";
+      type = types.bool;
+    };
+  };
+
+  config = mkIf cfg.enable {
+    nixpkgs = {
+      config.allowUnfree = cfg.allowUnfree;
+    };
+  };
+}
+#+end_src
+
+** Distributed Builds
+
+[[https://nix.dev/manual/nix/latest/advanced-topics/distributed-builds][Distributed build]] configuration using Nix's built-in =buildMachines= support. This allows
+any machine in the fleet to offload builds to other machines, significantly reducing build
+times for resource-intensive derivations.
+
+=nix.distributedBuilds= is set to =mkDefault true= here so that server profiles can
+override it to =false=. =nix.buildMachines= is harmless when distributed builds are
+disabled, so no conditional wrapping is needed. The server profiles
+(=profiles/nixos/server.nix= and =profiles/darwin/server.nix=) disable it because build
+servers have the resources to build locally, and offloading from one build server to
+another creates unnecessary network overhead and potential circular dependencies.
+
+#+begin_src nix :tangle shared/nix/build-machines.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle shared/nix/build-machines.nix
+{
+  inputs,
+  config,
+  lib,
+  ...
+}:
+let
+  <<build-machines-let>>
+in
+{
+  <<distributed-builds-config>>
+
+  <<build-machines-known-hosts>>
+}
+#+end_src
+
+*** Protocol Selection
+
+The =ssh-ng= protocol is preferred over plain =ssh= because it supports content-addressed
+derivations and more efficient store path transfers. However, Hydra does not support
+=ssh-ng= (see [[https://github.com/NixOS/hydra/issues/688][NixOS/hydra#688]]), so the protocol is dynamically selected based on whether
+Hydra is enabled on the current machine.
+
+#+NAME: build-machines-let
+#+begin_src nix
+protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
+inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
+inherit (inputs.self.outputs.darwinConfigurations) mikumi;
+#+end_src
+
+*** Configuration
+
+#+NAME: distributed-builds-config
+#+begin_src nix
+nix = {
+  distributedBuilds = lib.mkDefault true;
+
+  extraOptions = ''
+    builders-use-substitutes = true
+  '';
+
+  <<build-machines-list>>
+};
+#+end_src
+
+*** Build Machines
+
+Each machine excludes itself from the build machine list (via =config.networking.hostName=
+checks) to avoid circular build delegation. The =mikumi= machine is also excluded from
+the =work= host because the work machine should not offload builds to personal
+infrastructure.
+
+Machine capabilities (=maxJobs=, =system-features=) are referenced from each machine's
+configuration rather than hardcoded. See each machine's definition under =systems/= for
+the actual values (e.g., =systems/nixos/tarangire/default.nix= for =max-jobs = 12=).
+
+#+NAME: build-machines-list
+#+begin_src nix
+buildMachines =
+  [ ]
+  ++ lib.optional (config.networking.hostName != "tarangire") {
+    inherit (tarangire.config.networking) hostName;
+    systems = [
+      "x86_64-linux"
+      "i686-linux"
+    ];
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = tarangire.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = tarangire.config.nix.settings.system-features;
+    mandatoryFeatures = [ ];
+  }
+  ++ lib.optional (config.networking.hostName != "kilimanjaro") {
+    inherit (kilimanjaro.config.networking) hostName;
+    systems = [
+      "x86_64-linux"
+      "i686-linux"
+    ];
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = kilimanjaro.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = kilimanjaro.config.nix.settings.system-features;
+    mandatoryFeatures = [ ];
+  }
+  ++ lib.optional (config.networking.hostName != "serengeti") {
+    inherit (serengeti.config.networking) hostName;
+    system = "aarch64-linux";
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = serengeti.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = serengeti.config.nix.settings.system-features;
+    mandatoryFeatures = [ ];
+  }
+  ++ lib.optional (config.networking.hostName != "mikumi" && config.networking.hostName != "work") {
+    inherit (mikumi.config.networking) hostName;
+    systems = [
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = mikumi.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = [
+      "apple-virt"
+      "benchmark"
+      "big-parallel"
+      "nixos-test"
+    ];
+    mandatoryFeatures = [ ];
+  };
+#+end_src
+
+*** SSH Known Hosts
+
+Distributed builds connect to remote machines over SSH, so each build machine's host
+key must be registered to avoid interactive verification prompts during unattended builds.
+
+#+NAME: build-machines-known-hosts
+#+begin_src nix
+programs.ssh.knownHosts = {
+  tarangire.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJJYgE/dmYLXYBrVnPicd0qsaUeqcBtXB8H9LHkJ2j4";
+  kilimanjaro.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILhpfAalh6A5xDSE+HOdNE29ZgIjlP7tdlhHs82boSwp";
+  serengeti.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDWwhfhDSZ+M2XDwP2MlC/zFfVpk3WjUxV/JWFgGzgNW";
+  mikumi.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfWOWKBFuDV08g6xP9MMY78CERI02CNG+5dy8CXQmXs";
+};
+#+end_src
+
+** User-Level Settings
+
+User-level Nix settings, managed through home-manager because they belong to the user's
+environment rather than the system configuration.
+
+XDG base directories are enabled to keep =~/.nix-defexpr= and =~/.nix-profile= under
+=~/.config/nix/= and =~/.local/state/nix/=, respectively, reducing dotfile clutter in
+=$HOME=.
+
+The =result= symlink is added to git ignores because =nix build= creates =result= symlinks
+in the project root by default, and these should never be committed. This applies to the
+user's global gitignore, not to any specific repository.
+
+#+begin_src nix :tangle home/nix/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle home/nix/default.nix
+{ config, ... }:
+{
+  nix.settings.use-xdg-base-directories = config.xdg.enable;
+
+  programs.git.ignores = [ "result" ];
+}
+#+end_src
+
 * NixOS
 
 NixOS-specific system modules.

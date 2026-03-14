@@ -1,3 +1,6 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 {
   inputs,
   config,
@@ -5,15 +8,13 @@
   ...
 }:
 let
-  # hydra doesn't support ssh-ng protocol
-  # https://github.com/NixOS/hydra/issues/688
   protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
   inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
   inherit (inputs.self.outputs.darwinConfigurations) mikumi;
 in
 {
   nix = {
-    distributedBuilds = true;
+    distributedBuilds = lib.mkDefault true;
 
     extraOptions = ''
       builders-use-substitutes = true
