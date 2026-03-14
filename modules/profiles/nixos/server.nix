@@ -9,5 +9,7 @@ in
 
   documentation.nixos.enable = mkDefault false;
 
+  nix.distributedBuilds = false;
+
   services.caddy.enable = true;
 }
