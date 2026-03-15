@@ -81,6 +81,7 @@ Include ALL of the following in each subagent's prompt:
 
 ### Org markup preservation
 - [[url][desc]]: translate only desc, keep URL intact
+- [[*heading][desc]]: translate *heading to match the translated heading name in po/ja.po, translate desc independently
 - =code= and ~verbatim~: do NOT translate content inside markers
 - *bold* / /italic/: translate text, keep markers
 - \\\\: preserve in same position
@@ -119,7 +120,8 @@ Include these checks in the prompt:
 5. **Terminology**: No "フレーク"/"デリベーション"/"オーバーレイ" (should stay English);
    "configuration"→"設定", "declarative"→"宣言的" consistently
 6. **Markup**: `[[`/`]]` count matches, URLs unchanged, `=code=`/`~verbatim~` preserved
-7. **Register**: Sample entries for consistent です/ます form
+7. **Internal links**: `[[*heading][desc]]` — verify `*heading` matches the translated heading name in the corresponding heading entry's msgstr
+8. **Register**: Sample entries for consistent です/ます form
 
 The review subagent should:
 - Fix minor issues (structural/terminology) directly
