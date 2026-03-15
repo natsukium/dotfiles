@@ -56,6 +56,32 @@
     enableGitIntegration = true;
   };
 
+  programs.difftastic = {
+    enable = true;
+  };
+
+  programs.lazygit = {
+    enable = true;
+    settings = {
+      gui = {
+        showIcons = true;
+      };
+
+      git = {
+        overrideGpg = true;
+        pagers = [
+          {
+            colorArg = "always";
+            pager = "delta --dark --paging=never";
+          }
+          {
+            externalDiffCommand = "difft --color=always";
+          }
+        ];
+      };
+    };
+  };
+
   programs.fish.shellAbbrs = {
     gpf = "git push --force-with-lease";
     gpm = "git pull (git remote show origin | sed -n '/HEAD branch/s/.*: //p')";

@@ -35,7 +35,6 @@ in
     ../modules/home-manager
     ../applications/atuin
     ../applications/gh-dash
-    ../applications/lazygit
     ../applications/misc
     ../applications/rbw
     ../applications/tmux

@@ -1214,6 +1214,10 @@ Git version control configuration. Git is configured directly through home-manag
 
   <<git-delta>>
 
+  <<git-difftastic>>
+
+  <<git-lazygit>>
+
   <<git-fish-abbreviations>>
 }
 #+end_src
@@ -1448,6 +1452,92 @@ view support. Chosen for its clean visual presentation.
 programs.delta = {
   enable = true;
   enableGitIntegration = true;
+};
+#+end_src
+
+*** Difftastic
+
+[[https://github.com/Wilfred/difftastic][Difftastic]] is a structural diff tool that operates at the AST level rather than
+comparing lines. It understands that moving a function or renaming a variable is a
+single semantic change, not a block of deletions and insertions. This is particularly
+valuable for JSX refactoring, indentation shifts, and nested tag restructuring, where
+line-based diffs produce noisy, hard-to-read output.
+
+Both difftastic and [[*Delta][delta]] are kept because they serve complementary roles: delta
+enhances git's built-in line diffs with syntax highlighting for everyday operations
+(=git diff=, =git log=), while difftastic is reached for via [[*Lazygit][lazygit]] when structural
+understanding matters.
+
+#+NAME: git-difftastic
+#+begin_src nix
+programs.difftastic = {
+  enable = true;
+};
+#+end_src
+
+*** Lazygit
+
+[[https://github.com/jesseduffield/lazygit][Lazygit]] is a terminal UI for git. A TUI was chosen over raw git commands for interactive
+operations like staging individual hunks, interactive rebase, and conflict resolution,
+where the visual feedback loop significantly reduces errors. Previously used gitui, but
+switched to lazygit for its broader feature set — gitui's performance advantage did not
+materialize in practice, and it lacked several workflow-critical operations.
+
+Performance degrades noticeably on large repositories like nixpkgs, but the ergonomics
+and active development make it a trusted part of the workflow despite this tradeoff.
+
+#+NAME: git-lazygit
+#+begin_src nix
+programs.lazygit = {
+  enable = true;
+  settings = {
+    <<lazygit-gui>>
+
+    <<lazygit-git>>
+  };
+};
+#+end_src
+
+**** GUI
+
+Enable Nerd Font icons in the lazygit interface for visual clarity.
+
+#+NAME: lazygit-gui
+#+begin_src nix
+gui = {
+  showIcons = true;
+};
+#+end_src
+
+**** Git Integration
+
+=overrideGpg = true= tells lazygit to run git commands inline instead of spawning a
+subprocess for GPG/SSH signing. By default, lazygit defers to a subprocess so the user
+can type a passphrase interactively. However, this subprocess mode prevents lazygit from
+orchestrating interactive rebase internally — rewording, reordering, or editing any commit
+other than HEAD is [[https://github.com/jesseduffield/lazygit/issues/1146][disabled entirely]] because the rebase would trigger multiple signing
+prompts that lazygit cannot handle mid-rebase. With =overrideGpg = true=, lazygit assumes
+the signing agent (ssh-agent, macOS Keychain) caches the passphrase, so no interactive
+prompt is needed and all rebase operations work normally.
+
+The pager configuration integrates both [[*Delta][delta]] and [[*Difftastic][difftastic]] into lazygit's diff views.
+Delta provides syntax-highlighted line diffs (=--dark --paging=never= since lazygit handles
+its own paging), and difftastic is available as the external diff command for
+[[*Difftastic][structural comparison]].
+
+#+NAME: lazygit-git
+#+begin_src nix
+git = {
+  overrideGpg = true;
+  pagers = [
+    {
+      colorArg = "always";
+      pager = "delta --dark --paging=never";
+    }
+    {
+      externalDiffCommand = "difft --color=always";
+    }
+  ];
 };
 #+end_src
 
