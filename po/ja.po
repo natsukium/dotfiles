@@ -8738,7 +8738,7 @@ msgstr ""
 #: modules/configuration.org:1458
 #, no-wrap
 msgid "Difftastic"
-msgstr ""
+msgstr "Difftastic"
 
 #. type: paragraph
 #: modules/configuration.org:1460
@@ -8750,6 +8750,14 @@ msgid ""
 "particularly valuable for JSX refactoring, indentation shifts, and nested "
 "tag restructuring, where line-based diffs produce noisy, hard-to-read output."
 msgstr ""
+"[[https://github.com/Wilfred/difftastic][Difftastic]]は、"
+"行単位の比較ではなくAST（抽象構文木）レベルで"
+"動作する構造的差分ツールです。関数の移動や"
+"変数のリネームを、削除と挿入のブロックではなく、"
+"単一の意味的変更として認識します。これはJSXの"
+"リファクタリング、インデントの変更、ネストされた"
+"タグの再構成において特に有用で、行ベースの差分では"
+"ノイズが多く読みにくい出力になる場面で力を発揮します。"
 
 #. type: paragraph
 #: modules/configuration.org:1466
@@ -8760,6 +8768,12 @@ msgid ""
 "difftastic is reached for via [[*Lazygit][lazygit]] when structural "
 "understanding matters."
 msgstr ""
+"difftasticと[[*Delta][delta]]の両方を併用しているのは、"
+"それぞれ補完的な役割を持つためです。deltaは日常的な"
+"操作（=git diff=、=git log=）でGitの組み込み行差分に"
+"シンタックスハイライトを追加し、difftasticは構造的な"
+"理解が重要な場面で[[*Lazygit][lazygit]]経由で"
+"使用します。"
 
 #. type: keyword NAME
 #: modules/configuration.org:1471
@@ -8780,7 +8794,7 @@ msgstr ""
 #: modules/configuration.org:1478
 #, no-wrap
 msgid "Lazygit"
-msgstr ""
+msgstr "Lazygit"
 
 #. type: paragraph
 #: modules/configuration.org:1480
@@ -8793,6 +8807,15 @@ msgid ""
 "performance advantage did not materialize in practice, and it lacked several "
 "workflow-critical operations."
 msgstr ""
+"[[https://github.com/jesseduffield/lazygit][Lazygit]]はGitの"
+"ターミナルUIです。個別のhunkのステージング、"
+"インタラクティブリベース、コンフリクト解決といった"
+"対話的操作では、視覚的なフィードバックループが"
+"エラーを大幅に減らすため、生のGitコマンドではなく"
+"TUIを選択しました。以前はgituiを使用していましたが、"
+"より広い機能セットを持つlazygitに移行しました。"
+"gituiのパフォーマンス上の優位性は実際には現れず、"
+"ワークフローに不可欠な操作がいくつか欠けていました。"
 
 #. type: paragraph
 #: modules/configuration.org:1486
@@ -8801,6 +8824,10 @@ msgid ""
 "ergonomics and active development make it a trusted part of the workflow "
 "despite this tradeoff."
 msgstr ""
+"nixpkgsのような大規模リポジトリではパフォーマンスが"
+"顕著に低下しますが、操作性と活発な開発により、"
+"このトレードオフにもかかわらずワークフローの"
+"信頼できる一部となっています。"
 
 #. type: keyword NAME
 #: modules/configuration.org:1489
@@ -8837,7 +8864,7 @@ msgstr "UI"
 #. type: paragraph
 #: modules/configuration.org:1503
 msgid "Enable Nerd Font icons in the lazygit interface for visual clarity."
-msgstr ""
+msgstr "視認性向上のため、lazygitのインターフェースでNerd Fontアイコンを有効にします。"
 
 #. type: keyword NAME
 #: modules/configuration.org:1505
@@ -8858,7 +8885,7 @@ msgstr ""
 #: modules/configuration.org:1512
 #, no-wrap
 msgid "Git Integration"
-msgstr ""
+msgstr "Git連携"
 
 #. type: paragraph
 #: modules/configuration.org:1514
@@ -8874,6 +8901,22 @@ msgid ""
 "signing agent (ssh-agent, macOS Keychain) caches the passphrase, so no "
 "interactive prompt is needed and all rebase operations work normally."
 msgstr ""
+"=overrideGpg = true= は、lazygitにGPG/SSH署名用の"
+"サブプロセスを生成する代わりにGitコマンドを"
+"インラインで実行するよう指示します。デフォルトでは、"
+"lazygitはユーザーが対話的にパスフレーズを入力できる"
+"ようサブプロセスに委譲します。しかし、この"
+"サブプロセスモードではlazygitが内部で"
+"インタラクティブリベースを制御できなくなります。"
+"リベース中に複数の署名プロンプトが発生し、"
+"lazygitがそれを処理できないため、HEAD以外の"
+"コミットのリワード、並べ替え、編集が"
+"[[https://github.com/jesseduffield/lazygit/issues/1146][完全に無効化]]"
+"されます。=overrideGpg = true= を設定すると、"
+"lazygitは署名エージェント（ssh-agent、macOS "
+"Keychain）がパスフレーズをキャッシュしていると"
+"想定するため、対話的プロンプトが不要になり、"
+"すべてのリベース操作が正常に動作します。"
 
 #. type: paragraph
 #: modules/configuration.org:1523
@@ -8884,6 +8927,13 @@ msgid ""
 "and difftastic is available as the external diff command for [[*Difftastic]"
 "[structural comparison]]."
 msgstr ""
+"ページャー設定により、[[*Delta][delta]]と"
+"[[*Difftastic][difftastic]]の両方がlazygitの差分"
+"ビューに統合されます。Deltaはシンタックスハイライト"
+"付きの行差分を提供し（lazygitが独自にページングを"
+"行うため =--dark --paging=never= を指定）、"
+"difftasticは[[*Difftastic][構造的比較]]のための"
+"外部diffコマンドとして利用できます。"
 
 #. type: keyword NAME
 #: modules/configuration.org:1528
