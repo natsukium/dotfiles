@@ -111,4 +111,18 @@ in
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
 
   security.pam.services.sudo_local.touchIdAuth = true;
+
+  my.services.kanata = {
+    enable = true;
+    keyboards.default = {
+      config = ''
+        ;; Hold f activates arrows for keys: i j k l
+        (defsrc f i j k l)
+        (defalias f (tap-hold 200 200 f
+          (layer-while-held arrows)))
+        (deflayer base   @f   i    j    k    l)
+        (deflayer arrows _    up   left down right)
+      '';
+    };
+  };
 }
