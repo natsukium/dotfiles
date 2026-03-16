@@ -4,13 +4,13 @@
 
 * Overview
 
-This file defines custom NixOS and nix-darwin modules that extend the standard module system.
-Each module addresses specific use cases or provides opinionated defaults not available upstream.
+This file defines custom modules that extend the standard NixOS, nix-darwin, and home-manager
+module systems. Each module addresses specific use cases or provides opinionated defaults not
+available upstream.
 
-Modules are organized by platform:
-- *NixOS*: Linux-specific system modules
-- *darwin*: macOS-specific system modules (future)
-- *home-manager*: User-level modules (future)
+Modules are organized by functional domain (e.g., Shell, Networking, Version Control) rather
+than by module system target. When a domain contains both system-level and user-level
+configuration, subheaders separate them explicitly.
 
 * Nix
 
@@ -446,9 +446,7 @@ user's global gitignore, not to any specific repository.
 }
 #+end_src
 
-* NixOS
-
-NixOS-specific system modules.
+* Networking
 
 ** Tailscale
 
@@ -608,17 +606,13 @@ typically on desktop systems that suspend/resume.
 })
 #+end_src
 
-* home-manager
-
-User-level modules managed by home-manager.
-
-** Shell
+* Shell
 
 Interactive shells and scripting shells serve different purposes. An interactive shell
 does not need to be POSIX-compatible — what matters is usability, broad environment
 support, and extensibility.
 
-*** Fish
+** Fish
 
 Fish is the primary interactive shell, chosen for its out-of-the-box experience:
 syntax highlighting, autosuggestions, and tab completions work without configuration
@@ -647,7 +641,7 @@ most convenient and extensible interactive experience with the least setup effor
 }
 #+end_src
 
-**** Interactive Shell Init
+*** Interactive Shell Init
 
 Settings applied when fish starts an interactive session: keybindings, plugin
 configuration, environment variables, and shell integrations.
@@ -667,7 +661,7 @@ interactiveShellInit = ''
 '';
 #+end_src
 
-***** Keybindings
+**** Keybindings
 
 =Ctrl+S= is bound to =zi= ([[https://github.com/ajeetdsouza/zoxide][zoxide]] interactive mode) for fuzzy directory jumping.
 
@@ -676,7 +670,7 @@ interactiveShellInit = ''
 bind \cs zi
 #+end_src
 
-***** Pinentry
+**** Pinentry
 
 When connected via SSH, GPG's pinentry is switched to the curses (terminal) variant.
 The default graphical pinentry cannot display on a remote session without X11/Wayland
@@ -691,7 +685,7 @@ if test "$SSH_CONNECTION" != ""
 end
 #+end_src
 
-***** Extra Abbreviations
+**** Extra Abbreviations
 
 Position-aware [[https://fishshell.com/docs/current/cmds/abbr.html][abbreviations]] that use fish's advanced features (=--position anywhere=,
 =--regex=, =--function=) which are not available through home-manager's =shellAbbrs= option.
@@ -705,7 +699,7 @@ abbr -a extract_tar_gz --position command --regex ".+\.tar\.gz" --function _abbr
 abbr -a dotdot --regex '^\.\.+$' --function _abbr_multicd
 #+end_src
 
-***** any-nix-shell
+**** any-nix-shell
 
 [[https://github.com/haslersn/any-nix-shell][any-nix-shell]] keeps fish as the interactive shell inside =nix shell= and =nix develop=
 environments. Without it, entering a Nix shell drops into bash (the default builder
@@ -718,7 +712,7 @@ configuration is applied.
 ${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
 #+end_src
 
-**** Abbreviations
+*** Abbreviations
 
 #+NAME: fish-abbreviations
 #+begin_src nix
@@ -729,7 +723,7 @@ shellAbbrs = {
 };
 #+end_src
 
-***** General
+**** General
 
 #+NAME: fish-abbr-general
 #+begin_src nix
@@ -737,7 +731,7 @@ shellAbbrs = {
 l = "ls";
 #+end_src
 
-***** Nix Remote Build
+**** Nix Remote Build
 
 Abbreviations for specifying Nix build target systems, primarily used when working on
 nixpkgs. Each abbreviation expands to =--system <triple>= and conditionally appends
@@ -777,7 +771,7 @@ host, which would fail with an architecture mismatch.
 # spellchecker:on
 #+end_src
 
-**** Functions
+*** Functions
 
 Helper functions used by the abbreviation system. These are separated from the
 abbreviation definitions because fish requires functions to be defined before they
@@ -792,7 +786,7 @@ functions = {
 };
 #+end_src
 
-**** Plugins
+*** Plugins
 
 #+NAME: fish-plugins
 #+begin_src nix
@@ -824,7 +818,7 @@ set -U __done_min_cmd_duration 15000
 navigation. It replaces fish's built-in history search (=Ctrl+R=) with fzf's fuzzy
 finder, which handles large histories more effectively.
 
-*** Bash
+** Bash
 
 Bash is configured as a minimal fallback shell rather than a full interactive
 environment. The primary use case is ensuring a usable shell exists when fish is
@@ -861,7 +855,7 @@ fish-specific.
 }
 #+end_src
 
-**** History
+*** History
 
 History is stored under =XDG_CONFIG_HOME= to keep =$HOME= clean, consistent with
 the repository's preference for XDG base directories (see [[*User-Level Settings][User-Level Settings]]).
@@ -871,7 +865,7 @@ the repository's preference for XDG base directories (see [[*User-Level Settings
 historyFile = "$XDG_CONFIG_HOME/bash/history";
 #+end_src
 
-**** Completion
+*** Completion
 
 Bash completion is disabled because bash is not used as the primary interactive
 shell. Loading completion scripts adds startup time (~100ms+) with no benefit when
@@ -882,7 +876,7 @@ the shell is only used as a fallback or for running scripts.
 enableCompletion = false;
 #+end_src
 
-**** Aliases
+*** Aliases
 
 Basic aliases that provide a minimal quality-of-life improvement if bash is used
 interactively. These are intentionally simple — fish handles the rich interactive
@@ -898,7 +892,7 @@ shellAliases = {
 };
 #+end_src
 
-**** Init
+*** Init
 
 This configuration is a remnant from before fish was set as the default login shell.
 Previously, bash was the login shell and =.bashrc= launched fish, so these settings
@@ -915,7 +909,7 @@ initExtra = ''
 '';
 #+end_src
 
-***** Terminal Settings
+**** Terminal Settings
 
 - =stty stop undef=: Disables =Ctrl+S= from sending =XOFF= (terminal pause), freeing
   it for use as a keybinding in fish and other TUI applications. Without this, pressing
@@ -932,7 +926,7 @@ stty werase undef
 bind "\C-w":unix-filename-rubout  # Ctrl-w
 #+end_src
 
-***** TMUX Auto-attach
+**** TMUX Auto-attach
 
 Automatically starts or attaches to a tmux session when bash is the interactive shell,
 but only when kitty is not the terminal emulator. Kitty has its own tab/window
@@ -955,7 +949,7 @@ if type tmux > /dev/null 2>&1; then
 fi
 #+end_src
 
-*** Nushell
+** Nushell
 
 Nushell is enabled for its ability to handle structured data natively, similar to
 PowerShell. Where traditional shells pipe text between commands, Nushell operates on
@@ -981,7 +975,7 @@ use, and committing to Nushell-specific workflows would be premature.
 }
 #+end_src
 
-*** Starship
+** Starship
 
 [[https://starship.rs/][Starship]] is a cross-shell prompt written in Rust, used across all shells configured
 here to provide a consistent prompt experience. It has been used since its predecessor
@@ -1011,7 +1005,7 @@ includes a custom async prompt module for fish.
 # Do not edit directly.
 #+end_src
 
-**** Prompt Format
+*** Prompt Format
 
 The prompt format prepends a shell indicator before the default modules.
 This makes it immediately visible which shell is active, useful when switching
@@ -1023,7 +1017,7 @@ between fish and bash for testing or debugging.
 format = "$shell$all$line_break$character"
 #+end_src
 
-**** Shell Indicator
+*** Shell Indicator
 
 Each shell has a distinct icon: =󰈺= (fish icon) for fish. Bash and nushell
 use the default indicator.
@@ -1035,7 +1029,7 @@ powershell_indicator = "󰨊"
 disabled = false
 #+end_src
 
-**** Remote Container Detection
+*** Remote Container Detection
 
 A custom module detects when running inside a VS Code Remote Container
 (Dev Container) by checking the =REMOTE_CONTAINERS= environment variable,
@@ -1049,7 +1043,7 @@ symbol = "🐋"
 format = " in $symbol "
 #+end_src
 
-**** Disabled Modules
+*** Disabled Modules
 
 =gcloud= is disabled because it reads the active GCP configuration from the
 home directory (=~/.config/gcloud/=), causing it to appear in every repository
@@ -1060,7 +1054,7 @@ regardless of whether the project uses GCP.
 disabled = true
 #+end_src
 
-**** Async Prompt Module
+*** Async Prompt Module
 
 A custom home-manager module that replaces starship's default fish integration with
 an asynchronous variant. The async prompt script is cherry-picked from
@@ -1110,7 +1104,7 @@ in
 }
 #+end_src
 
-***** Async Prompt Script
+**** Async Prompt Script
 
 #+begin_src fish :tangle home-manager/starship/async_prompt.fish :exports none
 # This file is auto-generated from configuration.org.
@@ -1184,6 +1178,8 @@ end
 # https://github.com/acomagu/fish-async-prompt
 # https://github.com/fish-shell/fish-shell/issues/8223
 #+end_src
+
+* Version Control
 
 ** Git
 
@@ -1617,6 +1613,8 @@ gstp = "git stash pop";
 gsw = "git switch";
 gswc = "git switch -c";
 #+end_src
+
+* Browser
 
 ** Zen Browser
 
