@@ -10,7 +10,13 @@ let
   driver = cfg.package.darwinDriver;
 
   # System Extensions must reside inside /Applications, not as symlinks.
-  parentAppDir = "/Applications/.Nix-Kanata";
+  parentAppDir = "/Applications/.Nix-Karabiner";
+
+  # macOS TCC identifies binaries by code signature. Nix store paths change on
+  # every rebuild and carry only linker-signed adhoc signatures, so Input
+  # Monitoring permission is lost after each rebuild. Copying to a stable path
+  # and re-signing lets the TCC grant persist across rebuilds.
+  kanataBinDir = "/usr/local/lib/kanata";
 
   upstreamDoc = "See https://github.com/jtroo/kanata/blob/main/docs/config.adoc for more information.";
 
@@ -91,19 +97,24 @@ let
   mkService =
     name: keyboard:
     lib.nameValuePair (mkName name) {
-      # wait4path ensures the Nix Store is mounted before attempting to
-      # run kanata, which lives in the store.
-      script = ''
-        /bin/wait4path ${lib.getExe cfg.package} && exec ${lib.getExe cfg.package} \
-          --cfg ${keyboard.configFile} \
-          ${lib.optionalString (keyboard.port != null) "--port ${toString keyboard.port}"} \
-          ${lib.escapeShellArgs keyboard.extraArgs}
-      '';
+      # ProgramArguments calls kanata directly instead of wrapping in /bin/sh,
+      # so macOS TCC checks the kanata binary itself for Input Monitoring
+      # permission rather than the shell.
       serviceConfig = {
+        ProgramArguments = [
+          "${kanataBinDir}/kanata"
+          "--cfg"
+          (toString keyboard.configFile)
+        ]
+        ++ lib.optionals (keyboard.port != null) [
+          "--port"
+          (toString keyboard.port)
+        ]
+        ++ keyboard.extraArgs;
         RunAtLoad = true;
         KeepAlive = true;
-        StandardOutPath = "/tmp/${mkName name}.log";
-        StandardErrorPath = "/tmp/${mkName name}.err.log";
+        StandardOutPath = "/var/log/${mkName name}.log";
+        StandardErrorPath = "/var/log/${mkName name}.err";
       };
     };
 in
@@ -132,13 +143,24 @@ in
       rm -rf ${parentAppDir}
       mkdir -p ${parentAppDir}
       cp -r ${driver}/Applications/.Karabiner-VirtualHIDDevice-Manager.app ${parentAppDir}
+
+      mkdir -p ${kanataBinDir}
+      cp -f ${lib.getExe cfg.package} ${kanataBinDir}/kanata
+      chmod 755 ${kanataBinDir}/kanata
+      /usr/bin/codesign -fs - ${kanataBinDir}/kanata
     '';
 
-    system.activationScripts.postActivation.text = ''
-      echo "activating Karabiner DriverKit VirtualHIDDevice for kanata" >&2
-      ${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager activate
-    '';
+    launchd.user.agents.activate_karabiner_system_ext = {
+      serviceConfig.ProgramArguments = [
+        "${parentAppDir}/.Karabiner-VirtualHIDDevice-Manager.app/Contents/MacOS/Karabiner-VirtualHIDDevice-Manager"
+        "activate"
+      ];
+      serviceConfig.RunAtLoad = true;
+    };
 
+    # kanata must run as a system daemon (root) because the Karabiner
+    # VirtualHIDDevice socket at /Library/Application Support/org.pqrs/tmp/
+    # rootonly/ is only accessible by root.
     launchd.daemons = {
       Karabiner-VirtualHIDDevice-Daemon = {
         serviceConfig = {
