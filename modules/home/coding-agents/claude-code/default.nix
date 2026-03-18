@@ -22,6 +22,37 @@ in
       settings = {
         includeCoAuthoredBy = false;
 
+        statusLine = {
+          type = "command";
+          command = builtins.toString (
+            pkgs.writeShellScript "claude-statusline" ''
+              data=$(cat)
+
+              model=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.model.display_name // "?"')
+              used=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.context_window.used_percentage // empty')
+              exceeds=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.exceeds_200k_tokens // false')
+              version=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.version // "?"')
+              branch=$(cd "$(echo "$data" | ${lib.getExe pkgs.jq} -r '.cwd // "."')" 2>/dev/null && ${lib.getExe pkgs.git} rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+
+              if [ -n "$used" ]; then
+                used_fmt=$(printf "%.0f%%" "$used")
+                if [ "$exceeds" = "true" ]; then
+                  used_fmt="\033[31m''${used_fmt}\033[0m"
+                fi
+              else
+                used_fmt="--"
+              fi
+
+              branch_fmt=""
+              if [ -n "$branch" ]; then
+                branch_fmt=" $branch"
+              fi
+
+              echo -e "''${model} | ctx:''${used_fmt} | v''${version}''${branch_fmt}"
+            ''
+          );
+        };
+
         permissions = {
           allow = [
             "Bash(ast-grep:*)"
