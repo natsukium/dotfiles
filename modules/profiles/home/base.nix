@@ -1,9 +1,9 @@
 {
   imports = [
-    ../../home/bash
-    ../../home/fish
+    ../../home/shell/bash
+    ../../home/shell/fish
     ../../home/nix
-    ../../home/nushell
-    ../../home/starship
+    ../../home/shell/nushell
+    ../../home/shell/starship
   ];
 }

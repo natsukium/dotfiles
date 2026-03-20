@@ -15,12 +15,12 @@ syntax highlighting, autosuggestions, and tab completions work without configura
 or plugins. Among shells with broad environment and software support, fish provides the
 most convenient and extensible interactive experience with the least setup effort.
 
-#+begin_src nix :tangle ../modules/home/fish/default.nix :exports none
+#+begin_src nix :tangle ../modules/home/shell/fish/default.nix :exports none
 # This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle ../modules/home/fish/default.nix
+#+begin_src nix :tangle ../modules/home/shell/fish/default.nix
 { pkgs, ... }:
 {
   programs.fish = {
@@ -223,12 +223,12 @@ assume bash. It also serves as a testing environment when fish exhibits unexpect
 behaviour — having a clean bash available helps isolate whether an issue is
 fish-specific.
 
-#+begin_src nix :tangle ../modules/home/bash/default.nix :exports none
+#+begin_src nix :tangle ../modules/home/shell/bash/default.nix :exports none
 # This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle ../modules/home/bash/default.nix
+#+begin_src nix :tangle ../modules/home/shell/bash/default.nix
 {
   pkgs,
   lib,
@@ -357,12 +357,12 @@ interactive shell.
 No custom configuration is added yet — the defaults are sufficient for exploratory
 use, and committing to Nushell-specific workflows would be premature.
 
-#+begin_src nix :tangle ../modules/home/nushell/default.nix :exports none
+#+begin_src nix :tangle ../modules/home/shell/nushell/default.nix :exports none
 # This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle ../modules/home/nushell/default.nix
+#+begin_src nix :tangle ../modules/home/shell/nushell/default.nix
 { config, ... }:
 {
   programs.nushell = {
@@ -380,12 +380,12 @@ here to provide a consistent prompt experience. It has been used since its prede
 Starship does not natively support asynchronous prompt rendering, so this section also
 includes a custom async prompt module for fish.
 
-#+begin_src nix :tangle ../modules/home/starship/default.nix :exports none
+#+begin_src nix :tangle ../modules/home/shell/starship/default.nix :exports none
 # This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle ../modules/home/starship/default.nix
+#+begin_src nix :tangle ../modules/home/shell/starship/default.nix
 { pkgs, ... }:
 {
   programs.starship = {
@@ -396,7 +396,7 @@ includes a custom async prompt module for fish.
 }
 #+end_src
 
-#+begin_src toml :tangle ../modules/home/starship/starship.toml :exports none
+#+begin_src toml :tangle ../modules/home/shell/starship/starship.toml :exports none
 # This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 #+end_src
@@ -407,7 +407,7 @@ The prompt format prepends a shell indicator before the default modules.
 This makes it immediately visible which shell is active, useful when switching
 between fish and bash for testing or debugging.
 
-#+begin_src toml :tangle ../modules/home/starship/starship.toml
+#+begin_src toml :tangle ../modules/home/shell/starship/starship.toml
 "$schema" = "https://starship.rs/config-schema.json"
 
 format = "$shell$all$line_break$character"
@@ -418,7 +418,7 @@ format = "$shell$all$line_break$character"
 Each shell has a distinct icon: =󰈺= (fish icon) for fish. Bash and nushell
 use the default indicator.
 
-#+begin_src toml :tangle ../modules/home/starship/starship.toml
+#+begin_src toml :tangle ../modules/home/shell/starship/starship.toml
 [shell]
 fish_indicator = "󰈺"
 powershell_indicator = "󰨊"
@@ -432,7 +432,7 @@ A custom module detects when running inside a VS Code Remote Container
 displaying a whale emoji (🐋) as a visual reminder. This has not been used for
 several years and may no longer be relevant.
 
-#+begin_src toml :tangle ../modules/home/starship/starship.toml
+#+begin_src toml :tangle ../modules/home/shell/starship/starship.toml
 [custom.remote-container]
 when = """ test "$REMOTE_CONTAINERS" """
 symbol = "🐋"
@@ -445,7 +445,7 @@ format = " in $symbol "
 home directory (=~/.config/gcloud/=), causing it to appear in every repository
 regardless of whether the project uses GCP.
 
-#+begin_src toml :tangle ../modules/home/starship/starship.toml
+#+begin_src toml :tangle ../modules/home/shell/starship/starship.toml
 [gcloud]
 disabled = true
 #+end_src
