@@ -34,6 +34,7 @@ in
     sops-nix.homeManagerModules.sops
     paneru.homeModules.paneru
     ../modules/home-manager
+    ../modules/home-manager-modules
     ../applications/atuin
     ../applications/gh-dash
     ../applications/misc

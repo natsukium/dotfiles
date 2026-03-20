@@ -11,6 +11,7 @@ in
 {
   imports = [
     ../../modules/darwin
+    ../../modules/darwin-modules
     ../common.nix
     inputs.comin.darwinModules.comin
     inputs.sops-nix.darwinModules.sops

@@ -15,6 +15,7 @@ in
 {
   imports = [
     ../../modules/nixos
+    ../../modules/nixos-modules
     ../common.nix
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko
