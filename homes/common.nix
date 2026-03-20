@@ -35,10 +35,10 @@ in
     paneru.homeModules.paneru
     ../modules/home-manager
     ../modules/home-manager-modules
-    ../applications/atuin
-    ../applications/gh-dash
-    ../applications/misc
-    ../applications/rbw
-    ../applications/tmux
+    ../modules/home/misc/atuin
+    ../modules/home/misc/gh-dash
+    ../modules/home/misc
+    ../modules/home/misc/rbw
+    ../modules/home/terminal/tmux
   ];
 }

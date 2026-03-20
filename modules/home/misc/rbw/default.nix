@@ -5,7 +5,7 @@
       enable = true;
       settings = {
         email = "tomoya.otabi@gmail.com";
-        pinentry = pkgs.callPackage ../../pkgs/pinentry-wrapper { };
+        pinentry = pkgs.callPackage ../../../../pkgs/pinentry-wrapper { };
       };
     };
   };

@@ -1,11 +1,11 @@
 { pkgs, ... }:
 {
   imports = [
-    ../applications/emacs
-    ../applications/kitty
-    ../applications/qutebrowser
-    ../applications/vscode
-    ../applications/zotero
+    ../modules/home/editors/emacs
+    ../modules/home/terminal/kitty
+    ../modules/home/browser/qutebrowser
+    ../modules/home/editors/vscode
+    ../modules/home/misc/zotero
     ../modules/home/coding-agents/claude-desktop
     ../modules/home/email
     ../modules/home/security/gpg

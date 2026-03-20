@@ -12,8 +12,8 @@ let
 in
 {
   imports = [
-    ../../applications/hyprland
-    ../../applications/niri
+    ../../modules/home/desktop/hyprland
+    ../../modules/home/desktop/niri
     ../desktop.nix
   ];
 
