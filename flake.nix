@@ -209,6 +209,9 @@
 
       flake = {
         overlays = import ./overlays { inherit inputs; };
+        nixosModules = import ./modules/nixos-modules;
+        darwinModules = import ./modules/darwin-modules;
+        homeManagerModules = import ./modules/home-manager-modules;
       };
 
       perSystem =
