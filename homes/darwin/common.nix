@@ -21,17 +21,16 @@ in
 
       services.colima = {
         enable = true;
-        profiles.default.settings =
-          {
-            cpu = 8;
-            memory = 8;
-            runtime = "docker";
-          }
-          // lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64) {
-            vmType = "vz";
-            mountType = "virtiofs";
-            rosetta = true;
-          };
+        profiles.default.settings = {
+          cpu = 8;
+          memory = 8;
+          runtime = "docker";
+        }
+        // lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64) {
+          vmType = "vz";
+          mountType = "virtiofs";
+          rosetta = true;
+        };
       };
 
       home.packages = with pkgs; [
