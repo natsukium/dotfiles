@@ -1,4 +1,4 @@
-# This file is auto-generated from configuration.org.
+# This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 
 { pkgs, ... }:

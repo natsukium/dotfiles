@@ -1,4 +1,4 @@
-# This file is auto-generated from configuration.org.
+# This file is auto-generated from docs/shell.org.
 # Do not edit directly.
 
 # cherry picked from https://gist.github.com/duament/bac0181935953b97ca71640727c9c029

@@ -14,16 +14,20 @@ tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | g
 docs-tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sed 's|^\.\./||' | sort -u)
 
 CONF_TANGLE     := $(call docs-tangle-targets,docs/configuration.org)
+SHELL_TANGLE    := $(call docs-tangle-targets,docs/shell.org)
 MODULES_TANGLE  := $(addprefix modules/,$(call tangle-targets,modules/configuration.org))
 OVERLAYS_TANGLE := $(call docs-tangle-targets,docs/overlays.org)
 
-tangle: $(CONF_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
+tangle: $(CONF_TANGLE) $(SHELL_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
 
 # org-babel skips writing files whose content is unchanged, leaving their mtime
 # stale and causing make to re-tangle on every invocation.
 $(CONF_TANGLE) &: docs/configuration.org
 	$(call tangle-org,$<)
 	@touch $(CONF_TANGLE)
+
+$(SHELL_TANGLE) &: docs/shell.org
+	$(call tangle-org,$<)
 
 $(OVERLAYS_TANGLE) &: docs/overlays.org
 	$(call tangle-org,$<)
