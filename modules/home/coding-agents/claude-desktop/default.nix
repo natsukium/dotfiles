@@ -33,7 +33,7 @@ in
   };
 
   sops.secrets.gh-token-for-mcp = {
-    sopsFile = ./secrets.yaml;
+    sopsFile = ../../../../homes/shared/secrets.yaml;
   };
 
 }

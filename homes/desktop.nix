@@ -6,10 +6,10 @@
     ../applications/qutebrowser
     ../applications/vscode
     ../applications/zotero
-    ./shared/claude.nix
-    ./shared/email.nix
-    ./shared/gpg
-    ./shared/weechat.nix
+    ../modules/home/coding-agents/claude-desktop
+    ../modules/home/email
+    ../modules/home/security/gpg
+    ../modules/home/communication/weechat
   ];
 
   my.services.copyq.enable = true;

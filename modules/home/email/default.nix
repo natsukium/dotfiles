@@ -181,9 +181,9 @@ in
   };
 
   sops.secrets.gmail-oauth-client-id = {
-    sopsFile = ./secrets.yaml;
+    sopsFile = ../../../homes/shared/secrets.yaml;
   };
   sops.secrets.gmail-oauth-client-secret = {
-    sopsFile = ./secrets.yaml;
+    sopsFile = ../../../homes/shared/secrets.yaml;
   };
 }
