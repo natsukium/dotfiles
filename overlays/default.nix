@@ -1,4 +1,4 @@
-# This file is auto-generated from configuration.org.
+# This file is auto-generated from docs/overlays.org.
 # Do not edit directly.
 
 { inputs }:

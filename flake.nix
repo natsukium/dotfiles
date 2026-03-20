@@ -1,4 +1,4 @@
-# This file is auto-generated from configuration.org.
+# This file is auto-generated from docs/configuration.org.
 # Do not edit directly.
 
 {
@@ -259,7 +259,7 @@
                 name = "dotfiles";
                 src = lib.cleanSource ./.;
                 postPatch = ''
-                  substituteInPlace configuration.org \
+                  substituteInPlace docs/configuration.org \
                     --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
                 '';
                 nativeBuildInputs = [

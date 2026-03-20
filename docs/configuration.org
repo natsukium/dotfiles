@@ -45,7 +45,7 @@ uses several Nix ecosystem tools:
 
 * Philosophy                                                         :readme:
 :PROPERTIES:
-:EXPORT_FILE_NAME: CLAUDE
+:EXPORT_FILE_NAME: ../CLAUDE
 :EXPORT_OPTIONS: toc:nil
 :END:
 
@@ -78,12 +78,12 @@ This flake manages NixOS, nix-darwin, and home-manager configurations for multip
 across different platforms (macOS, Linux, Android). It uses flake-parts for modular organization
 and includes tooling for development, code formatting, and pre-commit hooks.
 
-#+begin_src nix :tangle flake.nix :exports none
-# This file is auto-generated from configuration.org.
+#+begin_src nix :tangle ../flake.nix :exports none
+# This file is auto-generated from docs/configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle flake.nix
+#+begin_src nix :tangle ../flake.nix
 {
   description = "dotfiles";
 
@@ -176,7 +176,7 @@ nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable
 ***** nixpkgs-stable
 
 Provides stable packages when unstable has build failures or regressions. Mainly used by the
-=stable= overlay (see [[file:overlays/configuration.org][overlays/configuration.org]]) for packages that are broken in unstable.
+=stable= overlay (see [[file:overlays.org][docs/overlays.org]]) for packages that are broken in unstable.
 
 #+NAME: nixpkgs-stable
 #+begin_src nix
@@ -1096,7 +1096,7 @@ perSystem =
           name = "dotfiles";
           src = lib.cleanSource ./.;
           postPatch = ''
-            substituteInPlace configuration.org \
+            substituteInPlace docs/configuration.org \
               --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
           '';
           nativeBuildInputs = [
@@ -1248,23 +1248,23 @@ perSystem =
 #+end_src
 
 ** Overlays
-#+INCLUDE: "./overlays/configuration.org"
+#+INCLUDE: "./overlays.org"
 
 ** Modules
-#+INCLUDE: "./modules/configuration.org"
+#+INCLUDE: "../modules/configuration.org"
 
 ** Emacs
 *** early-init.org
-#+INCLUDE: "./applications/emacs/early-init.org"
+#+INCLUDE: "../applications/emacs/early-init.org"
 *** init.org
-#+INCLUDE: "./applications/emacs/init.org"
+#+INCLUDE: "../applications/emacs/init.org"
 
 ** Scripts
 
 Scripts used in flake derivations, pre-commit hooks, and Makefile recipes.
 Extracted to separate files for proper syntax highlighting and independent invocability.
 
-#+begin_src emacs-lisp :tangle scripts/org-to-html.el :mkdirp yes
+#+begin_src emacs-lisp :tangle ../scripts/org-to-html.el :mkdirp yes
 (require 'org)
 (require 'htmlize)
 (require 'nix-ts-mode)
@@ -1293,10 +1293,10 @@ Extracted to separate files for proper syntax highlighting and independent invoc
 (set-face-attribute 'font-lock-punctuation-face nil :foreground "#5f5f5f")
 (set-face-attribute 'font-lock-escape-face nil :foreground "#a0132f")
 
-(find-file "configuration.org")
+(find-file "docs/configuration.org")
 (org-html-export-to-html)
 
-(find-file "configuration.ja.org")
+(find-file "docs/flake.ja.org")
 (org-html-export-to-html)
 #+end_src
 
@@ -1304,7 +1304,7 @@ The two pre-commit hook scripts share a common pattern: run a command, then chec
 =git diff= for changes and fail with instructions if any are found. This shared
 logic lives in =check-git-changes.sh=.
 
-#+begin_src bash :tangle scripts/check-git-changes.sh :shebang "#!/usr/bin/env bash" :mkdirp yes
+#+begin_src bash :tangle ../scripts/check-git-changes.sh :shebang "#!/usr/bin/env bash" :mkdirp yes
 # Usage: check-git-changes <message> [git-diff-args...]
 # Exits 1 if git diff finds changes, with instructions to stage them.
 set -euo pipefail
@@ -1325,35 +1325,35 @@ if [ -n "$changed" ]; then
 fi
 #+end_src
 
-#+begin_src bash :tangle scripts/check-po4a.sh :shebang "#!/usr/bin/env bash" :mkdirp yes
+#+begin_src bash :tangle ../scripts/check-po4a.sh :shebang "#!/usr/bin/env bash" :mkdirp yes
 set -euo pipefail
 
 po4a po4a.cfg
 check-git-changes "po4a updated translation files." -- po/ '*.ja.org'
 #+end_src
 
-#+begin_src bash :tangle scripts/check-org-tangle.sh :shebang "#!/usr/bin/env bash" :mkdirp yes
+#+begin_src bash :tangle ../scripts/check-org-tangle.sh :shebang "#!/usr/bin/env bash" :mkdirp yes
 set -euo pipefail
 
 make -B tangle -j
 check-git-changes "Org files were out of sync and have been auto-tangled."
 #+end_src
 
-#+begin_src emacs-lisp :tangle scripts/export-claude-md.el :mkdirp yes
+#+begin_src emacs-lisp :tangle ../scripts/export-claude-md.el :mkdirp yes
 (require 'ox-md)
 (re-search-forward "^\\* Philosophy")
 (org-md-export-to-markdown nil t)
 #+end_src
 
 The =org-export-with-author= setting is explicitly disabled because
-=configuration.org= has no =#+AUTHOR:= keyword, so Org falls back to the
+=docs/configuration.org= has no =#+AUTHOR:= keyword, so Org falls back to the
 Emacs variable =user-full-name=. On macOS, this variable is populated from
 the system directory service (=dscl= / =getpwuid=), producing an unwanted
 =#+author:= line. On Linux, especially in CI environments, the value is
 typically empty, so the line is omitted. Disabling the setting ensures
 consistent output across platforms.
 
-#+begin_src emacs-lisp :tangle scripts/export-readme-org.el :mkdirp yes
+#+begin_src emacs-lisp :tangle ../scripts/export-readme-org.el :mkdirp yes
 (require 'ox-org)
 (let ((org-export-select-tags (list "readme"))
       (org-export-with-author nil)
@@ -1438,14 +1438,14 @@ The =-k 0= option forces output of translated files
 even if the translation is incomplete
 (default threshold is 80%).
 
-#+begin_src conf :tangle po4a.cfg
+#+begin_src conf :tangle ../po4a.cfg
 [po4a_langs] ja
 [po4a_paths] po/dotfiles.pot $lang:po/$lang.po
-[type: org] configuration.org $lang:configuration.$lang.org opt:"-k 0"
+[type: org] docs/configuration.org $lang:docs/flake.$lang.org opt:"-k 0"
 [type: org] .github/README.org $lang:.github/README.$lang.org opt:"-k 0"
 [type: org] applications/emacs/init.org $lang:applications/emacs/init.$lang.org opt:"-k 0"
 [type: org] applications/emacs/early-init.org $lang:applications/emacs/early-init.$lang.org opt:"-k 0"
-[type: org] overlays/configuration.org $lang:overlays/configuration.$lang.org opt:"-k 0"
+[type: org] docs/overlays.org $lang:docs/overlays.$lang.org opt:"-k 0"
 [type: org] modules/configuration.org $lang:modules/configuration.$lang.org opt:"-k 0"
 #+end_src
 

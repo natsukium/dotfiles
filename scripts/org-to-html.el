@@ -26,8 +26,8 @@
 (set-face-attribute 'font-lock-punctuation-face nil :foreground "#5f5f5f")
 (set-face-attribute 'font-lock-escape-face nil :foreground "#a0132f")
 
-(find-file "configuration.org")
+(find-file "docs/configuration.org")
 (org-html-export-to-html)
 
-(find-file "configuration.ja.org")
+(find-file "docs/flake.ja.org")
 (org-html-export-to-html)

@@ -11,31 +11,32 @@ define tangle-org
 endef
 
 tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sort -u)
+docs-tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sed 's|^\.\./||' | sort -u)
 
-CONF_TANGLE    := $(call tangle-targets,configuration.org)
-MODULES_TANGLE := $(addprefix modules/,$(call tangle-targets,modules/configuration.org))
-OVERLAYS_TANGLE := $(addprefix overlays/,$(call tangle-targets,overlays/configuration.org))
+CONF_TANGLE     := $(call docs-tangle-targets,docs/configuration.org)
+MODULES_TANGLE  := $(addprefix modules/,$(call tangle-targets,modules/configuration.org))
+OVERLAYS_TANGLE := $(call docs-tangle-targets,docs/overlays.org)
 
 tangle: $(CONF_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
 
 # org-babel skips writing files whose content is unchanged, leaving their mtime
 # stale and causing make to re-tangle on every invocation.
-$(CONF_TANGLE) &: configuration.org
+$(CONF_TANGLE) &: docs/configuration.org
 	$(call tangle-org,$<)
 	@touch $(CONF_TANGLE)
 
-$(OVERLAYS_TANGLE) &: overlays/configuration.org
+$(OVERLAYS_TANGLE) &: docs/overlays.org
 	$(call tangle-org,$<)
 
 $(MODULES_TANGLE) &: modules/configuration.org
 	$(call tangle-org,$<)
 
-CLAUDE.md: configuration.org scripts/export-claude-md.el
-	$(EMACS) --visit $< -l scripts/export-claude-md.el
+CLAUDE.md: docs/configuration.org scripts/export-claude-md.el
+	$(EMACS) --visit $< -l $(CURDIR)/scripts/export-claude-md.el
 
-.github/README.org: configuration.org scripts/export-readme-org.el
+.github/README.org: docs/configuration.org scripts/export-readme-org.el
 	@mkdir -p .github
-	$(EMACS) --visit $< --eval '(setq export-readme-dest "$@")' -l scripts/export-readme-org.el
+	$(EMACS) --visit $< --eval '(setq export-readme-dest "$(CURDIR)/$@")' -l $(CURDIR)/scripts/export-readme-org.el
 
 #──────────────────────────────────────────────
 # Nix build
