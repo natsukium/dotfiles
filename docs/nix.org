@@ -2,16 +2,6 @@
 #+PROPERTY: header-args:nix :mkdirp yes :noweb tangle
 #+OPTIONS: ^:{}
 
-* Overview
-
-This file defines custom modules that extend the standard NixOS, nix-darwin, and home-manager
-module systems. Each module addresses specific use cases or provides opinionated defaults not
-available upstream.
-
-Modules are organized by functional domain (e.g., Shell, Networking, Version Control) rather
-than by module system target. When a domain contains both system-level and user-level
-configuration, subheaders separate them explicitly.
-
 * Nix
 
 Nix package manager and nixpkgs configuration. These modules are shared across NixOS and
@@ -22,12 +12,12 @@ nix-darwin, providing consistent Nix behavior on all machines.
 Core Nix daemon configuration including flakes, garbage collection, binary caches,
 and sandbox settings.
 
-#+begin_src nix :tangle shared/nix/default.nix :exports none
-# This file is auto-generated from configuration.org.
+#+begin_src nix :tangle ../modules/shared/nix/default.nix :exports none
+# This file is auto-generated from docs/nix.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle shared/nix/default.nix
+#+begin_src nix :tangle ../modules/shared/nix/default.nix
 {
   config,
   lib,
@@ -233,12 +223,12 @@ unfree drivers and CUDA libraries, and specifying each unfree package individual
 =allowUnfreePredicate= would be prohibitively tedious for the number of transitive
 dependencies involved.
 
-#+begin_src nix :tangle shared/nixpkgs/default.nix :exports none
-# This file is auto-generated from configuration.org.
+#+begin_src nix :tangle ../modules/shared/nixpkgs/default.nix :exports none
+# This file is auto-generated from docs/nix.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle shared/nixpkgs/default.nix
+#+begin_src nix :tangle ../modules/shared/nixpkgs/default.nix
 { config, lib, ... }:
 let
   cfg = config.my.nixpkgs;
@@ -282,12 +272,12 @@ disabled, so no conditional wrapping is needed. The server profiles
 servers have the resources to build locally, and offloading from one build server to
 another creates unnecessary network overhead and potential circular dependencies.
 
-#+begin_src nix :tangle shared/nix/build-machines.nix :exports none
-# This file is auto-generated from configuration.org.
+#+begin_src nix :tangle ../modules/shared/nix/build-machines.nix :exports none
+# This file is auto-generated from docs/nix.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle shared/nix/build-machines.nix
+#+begin_src nix :tangle ../modules/shared/nix/build-machines.nix
 {
   inputs,
   config,
@@ -432,397 +422,16 @@ The =result= symlink is added to git ignores because =nix build= creates =result
 in the project root by default, and these should never be committed. This applies to the
 user's global gitignore, not to any specific repository.
 
-#+begin_src nix :tangle home/nix/default.nix :exports none
-# This file is auto-generated from configuration.org.
+#+begin_src nix :tangle ../modules/home/nix/default.nix :exports none
+# This file is auto-generated from docs/nix.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/nix/default.nix
+#+begin_src nix :tangle ../modules/home/nix/default.nix
 { config, ... }:
 {
   nix.settings.use-xdg-base-directories = config.xdg.enable;
 
   programs.git.ignores = [ "result" ];
 }
-#+end_src
-
-* Networking
-
-** Tailscale
-
-Opinionated Tailscale VPN configuration for NixOS systems. This module provides sensible defaults
-for running Tailscale with MagicDNS, SSH access, and proper firewall configuration.
-
-#+begin_src nix :tangle nixos/tailscale.nix :exports none
-# This file is auto-generated from configuration.org.
-# Do not edit directly.
-#+end_src
-
-#+begin_src nix :tangle nixos/tailscale.nix
-{ config, lib, ... }:
-let
-  cfg = config.my.services.tailscale;
-in
-{
-  <<tailscale-options>>
-
-  <<tailscale-config>>
-}
-#+end_src
-
-*** Options
-
-Module options for controlling Tailscale behavior.
-
-#+NAME: tailscale-options
-#+begin_src nix
-options.my.services.tailscale = {
-  enable = lib.mkEnableOption "Tailscale VPN";
-
-  <<configureResolver-option>>
-};
-#+end_src
-
-**** configureResolver
-
-Desktop systems may experience DNS resolution failures after suspend/resume. When the system
-resumes, external domain resolution (e.g., github.com) fails while Tailnet hostnames continue
-to work. This is a known issue with Tailscale's DNS state management during network transitions.
-
-Enabling =configureResolver= activates systemd-resolved, which helps mitigate DNS resolution
-issues after suspend/resume. While this doesn't completely eliminate the issue (the upstream
-bug remains open), it provides the most reliable MagicDNS experience.
-
-For headless servers, this option is typically unnecessary because servers don't suspend,
-and thus never encounter this resume-related DNS bug.
-
-See [[https://github.com/tailscale/tailscale/issues/4254][tailscale/tailscale#4254]] for the upstream discussion.
-
-#+NAME: configureResolver-option
-#+begin_src nix
-configureResolver = lib.mkOption {
-  type = lib.types.bool;
-  default = false;
-  description = ''
-    Enable systemd-resolved for Tailscale DNS.
-    Recommended for desktop systems to mitigate DNS failures after suspend/resume.
-    https://github.com/tailscale/tailscale/issues/4254
-  '';
-};
-#+end_src
-
-*** Configuration
-
-#+NAME: tailscale-config
-#+begin_src nix
-config = lib.mkIf cfg.enable (
-  lib.mkMerge [
-    {
-      <<tailscale-service>>
-
-      <<tailscale-networking>>
-
-      <<tailscale-secrets>>
-    }
-    <<tailscale-resolver>>
-  ]
-);
-#+end_src
-
-**** Service Settings
-
-Core Tailscale service configuration.
-
-=useRoutingFeatures = "server"= enables this machine to act as a subnet router or exit node.
-All machines in this configuration can potentially serve as exit nodes for other devices,
-providing flexibility when traveling or on restricted networks.
-
-=authKeyFile= points to a SOPS-managed secret containing a Tailscale auth key. Using auth keys
-enables unattended authentication, which is essential for automated deployments and GitOps
-workflows with tools like comin.
-
-=--ssh= enables Tailscale SSH, allowing SSH access over the Tailscale network without managing
-SSH keys or exposing port 22 to the public internet.
-
-#+NAME: tailscale-service
-#+begin_src nix
-services.tailscale = {
-  enable = true;
-  useRoutingFeatures = "server";
-  authKeyFile = config.sops.secrets.tailscale-authkey.path;
-  extraUpFlags = [ "--ssh" ];
-};
-#+end_src
-
-**** Networking
-
-Firewall and DNS configuration for Tailscale integration.
-
-The =tailscale0= interface is trusted because all traffic on this interface is authenticated
-by Tailscale. This allows services to be exposed only to the tailnet without additional
-firewall rules.
-
-=100.100.100.100= is Tailscale's MagicDNS resolver, enabling resolution of tailnet hostnames
-(e.g., =hostname.tail4108.ts.net=). =8.8.8.8= provides fallback for non-tailnet queries,
-though in practice MagicDNS handles forwarding to upstream resolvers.
-
-The search domain is the tailnet domain, allowing short hostnames (e.g., =ssh manyara=
-instead of =ssh manyara.tail4108.ts.net=).
-
-#+NAME: tailscale-networking
-#+begin_src nix
-networking = {
-  firewall = {
-    trustedInterfaces = [ "tailscale0" ];
-    allowedUDPPorts = [ config.services.tailscale.port ];
-  };
-  nameservers = [
-    "100.100.100.100"
-    "8.8.8.8"
-  ];
-  search = [ "tail4108.ts.net" ];
-};
-#+end_src
-
-**** Secrets
-
-SOPS secret declaration for the Tailscale auth key. The actual key is stored encrypted
-in the repository's secrets file and decrypted at activation time.
-
-#+NAME: tailscale-secrets
-#+begin_src nix
-sops.secrets.tailscale-authkey = { };
-#+end_src
-
-**** Resolver
-
-Conditional systemd-resolved configuration. Only enabled when =configureResolver= is true,
-typically on desktop systems that suspend/resume.
-
-#+NAME: tailscale-resolver
-#+begin_src nix
-(lib.mkIf cfg.configureResolver {
-  services.resolved.enable = cfg.configureResolver;
-})
-#+end_src
-
-* Browser
-
-** Zen Browser
-
-[[https://zen-browser.app/][Zen Browser]] is a Firefox-based browser with a focus on privacy and customization.
-Firefox derivatives were preferred over Chromium-based browsers because Firefox's extension
-ecosystem and =about:config= provide deeper control over browser behavior, and the Nix
-ecosystem has mature tooling for managing Firefox profiles declaratively via home-manager.
-
-Zen Browser was chosen over vanilla Firefox for its improved UI/UX while retaining full
-Firefox compatibility — extensions, search engines, and profile settings work identically.
-
-#+begin_src nix :tangle home/zen-browser/default.nix :exports none
-# This file is auto-generated from configuration.org.
-# Do not edit directly.
-#+end_src
-
-#+begin_src nix :tangle home/zen-browser/default.nix
-{
-  inputs,
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.my.programs.zen-browser;
-in
-{
-  imports = [ inputs.zen-browser.homeModules.beta ];
-
-  options.my.programs.zen-browser = {
-    enable = lib.mkEnableOption "Zen Browser";
-  };
-
-  config = lib.mkIf cfg.enable {
-    programs.zen-browser = {
-      enable = true;
-      profiles.natsukium = {
-        <<zen-browser-settings>>
-
-        <<zen-browser-search>>
-
-        <<zen-browser-extensions>>
-      };
-    };
-  };
-}
-#+end_src
-
-*** Settings
-
-Auto-install extensions without user prompts. By default, Firefox shows a confirmation dialog
-for each extension installed via the profile. Setting =extensions.autoDisableScopes= to 0
-disables this behavior, which is necessary for fully declarative extension management —
-otherwise the first launch after a profile rebuild would require manual approval for every
-extension.
-
-#+NAME: zen-browser-settings
-#+begin_src nix
-settings = {
-  "extensions.autoDisableScopes" = 0;
-};
-#+end_src
-
-*** Search Engines
-
-Custom search engines for quick access to development-related package registries and
-documentation. Each engine is assigned a short alias (e.g., =@np=) for use in the address bar,
-avoiding the need to navigate to each site manually.
-
-#+NAME: zen-browser-search
-#+begin_src nix
-search = {
-  force = true;
-  engines = {
-    <<zen-browser-search-engine-nix-packages>>
-
-    <<zen-browser-search-engine-nixos-wiki>>
-
-    <<zen-browser-search-engine-noogle>>
-
-    <<zen-browser-search-engine-crates-io>>
-
-    <<zen-browser-search-engine-npm>>
-
-    <<zen-browser-search-engine-pypi>>
-  };
-};
-#+end_src
-
-**** Nix Packages
-
-Search the official NixOS/nixpkgs repository. Uses =nixos-icons= from nixpkgs for the icon
-to avoid depending on an external URL that could change or become unavailable.
-
-#+NAME: zen-browser-search-engine-nix-packages
-#+begin_src nix
-nix-packages = {
-  name = "Nix Packages";
-  urls = [
-    {
-      template = "https://search.nixos.org/packages";
-      params = [
-        {
-          name = "type";
-          value = "packages";
-        }
-        {
-          name = "query";
-          value = "{searchTerms}";
-        }
-      ];
-    }
-  ];
-
-  icon = "${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg";
-  definedAliases = [ "@np" ];
-};
-#+end_src
-
-**** NixOS Wiki
-
-Search the NixOS community wiki for configuration examples and troubleshooting guides.
-
-#+NAME: zen-browser-search-engine-nixos-wiki
-#+begin_src nix
-nixos-wiki = {
-  name = "NixOS Wiki";
-  urls = [ { template = "https://wiki.nixos.org/w/index.php?search={searchTerms}"; } ];
-  icon = "https://wiki.nixos.org/favicon.ico";
-  definedAliases = [ "@nw" ];
-};
-#+end_src
-
-**** noogle
-
-[[https://noogle.dev/][noogle]] is a Nix function search engine — the equivalent of Hoogle for Haskell.
-Useful for discovering library functions by type signature or name when writing Nix expressions.
-
-#+NAME: zen-browser-search-engine-noogle
-#+begin_src nix
-noogle = {
-  name = "noogle";
-  urls = [ { template = "https://noogle.dev/q?term={searchTerms}"; } ];
-  icon = "https://noogle.dev/favicon.png";
-  definedAliases = [ "@noogle" ];
-};
-#+end_src
-
-**** crates.io
-
-Search the Rust package registry for crate discovery and version information.
-
-#+NAME: zen-browser-search-engine-crates-io
-#+begin_src nix
-crates-io = {
-  name = "crates.io";
-  urls = [ { template = "https://crates.io/search?q={searchTerms}"; } ];
-  icon = "https://crates.io/favicon.ico";
-  definedAliases = [ "@crates" ];
-};
-#+end_src
-
-**** npm
-
-Search the npm registry for JavaScript/TypeScript package discovery.
-
-#+NAME: zen-browser-search-engine-npm
-#+begin_src nix
-npm = {
-  name = "npm";
-  urls = [ { template = "https://www.npmjs.com/search?q={searchTerms}"; } ];
-  icon = "https://www.google.com/s2/favicons?domain=npmjs.com&sz=64";
-  definedAliases = [ "@npm" ];
-};
-#+end_src
-
-**** PyPI
-
-Search the Python Package Index for Python package discovery.
-
-#+NAME: zen-browser-search-engine-pypi
-#+begin_src nix
-pypi = {
-  name = "PyPI";
-  urls = [ { template = "https://pypi.org/search/?q={searchTerms}"; } ];
-  icon = "https://pypi.org/favicon.ico";
-  definedAliases = [ "@pypi" ];
-};
-#+end_src
-
-*** Extensions
-
-Browser extensions managed declaratively. Extensions are sourced from two overlay-provided
-sets: =firefox-addons= (from the NUR firefox-addons repository) and =my-firefox-addons=
-(custom additions not available upstream).
-
-#+NAME: zen-browser-extensions
-#+begin_src nix
-extensions = {
-  packages =
-    (with pkgs.firefox-addons; [
-      bitwarden
-      instapaper-official
-      keepa
-      onepassword-password-manager
-      refined-github
-      tampermonkey
-      vimium
-      wayback-machine
-      zotero-connector
-    ])
-    ++ (with pkgs.my-firefox-addons; [
-      adguard-adblocker
-      calilay
-      kiseppe-price-chart-kindle
-    ]);
-};
 #+end_src

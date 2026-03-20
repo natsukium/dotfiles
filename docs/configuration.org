@@ -1251,9 +1251,20 @@ perSystem =
 #+INCLUDE: "./overlays.org"
 
 ** Modules
+
+This section defines custom modules that extend the standard NixOS, nix-darwin, and
+home-manager module systems. Each module addresses specific use cases or provides
+opinionated defaults not available upstream.
+
+Modules are organized by functional domain (e.g., Shell, Networking, Version Control)
+rather than by module system target. When a domain contains both system-level and
+user-level configuration, subheaders separate them explicitly.
+
+#+INCLUDE: "./nix.org"
+#+INCLUDE: "./networking.org"
 #+INCLUDE: "./shell.org"
 #+INCLUDE: "./vcs.org"
-#+INCLUDE: "../modules/configuration.org"
+#+INCLUDE: "./browser.org"
 
 ** Emacs
 *** early-init.org
@@ -1447,10 +1458,12 @@ even if the translation is incomplete
 [type: org] .github/README.org $lang:.github/README.$lang.org opt:"-k 0"
 [type: org] applications/emacs/init.org $lang:applications/emacs/init.$lang.org opt:"-k 0"
 [type: org] applications/emacs/early-init.org $lang:applications/emacs/early-init.$lang.org opt:"-k 0"
+[type: org] docs/nix.org $lang:docs/nix.$lang.org opt:"-k 0"
+[type: org] docs/networking.org $lang:docs/networking.$lang.org opt:"-k 0"
 [type: org] docs/shell.org $lang:docs/shell.$lang.org opt:"-k 0"
 [type: org] docs/vcs.org $lang:docs/vcs.$lang.org opt:"-k 0"
+[type: org] docs/browser.org $lang:docs/browser.$lang.org opt:"-k 0"
 [type: org] docs/overlays.org $lang:docs/overlays.$lang.org opt:"-k 0"
-[type: org] modules/configuration.org $lang:modules/configuration.$lang.org opt:"-k 0"
 #+end_src
 
 For detailed information about =po4a.cfg= configuration, see =man po4a=.

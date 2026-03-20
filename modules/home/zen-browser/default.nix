@@ -1,4 +1,4 @@
-# This file is auto-generated from configuration.org.
+# This file is auto-generated from docs/browser.org.
 # Do not edit directly.
 
 {

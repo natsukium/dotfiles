@@ -10,16 +10,17 @@ define tangle-org
 	$(EMACS) --eval '(dolist (file (org-babel-tangle-file "$(1)")) (with-current-buffer (find-file-noselect file) (delete-trailing-whitespace) (save-buffer)))'
 endef
 
-tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sort -u)
-docs-tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sed 's|^\.\./||' | sort -u)
+tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sed 's|^\.\./||' | sort -u)
 
-CONF_TANGLE     := $(call docs-tangle-targets,docs/configuration.org)
-SHELL_TANGLE    := $(call docs-tangle-targets,docs/shell.org)
-VCS_TANGLE      := $(call docs-tangle-targets,docs/vcs.org)
-MODULES_TANGLE  := $(addprefix modules/,$(call tangle-targets,modules/configuration.org))
-OVERLAYS_TANGLE := $(call docs-tangle-targets,docs/overlays.org)
+CONF_TANGLE        := $(call tangle-targets,docs/configuration.org)
+NIX_TANGLE         := $(call tangle-targets,docs/nix.org)
+NETWORKING_TANGLE  := $(call tangle-targets,docs/networking.org)
+SHELL_TANGLE       := $(call tangle-targets,docs/shell.org)
+VCS_TANGLE         := $(call tangle-targets,docs/vcs.org)
+BROWSER_TANGLE     := $(call tangle-targets,docs/browser.org)
+OVERLAYS_TANGLE    := $(call tangle-targets,docs/overlays.org)
 
-tangle: $(CONF_TANGLE) $(SHELL_TANGLE) $(VCS_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
+tangle: $(CONF_TANGLE) $(NIX_TANGLE) $(NETWORKING_TANGLE) $(SHELL_TANGLE) $(VCS_TANGLE) $(BROWSER_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
 
 # org-babel skips writing files whose content is unchanged, leaving their mtime
 # stale and causing make to re-tangle on every invocation.
@@ -27,16 +28,22 @@ $(CONF_TANGLE) &: docs/configuration.org
 	$(call tangle-org,$<)
 	@touch $(CONF_TANGLE)
 
+$(NIX_TANGLE) &: docs/nix.org
+	$(call tangle-org,$<)
+
+$(NETWORKING_TANGLE) &: docs/networking.org
+	$(call tangle-org,$<)
+
 $(SHELL_TANGLE) &: docs/shell.org
 	$(call tangle-org,$<)
 
 $(VCS_TANGLE) &: docs/vcs.org
 	$(call tangle-org,$<)
 
-$(OVERLAYS_TANGLE) &: docs/overlays.org
+$(BROWSER_TANGLE) &: docs/browser.org
 	$(call tangle-org,$<)
 
-$(MODULES_TANGLE) &: modules/configuration.org
+$(OVERLAYS_TANGLE) &: docs/overlays.org
 	$(call tangle-org,$<)
 
 CLAUDE.md: docs/configuration.org scripts/export-claude-md.el
