@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   specialArgs,
   ...
@@ -18,15 +19,24 @@ in
         ../common.nix
       ];
 
-      my.virtualisation.colima = {
+      services.colima = {
         enable = true;
-        settings = {
-          cpu = 8;
-          memory = 8;
-        };
+        profiles.default.settings =
+          {
+            cpu = 8;
+            memory = 8;
+            runtime = "docker";
+          }
+          // lib.optionalAttrs (pkgs.stdenv.hostPlatform.isDarwin && pkgs.stdenv.hostPlatform.isAarch64) {
+            vmType = "vz";
+            mountType = "virtiofs";
+            rosetta = true;
+          };
       };
 
       home.packages = with pkgs; [
+        docker-client
+        docker-buildx
         # without this, the older builtin `less` would be used
         less
       ];

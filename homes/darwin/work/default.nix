@@ -24,9 +24,13 @@ in
 
     my.programs.just.enableEnhancedCompletion = true;
 
-    my.virtualisation.colima = {
-      settings.disk = 200;
-      enableKubernetes = true;
+    services.colima.profiles.default = {
+      # Docker Desktop is installed on the work machine
+      isActive = false;
+      settings = {
+        disk = 200;
+        kubernetes.enabled = true;
+      };
     };
   };
 }
