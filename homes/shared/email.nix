@@ -104,6 +104,13 @@ in
       pattern = \.attmcojp\.github\.com
       tags = +github::attmcojp
 
+      # remove 'new' from github-tagged messages so InboxFilter skips them,
+      # placed after all HeaderMatchingFilters to avoid breaking their
+      # tag:new query
+      [Filter.0]
+      query = tag:github
+      tags = -new
+
       [InboxFilter]
 
       [MailMover]
