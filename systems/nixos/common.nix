@@ -64,6 +64,10 @@ in
     pinentryPackage = pinentryWrapper;
   };
 
+  # dhcpcd tries to manage Docker's veth interfaces and crashes (SEGV in ipv6nd_expire)
+  # in a loop, which eventually causes DHCP lease renewal to fail after a few days
+  networking.dhcpcd.denyInterfaces = [ "veth*" ];
+
   virtualisation.docker.rootless = {
     enable = true;
     setSocketVariable = true;
