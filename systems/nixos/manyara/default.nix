@@ -67,6 +67,12 @@
     };
   };
 
+  # syncthing needs write access to /data/books which is owned by calibre-web
+  users.users.${config.services.syncthing.user}.extraGroups = [ config.services.calibre-web.group ];
+  systemd.tmpfiles.rules = [
+    "d /data/books 0775 ${config.services.calibre-web.user} ${config.services.calibre-web.group} -"
+  ];
+
   sops.secrets.syncthing-key = {
     sopsFile = ./syncthing.yaml;
     owner = config.services.syncthing.user;
