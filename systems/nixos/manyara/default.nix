@@ -52,5 +52,31 @@
     host = "0.0.0.0";
   };
 
+  services.syncthing = {
+    enable = true;
+    openDefaultPorts = true;
+    guiAddress = "0.0.0.0:8384";
+    key = config.sops.secrets.syncthing-key.path;
+    cert = config.sops.secrets.syncthing-cert.path;
+    settings = {
+      devices.kilimanjaro.id = "TGY53EL-MT6DGIB-MJA6B4K-XVPA2KA-M3JHXPJ-GXLUOYH-6656M47-65HZPAI";
+      folders.calibre-library = {
+        path = "/data/books";
+        devices = [ "kilimanjaro" ];
+      };
+    };
+  };
+
+  sops.secrets.syncthing-key = {
+    sopsFile = ./syncthing.yaml;
+    owner = config.services.syncthing.user;
+  };
+  sops.secrets.syncthing-cert = {
+    sopsFile = ./syncthing.yaml;
+    owner = config.services.syncthing.user;
+  };
+
+  networking.firewall.allowedTCPPorts = [ 8384 ];
+
   sops.secrets.cloudflared-tunnel-cert = { };
 }

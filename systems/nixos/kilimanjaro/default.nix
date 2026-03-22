@@ -53,6 +53,29 @@
     options = [ "rw" ];
   };
 
+  services.syncthing = {
+    enable = true;
+    openDefaultPorts = true;
+    key = config.sops.secrets.syncthing-key.path;
+    cert = config.sops.secrets.syncthing-cert.path;
+    settings = {
+      devices.manyara.id = "QR5JSZF-GGDDSEQ-5LEDB4S-RGLWILH-OYVRYII-GUCDB3V-W3TNVAX-QTCZEAB";
+      folders.calibre-library = {
+        path = "/data/calibre-library";
+        devices = [ "manyara" ];
+      };
+    };
+  };
+
+  sops.secrets.syncthing-key = {
+    sopsFile = ./syncthing.yaml;
+    owner = config.services.syncthing.user;
+  };
+  sops.secrets.syncthing-cert = {
+    sopsFile = ./syncthing.yaml;
+    owner = config.services.syncthing.user;
+  };
+
   sops.secrets.wifi = { };
 
   nix.settings = {
