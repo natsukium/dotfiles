@@ -14,6 +14,7 @@ in
     settings = {
       clusterJoinTokenPath = config.sops.secrets.hercules-ci-agent-token.path;
       binaryCachesPath = config.sops.secrets.binary-caches.path;
+      nixSettings.sandbox = !stdenv.hostPlatform.isDarwin;
     };
   };
 
