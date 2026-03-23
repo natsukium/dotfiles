@@ -5,6 +5,7 @@
     ../common.nix
     ../desktop.nix
     ../linux-builder.nix
+    ../services/github-runner
   ];
 
   system.stateVersion = 6;
