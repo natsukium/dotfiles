@@ -4,6 +4,8 @@
     ../../../systems/darwin/common.nix
     ../../../systems/darwin/desktop.nix
     ../../../systems/darwin/linux-builder.nix
+    ../../../modules/github-runner-vm/darwin.nix
+    ../../../systems/darwin/services/github-runner
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
@@ -42,6 +44,13 @@
   system.stateVersion = 6;
 
   my.services.timemachine.enableLocalSnapshot = true;
+  my.services.github-runner-vm = {
+    enable = true;
+    count = 4;
+    url = "https://github.com/attmcojp";
+    runnerNamePrefix = "natsukium-linux-arm64";
+    extraLabels = [ "bashauma-linux-arm64-experimental" ];
+  };
 
   nix.settings = {
     substituters = [ "https://attmcojp.cachix.org" ];
