@@ -15,7 +15,8 @@ let
   gvproxy = pkgs.gvproxy;
   maxFilesPerProc = 26214400;
 
-  indices = lib.range 1 cfg.count;
+  instanceCount = lib.length (lib.attrNames cfg.instances);
+  indices = map (s: builtins.fromJSON s) (lib.attrNames cfg.instances);
 
   # microvm.nix's nixpkgs (unstable) has vfkit with pty support
   microvmPkgs = import self.inputs.microvm.inputs.nixpkgs {
@@ -75,24 +76,22 @@ let
 
   mkGuestNixos =
     i:
+    let
+      inst = cfg.instances.${toString i};
+    in
     self.inputs.nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
       specialArgs = {
         runnerIndex = i;
-        inherit (cfg)
-          url
-          runnerNamePrefix
-          extraLabels
-          tokenFile
-          diskSize
-          ;
+        inherit (cfg) url tokenFile sshAuthorizedKeys;
+        inherit (inst) runnerNamePrefix extraLabels diskSize;
       };
       modules = [
         self.inputs.microvm.nixosModules.microvm
         ./guest.nix
         {
-          microvm.vcpu = cfg.vcpu;
-          microvm.mem = cfg.mem;
+          microvm.vcpu = inst.vcpu;
+          microvm.mem = inst.mem;
 
           microvm.vmHostPackages = pkgs;
           microvm.vfkit.package = mkVfkit i;
@@ -178,7 +177,43 @@ in
       count = lib.mkOption {
         type = lib.types.int;
         default = 1;
-        description = "Number of runner VMs to launch on this host";
+        description = "Number of runner VMs to launch on this host. Used to generate default instances when `instances` is not set.";
+      };
+
+      instances = lib.mkOption {
+        type = lib.types.attrsOf (
+          lib.types.submodule {
+            options = {
+              mem = lib.mkOption {
+                type = lib.types.int;
+                default = cfg.mem;
+                description = "Memory for this VM in MiB";
+              };
+              vcpu = lib.mkOption {
+                type = lib.types.int;
+                default = cfg.vcpu;
+                description = "Number of virtual CPUs for this VM";
+              };
+              extraLabels = lib.mkOption {
+                type = lib.types.listOf lib.types.str;
+                default = cfg.extraLabels;
+                description = "Extra labels to apply to this runner";
+              };
+              diskSize = lib.mkOption {
+                type = lib.types.int;
+                default = cfg.diskSize;
+                description = "Persistent /var volume size in MiB for this VM";
+              };
+              runnerNamePrefix = lib.mkOption {
+                type = lib.types.str;
+                default = cfg.runnerNamePrefix;
+                description = "Prefix for this runner's name";
+              };
+            };
+          }
+        );
+        default = lib.genAttrs (map toString (lib.range 1 cfg.count)) (_: { });
+        description = "Per-instance configuration. Keys are instance indices (as strings). Unset options inherit from top-level defaults.";
       };
 
       url = lib.mkOption {
@@ -219,7 +254,7 @@ in
 
       mem = lib.mkOption {
         type = lib.types.int;
-        default = 12288;
+        default = 16384;
         description = "Memory per VM in MiB";
       };
 
@@ -227,6 +262,12 @@ in
         type = lib.types.int;
         default = 51200;
         description = "Persistent /var volume size in MiB";
+      };
+
+      sshAuthorizedKeys = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        default = [ ];
+        description = "SSH public keys to authorize for root login on guest VMs";
       };
 
       extraGuestModules = lib.mkOption {
@@ -248,7 +289,7 @@ in
       # descriptors rapidly; raise the system-wide limit to prevent
       # "Too many open files in system" during Nix builds in guests.
       sysctl -w kern.maxfilesperproc=${toString maxFilesPerProc}
-      sysctl -w kern.maxfiles=${toString (maxFilesPerProc * (cfg.count + 1))}
+      sysctl -w kern.maxfiles=${toString (maxFilesPerProc * (instanceCount + 1))}
     ''
     + lib.concatMapStringsSep "\n" (i: "mkdir -p /var/lib/github-runner-vm-${toString i}/logs") indices;
 

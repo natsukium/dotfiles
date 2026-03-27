@@ -10,6 +10,7 @@
   extraLabels ? [ ],
   tokenFile ? "/var/secrets/github-runner-token",
   diskSize ? 51200,
+  sshAuthorizedKeys ? [ ],
   ...
 }:
 let
@@ -37,10 +38,25 @@ in
   };
 
   # ---------- Networking ----------
+  # gvproxy provides a virtual 192.168.127.0/24 network with gateway at
+  # 192.168.127.1.  DHCP from gvproxy is unreliable with systemd-networkd,
+  # so assign the expected static IP directly.
   networking = {
     hostName = "github-runner-vm-${toString runnerIndex}";
     firewall.enable = false;
-    interfaces.enp0s1.useDHCP = true;
+    interfaces.enp0s1 = {
+      useDHCP = false;
+      ipv4.addresses = [
+        {
+          address = "192.168.127.2";
+          prefixLength = 24;
+        }
+      ];
+    };
+    defaultGateway = {
+      address = "192.168.127.1";
+      interface = "enp0s1";
+    };
     resolvconf.enable = false;
     enableIPv6 = false;
   };
@@ -139,9 +155,9 @@ in
           Type = "oneshot";
           RemainAfterExit = true;
           ExecStart = pkgs.writeShellScript "wait-for-token" ''
-            for i in $(seq 1 120); do
+            for i in $(seq 1 60); do
               [ -s ${tokenFile} ] && exit 0
-              sleep 1
+              sleep 5
             done
             echo "Timed out waiting for ${tokenFile}" >&2
             exit 1
@@ -197,7 +213,10 @@ in
       isSystemUser = true;
       group = "github-runner";
     };
-    root.initialPassword = "root";
+    root = {
+      initialPassword = "root";
+      openssh.authorizedKeys.keys = sshAuthorizedKeys;
+    };
   };
   users.groups.github-runner = { };
 

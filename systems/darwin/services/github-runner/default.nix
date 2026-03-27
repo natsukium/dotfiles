@@ -15,7 +15,7 @@
         url = "https://github.com/attmcojp";
         tokenFile = config.sops.secrets.github-runner-token.path;
         replace = true;
-        extraLabels = [ "bashauma-macos-arm64" ];
+        extraLabels = [ "bashauma-macos-arm64-experimental" ];
         extraPackages = with pkgs; [
           cachix
           curl

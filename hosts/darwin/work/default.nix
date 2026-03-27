@@ -1,11 +1,11 @@
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 {
   imports = [
     ../../../systems/darwin/common.nix
     ../../../systems/darwin/desktop.nix
     ../../../systems/darwin/linux-builder.nix
     ../../../modules/github-runner-vm/darwin.nix
-    ../../../systems/darwin/services/github-runner
+    # ../../../systems/darwin/services/github-runner
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
@@ -46,10 +46,19 @@
   my.services.timemachine.enableLocalSnapshot = true;
   my.services.github-runner-vm = {
     enable = true;
-    count = 4;
+    mem = 12288;
     url = "https://github.com/attmcojp";
     runnerNamePrefix = "natsukium-linux-arm64";
     extraLabels = [ "bashauma-linux-arm64-experimental" ];
+    sshAuthorizedKeys = [
+      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMf3Wg469RSR0CBK7vkRp9wZvR3DpjROqXkwHTUXMCW1"
+    ];
+    instances = lib.genAttrs (map toString (lib.range 1 3)) (_: { }) // {
+      "4" = {
+        mem = 24576;
+        extraLabels = [ "bashauma-linux-arm64-large-experimental" ];
+      };
+    };
   };
 
   nix.settings = {
