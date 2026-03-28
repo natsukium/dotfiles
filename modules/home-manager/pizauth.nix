@@ -15,7 +15,16 @@ let
     ;
   cfg = config.my.services.pizauth;
 
-  configContent = lib.concatStringsSep "\n\n" (
+  pizauthCmd = lib.getExe cfg.package;
+  ageCmd = lib.getExe pkgs.age;
+
+  dumpDir = dirOf cfg.persistence.dumpFile;
+
+  tokenEventCmd = lib.optionalString cfg.persistence.enable ''
+    token_event_cmd = "mkdir -p ${dumpDir} && ${pizauthCmd} dump | ${ageCmd} -e -R ${cfg.persistence.ageRecipient} -o ${cfg.persistence.dumpFile}";
+  '';
+
+  accountsContent = lib.concatStringsSep "\n\n" (
     lib.mapAttrsToList (
       name: acc:
       let
@@ -38,7 +47,34 @@ let
     ) cfg.accounts
   );
 
+  configContent = tokenEventCmd + accountsContent;
+
   configPath = config.sops.templates."pizauth.conf".path;
+
+  # Wrapper script that starts pizauth and restores persisted tokens.
+  # launchd has no ExecStartPost equivalent, so a unified wrapper
+  # script is used on both platforms (same pattern as mbsync.nix).
+  serverScript = pkgs.writeShellScript "pizauth-server" ''
+    set -euo pipefail
+    ${pizauthCmd} server -d -c ${configPath} &
+    PIZAUTH_PID=$!
+
+    if [ -f "${cfg.persistence.dumpFile}" ]; then
+      for _ in $(seq 1 50); do
+        ${pizauthCmd} status >/dev/null 2>&1 && break
+        sleep 1
+      done
+      ${ageCmd} -d -i ${cfg.persistence.ageIdentity} ${cfg.persistence.dumpFile} | ${pizauthCmd} restore || true
+    fi
+
+    wait "$PIZAUTH_PID"
+  '';
+
+  startCmd =
+    if cfg.persistence.enable then
+      "${serverScript}"
+    else
+      "${pizauthCmd} server -d -c ${configPath}";
 in
 {
   options.my.services.pizauth = {
@@ -79,6 +115,24 @@ in
       default = { };
       description = "pizauth account configurations.";
     };
+    persistence = {
+      enable = mkEnableOption "persistence of pizauth tokens via age-encrypted dump";
+      ageIdentity = mkOption {
+        type = types.str;
+        default = "${config.home.homeDirectory}/.ssh/id_ed25519";
+        description = "Path to the age identity (private key) for decryption.";
+      };
+      ageRecipient = mkOption {
+        type = types.str;
+        default = "${config.home.homeDirectory}/.ssh/id_ed25519.pub";
+        description = "Path to the age recipient (public key) for encryption.";
+      };
+      dumpFile = mkOption {
+        type = types.str;
+        default = "${config.xdg.dataHome}/pizauth/dump.age";
+        description = "Path to the age-encrypted token dump file.";
+      };
+    };
   };
 
   config = mkIf cfg.enable (mkMerge [
@@ -94,13 +148,7 @@ in
       launchd.agents.pizauth = {
         enable = true;
         config = {
-          ProgramArguments = [
-            "${lib.getExe cfg.package}"
-            "server"
-            "-d"
-            "-c"
-            configPath
-          ];
+          ProgramArguments = [ startCmd ];
           KeepAlive = true;
           StandardOutPath = "${config.home.homeDirectory}/Library/Logs/pizauth/stdout";
           StandardErrorPath = "${config.home.homeDirectory}/Library/Logs/pizauth/stderr";
@@ -114,7 +162,7 @@ in
           Description = "pizauth OAuth2 token daemon";
         };
         Service = {
-          ExecStart = "${lib.getExe cfg.package} server -d -c ${configPath}";
+          ExecStart = startCmd;
           Restart = "always";
         };
         Install = {

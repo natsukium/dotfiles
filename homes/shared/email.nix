@@ -154,6 +154,7 @@ in
 
   my.services.pizauth = {
     enable = true;
+    persistence.enable = true;
     # On macOS, unset XDG_RUNTIME_DIR so pizauth falls back to
     # $TMPDIR/runtime-$USER, which is consistent between launchd and
     # interactive shells (launchd can't expand shell variables in
