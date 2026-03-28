@@ -71,10 +71,7 @@ let
   '';
 
   startCmd =
-    if cfg.persistence.enable then
-      "${serverScript}"
-    else
-      "${pizauthCmd} server -d -c ${configPath}";
+    if cfg.persistence.enable then "${serverScript}" else "${pizauthCmd} server -d -c ${configPath}";
 in
 {
   options.my.services.pizauth = {
