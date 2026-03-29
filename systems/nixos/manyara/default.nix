@@ -63,6 +63,9 @@
       folders.calibre-library = {
         path = "/data/books";
         devices = [ "kilimanjaro" ];
+        # syncthing runs as a different user from the directory owner (calibre-web),
+        # so it cannot chown/chmod synced files — permission sync must be disabled
+        ignorePerms = true;
       };
     };
   };
@@ -70,7 +73,9 @@
   # syncthing needs write access to /data/books which is owned by calibre-web
   users.users.${config.services.syncthing.user}.extraGroups = [ config.services.calibre-web.group ];
   systemd.tmpfiles.rules = [
-    "d /data/books 0775 ${config.services.calibre-web.user} ${config.services.calibre-web.group} -"
+    # setgid (2xxx) ensures new files/dirs inherit the calibre-web group,
+    # so both syncthing (group member) and calibre-web (owner) can access them
+    "d /data/books 2775 ${config.services.calibre-web.user} ${config.services.calibre-web.group} -"
   ];
 
   sops.secrets.syncthing-key = {
