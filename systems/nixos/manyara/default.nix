@@ -72,6 +72,9 @@
 
   # syncthing needs write access to /data/books which is owned by calibre-web
   users.users.${config.services.syncthing.user}.extraGroups = [ config.services.calibre-web.group ];
+  # default umask 0022 strips group write, preventing calibre-web from modifying
+  # files syncthing creates — 0002 preserves group write so both services can coexist
+  systemd.services.syncthing.serviceConfig.UMask = "0002";
   systemd.tmpfiles.rules = [
     # setgid (2xxx) ensures new files/dirs inherit the calibre-web group,
     # so both syncthing (group member) and calibre-web (owner) can access them
