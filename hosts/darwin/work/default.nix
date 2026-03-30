@@ -44,21 +44,22 @@
   system.stateVersion = 6;
 
   my.services.timemachine.enableLocalSnapshot = true;
+  sops.secrets.github-runner-token = {
+    sopsFile = ../../../systems/darwin/services/github-runner/secrets.yaml;
+    # readable by the VM which mounts the secrets directory via virtiofs
+    mode = "0444";
+  };
+
   my.services.github-runner-vm = {
     enable = true;
-    mem = 12288;
+    mem = 16384;
     url = "https://github.com/attmcojp";
     runnerNamePrefix = "natsukium-linux-arm64";
     extraLabels = [ "bashauma-linux-arm64-experimental" ];
     sshAuthorizedKeys = [
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIMf3Wg469RSR0CBK7vkRp9wZvR3DpjROqXkwHTUXMCW1"
     ];
-    instances = lib.genAttrs (map toString (lib.range 1 3)) (_: { }) // {
-      "4" = {
-        mem = 24576;
-        extraLabels = [ "bashauma-linux-arm64-large-experimental" ];
-      };
-    };
+    instances = lib.genAttrs (map toString (lib.range 1 4)) (_: { });
   };
 
   nix.settings = {

@@ -9,7 +9,7 @@
   runnerNamePrefix ? "linux-arm64",
   extraLabels ? [ ],
   tokenFile ? "/var/secrets/github-runner-token",
-  diskSize ? 51200,
+  diskSize ? 204800,
   sshAuthorizedKeys ? [ ],
   ...
 }:
@@ -69,14 +69,17 @@ in
       enable = true;
       inherit url tokenFile;
       replace = true;
+      ephemeral = false;
       extraPackages = commonTools;
       inherit extraLabels;
-      extraEnvironment = {
-        BASH_ENV = "/etc/profile.d/nix-profile.sh";
-      };
+      # /run is tmpfs and too small for build artifacts; use the
+      # persistent /var volume instead.
       workDir = "/var/lib/github-runner-work/${runnerName}";
       user = "github-runner";
       group = "github-runner";
+      extraEnvironment = {
+        BASH_ENV = "/etc/profile.d/nix-profile.sh";
+      };
     };
 
     # ---------- SSH ----------
@@ -176,7 +179,8 @@ in
         after = [ "github-runner-token-wait.service" ];
         serviceConfig = {
           SupplementaryGroups = [ "docker" ];
-          # Ensure the runner restarts after crashes or unexpected exits
+          # Ephemeral runners exit after one job; always restart to
+          # re-register and pick up the next job.
           Restart = lib.mkForce "always";
           RestartSec = "5s";
         };

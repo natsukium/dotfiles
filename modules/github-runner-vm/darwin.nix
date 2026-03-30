@@ -104,10 +104,14 @@ let
               mountPoint = "/nix/.ro-store";
             }
             {
-              # Host-decrypted sops secrets shared via virtiofs
+              # Host-decrypted sops secrets shared via virtiofs.
+              # Use a per-VM real directory instead of cfg.hostSecretsPath
+              # directly, because sops-nix on darwin uses a symlink
+              # (/run/secrets -> /run/secrets.d/N) and vfkit's virtiofs
+              # does not follow symlinks for the source path.
               proto = "virtiofs";
               tag = "secrets";
-              source = cfg.hostSecretsPath;
+              source = "/var/lib/github-runner-vm-${toString i}/secrets";
               mountPoint = "/var/secrets";
             }
             {
@@ -139,7 +143,13 @@ let
     pkgs.writeShellScript "github-runner-vm-${toString i}-launch" ''
       set -euo pipefail
 
-      mkdir -p /var/lib/github-runner-vm-${toString i}/logs
+      mkdir -p /var/lib/github-runner-vm-${toString i}/{logs,secrets}
+
+      # Copy sops-decrypted secrets, resolving the /run/secrets symlink
+      # that vfkit's virtiofs cannot follow.
+      if [ -d "${cfg.hostSecretsPath}" ]; then
+        cp -Lf "${cfg.hostSecretsPath}"/* /var/lib/github-runner-vm-${toString i}/secrets/ 2>/dev/null || true
+      fi
 
       SOCK=/tmp/github-runner-vm-${toString i}-gvproxy.sock
       VFKIT_SOCK=/tmp/github-runner-vm-${toString i}-vfkit.sock
@@ -260,7 +270,7 @@ in
 
       diskSize = lib.mkOption {
         type = lib.types.int;
-        default = 51200;
+        default = 204800;
         description = "Persistent /var volume size in MiB";
       };
 
