@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-03-16 23:32+0900\n"
+"POT-Creation-Date: 2026-04-08 20:40+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -195,7 +195,7 @@ msgid "Main desktop"
 msgstr "メインデスクトップ"
 
 #. type: cell column 0
-#: configuration.org:37 configuration.org:926 .github/README.org:29
+#: configuration.org:37 configuration.org:973 .github/README.org:29
 #, no-wrap
 msgid "tarangire"
 msgstr ""
@@ -214,7 +214,7 @@ msgid "Build server"
 msgstr "ビルドサーバー"
 
 #. type: cell column 0
-#: configuration.org:38 configuration.org:900 .github/README.org:30
+#: configuration.org:38 configuration.org:947 .github/README.org:30
 #, no-wrap
 msgid "manyara"
 msgstr ""
@@ -250,7 +250,7 @@ msgid "WSL environment"
 msgstr "WSL環境"
 
 #. type: cell column 0
-#: configuration.org:40 configuration.org:915 .github/README.org:32
+#: configuration.org:40 configuration.org:962 .github/README.org:32
 #, no-wrap
 msgid "serengeti"
 msgstr ""
@@ -323,7 +323,7 @@ msgid "M1 Mac mini"
 msgstr ""
 
 #. type: cell column 0
-#: configuration.org:44 configuration.org:940 .github/README.org:36
+#: configuration.org:44 configuration.org:987 .github/README.org:36
 #, no-wrap
 msgid "android"
 msgstr ""
@@ -2004,7 +2004,7 @@ msgid "Main desktop (Intel Core i5-12400F)."
 msgstr "メインデスクトップ（Intel Core i5-12400F）。"
 
 #. type: paragraph
-#: configuration.org:879 configuration.org:930
+#: configuration.org:879 configuration.org:977
 msgid ""
 "Wake-on-LAN (WoL) is enabled via the following BIOS setting: =Advanced > APM "
 "Configuration > Power On By PCI-E > Enabled="
@@ -2032,14 +2032,127 @@ msgstr ""
 msgid "WSL (dual boot with kilimanjaro)."
 msgstr "WSL（kilimanjaroとデュアルブート）。"
 
-#. type: keyword NAME
+#. type: heading *****
 #: configuration.org:893
+#, no-wrap
+msgid "Setup"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:895
+msgid ""
+"Setting up arusha requires both Windows-side and WSL-side steps. The process "
+"follows [[https://github.com/nix-community/NixOS-WSL][NixOS-WSL]]'s quick "
+"start guide."
+msgstr ""
+
+#. type: heading ******
+#: configuration.org:898
+#, no-wrap
+msgid "Installing WSL"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:900
+msgid ""
+"=--no-distribution= avoids installing the default Ubuntu distribution, which "
+"would just be removed after importing NixOS."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:904
+#, no-wrap
+msgid "wsl --install --no-distribution"
+msgstr ""
+
+#. type: heading ******
+#: configuration.org:907
+#, no-wrap
+msgid "Importing NixOS-WSL"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:909
+msgid "Download the latest NixOS-WSL release image and import it."
+msgstr ""
+
+#. type: cell column 0
+#: configuration.org:913
+#, no-wrap
+msgid "Select-Object -ExpandProperty assets `"
+msgstr ""
+
+#. type: cell column 0
+#: configuration.org:914
+#, no-wrap
+msgid "Where-Object { $_.name -eq \"nixos.wsl\" } `"
+msgstr ""
+
+#. type: cell column 0
+#: configuration.org:915
+#, no-wrap
+msgid "ForEach-Object { Invoke-WebRequest -Uri $_.browser_download_url -OutFile $_.name }"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:912
+#, no-wrap
+msgid "Invoke-RestMethod -Uri https://api.github.com/repos/nix-community/nixos-wsl/releases/latest `"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:919
+#, no-wrap
+msgid "./nixos.wsl"
+msgstr ""
+
+#. type: heading ******
+#: configuration.org:922
+#, fuzzy, no-wrap
+#| msgid "System Configuration"
+msgid "Applying the configuration"
+msgstr "システム設定"
+
+#. type: paragraph
+#: configuration.org:924
+msgid ""
+"After the initial NixOS-WSL boot, apply this flake's configuration directly "
+"from GitHub. No local clone is needed for the first run."
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:928
+#, no-wrap
+msgid "wsl -d NixOS"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:932
+#, no-wrap
+msgid "sudo nixos-rebuild switch --flake github:natsukium/dotfiles#arusha"
+msgstr ""
+
+#. type: heading ******
+#: configuration.org:935
+#, no-wrap
+msgid "Windows-side CLI tools"
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:937
+msgid ""
+"Windows 24H2 includes a built-in =sudo= command, so =winget= can be elevated "
+"inline without a separate UAC prompt."
+msgstr ""
+
+#. type: keyword NAME
+#: configuration.org:940
 #, no-wrap
 msgid "host-arusha"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:895
+#: configuration.org:942
 #, no-wrap
 msgid ""
 "arusha = {\n"
@@ -2048,7 +2161,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:902
+#: configuration.org:949
 msgid ""
 "A mini PC with Intel N100, serving as a lightweight home server.  https://"
 "www.bee-link.com/products/beelink-mini-s12-pro-n100"
@@ -2057,7 +2170,7 @@ msgstr ""
 "www.bee-link.com/products/beelink-mini-s12-pro-n100"
 
 #. type: paragraph
-#: configuration.org:905
+#: configuration.org:952
 msgid ""
 "BIOS is configured with the following setting to automatically power on "
 "after an outage: =Chipset > PCH-IO Configuration > State After G3 > S0 State="
@@ -2066,13 +2179,13 @@ msgstr ""
 "IO Configuration > State After G3 > S0 State="
 
 #. type: keyword NAME
-#: configuration.org:908
+#: configuration.org:955
 #, no-wrap
 msgid "host-manyara"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:910
+#: configuration.org:957
 #, no-wrap
 msgid ""
 "manyara = {\n"
@@ -2081,18 +2194,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:917
+#: configuration.org:964
 msgid "Build server (OCI A1 Flex)."
 msgstr "ビルドサーバー（OCI A1 Flex）。"
 
 #. type: keyword NAME
-#: configuration.org:919
+#: configuration.org:966
 #, no-wrap
 msgid "host-serengeti"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:921
+#: configuration.org:968
 #, no-wrap
 msgid ""
 "serengeti = {\n"
@@ -2101,18 +2214,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:928
+#: configuration.org:975
 msgid "Build server (Ryzen 9 9950X)."
 msgstr "ビルドサーバー（Ryzen 9 9950X）。"
 
 #. type: keyword NAME
-#: configuration.org:933
+#: configuration.org:980
 #, no-wrap
 msgid "host-tarangire"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:935
+#: configuration.org:982
 #, no-wrap
 msgid ""
 "tarangire = {\n"
@@ -2121,18 +2234,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:942
+#: configuration.org:989
 msgid "Phone (Pixel 7a)."
 msgstr "スマートフォン（Pixel 7a）。"
 
 #. type: keyword NAME
-#: configuration.org:944
+#: configuration.org:991
 #, no-wrap
 msgid "host-android"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:946
+#: configuration.org:993
 #, no-wrap
 msgid ""
 "android = {\n"
@@ -2142,19 +2255,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:952
+#: configuration.org:999
 #, no-wrap
 msgid "Outputs"
 msgstr "出力"
 
 #. type: keyword NAME
-#: configuration.org:954
+#: configuration.org:1001
 #, no-wrap
 msgid "outputs"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:956
+#: configuration.org:1003
 #, no-wrap
 msgid ""
 "systems = [\n"
@@ -2165,7 +2278,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:962
+#: configuration.org:1009
 #, no-wrap
 msgid ""
 "imports = [\n"
@@ -2177,13 +2290,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:969
+#: configuration.org:1016
 #, no-wrap
 msgid "<<hosts>>"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:971
+#: configuration.org:1018
 #, no-wrap
 msgid ""
 "flake = {\n"
@@ -2192,7 +2305,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:975
+#: configuration.org:1022
 #, no-wrap
 msgid ""
 "perSystem =\n"
@@ -2212,7 +2325,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:990
+#: configuration.org:1037
 #, no-wrap
 msgid ""
 "checks = import ./tests {\n"
@@ -2222,7 +2335,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:995
+#: configuration.org:1042
 #, no-wrap
 msgid ""
 "packages = {\n"
@@ -2274,7 +2387,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1042
+#: configuration.org:1089
 #, no-wrap
 msgid ""
 "      installPhase = ''\n"
@@ -2288,7 +2401,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1051
+#: configuration.org:1098
 #, no-wrap
 msgid ""
 "pre-commit = {\n"
@@ -2396,7 +2509,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1155
+#: configuration.org:1202
 #, no-wrap
 msgid ""
 "treefmt = {\n"
@@ -2414,13 +2527,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1168
+#: configuration.org:1215
 #, no-wrap
 msgid "<<mcp-servers-config>>"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1170
+#: configuration.org:1217
 #, no-wrap
 msgid ""
 "  <<dev-shells>>\n"
@@ -2428,67 +2541,67 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1174
+#: configuration.org:1221
 #, no-wrap
 msgid "Overlays"
 msgstr "Overlay"
 
 #. type: keyword INCLUDE
-#: configuration.org:1175
+#: configuration.org:1222
 #, no-wrap
 msgid "\"./overlays/configuration.org\""
 msgstr "\"./overlays/configuration.ja.org\""
 
 #. type: heading **
-#: configuration.org:1177
+#: configuration.org:1224
 #, no-wrap
 msgid "Modules"
 msgstr "モジュール"
 
 #. type: keyword INCLUDE
-#: configuration.org:1178
+#: configuration.org:1225
 #, no-wrap
 msgid "\"./modules/configuration.org\""
 msgstr "\"./modules/configuration.ja.org\""
 
 #. type: heading **
-#: configuration.org:1180
+#: configuration.org:1227
 #, no-wrap
 msgid "Emacs"
 msgstr "Emacs"
 
 #. type: heading ***
-#: configuration.org:1181
+#: configuration.org:1228
 #, no-wrap
 msgid "early-init.org"
 msgstr "early-init.org"
 
 #. type: keyword INCLUDE
-#: configuration.org:1182
+#: configuration.org:1229
 #, no-wrap
 msgid "\"./applications/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: configuration.org:1183
+#: configuration.org:1230
 #, no-wrap
 msgid "init.org"
 msgstr "init.org"
 
 #. type: keyword INCLUDE
-#: configuration.org:1184
+#: configuration.org:1231
 #, no-wrap
 msgid "\"./applications/emacs/init.org\""
 msgstr "\"./applications/emacs/init.ja.org\""
 
 #. type: heading **
-#: configuration.org:1186
+#: configuration.org:1233
 #, no-wrap
 msgid "Scripts"
 msgstr "スクリプト"
 
 #. type: paragraph
-#: configuration.org:1188
+#: configuration.org:1235
 msgid ""
 "Scripts used in flake derivations, pre-commit hooks, and Makefile recipes.  "
 "Extracted to separate files for proper syntax highlighting and independent "
@@ -2499,7 +2612,7 @@ msgstr ""
 "しています。"
 
 #. type: paragraph in src
-#: configuration.org:1192
+#: configuration.org:1239
 #, no-wrap
 msgid ""
 "(require 'org)\n"
@@ -2508,7 +2621,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1196
+#: configuration.org:1243
 #, no-wrap
 msgid ""
 "(add-to-list 'org-src-lang-modes '(\"nix\" . nix-ts))\n"
@@ -2516,7 +2629,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1199
+#: configuration.org:1246
 #, no-wrap
 msgid ""
 ";; In batch mode, faces lack color attributes. Explicitly set\n"
@@ -2542,7 +2655,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1220
+#: configuration.org:1267
 #, no-wrap
 msgid ""
 "(find-file \"configuration.org\")\n"
@@ -2550,7 +2663,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1223
+#: configuration.org:1270
 #, no-wrap
 msgid ""
 "(find-file \"configuration.ja.org\")\n"
@@ -2558,7 +2671,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1227
+#: configuration.org:1274
 msgid ""
 "The two pre-commit hook scripts share a common pattern: run a command, then "
 "check =git diff= for changes and fail with instructions if any are found. "
@@ -2569,13 +2682,13 @@ msgstr ""
 "の共通ロジックは =check-git-changes.sh= にあります。"
 
 #. type: paragraph in src
-#: configuration.org:1234 configuration.org:1253 configuration.org:1260
+#: configuration.org:1281 configuration.org:1300 configuration.org:1307
 #, no-wrap
 msgid "set -euo pipefail"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1236
+#: configuration.org:1283
 #, no-wrap
 msgid ""
 "message=\"$1\"\n"
@@ -2583,13 +2696,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1239
+#: configuration.org:1286
 #, no-wrap
 msgid "changed=$(git diff --name-only \"$@\")"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1241
+#: configuration.org:1288
 #, no-wrap
 msgid ""
 "if [ -n \"$changed\" ]; then\n"
@@ -2604,7 +2717,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1255
+#: configuration.org:1302
 #, no-wrap
 msgid ""
 "po4a po4a.cfg\n"
@@ -2612,7 +2725,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1262
+#: configuration.org:1309
 #, no-wrap
 msgid ""
 "make -B tangle -j\n"
@@ -2620,7 +2733,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1267
+#: configuration.org:1314
 #, no-wrap
 msgid ""
 "(require 'ox-md)\n"
@@ -2629,7 +2742,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1272
+#: configuration.org:1319
 msgid ""
 "The =org-export-with-author= setting is explicitly disabled because "
 "=configuration.org= has no =#+AUTHOR:= keyword, so Org falls back to the "
@@ -2647,7 +2760,7 @@ msgstr ""
 "効にすることで、プラットフォーム間で一貫した出力を保証します。"
 
 #. type: paragraph in src
-#: configuration.org:1281
+#: configuration.org:1328
 #, no-wrap
 msgid ""
 "(require 'ox-org)\n"
@@ -2659,13 +2772,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: configuration.org:1289 .github/README.org:58
+#: configuration.org:1336 .github/README.org:58
 #, no-wrap
 msgid "Development"
 msgstr "開発"
 
 #. type: paragraph
-#: configuration.org:1291 .github/README.org:60
+#: configuration.org:1338 .github/README.org:60
 msgid ""
 "This repository provides a Nix development shell with all the tools needed "
 "for working on the configurations. Enter the shell by running:"
@@ -2674,13 +2787,13 @@ msgstr ""
 "す。以下のコマンドでシェルに入れます："
 
 #. type: paragraph in src
-#: configuration.org:1295 .github/README.org:64
+#: configuration.org:1342 .github/README.org:64
 #, no-wrap
 msgid "nix develop"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1298 .github/README.org:67
+#: configuration.org:1345 .github/README.org:67
 msgid ""
 "The shell includes infrastructure tools (Terraform, sops, ssh-to-age), "
 "translation tools (po4a, gettext), and build utilities (nix-fast-build).  On "
@@ -2693,13 +2806,13 @@ msgstr ""
 "的ソースからの =CLAUDE.md= 同期が行われます。"
 
 #. type: keyword name
-#: configuration.org:1303 .github/README.org:72
+#: configuration.org:1350 .github/README.org:72
 #, no-wrap
 msgid "dev-shells"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1305 .github/README.org:74
+#: configuration.org:1352 .github/README.org:74
 #, no-wrap
 msgid ""
 "devShells = {\n"
@@ -2733,35 +2846,35 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1335 .github/README.org:103
+#: configuration.org:1382 .github/README.org:103
 #, no-wrap
 msgid "Translation"
 msgstr "翻訳"
 
 #. type: paragraph
-#: configuration.org:1337 .github/README.org:105
+#: configuration.org:1384 .github/README.org:105
 msgid "This project uses po4a to manage translations."
 msgstr "このプロジェクトでは翻訳にpo4aを使っています。"
 
 #. type: heading ***
-#: configuration.org:1339 .github/README.org:106
+#: configuration.org:1386 .github/README.org:106
 #, no-wrap
 msgid "Requirements"
 msgstr "必要なソフトウェア"
 
 #. type: paragraph
-#: configuration.org:1341 .github/README.org:108
+#: configuration.org:1388 .github/README.org:108
 msgid "The required packages are included in the development shell."
 msgstr "必要なパッケージは開発シェルに含まれています。"
 
 #. type: keyword name
-#: configuration.org:1343 .github/README.org:110
+#: configuration.org:1390 .github/README.org:110
 #, no-wrap
 msgid "translation-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1345 .github/README.org:112
+#: configuration.org:1392 .github/README.org:112
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -2769,13 +2882,13 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1350 .github/README.org:117
+#: configuration.org:1397 .github/README.org:117
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr "=gettext=: msgfmtやその他の国際化ユーティリティを提供"
 
 #. type: plain list -
-#: configuration.org:1352 .github/README.org:119
+#: configuration.org:1399 .github/README.org:119
 #, no-wrap
 msgid ""
 "=po4a_0_74=: po4a >= 0.74 is required for Org mode support.\n"
@@ -2785,19 +2898,19 @@ msgstr ""
 "nixpkgsには古いバージョンが含まれているため、ピン留めしたderivationを使用しています（[[*出力][packages]]参照）。"
 
 #. type: heading ***
-#: configuration.org:1353 .github/README.org:119
+#: configuration.org:1400 .github/README.org:119
 #, no-wrap
 msgid "Translation workflow"
 msgstr "翻訳作業"
 
 #. type: heading ****
-#: configuration.org:1355 .github/README.org:121
+#: configuration.org:1402 .github/README.org:121
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr "po4aを設定する"
 
 #. type: paragraph
-#: configuration.org:1357 .github/README.org:123
+#: configuration.org:1404 .github/README.org:123
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -2810,7 +2923,7 @@ msgstr ""
 "いるときのみ出力されます。)"
 
 #. type: paragraph in src
-#: configuration.org:1366 .github/README.org:132
+#: configuration.org:1413 .github/README.org:132
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -2824,19 +2937,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1376 .github/README.org:142
+#: configuration.org:1423 .github/README.org:142
 msgid ""
 "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr "=po4a.cfg=について、詳しくは=man po4a=を参照してください。"
 
 #. type: heading ****
-#: configuration.org:1378 .github/README.org:143
+#: configuration.org:1425 .github/README.org:143
 #, no-wrap
 msgid "Create/Update po"
 msgstr "poを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:1380 .github/README.org:145
+#: configuration.org:1427 .github/README.org:145
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -2847,19 +2960,19 @@ msgstr ""
 "に生成します。"
 
 #. type: paragraph in src
-#: configuration.org:1386 .github/README.org:151
+#: configuration.org:1433 .github/README.org:151
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1389 .github/README.org:153
+#: configuration.org:1436 .github/README.org:153
 #, no-wrap
 msgid "Translate"
 msgstr "翻訳する"
 
 #. type: paragraph
-#: configuration.org:1391 .github/README.org:155
+#: configuration.org:1438 .github/README.org:155
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
@@ -2868,13 +2981,13 @@ msgstr ""
 "Gtranslator、KDEのLokalizeが有名です。"
 
 #. type: heading ****
-#: configuration.org:1398 .github/README.org:161
+#: configuration.org:1445 .github/README.org:161
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr "翻訳ファイルを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:1400 .github/README.org:163
+#: configuration.org:1447 .github/README.org:163
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -2884,7 +2997,7 @@ msgstr ""
 "め、実運用上はこのコマンドを実行するだけで良いでしょう。"
 
 #. type: paragraph in src
-#: configuration.org:1406 .github/README.org:169
+#: configuration.org:1453 .github/README.org:169
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""

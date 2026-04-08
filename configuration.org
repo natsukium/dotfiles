@@ -890,6 +890,53 @@ kilimanjaro = {
 
 WSL (dual boot with kilimanjaro).
 
+***** Setup
+
+Setting up arusha requires both Windows-side and WSL-side steps. The process
+follows [[https://github.com/nix-community/NixOS-WSL][NixOS-WSL]]'s quick start guide.
+
+****** Installing WSL
+
+=--no-distribution= avoids installing the default Ubuntu distribution, which
+would just be removed after importing NixOS.
+
+#+begin_src powershell :tangle no
+wsl --install --no-distribution
+#+end_src
+
+****** Importing NixOS-WSL
+
+Download the latest NixOS-WSL release image and import it.
+
+#+begin_src powershell :tangle no
+Invoke-RestMethod -Uri https://api.github.com/repos/nix-community/nixos-wsl/releases/latest `
+  | Select-Object -ExpandProperty assets `
+  | Where-Object { $_.name -eq "nixos.wsl" } `
+  | ForEach-Object { Invoke-WebRequest -Uri $_.browser_download_url -OutFile $_.name }
+#+end_src
+
+#+begin_src powershell :tangle no
+./nixos.wsl
+#+end_src
+
+****** Applying the configuration
+
+After the initial NixOS-WSL boot, apply this flake's configuration directly
+from GitHub. No local clone is needed for the first run.
+
+#+begin_src powershell :tangle no
+wsl -d NixOS
+#+end_src
+
+#+begin_src bash :tangle no
+sudo nixos-rebuild switch --flake github:natsukium/dotfiles#arusha
+#+end_src
+
+****** Windows-side CLI tools
+
+Windows 24H2 includes a built-in =sudo= command, so =winget= can be elevated
+inline without a separate UAC prompt.
+
 #+NAME: host-arusha
 #+begin_src nix
 arusha = {
