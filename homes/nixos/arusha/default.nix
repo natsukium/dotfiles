@@ -19,7 +19,6 @@ in
         ../../../modules/profiles/home/base.nix
         ../../../modules/profiles/home/development.nix
       ];
-      home.packages = [ pkgs.wslu ];
       home.sessionVariablesExtra = ''
         export WIN_HOME=$(wslpath $(wslvar USERPROFILE))
       '';
