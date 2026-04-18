@@ -61,7 +61,7 @@ jobs:
         run: nix flake check --no-build --all-systems --keep-going
   build:
     needs: [changes, check]
-    if: ${{ !cancelled() }}
+    if: ${{ !cancelled() && needs.check.result != 'failure' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
     strategy:
