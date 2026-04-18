@@ -71,6 +71,22 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         if: needs.check.result == 'success'
+      # macos-14 runners ship with only ~14GB free, which is exhausted by
+      # large builds like emacs-plus and terraform-provider-cloudflare.
+      # Drop the bundled toolchains we never use to reclaim space before
+      # the nix store grows.
+      - name: Free disk space (darwin)
+        if: needs.check.result == 'success' && matrix.os == 'macos-14'
+        run: |
+          sudo rm -rf \
+            /Applications/Xcode_*.app \
+            /Library/Developer/CoreSimulator \
+            /Library/Android \
+            ~/.dotnet \
+            /usr/local/share/chromium \
+            /usr/local/lib/node_modules \
+            /usr/local/share/powershell || true
+          df -h
       - uses: ./.github/actions/setup-nix
         if: needs.check.result == 'success'
         with:
