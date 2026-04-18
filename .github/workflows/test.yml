@@ -1,0 +1,104 @@
+name: build and cache
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/actions/setup-nix/**'
+      - '.github/workflows/test.yml'
+      - 'applications/**'
+      - 'flake-module.nix'
+      - 'flake.lock'
+      - 'flake.nix'
+      - 'homes/**'
+      - 'lib/**'
+      - 'modules/**'
+      - 'overlays/**'
+      - 'pkgs/**'
+      - 'systems/**'
+jobs:
+  changes:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      pull-requests: read
+    outputs:
+      nix: ${{ steps.filter.outputs.nix }}
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: dorny/paths-filter@fbd0ab8f3e69293af611ebaee6363fc25e6d187d # v4.0.1
+        id: filter
+        with:
+          filters: |
+            nix:
+              - '.github/actions/setup-nix/**'
+              - '.github/workflows/test.yml'
+              - 'applications/**'
+              - 'flake-module.nix'
+              - 'flake.lock'
+              - 'flake.nix'
+              - 'homes/**'
+              - 'lib/**'
+              - 'modules/**'
+              - 'overlays/**'
+              - 'pkgs/**'
+              - 'systems/**'
+  check:
+    needs: changes
+    if: ${{ !cancelled() && (needs.changes.outputs.nix == 'true' || github.event_name == 'push') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      - uses: ./.github/actions/setup-nix
+        with:
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Check flake
+        run: nix flake check --no-build --all-systems --keep-going
+  build:
+    needs: [changes, check]
+    if: ${{ !cancelled() }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, ubuntu-24.04-arm, macos-14]
+    steps:
+      - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+        if: needs.check.result == 'success'
+      # macos-14 runners ship with only ~14GB free, which is exhausted by
+      # large builds like emacs-plus and terraform-provider-cloudflare.
+      # Drop the bundled toolchains we never use to reclaim space before
+      # the nix store grows.
+      - name: Free disk space (darwin)
+        if: needs.check.result == 'success' && matrix.os == 'macos-14'
+        run: |
+          sudo rm -rf \
+            /Applications/Xcode_*.app \
+            /Library/Developer/CoreSimulator \
+            /Library/Android \
+            ~/.dotnet \
+            /usr/local/share/chromium \
+            /usr/local/lib/node_modules \
+            /usr/local/share/powershell || true
+          df -h
+      - uses: ./.github/actions/setup-nix
+        if: needs.check.result == 'success'
+        with:
+          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+      - name: Create /run for darwin
+        if: needs.check.result == 'success' && matrix.os == 'macos-14'
+        run: |
+          printf "run\tprivate/var/run\n" | sudo tee -a /etc/synthetic.conf
+          /System/Library/Filesystems/apfs.fs/Contents/Resources/apfs.util -t || true
+      - name: build
+        if: needs.check.result == 'success'
+        run: |
+          export MAKEFLAGS="NIX:=nix"
+          make build
+          df -h
