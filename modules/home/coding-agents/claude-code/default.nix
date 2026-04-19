@@ -20,7 +20,10 @@ in
       package = pkgs.edge.claude-code-bin;
 
       settings = {
-        includeCoAuthoredBy = false;
+        attribution = {
+          commit = "";
+          pr = "";
+        };
 
         statusLine = {
           type = "command";
