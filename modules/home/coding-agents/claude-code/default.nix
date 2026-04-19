@@ -105,7 +105,7 @@ in
             "mcp__nixos*"
             "mcp__playwright__*"
           ];
-          defaultMode = "plan";
+          defaultMode = "auto";
         };
 
         hooks = {
