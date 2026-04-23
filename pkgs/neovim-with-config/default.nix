@@ -39,7 +39,6 @@ let
     "matchit.vim"
     "matchparen.vim"
     "netrwPlugin.vim"
-    "tohtml.lua"
     "tutor.vim"
   ];
 
