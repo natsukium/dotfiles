@@ -128,13 +128,13 @@ in
         };
       };
 
-      memory.source = ../common/AGENTS.md;
+      context = ../common/AGENTS.md;
 
       agentsDir = ./agents;
 
       commandsDir = ./commands;
 
-      skillsDir = ../common/skills;
+      skills = ../common/skills;
 
       lspServers = {
         nix = {
