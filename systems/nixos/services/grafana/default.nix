@@ -18,6 +18,12 @@
           type = "prometheus";
           url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
         }
+        {
+          name = "Loki";
+          type = "loki";
+          uid = "loki";
+          url = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}";
+        }
       ];
       dashboards.settings = {
         apiVersion = 1;

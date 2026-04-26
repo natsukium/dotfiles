@@ -1,4 +1,6 @@
 {
+  imports = [ ./alloy.nix ];
+
   services.comin = {
     enable = true;
     remotes = [
