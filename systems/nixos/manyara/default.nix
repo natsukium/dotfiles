@@ -15,6 +15,7 @@
     ../services/calibre-web
     ../services/forgejo
     ../services/grafana
+    ../services/loki
     ../services/miniflux
     ../services/prometheus
     ./hardware-configuration.nix
