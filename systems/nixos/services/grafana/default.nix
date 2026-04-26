@@ -19,6 +19,18 @@
           url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
         }
       ];
+      dashboards.settings = {
+        apiVersion = 1;
+        providers = [
+          {
+            name = "nix-managed";
+            options.path = "${./dashboards}";
+            options.foldersFromFilesStructure = true;
+            allowUiUpdates = false;
+            disableDeletion = true;
+          }
+        ];
+      };
     };
   };
 

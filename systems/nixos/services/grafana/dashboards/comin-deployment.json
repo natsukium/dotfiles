@@ -1,0 +1,923 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": {
+					"type": "grafana",
+					"uid": "-- Grafana --"
+				},
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"type": "dashboard"
+			}
+		]
+	},
+	"editable": true,
+	"fiscalYearStartMonth": 0,
+	"graphTooltip": 0,
+	"links": [],
+	"panels": [
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"decimals": 0,
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "blue",
+								"value": 0
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 0,
+				"y": 0
+			},
+			"id": 4,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "center",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "count(up{job=\"comin\"})",
+					"instant": true,
+					"refId": "A"
+				}
+			],
+			"title": "Total Hosts",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"decimals": 0,
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 8,
+				"y": 0
+			},
+			"id": 5,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "center",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "count(comin_deployment_info{status=\"done\"}) or vector(0)",
+					"instant": true,
+					"refId": "A"
+				}
+			],
+			"title": "Successful Deployments",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"decimals": 0,
+					"mappings": [
+						{
+							"options": {
+								"0": {
+									"color": "green",
+									"text": "None"
+								}
+							},
+							"type": "value"
+						}
+					],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 12,
+				"y": 0
+			},
+			"id": 3,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "center",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "count(comin_deployment_info{status=\"failed\"}) or vector(0)",
+					"instant": true,
+					"refId": "A"
+				}
+			],
+			"title": "Failed Deployments",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"decimals": 0,
+					"mappings": [
+						{
+							"options": {
+								"0": {
+									"color": "green",
+									"text": "None"
+								}
+							},
+							"type": "value"
+						}
+					],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							},
+							{
+								"color": "orange",
+								"value": 1
+							},
+							{
+								"color": "red",
+								"value": 3
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 16,
+				"y": 0
+			},
+			"id": 2,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "center",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "count(comin_host_info{need_to_reboot=\"1\"}) or vector(0)",
+					"instant": true,
+					"refId": "A"
+				}
+			],
+			"title": "Hosts Requiring Reboot",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"custom": {
+						"align": "left",
+						"cellOptions": {
+							"type": "auto"
+						},
+						"footer": {
+							"reducers": []
+						},
+						"inspect": false
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Status"
+						},
+						"properties": [
+							{
+								"id": "mappings",
+								"value": [
+									{
+										"options": {
+											"done": {
+												"color": "green",
+												"text": "Done"
+											},
+											"failed": {
+												"color": "red",
+												"text": "Failed"
+											}
+										},
+										"type": "value"
+									}
+								]
+							},
+							{
+								"id": "custom.width",
+								"value": 142
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Commit"
+						},
+						"properties": [
+							{
+								"id": "custom.width",
+								"value": 371
+							},
+							{
+								"id": "links",
+								"value": [
+									{
+										"targetBlank": true,
+										"title": "View commit on GitHub",
+										"url": "https://github.com/natsukium/dotfiles/commit/${__value.text}"
+									}
+								]
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Reboot"
+						},
+						"properties": [
+							{
+								"id": "mappings",
+								"value": [
+									{
+										"options": {
+											"0": {
+												"color": "green",
+												"text": "No"
+											},
+											"1": {
+												"color": "orange",
+												"text": "Yes"
+											}
+										},
+										"type": "value"
+									}
+								]
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Host"
+						},
+						"properties": [
+							{
+								"id": "custom.width",
+								"value": 172
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Drift"
+						},
+						"properties": [
+							{
+								"id": "custom.hidden",
+								"value": true
+							},
+							{
+								"id": "custom.cellOptions",
+								"value": {
+									"applyToRow": true,
+									"mode": "basic",
+									"type": "color-background"
+								}
+							},
+							{
+								"id": "thresholds",
+								"value": {
+									"mode": "absolute",
+									"steps": [
+										{
+											"color": "transparent",
+											"value": null
+										},
+										{
+											"color": "red",
+											"value": 1
+										}
+									]
+								}
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 10,
+				"w": 24,
+				"x": 0,
+				"y": 4
+			},
+			"id": 1,
+			"options": {
+				"cellHeight": "sm",
+				"showHeader": true,
+				"sortBy": [
+					{
+						"desc": true,
+						"displayName": "Reboot"
+					}
+				]
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "comin_deployment_info",
+					"format": "table",
+					"instant": true,
+					"refId": "Deploy"
+				},
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "comin_host_info",
+					"format": "table",
+					"instant": true,
+					"refId": "Reboot"
+				},
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "count by (instance) (comin_deployment_info unless on(commit_id) comin_expected_commit_info)",
+					"format": "table",
+					"instant": true,
+					"refId": "Drift"
+				}
+			],
+			"title": "Deployment Status",
+			"transformations": [
+				{
+					"id": "joinByField",
+					"options": {
+						"byField": "instance",
+						"mode": "outer"
+					}
+				},
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"pattern": "^(instance|status|commit_id|need_to_reboot|Value #Drift)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"indexByName": {
+							"Value #Drift": 4,
+							"commit_id": 2,
+							"instance": 0,
+							"need_to_reboot": 3,
+							"status": 1
+						},
+						"renameByName": {
+							"Value #Drift": "Drift",
+							"commit_id": "Commit",
+							"instance": "Host",
+							"need_to_reboot": "Reboot",
+							"status": "Status"
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"custom": {
+						"align": "right",
+						"cellOptions": {
+							"type": "auto"
+						},
+						"footer": {
+							"reducers": []
+						},
+						"inspect": false
+					},
+					"decimals": 0,
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": [
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Host"
+						},
+						"properties": [
+							{
+								"id": "custom.align",
+								"value": "left"
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Success Rate"
+						},
+						"properties": [
+							{
+								"id": "unit",
+								"value": "percentunit"
+							},
+							{
+								"id": "decimals",
+								"value": 2
+							},
+							{
+								"id": "thresholds",
+								"value": {
+									"mode": "absolute",
+									"steps": [
+										{
+											"color": "red",
+											"value": 0
+										},
+										{
+											"color": "yellow",
+											"value": 0.95
+										},
+										{
+											"color": "green",
+											"value": 0.99
+										}
+									]
+								}
+							}
+						]
+					},
+					{
+						"matcher": {
+							"id": "byName",
+							"options": "Failed"
+						},
+						"properties": [
+							{
+								"id": "thresholds",
+								"value": {
+									"mode": "absolute",
+									"steps": [
+										{
+											"color": "green",
+											"value": 0
+										},
+										{
+											"color": "orange",
+											"value": 10
+										},
+										{
+											"color": "red",
+											"value": 50
+										}
+									]
+								}
+							}
+						]
+					}
+				]
+			},
+			"gridPos": {
+				"h": 8,
+				"w": 24,
+				"x": 0,
+				"y": 14
+			},
+			"id": 7,
+			"options": {
+				"cellHeight": "sm",
+				"showHeader": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "comin_fetch_count{status=\"succeeded\"}",
+					"format": "table",
+					"instant": true,
+					"refId": "Succeeded"
+				},
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "comin_fetch_count{status=\"failed\"}",
+					"format": "table",
+					"instant": true,
+					"refId": "Failed"
+				}
+			],
+			"title": "Git Fetch Statistics",
+			"transformations": [
+				{
+					"id": "joinByField",
+					"options": {
+						"byField": "instance",
+						"mode": "outer"
+					}
+				},
+				{
+					"id": "filterFieldsByName",
+					"options": {
+						"include": {
+							"pattern": "^(instance|Value #Succeeded|Value #Failed)$"
+						}
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"renameByName": {
+							"Value #Failed": "Failed",
+							"Value #Succeeded": "Succeeded",
+							"instance": "Host"
+						}
+					}
+				},
+				{
+					"id": "calculateField",
+					"options": {
+						"alias": "Total",
+						"binary": {
+							"left": "Succeeded",
+							"operator": "+",
+							"right": "Failed"
+						},
+						"mode": "binary"
+					}
+				},
+				{
+					"id": "calculateField",
+					"options": {
+						"alias": "Success Rate",
+						"binary": {
+							"left": "Succeeded",
+							"operator": "/",
+							"right": "Total"
+						},
+						"mode": "binary"
+					}
+				},
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {
+							"Total": true
+						},
+						"indexByName": {
+							"Failed": 2,
+							"Host": 0,
+							"Succeeded": 1,
+							"Success Rate": 3
+						}
+					}
+				}
+			],
+			"type": "table"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"decimals": 0,
+					"mappings": [
+						{
+							"options": {
+								"0": {
+									"color": "green",
+									"text": "None"
+								}
+							},
+							"type": "value"
+						}
+					],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							},
+							{
+								"color": "red",
+								"value": 1
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 4,
+				"y": 0
+			},
+			"id": 8,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "center",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "count(up{job=\"comin\"} == 0) or vector(0)",
+					"instant": true,
+					"refId": "A"
+				}
+			],
+			"title": "Hosts Down",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "PBFA97CFB590B2093"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"decimals": 0,
+					"mappings": [
+						{
+							"options": {
+								"0": {
+									"color": "green",
+									"text": "In sync"
+								}
+							},
+							"type": "value"
+						}
+					],
+					"noValue": "no ref",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							},
+							{
+								"color": "orange",
+								"value": 1
+							},
+							{
+								"color": "red",
+								"value": 3
+							}
+						]
+					},
+					"unit": "none"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 4,
+				"x": 20,
+				"y": 0
+			},
+			"id": 9,
+			"options": {
+				"colorMode": "background",
+				"graphMode": "none",
+				"justifyMode": "center",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "PBFA97CFB590B2093"
+					},
+					"expr": "(count(comin_deployment_info unless on(commit_id) comin_expected_commit_info) or vector(0)) and on() (count(comin_expected_commit_info) > 0)",
+					"instant": true,
+					"refId": "A"
+				}
+			],
+			"title": "Drift Hosts",
+			"type": "stat"
+		}
+	],
+	"preload": false,
+	"refresh": "30s",
+	"schemaVersion": 42,
+	"tags": ["nixos", "comin", "deployment"],
+	"templating": {
+		"list": []
+	},
+	"time": {
+		"from": "now-24h",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "browser",
+	"title": "Comin Deployment",
+	"uid": "202de2d6-b145-46f1-94ce-af33d6b66875",
+	"weekStart": ""
+}
