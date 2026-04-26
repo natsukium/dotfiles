@@ -15,14 +15,14 @@
     enable32Bit = true;
   };
 
-  virtualisation.docker = {
-    enable = true;
-    enableNvidia = true;
-  };
+  virtualisation.docker.enable = true;
 
-  # docker.enableNvidia enables nvidia-container-toolkit, which added an assertion
-  # requiring explicit driver configuration. On WSL, drivers come from Windows.
-  hardware.nvidia-container-toolkit.suppressNvidiaDriverAssertion = true;
+  # nvidia-container-toolkit added an assertion requiring explicit driver
+  # configuration. On WSL, drivers come from Windows.
+  hardware.nvidia-container-toolkit = {
+    enable = true;
+    suppressNvidiaDriverAssertion = true;
+  };
 
   fonts.packages = with pkgs; [
     noto-fonts-cjk-sans
