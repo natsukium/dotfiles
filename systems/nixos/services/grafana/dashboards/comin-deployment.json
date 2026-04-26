@@ -902,6 +902,141 @@
 			],
 			"title": "Drift Hosts",
 			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "loki",
+				"uid": "loki"
+			},
+			"description": "Per-host log volume. Spikes correlate with deploy attempts; sustained volume on a single host hints at a flapping evaluation or build loop.",
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "palette-classic"
+					},
+					"custom": {
+						"axisCenteredZero": false,
+						"axisColorMode": "text",
+						"axisLabel": "",
+						"axisPlacement": "auto",
+						"barAlignment": 0,
+						"drawStyle": "bars",
+						"fillOpacity": 60,
+						"gradientMode": "none",
+						"hideFrom": {
+							"legend": false,
+							"tooltip": false,
+							"viz": false
+						},
+						"lineInterpolation": "linear",
+						"lineWidth": 1,
+						"pointSize": 5,
+						"scaleDistribution": {
+							"type": "linear"
+						},
+						"showPoints": "never",
+						"spanNulls": false,
+						"stacking": {
+							"group": "A",
+							"mode": "normal"
+						},
+						"thresholdsStyle": {
+							"mode": "off"
+						}
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green",
+								"value": 0
+							}
+						]
+					},
+					"unit": "short"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 24,
+				"x": 0,
+				"y": 24
+			},
+			"id": 11,
+			"options": {
+				"legend": {
+					"calcs": ["sum"],
+					"displayMode": "table",
+					"placement": "right",
+					"showLegend": true
+				},
+				"tooltip": {
+					"mode": "multi",
+					"sort": "desc"
+				}
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "loki",
+						"uid": "loki"
+					},
+					"editorMode": "code",
+					"expr": "sum by (host) (count_over_time({job=\"comin\", host=~\"$host\"}[$__interval]))",
+					"legendFormat": "{{host}}",
+					"queryType": "range",
+					"refId": "A"
+				}
+			],
+			"title": "Comin Log Volume by Host",
+			"type": "timeseries"
+		},
+		{
+			"datasource": {
+				"type": "loki",
+				"uid": "loki"
+			},
+			"description": "Live log stream from comin.service across all selected hosts (Linux journald + macOS /var/log/comin.log). Each line is prefixed with [host] so multiple hosts can be read in a single panel.",
+			"fieldConfig": {
+				"defaults": {},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 14,
+				"w": 24,
+				"x": 0,
+				"y": 30
+			},
+			"id": 10,
+			"options": {
+				"dedupStrategy": "none",
+				"enableInfiniteScrolling": true,
+				"enableLogDetails": true,
+				"prettifyLogMessage": false,
+				"showCommonLabels": false,
+				"showLabels": false,
+				"showTime": true,
+				"sortOrder": "Descending",
+				"wrapLogMessage": true
+			},
+			"pluginVersion": "12.3.1",
+			"targets": [
+				{
+					"datasource": {
+						"type": "loki",
+						"uid": "loki"
+					},
+					"editorMode": "code",
+					"expr": "{job=\"comin\", host=~\"$host\"} | logfmt | line_format `[{{ printf \"%-12s\" .host }}] {{ if .level }}[{{ .level }}] {{ end }}{{ if .msg }}{{ .msg }}{{ else }}{{ __line__ }}{{ end }}`",
+					"queryType": "range",
+					"refId": "A"
+				}
+			],
+			"title": "Comin Logs",
+			"type": "logs"
 		}
 	],
 	"preload": false,
@@ -909,7 +1044,34 @@
 	"schemaVersion": 42,
 	"tags": ["nixos", "comin", "deployment"],
 	"templating": {
-		"list": []
+		"list": [
+			{
+				"current": {
+					"text": ["All"],
+					"value": ["$__all"]
+				},
+				"datasource": {
+					"type": "loki",
+					"uid": "loki"
+				},
+				"definition": "",
+				"includeAll": true,
+				"label": "Host",
+				"multi": true,
+				"name": "host",
+				"options": [],
+				"query": {
+					"label": "host",
+					"refId": "LokiVariableQueryEditor-VariableQuery",
+					"stream": "{job=\"comin\"}",
+					"type": 1
+				},
+				"refresh": 2,
+				"regex": "",
+				"sort": 1,
+				"type": "query"
+			}
+		]
 	},
 	"time": {
 		"from": "now-24h",
