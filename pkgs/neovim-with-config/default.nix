@@ -1,7 +1,6 @@
 {
   lib,
   neovim-unwrapped,
-  neovimUtils,
   vimPlugins,
   wrapNeovimUnstable,
 
@@ -103,22 +102,19 @@ let
     (lib.makeBinPath (language-servers ++ tools))
   ];
 
-  config = neovimUtils.makeNeovimConfig {
-    withNodeJs = true; # for copilot
-    withRuby = false;
-    withPython3 = false;
-    vimAlias = true;
-    customLuaRC = ''
-      vim.opt.rtp:prepend('${./.}')
-
-      ${builtins.readFile ./init.lua}
-    '';
-
-    plugins = import ./plugins.nix { inherit vimPlugins; };
-
-  };
 in
-(wrapNeovimUnstable neovim-unwrapped' (
-  # if wrapperArgs is defined directly in config, it will somehow be overwritten
-  config // { wrapperArgs = config.wrapperArgs ++ extraWrapperArgs; }
-))
+wrapNeovimUnstable neovim-unwrapped' {
+  withNodeJs = true; # for copilot
+  withRuby = false;
+  withPython3 = false;
+  vimAlias = true;
+  luaRcContent = ''
+    vim.opt.rtp:prepend('${./.}')
+
+    ${builtins.readFile ./init.lua}
+  '';
+
+  plugins = import ./plugins.nix { inherit vimPlugins; };
+
+  wrapperArgs = extraWrapperArgs;
+}

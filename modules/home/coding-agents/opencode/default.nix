@@ -22,7 +22,9 @@ in
         instructions = [ "CLAUDE.md" ];
 
         autoupdate = false;
+      };
 
+      tui = {
         theme = "nord";
       };
     };
