@@ -26,6 +26,8 @@ provider "cloudflare" {
 }
 
 locals {
+  cloudflare_account_id = "dd87ce894022aec81eacd8ff1948438e"
+  zone_id               = "d318cc678ba046e46f9a7bc69f735764"
   records = {
     dotfiles = {
       content = "natsukium.github.io"
@@ -42,6 +44,14 @@ locals {
     forgejo = {
       content = "acfc103f-c6b4-4cef-8269-e1985b80e1ac.cfargotunnel.com"
       name    = "git.natsukium.com"
+      proxied = true
+      type    = "CNAME"
+    }
+    matrix = {
+      # cloudflared origin for the homeserver itself; clients and federation
+      # are pointed here by the apex Worker below, not directly via DNS.
+      content = "acfc103f-c6b4-4cef-8269-e1985b80e1ac.cfargotunnel.com"
+      name    = "matrix.natsukium.com"
       proxied = true
       type    = "CNAME"
     }
@@ -73,5 +83,20 @@ resource "cloudflare_dns_record" "record" {
   proxied  = each.value.proxied
   ttl      = 1
   type     = each.value.type
-  zone_id  = "d318cc678ba046e46f9a7bc69f735764"
+  zone_id  = local.zone_id
+}
+
+# apex delegation for Matrix discovery.
+# server_name = natsukium.com lets us use @user:natsukium.com mxids.
+resource "cloudflare_workers_script" "matrix_well_known" {
+  account_id  = local.cloudflare_account_id
+  script_name = "matrix-well-known"
+  content     = file("${path.module}/matrix-well-known.js")
+  main_module = "matrix-well-known.js"
+}
+
+resource "cloudflare_workers_route" "matrix_well_known" {
+  zone_id = local.zone_id
+  pattern = "natsukium.com/.well-known/matrix/*"
+  script  = cloudflare_workers_script.matrix_well_known.script_name
 }
