@@ -13,4 +13,11 @@
   ];
 
   my.services.copyq.enable = true;
+  my.services.flameshot = {
+    enable = true;
+    settings.General = {
+      startupLaunch = false;
+      saveLastRegion = true;
+    };
+  };
 }
