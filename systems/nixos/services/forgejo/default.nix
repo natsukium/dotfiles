@@ -29,30 +29,16 @@
       --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})" || true
   '';
 
-  services.cloudflared =
+  services.cloudflared.tunnels.${config.my.services.cloudflared-tunnel.id}.ingress.${config.services.forgejo.settings.server.DOMAIN} =
     let
-      inherit (config.services.forgejo.settings.server) DOMAIN HTTP_ADDR HTTP_PORT;
+      inherit (config.services.forgejo.settings.server) HTTP_ADDR HTTP_PORT;
     in
     {
-      tunnels = {
-        "acfc103f-c6b4-4cef-8269-e1985b80e1ac" = {
-          credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
-          ingress = {
-            "${DOMAIN}" = {
-              service = "http://${toString HTTP_ADDR}:${toString HTTP_PORT}";
-            };
-          };
-          default = "http_status:404";
-        };
-      };
+      service = "http://${toString HTTP_ADDR}:${toString HTTP_PORT}";
     };
 
   sops.secrets.forgejo-admin-password = {
     sopsFile = ./secrets.yaml;
     owner = "forgejo";
-  };
-
-  sops.secrets.cloudflared-tunnel = {
-    sopsFile = ./secrets.yaml;
   };
 }

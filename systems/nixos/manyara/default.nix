@@ -48,6 +48,20 @@
     certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
   };
 
+  my.services.cloudflared-tunnel = {
+    enable = true;
+    # reuses the tunnel originally created for forgejo so all manyara-hosted
+    # services share a single cloudflared connection rather than each opening
+    # their own; DNS for git.natsukium.com / matrix.natsukium.com both CNAME
+    # to <id>.cfargotunnel.com
+    id = "acfc103f-c6b4-4cef-8269-e1985b80e1ac";
+    credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
+  };
+
+  sops.secrets.cloudflared-tunnel = {
+    sopsFile = ../services/forgejo/secrets.yaml;
+  };
+
   services.simple-wol-manager = {
     enable = true;
     host = "0.0.0.0";
