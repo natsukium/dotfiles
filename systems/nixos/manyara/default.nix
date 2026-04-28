@@ -7,7 +7,7 @@
 {
   imports = [
     ../../../modules/profiles/nixos/base.nix
-    ../../../modules/profiles/nixos/server.nix
+    ../../../modules/profiles/nixos/home-server.nix
     ../../shared/comin/prometheus.nix
     ../common.nix
     ../services/adguardhome
@@ -106,6 +106,22 @@
   };
 
   networking.firewall.allowedTCPPorts = [ 8384 ];
+
+  my.services.matrix-continuwuity = {
+    serverName = "natsukium.com";
+    apiHost = "matrix.natsukium.com";
+    environmentFile = config.sops.templates."continuwuity.env".path;
+  };
+
+  sops.secrets.matrix-registration-token.sopsFile = ./secrets.yaml;
+  sops.templates."continuwuity.env" = {
+    content = ''
+      CONTINUWUITY_REGISTRATION_TOKEN=${config.sops.placeholder.matrix-registration-token}
+    '';
+    owner = config.services.matrix-continuwuity.user;
+    group = config.services.matrix-continuwuity.group;
+    mode = "0440";
+  };
 
   sops.secrets.cloudflared-tunnel-cert = { };
 }
