@@ -106,6 +106,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<nixos-facter-modules>>
     # Infrastructure
     <<comin>>
+    <<microvm>>
     <<sops-nix>>
     <<tsnsrv>>
     # Development Tools
@@ -120,6 +121,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<edgepkgs>>
     <<emacs-overlay>>
     <<firefox-addons>>
+    <<hermes-agent>>
     <<mcp-servers>>
     <<niri-flake>>
     <<nur-packages>>
@@ -397,6 +399,29 @@ comin = {
 };
 #+end_src
 
+***** microvm
+
+https://github.com/astro/microvm.nix
+
+#+BEGIN_QUOTE
+NixOS modules for declaring & running virtual machines from within your system Flake configuration
+#+END_QUOTE
+
+Lightweight per-VM isolation suitable for running somewhat untrusted code.
+Used to sandbox third-party agent code (hermes-agent) so crashes, runaway
+tool invocations, or compromise of the agent runtime cannot reach the host's
+service stack. A microvm is preferred over a plain systemd-nspawn container
+because the qemu/firecracker boundary blocks kernel-level escapes that
+container namespacing alone does not.
+
+#+NAME: microvm
+#+begin_src nix
+microvm = {
+  url = "github:astro/microvm.nix";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
 ***** sops-nix
 
 https://github.com/Mic92/sops-nix
@@ -625,6 +650,26 @@ management through home-manager.
 #+begin_src nix
 firefox-addons = {
   url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** hermes-agent
+
+https://github.com/NousResearch/hermes-agent
+
+#+BEGIN_QUOTE
+The self-improving AI agent built by Nous Research
+#+END_QUOTE
+
+Provides the upstream NixOS module (=nixosModules.default=) and packaged Python
+build of hermes-agent.
+
+#+NAME: hermes-agent
+#+begin_src nix
+hermes-agent = {
+  url = "github:NousResearch/hermes-agent";
+  inputs.flake-parts.follows = "flake-parts";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 #+end_src
