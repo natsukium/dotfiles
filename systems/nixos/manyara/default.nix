@@ -13,6 +13,7 @@
     ../services/adguardhome
     ../services/atuin
     ../services/calibre-web
+    ../services/continuwuity
     ../services/forgejo
     ../services/grafana
     ../services/loki
