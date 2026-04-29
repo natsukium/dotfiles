@@ -16,6 +16,7 @@
     ../services/continuwuity
     ../services/forgejo
     ../services/grafana
+    ../services/hermes-agent
     ../services/home-assistant
     ../services/loki
     ../services/miniflux
