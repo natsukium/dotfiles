@@ -28,4 +28,17 @@
     _1password.enable = true; # Integration with the 1Password GUI
     _1password-gui.enable = true;
   };
+
+  services.ollama = {
+    enable = true;
+    host = "0.0.0.0";
+    loadModels = [
+      "gemma4:31b"
+      "gemma4:e4b"
+      "nemotron-3-super:120b"
+      "nemotron3:33b"
+      "qwen3.6:27b"
+      "qwen3.6:35b"
+    ];
+  };
 }
