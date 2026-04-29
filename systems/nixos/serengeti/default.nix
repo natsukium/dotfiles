@@ -45,6 +45,16 @@
   };
   sops.secrets.cloudflared-tunnel-cert = { };
 
+  my.services.cloudflared-tunnel = {
+    enable = true;
+    id = "1af5e046-7d0f-4fa4-9366-69eb490d5119";
+    credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
+  };
+
+  sops.secrets.cloudflared-tunnel = {
+    sopsFile = ./secrets.yaml;
+  };
+
   nix.settings = {
     max-jobs = 2;
   };

@@ -37,25 +37,11 @@ in
     };
   };
 
-  services.cloudflared = {
-    tunnels = {
-      "1af5e046-7d0f-4fa4-9366-69eb490d5119" = {
-        credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
-        ingress = {
-          "cache.natsukium.com" = {
-            service = "http://localhost:${atticdPort}";
-          };
-        };
-        default = "http_status:404";
-      };
-    };
+  my.services.cloudflared-tunnel.ingress."cache.natsukium.com" = {
+    service = "http://localhost:${atticdPort}";
   };
 
   sops.secrets.atticd = {
-    sopsFile = ./secrets.yaml;
-  };
-
-  sops.secrets.cloudflared-tunnel = {
     sopsFile = ./secrets.yaml;
   };
 }

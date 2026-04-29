@@ -48,6 +48,16 @@
     certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
   };
 
+  my.services.cloudflared-tunnel = {
+    enable = true;
+    id = "acfc103f-c6b4-4cef-8269-e1985b80e1ac";
+    credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
+  };
+
+  sops.secrets.cloudflared-tunnel = {
+    sopsFile = ./secrets.yaml;
+  };
+
   services.simple-wol-manager = {
     enable = true;
     host = "0.0.0.0";
