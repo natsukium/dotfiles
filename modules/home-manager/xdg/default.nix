@@ -116,7 +116,10 @@ in
     })
     (mkIf pkgs.stdenv.hostPlatform.isDarwin {
       home.sessionVariables = {
-        XDG_RUNTIME_DIR = "\"$TMPDIR\"runtime-\"$UID\"";
+        # Use getconf because $TMPDIR is unset in SSH sessions on macOS
+        # (pam_launchd does not always populate it), which would otherwise
+        # leave XDG_RUNTIME_DIR as a relative "runtime-$UID" path.
+        XDG_RUNTIME_DIR = ''"$(getconf DARWIN_USER_TEMP_DIR 2>/dev/null || echo /tmp/)"runtime-"$UID"'';
       };
     })
   ]);
