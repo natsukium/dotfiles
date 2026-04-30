@@ -65,6 +65,11 @@ in
     package = emacs;
   };
 
+  services.emacs = {
+    enable = true;
+    client.enable = true;
+  };
+
   xdg.configFile."emacs/init.el".source = tangle ./init.org;
   xdg.configFile."emacs/early-init.el".source = tangle ./early-init.org;
   home.file.".authinfo.age".source = ./authinfo.age;
