@@ -563,6 +563,81 @@ to prevent lines from becoming unnecessarily long.
 (setq org-agenda-files '("~/dropbox/org"))
 #+end_src
 
+** org-gcal
+
+[[https://github.com/kidd/org-gcal.el][org-gcal]] provides bidirectional sync between Google Calendar and Org files
+via the native Google Calendar API.
+
+#+begin_src emacs-lisp
+(use-package org-gcal
+  :ensure t
+  :defer t)
+#+end_src
+
+Prerequisites for this configuration to function:
+
+1. On the personal Cloud Project, the Google Calendar API is enabled
+   and =https://www.googleapis.com/auth/calendar= is added
+   to the OAuth consent screen scopes.
+2. =~/.authinfo.age= contains entries:
+   #+begin_example
+   machine org-gcal login client-id password <client-id>
+   machine org-gcal login client-secret password <client-secret>
+   #+end_example
+
+org-gcal registers an =oauth2-auto= provider entry at package load time
+only when both =org-gcal-client-id= and =org-gcal-client-secret= are
+already set; otherwise it skips registration and warns.
+Since these variables are populated after the package loads,
+=org-gcal-reload-client-id-secret= must be called explicitly to perform
+the registration with the populated values.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-gcal
+  (setq org-gcal-client-id
+        (auth-source-pick-first-password :host "org-gcal" :user "client-id"))
+  (setq org-gcal-client-secret
+        (auth-source-pick-first-password :host "org-gcal" :user "client-secret"))
+  (org-gcal-reload-client-id-secret))
+#+end_src
+
+org-gcal supports only one global OAuth client.
+To sync calendars from multiple accounts, share the secondary calendars
+to the authorized account via Google Calendar's sharing UI
+with "Make changes to events" permission.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-gcal
+  (setq org-gcal-fetch-file-alist
+        `(("tomoya.otabi@gmail.com" . ,(concat org-root "gcal-personal.org"))
+          ("tomoya.otabi@attm.co.jp" . ,(concat org-root "gcal-work.org")))))
+#+end_src
+
+The empty-file pre-creation works around
+[[https://github.com/telotortium/emacs-oauth2-auto/issues/6][emacs-oauth2-auto issue #6]]:
+when =~/.config/emacs/= contains symlinks (here from home-manager
+managing other emacs config files), oauth2-auto's first write to the
+plstore fails an internal file/buffer identity check.
+Pre-creating the file before the first sync lets that check succeed.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'oauth2-auto
+  (unless (file-exists-p oauth2-auto-plstore)
+    (write-region "" nil oauth2-auto-plstore)))
+#+end_src
+
+org-gcal stores one plstore entry per calendar ID
+and each one is read on every sync to retrieve the access token,
+so without passphrase caching the user is prompted by pinentry
+multiple times per sync.
+=plstore-cache-passphrase-for-symmetric-encryption=
+caches the passphrase within the Emacs session
+to reduce this to a single prompt after Emacs restart.
+
+#+begin_src emacs-lisp
+(setq plstore-cache-passphrase-for-symmetric-encryption t)
+#+end_src
+
 ** org-roam
 #+begin_src emacs-lisp
 (use-package org-roam

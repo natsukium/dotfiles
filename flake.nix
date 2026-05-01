@@ -325,6 +325,7 @@
                     priority = 10;
                     excludes = [
                       ".sops.yaml"
+                      "\\*.age$"
                       "homes/shared/gpg/keys.txt"
                       "secrets.yaml"
                       "secrets/default.yaml"
