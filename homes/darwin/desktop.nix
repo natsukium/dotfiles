@@ -14,8 +14,7 @@ let
 in
 {
   imports = [
-    ../../applications/hammerspoon
-    ../../applications/jankyborders
+    ../../applications/paneru
     ../../applications/sketchybar
     ../desktop.nix
     ./gui-apps-utils

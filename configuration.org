@@ -123,6 +123,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<mcp-servers>>
     <<niri-flake>>
     <<nur-packages>>
+    <<paneru>>
     <<simple-wol-manager>>
     <<zen-browser>>
   };
@@ -684,6 +685,34 @@ that are either too niche for nixpkgs or require customizations.
 nur-packages = {
   url = "github:natsukium/nur-packages";
   inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** paneru
+
+https://github.com/karinushka/paneru (fork: https://github.com/natsukium/paneru)
+
+#+begin_quote
+A sliding, tiling window manager for MacOS.
+#+end_quote
+
+Paneru brings the Niri-style scrollable tiling workflow used on Linux machines
+to macOS. Among the window managers tried for this purpose, it has run the
+most stably in day-to-day use, which is why it was chosen.
+
+The =natsukium/paneru= fork exists for a single reason: upstream tiles Emacs
+child frames — the floating windows used by completion UIs such as Corfu —
+alongside their parent, which collapses the popup. The fork keeps child
+frames floating. Once the patch has been confirmed stable in daily use, the
+plan is to send it upstream and switch this input back to =karinushka/paneru=.
+
+#+NAME: paneru
+#+begin_src nix
+paneru = {
+  url = "github:natsukium/paneru/fix/emacs-child-frame";
+  inputs.flake-parts.follows = "flake-parts";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.nix-darwin.follows = "darwin";
 };
 #+end_src
 

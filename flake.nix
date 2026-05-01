@@ -131,6 +131,12 @@
       url = "github:natsukium/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    paneru = {
+      url = "github:natsukium/paneru/fix/emacs-child-frame";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nix-darwin.follows = "darwin";
+    };
     simple-wol-manager = {
       url = "git+https://git.natsukium.com/natsukium/simple-wol-manager";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -325,7 +331,6 @@
                     priority = 10;
                     excludes = [
                       ".sops.yaml"
-                      "\\*.age$"
                       "homes/shared/gpg/keys.txt"
                       "secrets.yaml"
                       "secrets/default.yaml"

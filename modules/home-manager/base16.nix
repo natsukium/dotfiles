@@ -67,15 +67,15 @@ in
       type = types.bool;
       default = true;
     };
-    jankyborders = mkOption {
-      type = types.bool;
-      default = true;
-    };
     kitty = mkOption {
       type = types.bool;
       default = true;
     };
     mako = mkOption {
+      type = types.bool;
+      default = true;
+    };
+    paneru = mkOption {
       type = types.bool;
       default = true;
     };
@@ -297,12 +297,6 @@ in
         };
       };
     })
-    (mkIf cfg.jankyborders {
-      services.jankyborders.settings = {
-        active_color = "0xff${base0D}";
-        inactive_color = "0xff${base03}";
-      };
-    })
     (mkIf cfg.kitty {
       programs.kitty.settings = {
         background = "#${base00}";
@@ -367,6 +361,13 @@ in
           text-color=#${base08}
           border-color=#${base0D}
         '';
+      };
+    })
+    (mkIf cfg.paneru {
+      services.paneru.settings.decorations.active.border = {
+        enabled = true;
+        color = "#${base0D}";
+        width = 2.0;
       };
     })
     (mkIf cfg.qutebrowser {
