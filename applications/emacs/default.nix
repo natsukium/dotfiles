@@ -51,6 +51,8 @@ let
         (claude-code-ide epkgs)
         pkgs.notmuch.emacs
         pkgs.age
+        pkgs.beancount
+        pkgs.beancount-language-server
         pkgs.gettext
         pkgs.nixd
         pkgs.nixfmt

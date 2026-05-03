@@ -349,6 +349,22 @@ Use maximum font-lock level for tree-sitter modes.
 (setq treesit-font-lock-level 4)
 #+end_src
 
+** Beancount
+
+[[https://github.com/beancount/beancount-mode][beancount-mode]] is the major mode bundled with [[https://beancount.github.io/][Beancount]].
+LSP integration uses [[https://github.com/polarmutex/beancount-language-server][beancount-language-server]]
+via lsp-mode's bundled =lsp-beancount= client.
+
+Upstream only auto-registers =.beancount=,
+so =.bean= is added explicitly here for the common short extension.
+
+#+begin_src emacs-lisp
+(use-package beancount
+  :ensure t
+  :mode "\\.bean\\(count\\)?\\'"
+  :hook (beancount-mode . lsp-deferred))
+#+end_src
+
 ** Markdown
 
 https://github.com/jrblevin/markdown-mode
