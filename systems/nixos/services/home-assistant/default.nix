@@ -12,6 +12,7 @@
     config = {
       homeassistant = {
         name = "Home";
+        unit_system = "metric";
       };
       http = {
         use_x_forwarded_for = true;
