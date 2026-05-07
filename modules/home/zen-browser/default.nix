@@ -96,8 +96,8 @@ in
               keepa
               onepassword-password-manager
               refined-github
-              tampermonkey
               vimium
+              violentmonkey
               wayback-machine
               zotero-connector
             ])
