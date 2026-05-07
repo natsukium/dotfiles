@@ -21,6 +21,11 @@ in
       {
         type = "user";
         id = "hermes-net";
+        # microvm.nix made `mac` mandatory; type=user is SLIRP/NAT so the
+        # value is cosmetic, but we still pick a stable locally-administered
+        # address (02: prefix) so the guest's interface name stays the same
+        # across rebuilds.
+        mac = "02:00:00:00:48:01";
       }
     ];
 
