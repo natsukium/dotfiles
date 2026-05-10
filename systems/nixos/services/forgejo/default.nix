@@ -15,6 +15,7 @@
         HTTP_PORT = 3010;
         SSH_PORT = lib.head config.services.openssh.ports;
         DOMAIN = "git.natsukium.com";
+        ROOT_URL = "https://git.natsukium.com/";
       };
       actions = {
         ENABLED = true;
