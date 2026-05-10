@@ -13,6 +13,7 @@
       service.DISABLE_REGISTRATION = true;
       server = {
         HTTP_PORT = 3010;
+        SSH_PORT = lib.head config.services.openssh.ports;
         DOMAIN = "git.natsukium.com";
       };
       actions = {
