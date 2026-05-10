@@ -13,7 +13,13 @@
       service.DISABLE_REGISTRATION = true;
       server = {
         HTTP_PORT = 3010;
-        SSH_PORT = lib.head config.services.openssh.ports;
+        # Forgejo's builtin SSH server avoids colliding with Tailscale SSH on
+        # port 22 (tailscaled intercepts tailnet IP :22 and skips OpenSSH's
+        # authorized_keys flow, which the forced `forgejo serv` command relies
+        # on). Reachability is gated by the host firewall — only tailscale0 is
+        # in trustedInterfaces, so this stays tailnet-internal.
+        START_SSH_SERVER = true;
+        SSH_PORT = 2222;
         DOMAIN = "git.natsukium.com";
         ROOT_URL = "https://git.natsukium.com/";
       };
