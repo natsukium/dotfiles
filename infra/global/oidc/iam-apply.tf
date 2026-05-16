@@ -114,34 +114,33 @@ resource "aws_iam_role_policy_attachment" "apply_sso_directory" {
   policy_arn = "arn:aws:iam::aws:policy/AWSSSODirectoryAdministrator"
 }
 
-# AWSSSOMasterAccountAdministrator omits SAML provider management on the
-# provider that IdC creates and depends on (AWSSSO_*_DO_NOT_DELETE).
-# aws_ssoadmin_account_assignment internally calls Get/Create/Update on
-# this provider during assignment lifecycle. Scoped to AWSSSO_* providers
-# to avoid touching unrelated SAML configurations.
-data "aws_iam_policy_document" "apply_sso_saml" {
+# AWSSSOMasterAccountAdministrator's actual contents have gaps not
+# reflected in AWS docs: it lacks IAM perms for the SAML provider IdC
+# depends on (AWSSSO_*_DO_NOT_DELETE) AND for the reserved permission-set
+# roles IdC creates per assignment (aws-reserved/sso.amazonaws.com/*).
+#
+# Granting iam:* on these two specific resource ARN patterns covers the
+# full IdC operation surface without enumerating individual API calls
+# (Get/Create/Update/Delete/Attach/Detach/Tag/...) — apply_role still
+# cannot touch IAM resources outside IdC's reserved naming.
+data "aws_iam_policy_document" "apply_sso_iam" {
   statement {
-    actions = [
-      "iam:GetSAMLProvider",
-      "iam:CreateSAMLProvider",
-      "iam:UpdateSAMLProvider",
-      "iam:DeleteSAMLProvider",
-      "iam:TagSAMLProvider",
-      "iam:UntagSAMLProvider",
-      "iam:ListSAMLProviderTags",
+    actions = ["iam:*"]
+    resources = [
+      "arn:aws:iam::*:saml-provider/AWSSSO_*",
+      "arn:aws:iam::*:role/aws-reserved/sso.amazonaws.com/*",
     ]
-    resources = ["arn:aws:iam::*:saml-provider/AWSSSO_*"]
   }
 }
 
-resource "aws_iam_policy" "apply_sso_saml" {
-  name   = "apply-sso-saml-provider"
-  policy = data.aws_iam_policy_document.apply_sso_saml.json
+resource "aws_iam_policy" "apply_sso_iam" {
+  name   = "apply-sso-iam"
+  policy = data.aws_iam_policy_document.apply_sso_iam.json
 }
 
-resource "aws_iam_role_policy_attachment" "apply_sso_saml" {
+resource "aws_iam_role_policy_attachment" "apply_sso_iam" {
   role       = aws_iam_role.apply.name
-  policy_arn = aws_iam_policy.apply_sso_saml.arn
+  policy_arn = aws_iam_policy.apply_sso_iam.arn
 }
 
 # Lets apply_role self-update the OIDC stack via CI. ARN patterns bound
