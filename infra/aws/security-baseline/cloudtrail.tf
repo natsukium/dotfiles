@@ -70,7 +70,11 @@ data "aws_iam_policy_document" "cloudtrail_logs_bucket" {
       identifiers = ["cloudtrail.amazonaws.com"]
     }
     actions = ["s3:PutObject"]
+    # Org trails write under the org-id-namespaced path, but CloudTrail's
+    # preflight CreateTrail check additionally validates writes at the
+    # management account's account-id path; both must be allowed.
     resources = [
+      "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${data.aws_caller_identity.current.account_id}/*",
       "${aws_s3_bucket.cloudtrail_logs.arn}/AWSLogs/${data.terraform_remote_state.organization.outputs.organization_id}/*",
     ]
     condition {
