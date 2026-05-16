@@ -37,6 +37,12 @@ in
         tag = "ro-store";
         proto = "virtiofs";
       }
+      {
+        source = "/var/lib/syncthing/org";
+        mountPoint = "/var/lib/hermes/org";
+        tag = "org";
+        proto = "virtiofs";
+      }
     ];
 
     # Writable upper for /nix/store so the agent can `nix shell nixpkgs#…`.
@@ -87,6 +93,16 @@ in
     ];
     extraDependencyGroups = [ "matrix" ];
   };
+
+  # Shared with the manyara host (same gid 9001) so virtiofs passthrough
+  # preserves the group identity: files hermes writes land on the host with
+  # gid org-sync, and files syncthing writes are reachable here via the
+  # same group. hermes is added to the group so it can rw the org tree.
+  # The upstream hermes-agent module already sets UMask=0007, which keeps
+  # group write (files 0660, dirs 0770) so syncthing on the host can update
+  # subtrees hermes creates without a separate UMask override here.
+  users.groups.org-sync.gid = 9001;
+  users.users.hermes.extraGroups = [ "org-sync" ];
 
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,
   # so files land on the ephemeral root. Rewrite .env and config.yaml on every
