@@ -40,6 +40,8 @@ jobs:
               - 'infra/global/oidc/**'
             aws_organization:
               - 'infra/aws/organization/**'
+            aws_identity_center:
+              - 'infra/aws/identity-center/**'
             shared:
               - 'flake.lock'
               - '.github/workflows/terraform.yml'
@@ -51,6 +53,7 @@ jobs:
             "infra/global/state"
             "infra/global/oidc"
             "infra/aws/organization"
+            "infra/aws/identity-center"
           )
           if [[ "${{ steps.filter.outputs.shared }}" == "true" ]]; then
             directories=$(jq -nc --args '$ARGS.positional' -- "${all_dirs[@]}")
@@ -70,6 +73,9 @@ jobs:
             fi
             if [[ "${{ steps.filter.outputs.aws_organization }}" == "true" ]]; then
               dirs+=("infra/aws/organization")
+            fi
+            if [[ "${{ steps.filter.outputs.aws_identity_center }}" == "true" ]]; then
+              dirs+=("infra/aws/identity-center")
             fi
             directories=$(jq -nc --args '$ARGS.positional' -- "${dirs[@]}")
           fi
