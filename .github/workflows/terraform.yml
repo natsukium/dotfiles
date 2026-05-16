@@ -38,6 +38,8 @@ jobs:
               - 'infra/global/state/**'
             oidc:
               - 'infra/global/oidc/**'
+            aws_organization:
+              - 'infra/aws/organization/**'
             shared:
               - 'flake.lock'
               - '.github/workflows/terraform.yml'
@@ -48,6 +50,7 @@ jobs:
             "infra/global/domains/natsukium-com"
             "infra/global/state"
             "infra/global/oidc"
+            "infra/aws/organization"
           )
           if [[ "${{ steps.filter.outputs.shared }}" == "true" ]]; then
             directories=$(jq -nc --args '$ARGS.positional' -- "${all_dirs[@]}")
@@ -64,6 +67,9 @@ jobs:
             fi
             if [[ "${{ steps.filter.outputs.oidc }}" == "true" ]]; then
               dirs+=("infra/global/oidc")
+            fi
+            if [[ "${{ steps.filter.outputs.aws_organization }}" == "true" ]]; then
+              dirs+=("infra/aws/organization")
             fi
             directories=$(jq -nc --args '$ARGS.positional' -- "${dirs[@]}")
           fi
