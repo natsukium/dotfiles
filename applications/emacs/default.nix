@@ -22,25 +22,6 @@ let
       install emacs-lisp $out
     '';
 
-  claude-code-ide =
-    epkgs:
-    epkgs.melpaBuild {
-      pname = "claude-code-ide";
-      version = "0-unstable-2026-01-02";
-      src = pkgs.fetchFromGitHub {
-        owner = "manzaltu";
-        repo = "claude-code-ide.el";
-        rev = "760240d7f03ff16f90ede9d4f4243cd94f3fed73";
-        hash = "sha256-Abs8+r5bQSkRJC74TEq1RRZtvj4TYmL1Vijq6KO9GG4=";
-      };
-      packageRequires = with epkgs; [
-        transient
-        vterm
-        websocket
-        web-server
-      ];
-    };
-
   emacs = pkgs.emacsWithPackagesFromUsePackage {
     package = emacs-unwrapped;
     config = ./init.org;
@@ -48,7 +29,6 @@ let
     extraEmacsPackages =
       epkgs: with epkgs; [
         treesit-grammars.with-all-grammars
-        (claude-code-ide epkgs)
         pkgs.notmuch.emacs
         pkgs.age
         pkgs.beancount
