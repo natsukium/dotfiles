@@ -168,6 +168,7 @@ data "aws_iam_policy_document" "apply_iam_oidc" {
       "arn:aws:iam::*:role/github-actions-*",
       "arn:aws:iam::*:policy/tfstate-*",
       "arn:aws:iam::*:policy/apply-*",
+      "arn:aws:iam::*:policy/plan-*",
       "arn:aws:iam::*:oidc-provider/token.actions.githubusercontent.com",
     ]
   }
