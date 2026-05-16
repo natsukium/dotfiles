@@ -90,6 +90,14 @@ resource "aws_s3_bucket_policy" "cloudtrail_logs" {
   policy = data.aws_iam_policy_document.cloudtrail_logs_bucket.json
 }
 
+# Service-linked role for CloudTrail. Enabling cloudtrail.amazonaws.com
+# as a trusted service in Organizations does not auto-provision the SLR;
+# without it, CreateTrail with is_organization_trail=true fails with
+# InsufficientDependencyServiceAccessPermissionException.
+resource "aws_iam_service_linked_role" "cloudtrail" {
+  aws_service_name = "cloudtrail.amazonaws.com"
+}
+
 # Organization trail captures API activity from every member account
 # (including future ones) into a single bucket in the management account.
 # is_multi_region_trail ensures regional services are also covered without
@@ -103,7 +111,10 @@ resource "aws_cloudtrail" "org_trail" {
   include_global_service_events = true
   enable_log_file_validation    = true
 
-  depends_on = [aws_s3_bucket_policy.cloudtrail_logs]
+  depends_on = [
+    aws_s3_bucket_policy.cloudtrail_logs,
+    aws_iam_service_linked_role.cloudtrail,
+  ]
 }
 
 output "cloudtrail_logs_bucket" {
