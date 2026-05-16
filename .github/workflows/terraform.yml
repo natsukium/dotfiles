@@ -63,9 +63,6 @@ jobs:
         directory: ${{ fromJson(needs.detect.outputs.directories) }}
     env:
       SOPS_AGE_KEY: ${{ secrets.SOPS_AGE_KEY }}
-    defaults:
-      run:
-        working-directory: ${{ matrix.directory }}
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-nix
@@ -76,11 +73,14 @@ jobs:
           role-to-assume: ${{ vars.AWS_PLAN_ROLE_ARN }}
           aws-region: us-east-2
       - name: Terraform Init
+        working-directory: ${{ matrix.directory }}
         run: nix develop -c terraform init
       - name: Terraform Format
+        working-directory: ${{ matrix.directory }}
         run: nix develop -c terraform fmt -check
       - name: Terraform Plan
         id: plan
+        working-directory: ${{ matrix.directory }}
         run: |
           set +e
           nix develop -c terraform plan -no-color -lock=false -out=tfplan > plan.txt 2>&1
@@ -120,4 +120,5 @@ jobs:
           aws-region: us-east-2
       - name: Terraform Apply
         if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        working-directory: ${{ matrix.directory }}
         run: nix develop -c terraform apply tfplan
