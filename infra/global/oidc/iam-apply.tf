@@ -100,6 +100,20 @@ resource "aws_iam_role_policy_attachment" "apply_iam_slr" {
   policy_arn = aws_iam_policy.apply_iam_slr.arn
 }
 
+# Identity Center management splits across two AWS-managed policies: the
+# master account scope (permission sets, account assignments) and the
+# identity store scope (users, groups, memberships). Both are needed for
+# the infra/aws/identity-center stack to apply end-to-end.
+resource "aws_iam_role_policy_attachment" "apply_sso_master" {
+  role       = aws_iam_role.apply.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSSSOMasterAccountAdministrator"
+}
+
+resource "aws_iam_role_policy_attachment" "apply_sso_directory" {
+  role       = aws_iam_role.apply.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSSSODirectoryAdministrator"
+}
+
 # Lets apply_role self-update the OIDC stack via CI. ARN patterns bound
 # the blast radius — IAM resources outside this stack's naming conventions
 # are unreachable. Self-trust edits remain possible; PR review and console
