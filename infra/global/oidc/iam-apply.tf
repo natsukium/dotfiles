@@ -114,6 +114,28 @@ resource "aws_iam_role_policy_attachment" "apply_sso_directory" {
   policy_arn = "arn:aws:iam::aws:policy/AWSSSODirectoryAdministrator"
 }
 
+# AWSSSOMasterAccountAdministrator omits iam:GetSAMLProvider on the SAML
+# provider that IdC creates and depends on (AWSSSO_*_DO_NOT_DELETE).
+# Without it, aws_ssoadmin_account_assignment fails when verifying the
+# underlying SAML trust during create. Scoped to AWSSSO_* providers to
+# avoid touching unrelated SAML configurations.
+data "aws_iam_policy_document" "apply_sso_saml" {
+  statement {
+    actions   = ["iam:GetSAMLProvider"]
+    resources = ["arn:aws:iam::*:saml-provider/AWSSSO_*"]
+  }
+}
+
+resource "aws_iam_policy" "apply_sso_saml" {
+  name   = "apply-sso-saml-provider"
+  policy = data.aws_iam_policy_document.apply_sso_saml.json
+}
+
+resource "aws_iam_role_policy_attachment" "apply_sso_saml" {
+  role       = aws_iam_role.apply.name
+  policy_arn = aws_iam_policy.apply_sso_saml.arn
+}
+
 # Lets apply_role self-update the OIDC stack via CI. ARN patterns bound
 # the blast radius — IAM resources outside this stack's naming conventions
 # are unreachable. Self-trust edits remain possible; PR review and console
