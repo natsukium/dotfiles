@@ -76,3 +76,25 @@ resource "aws_iam_role_policy_attachment" "plan_readonly" {
   role       = aws_iam_role.plan.name
   policy_arn = "arn:aws:iam::aws:policy/ReadOnlyAccess"
 }
+
+# Cross-account assume into research for the infra/aws/accounts/research
+# stack. OrganizationAccountAccessRole is admin-scoped; a read-only role
+# would be tighter for plan but adds bootstrap overhead not justified at
+# this scale. Terraform plan only issues reads, so the practical capability
+# is bounded to refresh operations.
+data "aws_iam_policy_document" "plan_research_assume" {
+  statement {
+    actions   = ["sts:AssumeRole"]
+    resources = ["arn:aws:iam::907199504666:role/OrganizationAccountAccessRole"]
+  }
+}
+
+resource "aws_iam_policy" "plan_research_assume" {
+  name   = "plan-research-account-assume-role"
+  policy = data.aws_iam_policy_document.plan_research_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "plan_research_assume" {
+  role       = aws_iam_role.plan.name
+  policy_arn = aws_iam_policy.plan_research_assume.arn
+}

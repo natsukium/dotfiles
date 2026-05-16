@@ -182,3 +182,23 @@ resource "aws_iam_role_policy_attachment" "apply_iam_oidc" {
   role       = aws_iam_role.apply.name
   policy_arn = aws_iam_policy.apply_iam_oidc.arn
 }
+
+# Cross-account assume into research for the infra/aws/accounts/research
+# stack. OrganizationAccountAccessRole is the default admin role created
+# when AWS Organizations provisions a member account.
+data "aws_iam_policy_document" "apply_research_assume" {
+  statement {
+    actions   = ["sts:AssumeRole"]
+    resources = ["arn:aws:iam::907199504666:role/OrganizationAccountAccessRole"]
+  }
+}
+
+resource "aws_iam_policy" "apply_research_assume" {
+  name   = "apply-research-account-assume-role"
+  policy = data.aws_iam_policy_document.apply_research_assume.json
+}
+
+resource "aws_iam_role_policy_attachment" "apply_research_assume" {
+  role       = aws_iam_role.apply.name
+  policy_arn = aws_iam_policy.apply_research_assume.arn
+}
