@@ -203,3 +203,61 @@ resource "aws_iam_role_policy_attachment" "apply_research_assume" {
   role       = aws_iam_role.apply.name
   policy_arn = aws_iam_policy.apply_research_assume.arn
 }
+
+# Security baseline stack (infra/aws/security-baseline) needs CloudTrail,
+# Budgets, and management of a CloudTrail logs S3 bucket. SCP management
+# is already covered by AWSOrganizationsFullAccess.
+resource "aws_iam_role_policy_attachment" "apply_cloudtrail" {
+  role       = aws_iam_role.apply.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSCloudTrail_FullAccess"
+}
+
+# Budgets has no AWS-managed policy for full management; a custom
+# policy gives apply_role the ability to create and update budget alerts.
+data "aws_iam_policy_document" "apply_budgets" {
+  statement {
+    actions   = ["budgets:*"]
+    resources = ["*"]
+  }
+}
+
+resource "aws_iam_policy" "apply_budgets" {
+  name   = "apply-budgets"
+  policy = data.aws_iam_policy_document.apply_budgets.json
+}
+
+resource "aws_iam_role_policy_attachment" "apply_budgets" {
+  role       = aws_iam_role.apply.name
+  policy_arn = aws_iam_policy.apply_budgets.arn
+}
+
+# S3 bucket management scoped to the CloudTrail logs bucket only.
+# AmazonS3FullAccess would grant access to all buckets in the management
+# account, which is broader than this stack needs.
+data "aws_iam_policy_document" "apply_cloudtrail_bucket" {
+  statement {
+    actions = [
+      "s3:CreateBucket",
+      "s3:DeleteBucket",
+      "s3:Get*",
+      "s3:List*",
+      "s3:Put*",
+      "s3:DeleteObject",
+      "s3:DeleteObjectVersion",
+    ]
+    resources = [
+      "arn:aws:s3:::233656399216-cloudtrail-logs",
+      "arn:aws:s3:::233656399216-cloudtrail-logs/*",
+    ]
+  }
+}
+
+resource "aws_iam_policy" "apply_cloudtrail_bucket" {
+  name   = "apply-cloudtrail-bucket"
+  policy = data.aws_iam_policy_document.apply_cloudtrail_bucket.json
+}
+
+resource "aws_iam_role_policy_attachment" "apply_cloudtrail_bucket" {
+  role       = aws_iam_role.apply.name
+  policy_arn = aws_iam_policy.apply_cloudtrail_bucket.arn
+}
