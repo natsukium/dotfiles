@@ -114,14 +114,22 @@ resource "aws_iam_role_policy_attachment" "apply_sso_directory" {
   policy_arn = "arn:aws:iam::aws:policy/AWSSSODirectoryAdministrator"
 }
 
-# AWSSSOMasterAccountAdministrator omits iam:GetSAMLProvider on the SAML
+# AWSSSOMasterAccountAdministrator omits SAML provider management on the
 # provider that IdC creates and depends on (AWSSSO_*_DO_NOT_DELETE).
-# Without it, aws_ssoadmin_account_assignment fails when verifying the
-# underlying SAML trust during create. Scoped to AWSSSO_* providers to
-# avoid touching unrelated SAML configurations.
+# aws_ssoadmin_account_assignment internally calls Get/Create/Update on
+# this provider during assignment lifecycle. Scoped to AWSSSO_* providers
+# to avoid touching unrelated SAML configurations.
 data "aws_iam_policy_document" "apply_sso_saml" {
   statement {
-    actions   = ["iam:GetSAMLProvider"]
+    actions = [
+      "iam:GetSAMLProvider",
+      "iam:CreateSAMLProvider",
+      "iam:UpdateSAMLProvider",
+      "iam:DeleteSAMLProvider",
+      "iam:TagSAMLProvider",
+      "iam:UntagSAMLProvider",
+      "iam:ListSAMLProviderTags",
+    ]
     resources = ["arn:aws:iam::*:saml-provider/AWSSSO_*"]
   }
 }
