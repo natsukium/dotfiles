@@ -34,14 +34,23 @@ jobs:
               - 'infra/services/github/**'
             cloudflare:
               - 'infra/global/domains/natsukium-com/**'
+            state:
+              - 'infra/global/state/**'
+            oidc:
+              - 'infra/global/oidc/**'
             shared:
               - 'flake.lock'
               - '.github/workflows/terraform.yml'
       - id: build-matrix
         run: |
-          directories='[]'
+          all_dirs=(
+            "infra/services/github"
+            "infra/global/domains/natsukium-com"
+            "infra/global/state"
+            "infra/global/oidc"
+          )
           if [[ "${{ steps.filter.outputs.shared }}" == "true" ]]; then
-            directories='["infra/services/github","infra/global/domains/natsukium-com"]'
+            directories=$(jq -nc --args '$ARGS.positional' -- "${all_dirs[@]}")
           else
             dirs=()
             if [[ "${{ steps.filter.outputs.github }}" == "true" ]]; then
@@ -49,6 +58,12 @@ jobs:
             fi
             if [[ "${{ steps.filter.outputs.cloudflare }}" == "true" ]]; then
               dirs+=("infra/global/domains/natsukium-com")
+            fi
+            if [[ "${{ steps.filter.outputs.state }}" == "true" ]]; then
+              dirs+=("infra/global/state")
+            fi
+            if [[ "${{ steps.filter.outputs.oidc }}" == "true" ]]; then
+              dirs+=("infra/global/oidc")
             fi
             directories=$(jq -nc --args '$ARGS.positional' -- "${dirs[@]}")
           fi
