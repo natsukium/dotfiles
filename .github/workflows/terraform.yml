@@ -50,7 +50,7 @@ jobs:
             if [[ "${{ steps.filter.outputs.cloudflare }}" == "true" ]]; then
               dirs+=("infra/global/domains/natsukium-com")
             fi
-            directories=$(printf '%s\n' "${dirs[@]}" | jq -R . | jq -sc .)
+            directories=$(jq -nc --args '$ARGS.positional' -- "${dirs[@]}")
           fi
           echo "directories=$directories" >> "$GITHUB_OUTPUT"
   terraform:
