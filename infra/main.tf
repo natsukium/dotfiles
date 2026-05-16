@@ -7,6 +7,14 @@ terraform {
       source = "carlpett/sops"
     }
   }
+
+  backend "s3" {
+    bucket       = "natsukium-tfstate"
+    encrypt      = true
+    key          = "services/nix-builder/terraform.tfstate"
+    region       = "us-east-2"
+    use_lockfile = true
+  }
 }
 
 data "sops_file" "oci-secret" {
