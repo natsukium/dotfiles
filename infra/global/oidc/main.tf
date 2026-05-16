@@ -80,13 +80,19 @@ data "aws_iam_policy_document" "tfstate_read" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["global/*"]
+      values = [
+        "global/*",
+        "services/*",
+      ]
     }
   }
 
   statement {
-    actions   = ["s3:GetObject"]
-    resources = ["arn:aws:s3:::natsukium-tfstate/global/*"]
+    actions = ["s3:GetObject"]
+    resources = [
+      "arn:aws:s3:::natsukium-tfstate/global/*",
+      "arn:aws:s3:::natsukium-tfstate/services/*",
+    ]
   }
 }
 
@@ -140,7 +146,10 @@ data "aws_iam_policy_document" "tfstate_write" {
     condition {
       test     = "StringLike"
       variable = "s3:prefix"
-      values   = ["global/*"]
+      values = [
+        "global/*",
+        "services/*",
+      ]
     }
   }
 
@@ -150,7 +159,10 @@ data "aws_iam_policy_document" "tfstate_write" {
       "s3:PutObject",
       "s3:DeleteObject",
     ]
-    resources = ["arn:aws:s3:::natsukium-tfstate/global/*"]
+    resources = [
+      "arn:aws:s3:::natsukium-tfstate/global/*",
+      "arn:aws:s3:::natsukium-tfstate/services/*",
+    ]
   }
 }
 
