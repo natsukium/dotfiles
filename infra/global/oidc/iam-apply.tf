@@ -70,6 +70,36 @@ resource "aws_iam_role_policy_attachment" "apply_tfstate" {
   policy_arn = aws_iam_policy.tfstate_write.arn
 }
 
+# Per-stack managed policies (vs AdministratorAccess) to bound blast radius
+# if the OIDC token leaks. New stacks add their own policies here.
+resource "aws_iam_role_policy_attachment" "apply_organizations" {
+  role       = aws_iam_role.apply.name
+  policy_arn = "arn:aws:iam::aws:policy/AWSOrganizationsFullAccess"
+}
+
+# AWSOrganizationsFullAccess covers iam:CreateServiceLinkedRole only for
+# organizations itself; sso/cloudtrail/guardduty SLRs need this extra grant.
+data "aws_iam_policy_document" "apply_iam_slr" {
+  statement {
+    actions = [
+      "iam:CreateServiceLinkedRole",
+      "iam:DeleteServiceLinkedRole",
+      "iam:GetServiceLinkedRoleDeletionStatus",
+    ]
+    resources = ["arn:aws:iam::*:role/aws-service-role/*"]
+  }
+}
+
+resource "aws_iam_policy" "apply_iam_slr" {
+  name   = "apply-iam-service-linked-role"
+  policy = data.aws_iam_policy_document.apply_iam_slr.json
+}
+
+resource "aws_iam_role_policy_attachment" "apply_iam_slr" {
+  role       = aws_iam_role.apply.name
+  policy_arn = aws_iam_policy.apply_iam_slr.arn
+}
+
 # Lets apply_role self-update the OIDC stack via CI. ARN patterns bound
 # the blast radius — IAM resources outside this stack's naming conventions
 # are unreachable. Self-trust edits remain possible; PR review and console
