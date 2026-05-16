@@ -85,6 +85,12 @@ data "aws_iam_policy_document" "apply_iam_slr" {
       "iam:CreateServiceLinkedRole",
       "iam:DeleteServiceLinkedRole",
       "iam:GetServiceLinkedRoleDeletionStatus",
+      # Get/List actions are needed by terraform refresh after creating an
+      # SLR; without them apply fails right after CreateServiceLinkedRole
+      # with iam:GetRole denied.
+      "iam:GetRole",
+      "iam:ListAttachedRolePolicies",
+      "iam:ListRolePolicies",
     ]
     resources = ["arn:aws:iam::*:role/aws-service-role/*"]
   }
