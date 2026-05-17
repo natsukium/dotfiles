@@ -855,6 +855,33 @@ so that no separate age keypair is needed.
   (setq auth-sources '("~/.authinfo.age")))
 #+end_src
 
+* AI
+
+** gptel
+
+[[https://github.com/karthink/gptel][gptel]] turns any buffer into a chat with
+an LLM backend.
+
+The OpenRouter API key is written in authinfo in the following format:
+
+#+begin_example
+machine openrouter.ai login apikey password <token>
+#+end_example
+
+#+begin_src emacs-lisp
+(use-package gptel
+  :ensure t
+  :config
+  (setq gptel-model 'deepseek/deepseek-v4-flash:free
+        gptel-backend (gptel-make-openai "OpenRouter"
+                        :host "openrouter.ai"
+                        :endpoint "/api/v1/chat/completions"
+                        :stream t
+                        :key 'gptel-api-key
+                        :models '(deepseek/deepseek-v4-flash:free
+                                  google/gemma-4-26b-a4b-it:free))))
+#+end_src
+
 * misc
 ** vundo
 #+begin_src emacs-lisp
