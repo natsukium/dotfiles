@@ -373,13 +373,31 @@ https://github.com/jrblevin/markdown-mode
 markdown-mode is a major mode for editing Markdown-formatted text.
 #+end_quote
 
+First, enable =markdown-fontify-code-blocks-natively= so fenced code
+blocks are highlighted by each language's major mode. A =```nix= block
+then reads like a real Nix buffer rather than a flat monochrome region.
+
+Also enable =markdown-marginalize-headers= to push leading =#=
+characters into the left margin. Header text then starts at the same
+column across all depths, keeping the outline aligned with body
+paragraphs.
+
+Finally, set =markdown-indent-on-enter= to ='indent-and-new-item= so
+=RET= inside a list inserts the next bullet or number at the correct
+indent level.
+
 #+begin_src emacs-lisp
 (use-package markdown-mode
   :ensure t
   :mode ("README\\.md\\'" . gfm-mode)
   :init (setq markdown-command "multimarkdown")
   :bind (:map markdown-mode-map
-              ("C-c C-e" . markdown-do)))
+              ("C-c C-e" . markdown-do))
+  :config
+  (setq markdown-header-scaling t)
+  (setq markdown-fontify-code-blocks-natively t)
+  (setq markdown-marginalize-headers t)
+  (setq markdown-indent-on-enter 'indent-and-new-item))
 #+end_src
 
 ** Nix
