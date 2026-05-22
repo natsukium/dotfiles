@@ -60,6 +60,7 @@ in
         "hermes-agent.env" = config.sops.templates."hermes-agent.env".path;
         "hermes-agent.auth.json" = config.sops.secrets."hermes-agent/auth-json".path;
       };
+      nix.registry.nixpkgs.flake = inputs.nixpkgs;
     };
   };
 }

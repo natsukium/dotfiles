@@ -38,6 +38,10 @@ in
       }
     ];
 
+    # Writable upper for /nix/store so the agent can `nix shell nixpkgs#…`.
+    # Without it, /nix/var/nix/temproots is RO and every nix-command write fails.
+    writableStoreOverlay = "/nix/.rw-store";
+
     # ext4 image, not virtiofs: hermes writes a SQLite database whose WAL/SHM
     # files interact poorly with virtiofs metadata caching.
     volumes = [
@@ -47,12 +51,32 @@ in
         size = 4096;
         label = "hermes-state";
       }
+      {
+        image = "nix-overlay.img";
+        mountPoint = "/nix/.rw-store";
+        size = 8192;
+        label = "hermes-nix-overlay";
+      }
     ];
+  };
+
+  nix.settings = {
+    experimental-features = [
+      "nix-command"
+      "flakes"
+    ];
+    # microvm.nix asserts this is off when writableStoreOverlay is set.
+    auto-optimise-store = false;
   };
 
   services.hermes-agent = {
     enable = true;
     settings.model.provider = "openai-codex";
+    addToSystemPackages = true;
+    extraPackages = with pkgs; [
+      python3
+      jq
+    ];
   };
 
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,
