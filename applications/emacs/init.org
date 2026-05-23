@@ -309,6 +309,47 @@ The required permissions are:
   :after magit)
 #+end_src
 
+*** consult-gh
+
+[[https://github.com/armindarvish/consult-gh][consult-gh]] drives the =gh= CLI
+through a consult interface, so searching repositories, issues, pull requests,
+and code across GitHub happens from the minibuffer with live preview.
+
+Forge already covers issues and pull requests for repositories tracked locally
+in magit. consult-gh extends that reach to arbitrary repositories: scanning an
+upstream's recent issues, opening another project's README, or finding a snippet
+by code search—without first cloning or visiting the repo in magit.
+
+#+begin_src emacs-lisp
+(use-package consult-gh
+  :ensure t
+  :after consult
+  :config
+  (consult-gh-enable-default-keybindings))
+#+end_src
+
+=consult-gh-embark-mode= adds embark actions on results (clone, browse,
+copy URL, ...).
+
+#+begin_src emacs-lisp
+(use-package consult-gh-embark
+  :ensure t
+  :after (consult-gh embark)
+  :config
+  (consult-gh-embark-mode +1))
+#+end_src
+
+=consult-gh-forge-mode= routes issue and PR viewing through forge buffers,
+keeping the editing surface consistent with the existing magit/forge workflow.
+
+#+begin_src emacs-lisp
+(use-package consult-gh-forge
+  :ensure t
+  :after (consult-gh forge)
+  :config
+  (consult-gh-forge-mode +1))
+#+end_src
+
 * LSP
 
 [[https://emacs-lsp.github.io/lsp-mode/][lsp-mode]] is a Language Server Protocol client for Emacs.
