@@ -83,6 +83,7 @@ in
       python3
       jq
     ];
+    extraDependencyGroups = [ "matrix" ];
   };
 
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,
