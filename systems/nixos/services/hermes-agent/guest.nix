@@ -71,7 +71,10 @@ in
 
   services.hermes-agent = {
     enable = true;
-    settings.model.provider = "openai-codex";
+    settings = {
+      model.provider = "openai-codex";
+      web.search_backend = "searxng";
+    };
     addToSystemPackages = true;
     extraPackages = with pkgs; [
       python3

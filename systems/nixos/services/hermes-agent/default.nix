@@ -40,6 +40,7 @@ in
       MATRIX_ALLOWED_USERS=@natsukium:${matrix.server_name}
       MATRIX_ENCRYPTION=true
       MATRIX_RECOVERY_KEY=${config.sops.placeholder."hermes-agent/matrix-recovery-key"}
+      SEARXNG_URL=http://10.0.2.2:${toString config.services.searx.settings.server.port}
     '';
     owner = "microvm";
     group = "kvm";

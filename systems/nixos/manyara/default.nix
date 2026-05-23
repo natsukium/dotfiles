@@ -21,6 +21,7 @@
     ../services/loki
     ../services/miniflux
     ../services/prometheus
+    ../services/searxng
     ./hardware-configuration.nix
     inputs.simple-wol-manager.nixosModules.default
   ];
