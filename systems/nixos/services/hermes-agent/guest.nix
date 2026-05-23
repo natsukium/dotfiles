@@ -55,7 +55,10 @@ in
         image = "nix-overlay.img";
         mountPoint = "/nix/.rw-store";
         size = 8192;
-        label = "hermes-nix-overlay";
+        # ext4 labels are capped at 16 bytes; "hermes-nix-overlay" (18) gets
+        # silently truncated by mkfs to "hermes-nix-overl", leaving the
+        # generated fstab's by-label lookup forever unsatisfied.
+        label = "hermes-nix-ovl";
       }
     ];
   };
