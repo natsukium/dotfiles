@@ -1834,3 +1834,51 @@ extensions = {
     ]);
 };
 #+end_src
+
+* Editor
+
+** Neovim
+
+Neovim is the editor I spend the most time in, primarily for coding —
+though the gravitational pull of =org-mode= is slowly dragging me over
+to Emacs.
+
+Everything Neovim-related lives under =flake/features/neovim/=: the
+wrapped derivation (=package.nix=) and the lua configuration. The
+flake-parts module pulls double duty from a single file:
+
+1. =perSystem.packages.neovim= makes =nix run .#neovim= work on every
+   supported system.
+2. =flake.homeManagerModules.neovim= lets a home-manager config opt in
+   with =my.programs.neovim.enable=, which installs the wrapped Neovim
+   plus =neovim-remote= and exports =EDITOR=nvim=.
+
+#+begin_src nix :tangle flake/features/neovim/default.nix
+{ ... }:
+{
+  flake.homeManagerModules.neovim =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      options.my.programs.neovim.enable = lib.mkEnableOption "neovim";
+
+      config = lib.mkIf config.my.programs.neovim.enable {
+        home.packages = [
+          (pkgs.callPackage ./package.nix { })
+          pkgs.neovim-remote
+        ];
+        home.sessionVariables.EDITOR = "nvim";
+      };
+    };
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      packages.neovim = pkgs.callPackage ./package.nix { };
+    };
+}
+#+end_src

@@ -1,11 +1,15 @@
 {
   inputs,
   config,
-  pkgs,
   ...
 }:
 let
-  inherit (inputs) nix-colors paneru sops-nix;
+  inherit (inputs)
+    nix-colors
+    paneru
+    sops-nix
+    self
+    ;
 in
 {
   programs.home-manager.enable = true;
@@ -18,14 +22,7 @@ in
   colorScheme = nix-colors.colorSchemes.nord;
   base16.enable = true;
 
-  # editor
-  home.packages = [
-    (pkgs.callPackage ../pkgs/neovim-with-config { })
-    pkgs.neovim-remote
-  ];
-  home.sessionVariables = {
-    EDITOR = "nvim";
-  };
+  my.programs.neovim.enable = true;
 
   sops.age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
 
@@ -33,6 +30,7 @@ in
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
     paneru.homeModules.paneru
+    self.homeManagerModules.neovim
     ../modules/home-manager
     ../applications/atuin
     ../applications/gh-dash

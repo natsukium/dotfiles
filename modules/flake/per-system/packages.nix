@@ -9,7 +9,6 @@
     {
       packages = {
         fastfetch = pkgs.callPackage ../../../pkgs/fastfetch { };
-        neovim = pkgs.callPackage ../../../pkgs/neovim-with-config { };
         html =
           with pkgs;
           let

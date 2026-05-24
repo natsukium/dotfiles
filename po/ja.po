@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-05-24 22:27+0900\n"
+"POT-Creation-Date: 2026-05-24 23:22+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -2345,6 +2345,7 @@ msgstr ""
 msgid ""
 "imports = [\n"
 "  ./flake-module.nix\n"
+"  ./modules/flake/features/neovim\n"
 "  ./modules/flake/per-system/checks.nix\n"
 "  ./modules/flake/per-system/dev-shell.nix\n"
 "  ./modules/flake/per-system/mcp-servers.nix\n"
@@ -2356,13 +2357,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1058
+#: configuration.org:1059
 #, no-wrap
 msgid "<<hosts>>"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1060
+#: configuration.org:1061
 #, no-wrap
 msgid ""
 "flake = {\n"
@@ -2371,14 +2372,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1065
+#: configuration.org:1066
 #, fuzzy, no-wrap
 #| msgid "NixOS-specific system modules."
 msgid "Per-system modules"
 msgstr "NixOS固有のシステムモジュールです。"
 
 #. type: paragraph
-#: configuration.org:1067
+#: configuration.org:1068
 msgid ""
 "Per-concern flake-parts modules that each contribute to =perSystem=. "
 "Splitting them keeps =flake.nix= small and lets each concern carry its own "
@@ -2387,12 +2388,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1072
+#: configuration.org:1073
 msgid "The shared pattern is:"
 msgstr ""
 
 #. type: paragraph in SRC
-#: configuration.org:1075
+#: configuration.org:1076
 #, no-wrap
 msgid ""
 "{ ... }: # or { self, inputs, ... }: when the module needs them\n"
@@ -2406,21 +2407,21 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1085
+#: configuration.org:1086
 #, fuzzy, no-wrap
 #| msgid "Nixpkgs"
 msgid "Nixpkgs instance"
 msgstr "Nixpkgs"
 
 #. type: paragraph
-#: configuration.org:1087
+#: configuration.org:1088
 msgid ""
 "Constructs the per-system =pkgs= with overlays applied, exposed to all other "
 "=perSystem= consumers via =_module.args.pkgs=."
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1090
+#: configuration.org:1091
 msgid ""
 "=allowUnfree= is enabled because several desktop hosts pull in unfree "
 "packages (NVIDIA drivers on =kilimanjaro=, =1password=, etc.) and gating "
@@ -2428,7 +2429,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1095
+#: configuration.org:1096
 #, no-wrap
 msgid ""
 "{ self, inputs, ... }:\n"
@@ -2446,13 +2447,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1109
+#: configuration.org:1110
 #, no-wrap
 msgid "Checks"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1111
+#: configuration.org:1112
 msgid ""
 "Re-exports the NixOS VM tests under =./tests= as flake checks for the "
 "current system. Kept in its own module so the test wiring is easy to find "
@@ -2460,7 +2461,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1116
+#: configuration.org:1117
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -2477,19 +2478,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1129
+#: configuration.org:1130
 #, fuzzy, no-wrap
 #| msgid "Nix Packages"
 msgid "Packages"
 msgstr "Nixパッケージ"
 
 #. type: paragraph
-#: configuration.org:1131
+#: configuration.org:1132
 msgid "Per-system packages exposed as flake outputs."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1134
+#: configuration.org:1135
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -2503,7 +2504,6 @@ msgid ""
 "    {\n"
 "      packages = {\n"
 "        fastfetch = pkgs.callPackage ../../../pkgs/fastfetch { };\n"
-"        neovim = pkgs.callPackage ../../../pkgs/neovim-with-config { };\n"
 "        html =\n"
 "          with pkgs;\n"
 "          let\n"
@@ -8890,8 +8890,8 @@ msgid ""
 "};"
 msgstr ""
 
-#. type: heading ****
-#: modules/configuration.org:1247
+#. type: heading *
+#: modules/configuration.org:1247 modules/configuration.org:1838
 #, no-wrap
 msgid "Editor"
 msgstr "エディター"
@@ -10307,6 +10307,92 @@ msgid ""
 "    ]);\n"
 "};"
 msgstr ""
+
+#. type: heading **
+#: modules/configuration.org:1840
+#, no-wrap
+msgid "Neovim"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:1842
+msgid ""
+"Neovim is the editor I spend the most time in, primarily for coding — though "
+"the gravitational pull of =org-mode= is slowly dragging me over to Emacs."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:1846
+msgid ""
+"Everything Neovim-related lives under =flake/features/neovim/=: the wrapped "
+"derivation (=package.nix=) and the lua configuration. The flake-parts module "
+"pulls double duty from a single file:"
+msgstr ""
+
+#. type: plain list 1.
+#: modules/configuration.org:1852
+#, no-wrap
+msgid ""
+"=perSystem.packages.neovim= makes =nix run .#neovim= work on every\n"
+"supported system."
+msgstr ""
+
+#. type: plain list 2.
+#: modules/configuration.org:1855
+#, no-wrap
+msgid ""
+"=flake.homeManagerModules.neovim= lets a home-manager config opt in\n"
+"with =my.programs.neovim.enable=, which installs the wrapped Neovim\n"
+"plus =neovim-remote= and exports =EDITOR=nvim=."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:1857
+#, no-wrap
+msgid ""
+"{ ... }:\n"
+"{\n"
+"  flake.homeManagerModules.neovim =\n"
+"    {\n"
+"      config,\n"
+"      lib,\n"
+"      pkgs,\n"
+"      ...\n"
+"    }:\n"
+"    {\n"
+"      options.my.programs.neovim.enable = lib.mkEnableOption \"neovim\";"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:1869
+#, no-wrap
+msgid ""
+"  config = lib.mkIf config.my.programs.neovim.enable {\n"
+"    home.packages = [\n"
+"      (pkgs.callPackage ./package.nix { })\n"
+"      pkgs.neovim-remote\n"
+"    ];\n"
+"    home.sessionVariables.EDITOR = \"nvim\";\n"
+"  };\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:1878
+#, no-wrap
+msgid ""
+"  perSystem =\n"
+"    { pkgs, ... }:\n"
+"    {\n"
+"      packages.neovim = pkgs.callPackage ./package.nix { };\n"
+"    };\n"
+"}"
+msgstr ""
+
+#, fuzzy
+#~| msgid "Requirements"
+#~ msgid "Required scopes:"
+#~ msgstr "必要なソフトウェア"
 
 #~ msgid ""
 #~ "Configurations are documented with the problem that motivated them, the "
