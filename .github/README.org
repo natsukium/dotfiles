@@ -67,36 +67,242 @@ translation tools (po4a, gettext), and build utilities (nix-fast-build).
 On entry, it automatically sets up pre-commit hooks, configures MCP servers,
 and syncs =CLAUDE.md= from the literate source.
 
-#+name: dev-shells
-#+begin_src nix
-devShells = {
-  default = pkgs.mkShell {
-    packages = with pkgs; [
-      aws-vault
-      nix-fast-build
-      sops
-      ssh-to-age
-      (terraform.withPlugins (p: [
-        p.carlpett_sops
-        p.cloudflare_cloudflare
-        p.determinatesystems_hydra
-        p.hashicorp_aws
-        p.hashicorp_external
-        p.hashicorp_null
-        p.integrations_github
-        p.oracle_oci
-      ]))
-      <<translation-packages>>
-    ];
-    shellHook =
-      config.pre-commit.installationScript
-      + config.mcp-servers.shellHook
-      + ''
-        echo "Syncing CLAUDE.md..."
-        make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
-      '';
+#+begin_src nix :tangle modules/flake/per-system/dev-shell.nix
+{ ... }:
+{
+  perSystem =
+    {
+      config,
+      pkgs,
+      ...
+    }:
+    {
+      devShells = {
+        default = pkgs.mkShell {
+          packages = with pkgs; [
+            aws-vault
+            nix-fast-build
+            sops
+            ssh-to-age
+            (terraform.withPlugins (p: [
+              p.carlpett_sops
+              p.cloudflare_cloudflare
+              p.determinatesystems_hydra
+              p.hashicorp_aws
+              p.hashicorp_external
+              p.hashicorp_null
+              p.integrations_github
+              p.oracle_oci
+            ]))
+            <<translation-packages>>
+          ];
+          shellHook =
+            config.pre-commit.installationScript
+            + config.mcp-servers.shellHook
+            + ''
+              echo "Syncing CLAUDE.md..."
+              make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+            '';
+        };
+      };
+    };
+}
+#+end_src
+** Pre-commit hooks
+
+Hooks run by [[https://github.com/cachix/git-hooks.nix][git-hooks.nix]] on every commit. =prek= is used as the runner
+because it is the actively-maintained Rust port of =pre-commit=, with a faster
+cold start and parallel hook execution out of the box.
+
+=check-org-tangle= is the only hook with =priority = 0= because it must run
+before everything else: if Org files are out of sync, formatters and linters
+downstream would otherwise fail against stale tangle output. Every other hook
+keeps the default priority and runs in parallel under =prek=.
+
+#+begin_src nix :tangle modules/flake/per-system/pre-commit.nix
+{ inputs, ... }:
+{
+  imports = [ inputs.git-hooks.flakeModule ];
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      pre-commit = {
+        check.enable = true;
+        settings = {
+          package = pkgs.prek;
+          src = ../../..;
+          hooks =
+            let
+              check-git-changes = pkgs.writeShellApplication {
+                name = "check-git-changes";
+                runtimeInputs = [ pkgs.git ];
+                text = builtins.readFile ../../../scripts/check-git-changes.sh;
+              };
+              emacs-with-org = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.org ]);
+            in
+            {
+              actionlint = {
+                enable = true;
+                priority = 10;
+              };
+              biome = {
+                enable = true;
+                priority = 10;
+              };
+              lua-ls = {
+                enable = false;
+                priority = 10;
+              };
+              nil = {
+                enable = true;
+                priority = 10;
+              };
+              shellcheck = {
+                enable = true;
+                priority = 10;
+              };
+              treefmt = {
+                enable = true;
+                priority = 10;
+              };
+              typos = {
+                enable = true;
+                priority = 10;
+                excludes = [
+                  ".sops.yaml"
+                  "homes/shared/gpg/keys.txt"
+                  "secrets.yaml"
+                  "secrets/default.yaml"
+                  "systems/nixos/tarangire/facter.json"
+                  "systems/shared/hercules-ci/binary-caches.json"
+                ];
+                settings.configPath = "typos.toml";
+              };
+              yamllint = {
+                enable = true;
+                priority = 10;
+                excludes = [
+                  "secrets/default.yaml"
+                  "secrets.yaml"
+                ];
+                settings.configData = "{rules: {document-start: {present: false}}}";
+              };
+              po4a = {
+                enable = true;
+                name = "po4a";
+                description = "Update translations with po4a";
+                priority = 10;
+                entry = pkgs.lib.getExe (
+                  pkgs.writeShellApplication {
+                    name = "check-po4a";
+                    runtimeInputs = [
+                      pkgs.po4a
+                      pkgs.gettext
+                      check-git-changes
+                    ];
+                    text = builtins.readFile ../../../scripts/check-po4a.sh;
+                  }
+                );
+                files = "(\\.org|po/.*\\.po)$";
+                pass_filenames = false;
+              };
+              "check-org-tangle" = {
+                enable = true;
+                name = "check-org-tangle";
+                description = "Verify org files are tangled and synchronized";
+                # Ensure this hook runs before all other hooks
+                priority = 0;
+                entry = pkgs.lib.getExe (
+                  pkgs.writeShellApplication {
+                    name = "check-org-tangle";
+                    runtimeInputs = [
+                      emacs-with-org
+                      pkgs.gnumake
+                      check-git-changes
+                    ];
+                    text = builtins.readFile ../../../scripts/check-org-tangle.sh;
+                  }
+                );
+                files = "\\.org$";
+                pass_filenames = false;
+              };
+            };
+        };
+      };
+    };
+}
+#+end_src
+** Formatting
+
+Formatters are aggregated via [[https://github.com/numtide/treefmt-nix][treefmt-nix]] and invoked from the =treefmt=
+pre-commit hook, so a single declaration covers both editor integrations and
+the commit-time check.
+
+#+begin_src nix :tangle modules/flake/per-system/treefmt.nix
+{ inputs, ... }:
+{
+  imports = [ inputs.treefmt-nix.flakeModule ];
+
+  perSystem = _: {
+    treefmt = {
+      projectRootFile = "flake.nix";
+      programs = {
+        biome.enable = true;
+        nixfmt.enable = true;
+        shfmt.enable = true;
+        stylua.enable = true;
+        taplo.enable = true;
+        terraform.enable = true;
+        yamlfmt.enable = true;
+      };
+    };
   };
-};
+}
+#+end_src
+** MCP Servers
+
+Configuration for [[https://github.com/natsukium/mcp-servers-nix][mcp-servers-nix]], enabled in the development shell.
+The =flavors.claude-code= preset generates a =.mcp.json= file compatible with
+Claude Code's expected format.
+
+Enabled servers:
+- =nixos=: NixOS package/option search and Home Manager documentation
+- =terraform=: Terraform registry lookup for providers, modules, and policies
+- =grafana=: Query dashboards, datasources, and metrics from the home server's Grafana instance
+
+The =passwordCommand= option retrieves secrets at runtime using =rbw= (Bitwarden CLI),
+avoiding plaintext credentials in the repository.
+
+#+begin_src nix :tangle modules/flake/per-system/mcp-servers.nix
+{ inputs, ... }:
+{
+  imports = [ inputs.mcp-servers.flakeModule ];
+
+  perSystem = _: {
+    mcp-servers = {
+      flavors.claude-code.enable = true;
+      programs = {
+        nixos.enable = true;
+        terraform.enable = true;
+        grafana = {
+          enable = true;
+          env = {
+            GRAFANA_URL = "http://manyara:3001";
+            GRAFANA_USERNAME = "admin";
+          };
+          passwordCommand = {
+            GRAFANA_PASSWORD = [
+              "rbw"
+              "get"
+              "grafana"
+            ];
+          };
+        };
+      };
+    };
+  };
+}
 #+end_src
 ** Translation
 
