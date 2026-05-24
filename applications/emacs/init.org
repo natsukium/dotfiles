@@ -296,12 +296,16 @@ The =authinfo.age= file should contain a GitHub API token entry:
 machine api.github.com login <username>^forge password <token>
 #+end_example
 
-The token is a fine-grained personal access token
-with a 6-month expiration that requires periodic regeneration.
-The required permissions are:
+The token must be a [[https://github.com/settings/tokens/new][classic personal access token]], not a fine-grained one,
+because the =/notifications= REST endpoints only accept classic tokens. A 6-month
+expiration is set so the token must be regenerated periodically.
 
-- Issues: Read and Write
-- Pull requests: Read and Write
+Required scopes:
+
+- =repo= — issues and pull requests
+- =notifications= — =forge-list-notifications= and notification marking
+- =user= — resolve the authenticated user's profile
+- =read:org= — enumerate organization repositories and teams
 
 #+begin_src emacs-lisp
 (use-package forge
