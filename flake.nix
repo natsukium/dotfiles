@@ -243,18 +243,6 @@
           packages = {
             fastfetch = pkgs.callPackage ./pkgs/fastfetch { };
             neovim = pkgs.callPackage ./pkgs/neovim-with-config { };
-            po4a_0_74 = (
-              pkgs.po4a.overrideAttrs (oldAttrs: {
-                version = "0.74";
-                src = pkgs.fetchurl {
-                  url = "https://github.com/mquinson/po4a/releases/download/v0.74/po4a-0.74.tar.gz";
-                  hash = "sha256-JfwyPyuje71Iw68Ov0mVJkSw5GgmH5hjPpEhmoOP58I=";
-                };
-                patches = [ ];
-                nativeBuildInputs = oldAttrs.nativeBuildInputs ++ [ pkgs.libxml2 ];
-                doCheck = false;
-              })
-            );
             html =
               with pkgs;
               let
@@ -278,7 +266,7 @@
                     (epkgs.treesit-grammars.with-grammars (g: [ g.tree-sitter-nix ]))
                   ]))
                   gettext
-                  self'.packages.po4a_0_74
+                  po4a
                 ];
                 buildPhase = ''
                   runHook preBuild
@@ -366,7 +354,7 @@
                       pkgs.writeShellApplication {
                         name = "check-po4a";
                         runtimeInputs = [
-                          self'.packages.po4a_0_74
+                          pkgs.po4a
                           pkgs.gettext
                           check-git-changes
                         ];
@@ -453,7 +441,7 @@
                   p.oracle_oci
                 ]))
                 gettext
-                self'.packages.po4a_0_74
+                po4a
               ];
               shellHook =
                 config.pre-commit.installationScript
