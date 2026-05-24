@@ -1882,3 +1882,135 @@ flake-parts module pulls double duty from a single file:
     };
 }
 #+end_src
+
+** Emacs
+
+Emacs has been my second-most-used editor since early 2026. The draw is
+=org-mode= — the workflows built around =org-capture= and =org-agenda=
+are slowly winning me over, and a widening set of daily inputs (email,
+RSS feeds, and more) now lives inside emacs, where the ongoing
+experiment is wiring each of them back into org.
+
+The feature lives alongside Neovim under =flake/features/emacs/= and
+pulls the same double duty:
+
+1. =perSystem.packages.emacs= exposes a wrapped emacs as a flake
+   output. =defaultInitFile = true= bundles the tangled =init.org= as
+   =default.el= so =nix run .#emacs= loads the full config without
+   home-manager.
+2. =flake.homeManagerModules.emacs= adds =my.programs.emacs.enable= for
+   home-manager hosts, wiring up =services.emacs= (daemon), the tangled
+   =~/.config/emacs/{init,early-init}.el=, and the encrypted
+   =~/.authinfo.age=.
+
+#+begin_src nix :tangle flake/features/emacs/default.nix
+# Requires: inputs.emacs-overlay
+{ lib, inputs, ... }:
+let
+  withEmacsOverlay = pkgs: pkgs.extend inputs.emacs-overlay.overlays.default;
+
+  mkEmacs = pkgs: (withEmacsOverlay pkgs).callPackage ./package.nix { };
+
+  tangle =
+    pkgs: org:
+    let
+      epkgs = withEmacsOverlay pkgs;
+      emacs-unwrapped = if pkgs.stdenv.hostPlatform.isDarwin then epkgs.emacs-plus else epkgs.emacs-pgtk;
+      stem = name: lib.head (lib.splitString "." name);
+      outName = "${stem (baseNameOf (toString org))}.el";
+    in
+    pkgs.runCommand outName { nativeBuildInputs = [ emacs-unwrapped ]; } ''
+      cp ${org} tmp.org
+      emacs -Q --batch --eval \
+        "(progn
+          (require 'ob-tangle)
+          (org-babel-tangle-file \"tmp.org\" \"emacs-lisp\"))"
+      install emacs-lisp $out
+    '';
+in
+{
+  flake.homeManagerModules.emacs =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      options.my.programs.emacs.enable = lib.mkEnableOption "emacs";
+
+      config = lib.mkIf config.my.programs.emacs.enable {
+        programs.emacs = {
+          enable = true;
+          package = mkEmacs pkgs;
+        };
+
+        services.emacs = {
+          enable = true;
+          client.enable = true;
+        };
+
+        xdg.configFile."emacs/init.el".source = tangle pkgs ./init.org;
+        xdg.configFile."emacs/early-init.el".source = tangle pkgs ./early-init.org;
+        home.file.".authinfo.age".source = ./authinfo.age;
+
+        home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+          emacs = "${config.programs.emacs.package}/Applications/Emacs.app/Contents/MacOS/Emacs";
+        };
+      };
+    };
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      packages.emacs = mkEmacs pkgs;
+    };
+}
+#+end_src
+
+#+begin_src nix :tangle flake/features/emacs/package.nix
+{
+  stdenv,
+  age,
+  beancount,
+  beancount-language-server,
+  emacs-pgtk,
+  emacs-plus,
+  emacsWithPackagesFromUsePackage,
+  gettext,
+  nixd,
+  nixfmt,
+  notmuch,
+  terraform-ls,
+  yaml-language-server,
+}:
+let
+  emacs-unwrapped = if stdenv.hostPlatform.isDarwin then emacs-plus else emacs-pgtk;
+in
+emacsWithPackagesFromUsePackage {
+  package = emacs-unwrapped;
+  config = ./init.org;
+  alwaysTangle = true;
+  # Bundle the tangled init.org as default.el so the package is usable
+  # standalone (e.g. `nix run .#emacs`); a home-manager-managed
+  # ~/.config/emacs/init.el still takes precedence when present.
+  defaultInitFile = true;
+  extraEmacsPackages = epkgs: [
+    epkgs.treesit-grammars.with-all-grammars
+    notmuch.emacs
+    age
+    beancount
+    beancount-language-server
+    gettext
+    nixd
+    nixfmt
+    yaml-language-server
+    terraform-ls
+  ];
+}
+#+end_src
+
+*** early-init.org
+#+INCLUDE: "./flake/features/emacs/early-init.org"
+*** init.org
+#+INCLUDE: "./flake/features/emacs/init.org"

@@ -1,7 +1,7 @@
-{ pkgs, ... }:
+{ inputs, ... }:
 {
   imports = [
-    ../applications/emacs
+    inputs.self.homeManagerModules.emacs
     ../applications/kitty
     ../applications/qutebrowser
     ../applications/vscode
@@ -11,6 +11,8 @@
     ./shared/gpg
     ./shared/weechat.nix
   ];
+
+  my.programs.emacs.enable = true;
 
   my.services.copyq.enable = true;
   my.services.flameshot = {

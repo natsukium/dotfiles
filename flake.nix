@@ -181,6 +181,7 @@
       imports = [
         ./flake-module.nix
         ./modules/flake/_registries.nix
+        ./modules/flake/features/emacs
         ./modules/flake/features/neovim
         ./modules/flake/per-system/checks.nix
         ./modules/flake/per-system/dev-shell.nix
