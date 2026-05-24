@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  self,
   ...
 }:
 let
@@ -79,9 +80,10 @@ in
       web.search_backend = "searxng";
     };
     addToSystemPackages = true;
-    extraPackages = with pkgs; [
-      python3
-      jq
+    extraPackages = [
+      pkgs.python3
+      pkgs.jq
+      self.packages.${pkgs.stdenv.hostPlatform.system}.emacs
     ];
     extraDependencyGroups = [ "matrix" ];
   };
