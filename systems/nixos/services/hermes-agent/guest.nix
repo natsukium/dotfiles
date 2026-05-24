@@ -104,6 +104,22 @@ in
   users.groups.org-sync.gid = 9001;
   users.users.hermes.extraGroups = [ "org-sync" ];
 
+  # init.org bakes in ~/dropbox/org, ~/dropbox/org-roam, and
+  # ~/.local/share/org-roam.db. Re-pointing those vars in the guest would
+  # fork the init.el (the very drift this setup is trying to avoid); instead,
+  # satisfy the paths via filesystem symlinks and stub directories so the
+  # user's emacs config loads as-is. ~/dropbox/org points at the virtiofs
+  # mount; ~/dropbox/org-roam is a local empty dir (org-roam isn't synced
+  # yet); ~/.local/share exists so org-roam-db-autosync-mode can create the
+  # SQLite db on first run.
+  systemd.tmpfiles.rules = [
+    "d /var/lib/hermes/dropbox 0750 hermes hermes -"
+    "L /var/lib/hermes/dropbox/org - hermes hermes - /var/lib/hermes/org"
+    "d /var/lib/hermes/dropbox/org-roam 0770 hermes hermes -"
+    "d /var/lib/hermes/.local 0750 hermes hermes -"
+    "d /var/lib/hermes/.local/share 0750 hermes hermes -"
+  ];
+
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,
   # so files land on the ephemeral root. Rewrite .env and config.yaml on every
   # boot; re-seed auth.json only when the deployed credential changes, so a
