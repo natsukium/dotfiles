@@ -394,6 +394,40 @@ Use maximum font-lock level for tree-sitter modes.
 (setq treesit-font-lock-level 4)
 #+end_src
 
+** treesit-fold
+
+[[https://github.com/emacs-tree-sitter/treesit-fold][treesit-fold]] provides
+code folding driven by the tree-sitter syntax tree, so foldable regions
+follow real syntactic nodes (functions, blocks, comments) rather than
+indentation heuristics.
+
+=global-treesit-fold-mode= activates it automatically in every supported
+tree-sitter mode.
+
+TAB is rebound to a wrapper that mimics =org-cycle=: when point sits on a
+foldable node, the fold is toggled; otherwise the original
+=indent-for-tab-command= runs, so ordinary indentation in code keeps
+working.
+
+Language-specific fold rules (e.g. Nix =let ... in= blocks) live with
+their respective language sections rather than here, so the catalogue of
+foldable nodes per language stays next to the rest of that mode's setup.
+
+#+begin_src emacs-lisp
+(use-package treesit-fold
+  :ensure t
+  :hook (after-init . global-treesit-fold-mode)
+  :preface
+  (defun my/treesit-fold-toggle-or-indent ()
+    "Toggle the fold at point when on a foldable node; otherwise indent."
+    (interactive)
+    (if (treesit-fold--foldable-node-at-pos)
+        (treesit-fold-toggle)
+      (indent-for-tab-command)))
+  :bind (:map treesit-fold-mode-map
+              ("TAB" . my/treesit-fold-toggle-or-indent)))
+#+end_src
+
 ** Beancount
 
 [[https://github.com/beancount/beancount-mode][beancount-mode]] is the major mode bundled with [[https://beancount.github.io/][Beancount]].
@@ -467,6 +501,11 @@ nixd performs actual Nix evaluation,
 enabling accurate completion for attribute paths (e.g. =pkgs.=),
 NixOS options, and flake inputs.
 
+The bundled =treesit-fold-parsers-nix= only knows about attrsets,
+interpolations, lists, and comments. Two extra rules are registered here
+so =let ... in= blocks and indented (=''...''=) multi-line strings fold as
+well.
+
 #+begin_src emacs-lisp
 (use-package nix-ts-mode
   :ensure t
@@ -477,7 +516,16 @@ NixOS options, and flake inputs.
   (with-eval-after-load 'org-src
     (add-to-list 'org-src-lang-modes '("nix" . nix-ts)))
   :config
-  (setq lsp-nix-nixd-formatting-command ["nixfmt"]))
+  (setq lsp-nix-nixd-formatting-command ["nixfmt"])
+  (with-eval-after-load 'treesit-fold
+    (setf (alist-get 'nix-ts-mode treesit-fold-range-alist)
+          (append (alist-get 'nix-ts-mode treesit-fold-range-alist)
+                  `((let_expression
+                     . ,(lambda (node offset)
+                          (treesit-fold-range-markers node offset "let" "in")))
+                    (indented_string_expression
+                     . ,(lambda (node offset)
+                          (treesit-fold-range-markers node offset "''" "''"))))))))
 #+end_src
 
 ** Terraform
