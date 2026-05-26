@@ -12,6 +12,7 @@
   notmuch,
   terraform-ls,
   yaml-language-server,
+  defaultInitFile,
 }:
 let
   emacs-unwrapped = if stdenv.hostPlatform.isDarwin then emacs-plus else emacs-pgtk;
@@ -23,7 +24,7 @@ emacsWithPackagesFromUsePackage {
   # Bundle the tangled init.org as default.el so the package is usable
   # standalone (e.g. `nix run .#emacs`); a home-manager-managed
   # ~/.config/emacs/init.el still takes precedence when present.
-  defaultInitFile = true;
+  inherit defaultInitFile;
   extraEmacsPackages = epkgs: [
     epkgs.treesit-grammars.with-all-grammars
     notmuch.emacs
