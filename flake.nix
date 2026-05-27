@@ -136,6 +136,10 @@
       inputs.xwayland-satellite-stable.follows = "";
       inputs.xwayland-satellite-unstable.follows = "";
     };
+    org-clickup = {
+      url = "git+https://git.natsukium.com/natsukium/org-clickup";
+      flake = false;
+    };
     nur-packages = {
       url = "github:natsukium/nur-packages";
       inputs.nixpkgs.follows = "nixpkgs";

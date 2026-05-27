@@ -774,6 +774,25 @@ to reduce this to a single prompt after Emacs restart.
 (setq plstore-cache-passphrase-for-symmetric-encryption t)
 #+end_src
 
+** org-clickup
+
+[[https://git.natsukium.com/natsukium/org-clickup][org-clickup]] is a personal package that bidirectionally syncs ClickUp
+tasks with org-mode TODO entries. Work tasks live in ClickUp, but the
+authoritative planning surface is org-mode (agenda, capture, refile)
+so daily triage stays in Emacs instead of switching to a browser tab.
+
+The API token must live in =~/.authinfo.age= as:
+
+#+begin_example
+machine api.clickup.com login <workspace-id> password <token>
+#+end_example
+
+#+begin_src emacs-lisp
+(use-package org-clickup
+  :ensure t
+  :defer t)
+#+end_src
+
 ** org-roam
 #+begin_src emacs-lisp
 (use-package org-roam
