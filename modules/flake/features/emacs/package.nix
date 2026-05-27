@@ -26,13 +26,19 @@ emacsWithPackagesFromUsePackage {
   # standalone (e.g. `nix run .#emacs`); a home-manager-managed
   # ~/.config/emacs/init.el still takes precedence when present.
   inherit defaultInitFile;
-  override = final: _prev: {
-    org-clickup = final.trivialBuild {
-      pname = "org-clickup";
-      version = "0-unstable";
-      src = org-clickup-src;
+  override =
+    epkgs:
+    epkgs
+    // {
+      org-clickup = epkgs.melpaBuild {
+        pname = "org-clickup";
+        ename = "org-clickup";
+        version = builtins.substring 0 8 (org-clickup-src.lastModifiedDate or "00000000");
+        commit = org-clickup-src.shortRev or "unknown";
+        files = ''("lisp/*.el")'';
+        src = org-clickup-src;
+      };
     };
-  };
   extraEmacsPackages = epkgs: [
     epkgs.treesit-grammars.with-all-grammars
     notmuch.emacs
