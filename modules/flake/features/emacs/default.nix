@@ -45,6 +45,7 @@ let
         name = "default.el";
         org = ./init.org;
       };
+      org-clickup-src = inputs.org-clickup;
     };
 in
 {
