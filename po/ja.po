@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-05-27 18:50+0900\n"
+"POT-Creation-Date: 2026-05-28 00:51+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -10611,6 +10611,7 @@ msgid ""
 "        name = \"default.el\";\n"
 "        org = ./init.org;\n"
 "      };\n"
+"      org-clickup-src = inputs.org-clickup;\n"
 "    };\n"
 "in\n"
 "{\n"
@@ -10626,7 +10627,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1967
+#: modules/configuration.org:1968
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.emacs.enable {\n"
@@ -10637,7 +10638,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1973
+#: modules/configuration.org:1974
 #, no-wrap
 msgid ""
 "services.emacs = {\n"
@@ -10647,7 +10648,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1978
+#: modules/configuration.org:1979
 #, no-wrap
 msgid ""
 "xdg.configFile.\"emacs/init.el\".source = tangleEl pkgs ./init.org;\n"
@@ -10656,7 +10657,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1982
+#: modules/configuration.org:1983
 #, no-wrap
 msgid ""
 "    home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -10667,7 +10668,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1988
+#: modules/configuration.org:1989
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -10679,7 +10680,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1997
+#: modules/configuration.org:1998
 #, no-wrap
 msgid ""
 "{\n"
@@ -10697,6 +10698,7 @@ msgid ""
 "  terraform-ls,\n"
 "  yaml-language-server,\n"
 "  defaultInitFile,\n"
+"  org-clickup-src,\n"
 "}:\n"
 "let\n"
 "  emacs-unwrapped = if stdenv.hostPlatform.isDarwin then emacs-plus else emacs-pgtk;\n"
@@ -10706,6 +10708,19 @@ msgid ""
 "  config = ./init.org;\n"
 "  alwaysTangle = true;\n"
 "  inherit defaultInitFile;\n"
+"  override =\n"
+"    epkgs:\n"
+"    epkgs\n"
+"    // {\n"
+"      org-clickup = epkgs.melpaBuild {\n"
+"        pname = \"org-clickup\";\n"
+"        ename = \"org-clickup\";\n"
+"        version = builtins.substring 0 8 (org-clickup-src.lastModifiedDate or \"00000000\");\n"
+"        commit = org-clickup-src.shortRev or \"unknown\";\n"
+"        files = ''(\"lisp/*.el\")'';\n"
+"        src = org-clickup-src;\n"
+"      };\n"
+"    };\n"
 "  extraEmacsPackages = epkgs: [\n"
 "    epkgs.treesit-grammars.with-all-grammars\n"
 "    notmuch.emacs\n"
@@ -10722,26 +10737,26 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2039
+#: modules/configuration.org:2054
 #, no-wrap
 msgid "early-init.org"
 msgstr "early-init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:2040
+#: modules/configuration.org:2055
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/early-init.org\""
 msgid "\"./flake/features/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: modules/configuration.org:2041
+#: modules/configuration.org:2056
 #, no-wrap
 msgid "init.org"
 msgstr "init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:2042
+#: modules/configuration.org:2057
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/init.org\""
 msgid "\"./flake/features/emacs/init.org\""
