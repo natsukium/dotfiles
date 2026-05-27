@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-05-25 01:30+0900\n"
+"POT-Creation-Date: 2026-05-27 17:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -9764,9 +9764,9 @@ msgstr ""
 #, no-wrap
 msgid ""
 "=perSystem.packages.emacs= exposes a wrapped emacs as a flake\n"
-"output. =defaultInitFile = true= bundles the tangled =init.org= as\n"
-"=default.el= so =nix run .#emacs= loads the full config without\n"
-"home-manager."
+"output. =init.org= is pre-tangled into =default.el= and passed to\n"
+"=emacsWithPackagesFromUsePackage= so =nix run .#emacs= loads the\n"
+"full config without home-manager."
 msgstr ""
 
 #. type: plain list 2.
@@ -9792,31 +9792,64 @@ msgstr ""
 #. type: paragraph in src
 #: modules/configuration.org:1912
 #, no-wrap
-msgid "mkEmacs = pkgs: (withEmacsOverlay pkgs).callPackage ./package.nix { };"
+msgid ""
+"emacsUnwrapped =\n"
+"  pkgs:\n"
+"  let\n"
+"    epkgs = withEmacsOverlay pkgs;\n"
+"  in\n"
+"  if pkgs.stdenv.hostPlatform.isDarwin then epkgs.emacs-plus else "
+"epkgs.emacs-pgtk;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1914
+#: modules/configuration.org:1922
 #, no-wrap
 msgid ""
-"  tangle =\n"
-"    pkgs: org:\n"
-"    let\n"
-"      epkgs = withEmacsOverlay pkgs;\n"
-"      emacs-unwrapped = if pkgs.stdenv.hostPlatform.isDarwin then "
-"epkgs.emacs-plus else epkgs.emacs-pgtk;\n"
-"      stem = name: lib.head (lib.splitString \".\" name);\n"
-"      outName = \"${stem (baseNameOf (toString org))}.el\";\n"
-"    in\n"
-"    pkgs.runCommand outName { nativeBuildInputs = [ emacs-unwrapped ]; } "
+"tangle =\n"
+"  pkgs:\n"
+"  {\n"
+"    name,\n"
+"    org,\n"
+"  }:\n"
+"  pkgs.runCommand name { nativeBuildInputs = [ (emacsUnwrapped pkgs) ]; } "
 "''\n"
-"      cp ${org} tmp.org\n"
-"      emacs -Q --batch --eval \\\n"
-"        \"(progn\n"
-"          (require 'ob-tangle)\n"
-"          (org-babel-tangle-file \\\"tmp.org\\\" \\\"emacs-lisp\\\"))\"\n"
-"      install emacs-lisp $out\n"
-"    '';\n"
+"    cp ${org} tmp.org\n"
+"    emacs -Q --batch --eval \\\n"
+"      \"(progn\n"
+"        (require 'ob-tangle)\n"
+"        (org-babel-tangle-file \\\"tmp.org\\\" \\\"emacs-lisp\\\"))\"\n"
+"    install emacs-lisp $out\n"
+"  '';"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:1937
+#, no-wrap
+msgid ""
+"tangleEl =\n"
+"  pkgs: org:\n"
+"  let\n"
+"    stem = name: lib.head (lib.splitString \".\" name);\n"
+"  in\n"
+"  tangle pkgs {\n"
+"    name = \"${stem (baseNameOf (toString org))}.el\";\n"
+"    inherit org;\n"
+"  };"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:1947
+#, no-wrap
+msgid ""
+"  mkEmacs =\n"
+"    pkgs:\n"
+"    (withEmacsOverlay pkgs).callPackage ./package.nix {\n"
+"      defaultInitFile = tangle pkgs {\n"
+"        name = \"default.el\";\n"
+"        org = ./init.org;\n"
+"      };\n"
+"    };\n"
 "in\n"
 "{\n"
 "  flake.homeManagerModules.emacs =\n"
@@ -9831,7 +9864,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1942
+#: modules/configuration.org:1967
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.emacs.enable {\n"
@@ -9842,7 +9875,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1948
+#: modules/configuration.org:1973
 #, no-wrap
 msgid ""
 "services.emacs = {\n"
@@ -9852,17 +9885,17 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1953
+#: modules/configuration.org:1978
 #, no-wrap
 msgid ""
-"xdg.configFile.\"emacs/init.el\".source = tangle pkgs ./init.org;\n"
-"xdg.configFile.\"emacs/early-init.el\".source = tangle pkgs "
+"xdg.configFile.\"emacs/init.el\".source = tangleEl pkgs ./init.org;\n"
+"xdg.configFile.\"emacs/early-init.el\".source = tangleEl pkgs "
 "./early-init.org;\n"
 "home.file.\".authinfo.age\".source = ./authinfo.age;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1957
+#: modules/configuration.org:1982
 #, no-wrap
 msgid ""
 "    home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin "
@@ -9875,7 +9908,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1963
+#: modules/configuration.org:1988
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -9887,7 +9920,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1972
+#: modules/configuration.org:1997
 #, no-wrap
 msgid ""
 "{\n"
@@ -9904,6 +9937,7 @@ msgid ""
 "  notmuch,\n"
 "  terraform-ls,\n"
 "  yaml-language-server,\n"
+"  defaultInitFile,\n"
 "}:\n"
 "let\n"
 "  emacs-unwrapped = if stdenv.hostPlatform.isDarwin then emacs-plus else "
@@ -9913,7 +9947,7 @@ msgid ""
 "  package = emacs-unwrapped;\n"
 "  config = ./init.org;\n"
 "  alwaysTangle = true;\n"
-"  defaultInitFile = true;\n"
+"  inherit defaultInitFile;\n"
 "  extraEmacsPackages = epkgs: [\n"
 "    epkgs.treesit-grammars.with-all-grammars\n"
 "    notmuch.emacs\n"
@@ -9930,25 +9964,25 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2013
+#: modules/configuration.org:2039
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:2014
+#: modules/configuration.org:2040
 #, no-wrap
 msgid "\"./flake/features/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2015
+#: modules/configuration.org:2041
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:2016
+#: modules/configuration.org:2042
 #, no-wrap
 msgid "\"./flake/features/emacs/init.org\""
 msgstr ""
