@@ -41,6 +41,13 @@ locals {
       proxied = true
       type    = "CNAME"
     }
+    niks3 = {
+      # write path: presigned-URL minting only. Reads go to nix-cache via R2.
+      content = "acfc103f-c6b4-4cef-8269-e1985b80e1ac.cfargotunnel.com"
+      name    = "niks3.natsukium.com"
+      proxied = true
+      type    = "CNAME"
+    }
     forgejo = {
       content = "acfc103f-c6b4-4cef-8269-e1985b80e1ac.cfargotunnel.com"
       name    = "git.natsukium.com"
@@ -99,4 +106,22 @@ resource "cloudflare_workers_route" "matrix_well_known" {
   zone_id = local.zone_id
   pattern = "natsukium.com/.well-known/matrix/*"
   script  = cloudflare_workers_script.matrix_well_known.script_name
+}
+
+# Separate from the Attic bucket: niks3's standard binary-cache layout is
+# incompatible with Attic's chunked store.
+resource "cloudflare_r2_bucket" "nix_cache_niks3" {
+  account_id = local.cloudflare_account_id
+  name       = "nix-cache-niks3"
+}
+
+# Public read path: clients pull straight from R2 (CDN-cached), bypassing the
+# tunnel. Cloudflare manages this DNS record itself, hence not in local.records.
+resource "cloudflare_r2_custom_domain" "nix_cache_niks3" {
+  account_id  = local.cloudflare_account_id
+  zone_id     = local.zone_id
+  bucket_name = cloudflare_r2_bucket.nix_cache_niks3.name
+  domain      = "nix-cache.natsukium.com"
+  enabled     = true
+  min_tls     = "1.2"
 }
