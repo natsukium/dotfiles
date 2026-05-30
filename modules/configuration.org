@@ -160,20 +160,24 @@ nix.settings.warn-dirty = false;
 
 **** Binary Caches
 
-Two binary caches are configured: =natsukium= holds pre-built artifacts for this dotfiles
-repository (CI-built system closures and custom packages), and =nix-community= provides
-caches for community projects including NVIDIA/CUDA packages and other
-nix-community-maintained derivations.
+Three binary caches are configured. =cache.natsukium.com= is a self-hosted Attic
+instance (running on serengeti, backed by Cloudflare R2) that CI pushes this flake's
+pre-built artifacts to. It took over from =natsukium.cachix.org= because the dotfiles
+closures outgrew Cachix's storage limits.
+=nix-community= provides caches for community projects including
+NVIDIA/CUDA packages and other nix-community-maintained derivations.
 
 #+NAME: nix-substituters
 #+begin_src nix
 nix.settings = {
   substituters = [
+    "https://cache.natsukium.com/dotfiles"
     "https://natsukium.cachix.org"
     "https://nix-community.cachix.org"
   ];
 
   trusted-public-keys = [
+    "dotfiles:ubfx5NMqcrhL5eAouZ/qYiuDFj1VHCHWY0eaBFCdols="
     "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
     "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
   ];

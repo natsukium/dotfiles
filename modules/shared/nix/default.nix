@@ -48,11 +48,13 @@ in
 
       nix.settings = {
         substituters = [
+          "https://cache.natsukium.com/dotfiles"
           "https://natsukium.cachix.org"
           "https://nix-community.cachix.org"
         ];
 
         trusted-public-keys = [
+          "dotfiles:ubfx5NMqcrhL5eAouZ/qYiuDFj1VHCHWY0eaBFCdols="
           "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
           "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
         ];
