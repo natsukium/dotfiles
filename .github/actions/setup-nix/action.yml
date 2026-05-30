@@ -1,11 +1,8 @@
-name: Setup Nix with Cachix
-description: Setup Nix environment with Cachix configuration
+name: Setup Nix with Attic
+description: Setup Nix environment with Attic binary cache
 inputs:
-  signingKey:
-    description: Cachix signing key
-    required: false
-  authToken:
-    description: Cachix auth token
+  token:
+    description: Attic auth token
     required: true
 runs:
   using: composite
@@ -15,10 +12,13 @@ runs:
       # so nixbuild/nix-quick-install-action cannot be used
       # https://github.com/nix-community/cache-nix-action/issues/60#issuecomment-3561402982
       uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31.10.6
-    - name: Setup cachix
-      uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
       with:
-        name: natsukium
-        signingKey: ${{ inputs.signingKey }}
-        authToken: ${{ inputs.authToken }}
-        extraPullNames: nix-community
+        extra_nix_config: |
+          extra-substituters = https://nix-community.cachix.org
+          extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+    - name: Setup attic
+      uses: ryanccn/attic-action@5635a15ef0c5462194ffbd05d1daeddc74625c3a # v0.5.0
+      with:
+        endpoint: https://cache.natsukium.com
+        cache: dotfiles
+        token: ${{ inputs.token }}
