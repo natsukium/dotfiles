@@ -1,12 +1,5 @@
-name: Setup Nix with Cachix
-description: Setup Nix environment with Cachix configuration
-inputs:
-  signingKey:
-    description: Cachix signing key
-    required: false
-  authToken:
-    description: Cachix auth token
-    required: true
+name: Setup Nix with niks3
+description: Setup Nix environment with the niks3 binary cache
 runs:
   using: composite
   steps:
@@ -15,10 +8,11 @@ runs:
       # so nixbuild/nix-quick-install-action cannot be used
       # https://github.com/nix-community/cache-nix-action/issues/60#issuecomment-3561402982
       uses: cachix/install-nix-action@8aa03977d8d733052d78f4e008a241fd1dbf36b3 # v31.10.6
-    - name: Setup cachix
-      uses: cachix/cachix-action@5f2d7c5294214f71b873db4b969586b980625e71 # v17
       with:
-        name: natsukium
-        signingKey: ${{ inputs.signingKey }}
-        authToken: ${{ inputs.authToken }}
-        extraPullNames: nix-community
+        extra_nix_config: |
+          extra-substituters = https://nix-community.cachix.org
+          extra-trusted-public-keys = nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=
+    - name: Setup niks3
+      uses: Mic92/niks3-action@bc010bf9dbc79ec59de6c79b1e7a167977d3978b # v1.0.0
+      with:
+        server-url: https://niks3.natsukium.com

@@ -14,6 +14,8 @@ concurrency:
 permissions:
   contents: read
   pull-requests: write
+  # required for the niks3 cache to authenticate via GitHub OIDC
+  id-token: write
 jobs:
   dix:
     runs-on: ubuntu-latest
@@ -21,8 +23,6 @@ jobs:
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-nix
-        with:
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - uses: natsukium/nix-diff-action@b5c316c6cafc8470037d7f330b178aaeeba96ba4 # v1.1.0
         with:
           attributes: |

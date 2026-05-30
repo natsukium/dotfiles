@@ -52,11 +52,13 @@ jobs:
     if: ${{ !cancelled() && (needs.changes.outputs.nix == 'true' || github.event_name == 'push') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: read
+      # required for the niks3 cache to authenticate via GitHub OIDC
+      id-token: write
     steps:
       - uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       - uses: ./.github/actions/setup-nix
-        with:
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Check flake
         run: nix flake check --no-build --all-systems --keep-going
   build:
@@ -64,6 +66,10 @@ jobs:
     if: ${{ !cancelled() && needs.check.result != 'failure' }}
     runs-on: ${{ matrix.os }}
     timeout-minutes: 120
+    permissions:
+      contents: read
+      # required for the niks3 cache to authenticate via GitHub OIDC
+      id-token: write
     strategy:
       fail-fast: false
       matrix:
@@ -89,8 +95,6 @@ jobs:
           df -h
       - uses: ./.github/actions/setup-nix
         if: needs.check.result == 'success'
-        with:
-          authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
       - name: Create /run for darwin
         if: needs.check.result == 'success' && matrix.os == 'macos-latest'
         run: |
