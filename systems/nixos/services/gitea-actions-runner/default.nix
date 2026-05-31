@@ -1,6 +1,8 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
   services.gitea-actions-runner = {
+    package = pkgs.forgejo-runner;
+
     instances.default = {
       enable = true;
       name = config.networking.hostName;
