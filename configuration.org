@@ -105,6 +105,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     # Infrastructure
     <<comin>>
     <<microvm>>
+    <<niks3>>
     <<sops-nix>>
     <<tsnsrv>>
     # Development Tools
@@ -457,6 +458,31 @@ tsnsrv = {
   url = "github:boinkor-net/tsnsrv";
   inputs.flake-parts.follows = "flake-parts";
   inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** niks3
+
+https://github.com/Mic92/niks3
+
+#+BEGIN_QUOTE
+S3-backed Nix binary cache with garbage collection
+#+END_QUOTE
+
+niks3 is a self-hosted, S3-backed Nix binary cache that resolves the upload
+limits I ran into with the alternatives: it hands clients presigned S3 URLs so
+NARs upload straight to R2, and the cloudflared tunnel only carries small API
+calls. Cachix's free 5 GB was not enough for my dotfiles closures, so builds kept
+re-running instead of being fetched from the cache. attic worked, but behind a
+free cloudflared tunnel every upload was proxied through the tunnel and hit
+Cloudflare's 100 MiB request-body cap on large derivations.
+
+#+NAME: niks3
+#+begin_src nix
+niks3 = {
+  url = "github:Mic92/niks3";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.treefmt-nix.follows = "treefmt-nix";
 };
 #+end_src
 
@@ -841,11 +867,13 @@ configured in their =nix.conf= or system configuration.
 #+NAME: nix-config
 #+begin_src nix
 extra-substituters = [
+  "https://nix-cache.natsukium.com"
   "https://natsukium.cachix.org"
   "https://nix-community.cachix.org"
 ];
 
 extra-trusted-public-keys = [
+  "niks3-1:SoIFTPtiPoCW3/OzUkIBKlLG5znMZfbihlr11XAOles="
   "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
   "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
 ];

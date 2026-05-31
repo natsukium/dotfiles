@@ -20,6 +20,7 @@
     ../services/home-assistant
     ../services/loki
     ../services/miniflux
+    ../services/niks3
     ../services/prometheus
     ../services/searxng
     ./hardware-configuration.nix
