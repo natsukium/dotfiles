@@ -32,6 +32,7 @@
     cachix
     coreutils
     fd
+    forgejo-cli
     gnumake
     gnutar
     hydra-check
