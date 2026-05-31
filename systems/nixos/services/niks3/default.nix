@@ -27,7 +27,7 @@ in
   # 4. sops ./secrets.yaml with niks3-api-token, niks3-signing-key (the full
   #    /tmp/niks3.key), niks3-s3-access-key, niks3-s3-secret-key.
   #
-  # CI pushes via GitHub OIDC, so no push token is stored.
+  # CI pushes via OIDC (GitHub and Forgejo Actions), so no push token is stored.
 
   imports = [ inputs.niks3.nixosModules.niks3 ];
 
@@ -53,10 +53,17 @@ in
 
     gc.olderThan = "168h";
 
-    oidc.providers.github = {
-      issuer = "https://token.actions.githubusercontent.com";
-      audience = "https://${serverDomain}";
-      boundClaims.repository = [ "natsukium/dotfiles" ];
+    oidc.providers = {
+      github = {
+        issuer = "https://token.actions.githubusercontent.com";
+        audience = "https://${serverDomain}";
+        boundClaims.repository = [ "natsukium/dotfiles" ];
+      };
+      forgejo = {
+        issuer = "https://git.natsukium.com/api/actions";
+        audience = "https://${serverDomain}";
+        boundClaims.repository_owner = [ "natsukium" ];
+      };
     };
   };
 
