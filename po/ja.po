@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-05-31 12:22+0900\n"
+"POT-Creation-Date: 2026-05-31 17:43+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -2874,6 +2874,18 @@ msgid ""
 "      pkgs,\n"
 "      ...\n"
 "    }:\n"
+"    let\n"
+"      terraform' = pkgs.terraform.withPlugins (p: [\n"
+"        p.carlpett_sops\n"
+"        p.cloudflare_cloudflare\n"
+"        p.determinatesystems_hydra\n"
+"        p.hashicorp_aws\n"
+"        p.hashicorp_external\n"
+"        p.hashicorp_null\n"
+"        p.integrations_github\n"
+"        p.oracle_oci\n"
+"      ]);\n"
+"    in\n"
 "    {\n"
 "      devShells = {\n"
 "        default = pkgs.mkShell {\n"
@@ -2882,16 +2894,7 @@ msgid ""
 "            nix-fast-build\n"
 "            sops\n"
 "            ssh-to-age\n"
-"            (terraform.withPlugins (p: [\n"
-"              p.carlpett_sops\n"
-"              p.cloudflare_cloudflare\n"
-"              p.determinatesystems_hydra\n"
-"              p.hashicorp_aws\n"
-"              p.hashicorp_external\n"
-"              p.hashicorp_null\n"
-"              p.integrations_github\n"
-"              p.oracle_oci\n"
-"            ]))\n"
+"            terraform'\n"
 "            <<translation-packages>>\n"
 "          ];\n"
 "          shellHook =\n"
@@ -2901,6 +2904,15 @@ msgid ""
 "              echo \"Syncing CLAUDE.md...\"\n"
 "              make CLAUDE.md >/dev/null 2>&1 || echo \"Warning: Failed to generate CLAUDE.md\"\n"
 "            '';\n"
+"        };"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1399 .github/README.org:111
+#, no-wrap
+msgid ""
+"        terraform = pkgs.mkShell {\n"
+"          packages = [ terraform' ];\n"
 "        };\n"
 "      };\n"
 "    };\n"
@@ -2908,13 +2920,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1400 .github/README.org:111
+#: configuration.org:1407 .github/README.org:118
 #, no-wrap
 msgid "Pre-commit hooks"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1402 .github/README.org:113
+#: configuration.org:1409 .github/README.org:120
 msgid ""
 "Hooks run by [[https://github.com/cachix/git-hooks.nix][git-hooks.nix]] on "
 "every commit. =prek= is used as the runner because it is the actively-"
@@ -2923,7 +2935,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1406 .github/README.org:117
+#: configuration.org:1413 .github/README.org:124
 msgid ""
 "=check-org-tangle= is the only hook with =priority = 0= because it must run "
 "before everything else: if Org files are out of sync, formatters and linters "
@@ -2932,7 +2944,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1412 .github/README.org:123
+#: configuration.org:1419 .github/README.org:130
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -2941,7 +2953,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1416 .github/README.org:127
+#: configuration.org:1423 .github/README.org:134
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -3054,14 +3066,14 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1526 .github/README.org:236
+#: configuration.org:1533 .github/README.org:243
 #, fuzzy, no-wrap
 #| msgid "Core Settings"
 msgid "Formatting"
 msgstr "コア設定"
 
 #. type: paragraph
-#: configuration.org:1528 .github/README.org:238
+#: configuration.org:1535 .github/README.org:245
 msgid ""
 "Formatters are aggregated via [[https://github.com/numtide/treefmt-nix]"
 "[treefmt-nix]] and invoked from the =treefmt= pre-commit hook, so a single "
@@ -3069,7 +3081,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1533 .github/README.org:243
+#: configuration.org:1540 .github/README.org:250
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3078,7 +3090,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1537 .github/README.org:247
+#: configuration.org:1544 .github/README.org:254
 #, no-wrap
 msgid ""
 "  perSystem = _: {\n"
@@ -3099,13 +3111,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1554 .github/README.org:263
+#: configuration.org:1561 .github/README.org:270
 #, no-wrap
 msgid "MCP Servers"
 msgstr "MCPサーバー"
 
 #. type: paragraph
-#: configuration.org:1556 .github/README.org:265
+#: configuration.org:1563 .github/README.org:272
 msgid ""
 "Configuration for [[https://github.com/natsukium/mcp-servers-nix][mcp-"
 "servers-nix]], enabled in the development shell.  The =flavors.claude-code= "
@@ -3117,30 +3129,30 @@ msgstr ""
 "の期待するフォーマットと互換性のある =.mcp.json= ファイルが生成されます。"
 
 #. type: plain list -
-#: configuration.org:1562 .github/README.org:271
+#: configuration.org:1569 .github/README.org:278
 #, no-wrap
 msgid "=nixos=: NixOS package/option search and Home Manager documentation"
 msgstr "=nixos=: NixOSパッケージ/オプション検索とHome Managerのドキュメント"
 
 #. type: plain list -
-#: configuration.org:1563 .github/README.org:272
+#: configuration.org:1570 .github/README.org:279
 #, no-wrap
 msgid "=terraform=: Terraform registry lookup for providers, modules, and policies"
 msgstr "=terraform=: Terraformレジストリのプロバイダー、モジュール、ポリシー検索"
 
 #. type: plain list -
-#: configuration.org:1564 .github/README.org:273
+#: configuration.org:1571 .github/README.org:280
 #, no-wrap
 msgid "=grafana=: Query dashboards, datasources, and metrics from the home server's Grafana instance"
 msgstr "=grafana=: ホームサーバーのGrafanaインスタンスからダッシュボード、データソース、メトリクスを照会"
 
 #. type: paragraph
-#: configuration.org:1560 .github/README.org:269
+#: configuration.org:1567 .github/README.org:276
 msgid "Enabled servers:"
 msgstr "有効なサーバー："
 
 #. type: paragraph
-#: configuration.org:1565 .github/README.org:274
+#: configuration.org:1572 .github/README.org:281
 msgid ""
 "The =passwordCommand= option retrieves secrets at runtime using =rbw= "
 "(Bitwarden CLI), avoiding plaintext credentials in the repository."
@@ -3149,7 +3161,7 @@ msgstr ""
 "レットを取得し、リポジトリに平文の認証情報を含めることを避けています。"
 
 #. type: paragraph in src
-#: configuration.org:1569 .github/README.org:278
+#: configuration.org:1576 .github/README.org:285
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3158,7 +3170,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1573 .github/README.org:282
+#: configuration.org:1580 .github/README.org:289
 #, no-wrap
 msgid ""
 "  perSystem = _: {\n"
@@ -3188,35 +3200,35 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1599 .github/README.org:307
+#: configuration.org:1606 .github/README.org:314
 #, no-wrap
 msgid "Translation"
 msgstr "翻訳"
 
 #. type: paragraph
-#: configuration.org:1601 .github/README.org:309
+#: configuration.org:1608 .github/README.org:316
 msgid "This project uses po4a to manage translations."
 msgstr "このプロジェクトでは翻訳にpo4aを使っています。"
 
 #. type: heading ***
-#: configuration.org:1603 .github/README.org:310
+#: configuration.org:1610 .github/README.org:317
 #, no-wrap
 msgid "Requirements"
 msgstr "必要なソフトウェア"
 
 #. type: paragraph
-#: configuration.org:1605 .github/README.org:312
+#: configuration.org:1612 .github/README.org:319
 msgid "The required packages are included in the development shell."
 msgstr "必要なパッケージは開発シェルに含まれています。"
 
 #. type: keyword name
-#: configuration.org:1607 .github/README.org:314
+#: configuration.org:1614 .github/README.org:321
 #, no-wrap
 msgid "translation-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1609 .github/README.org:316
+#: configuration.org:1616 .github/README.org:323
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -3224,31 +3236,31 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1614 .github/README.org:321
+#: configuration.org:1621 .github/README.org:328
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr "=gettext=: msgfmtやその他の国際化ユーティリティを提供"
 
 #. type: plain list -
-#: configuration.org:1615 .github/README.org:322
+#: configuration.org:1622 .github/README.org:329
 #, no-wrap
 msgid "=po4a=: po4a >= 0.74 is required for Org mode support."
 msgstr "=po4a=: Org modeサポートにはpo4a >= 0.74が必要です。"
 
 #. type: heading ***
-#: configuration.org:1616 .github/README.org:322
+#: configuration.org:1623 .github/README.org:329
 #, no-wrap
 msgid "Translation workflow"
 msgstr "翻訳作業"
 
 #. type: heading ****
-#: configuration.org:1618 .github/README.org:324
+#: configuration.org:1625 .github/README.org:331
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr "po4aを設定する"
 
 #. type: paragraph
-#: configuration.org:1620 .github/README.org:326
+#: configuration.org:1627 .github/README.org:333
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -3261,7 +3273,7 @@ msgstr ""
 "いるときのみ出力されます。)"
 
 #. type: paragraph in src
-#: configuration.org:1629 .github/README.org:335
+#: configuration.org:1636 .github/README.org:342
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -3275,19 +3287,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1639 .github/README.org:345
+#: configuration.org:1646 .github/README.org:352
 msgid ""
 "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr "=po4a.cfg=について、詳しくは=man po4a=を参照してください。"
 
 #. type: heading ****
-#: configuration.org:1641 .github/README.org:346
+#: configuration.org:1648 .github/README.org:353
 #, no-wrap
 msgid "Create/Update po"
 msgstr "poを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:1643 .github/README.org:348
+#: configuration.org:1650 .github/README.org:355
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -3298,19 +3310,19 @@ msgstr ""
 "に生成します。"
 
 #. type: paragraph in src
-#: configuration.org:1649 .github/README.org:354
+#: configuration.org:1656 .github/README.org:361
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:1652 .github/README.org:356
+#: configuration.org:1659 .github/README.org:363
 #, no-wrap
 msgid "Translate"
 msgstr "翻訳する"
 
 #. type: paragraph
-#: configuration.org:1654 .github/README.org:358
+#: configuration.org:1661 .github/README.org:365
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
@@ -3319,13 +3331,13 @@ msgstr ""
 "Gtranslator、KDEのLokalizeが有名です。"
 
 #. type: heading ****
-#: configuration.org:1661 .github/README.org:364
+#: configuration.org:1668 .github/README.org:371
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr "翻訳ファイルを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:1663 .github/README.org:366
+#: configuration.org:1670 .github/README.org:373
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -3335,7 +3347,7 @@ msgstr ""
 "め、実運用上はこのコマンドを実行するだけで良いでしょう。"
 
 #. type: paragraph in src
-#: configuration.org:1669 .github/README.org:372
+#: configuration.org:1676 .github/README.org:379
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""

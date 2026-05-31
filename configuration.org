@@ -1364,6 +1364,18 @@ and syncs =CLAUDE.md= from the literate source.
       pkgs,
       ...
     }:
+    let
+      terraform' = pkgs.terraform.withPlugins (p: [
+        p.carlpett_sops
+        p.cloudflare_cloudflare
+        p.determinatesystems_hydra
+        p.hashicorp_aws
+        p.hashicorp_external
+        p.hashicorp_null
+        p.integrations_github
+        p.oracle_oci
+      ]);
+    in
     {
       devShells = {
         default = pkgs.mkShell {
@@ -1372,16 +1384,7 @@ and syncs =CLAUDE.md= from the literate source.
             nix-fast-build
             sops
             ssh-to-age
-            (terraform.withPlugins (p: [
-              p.carlpett_sops
-              p.cloudflare_cloudflare
-              p.determinatesystems_hydra
-              p.hashicorp_aws
-              p.hashicorp_external
-              p.hashicorp_null
-              p.integrations_github
-              p.oracle_oci
-            ]))
+            terraform'
             <<translation-packages>>
           ];
           shellHook =
@@ -1391,6 +1394,10 @@ and syncs =CLAUDE.md= from the literate source.
               echo "Syncing CLAUDE.md..."
               make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
             '';
+        };
+
+        terraform = pkgs.mkShell {
+          packages = [ terraform' ];
         };
       };
     };
