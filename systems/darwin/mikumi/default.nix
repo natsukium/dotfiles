@@ -1,10 +1,11 @@
-{ config, pkgs, ... }:
+{ config, inputs, ... }:
 {
   imports = [
     ../../../modules/profiles/darwin/base.nix
     ../../../modules/profiles/darwin/server.nix
     ../../shared/hercules-ci/agent.nix
     ../common.nix
+    inputs.self.modules.darwin.forgejo-runner
   ];
 
   networking = {
@@ -20,6 +21,16 @@
   };
 
   programs.zsh.enable = true;
+
+  my.services.forgejo-runner = {
+    enable = true;
+    tokenFile = config.sops.secrets.forgejo-runner-token.path;
+  };
+  sops.secrets.forgejo-runner-token = {
+    sopsFile = ./secrets.yaml;
+    # launchd reads the env file as the runner user, so it must own it
+    owner = config.services.forgejo-runner.user;
+  };
 
   power = {
     # Enable these options only on Mac mini because MacBook does not support these features
