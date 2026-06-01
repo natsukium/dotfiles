@@ -1686,6 +1686,493 @@ gsw = "git switch";
 gswc = "git switch -c";
 #+end_src
 
+* Continuous Integration
+
+** Forgejo Actions Runner
+
+My Forgejo instance dispatches Actions jobs to registered runners. Linux hosts
+register through nixpkgs' =services.gitea-actions-runner=; macOS has no such
+module, so I provide =services.forgejo-runner= for Darwin, driven by launchd and
+shaped like the NixOS option (instances under
+=services.forgejo-runner.instances.<name>=) so a
+runner reads the same on either platform.
+
+Three modules share this file. The Darwin mechanism is neutral and
+upstreamable, so I publish it as the public =flake.darwinModules.forgejo-runner=.
+The per-class =my.services.forgejo-runner= wrappers bake my personal
+defaults (instance URL, labels, niks3 client) and go in the internal
+=flake.modules.{darwin,nixos}= registry, which =_class=-checks imports — a
+distinct surface from the public =darwinModules= output. A host enables a
+wrapper and supplies its own registration token.
+
+#+begin_src nix :tangle flake/features/forgejo-runner/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle flake/features/forgejo-runner/default.nix
+{ ... }:
+let
+  <<forgejo-runner-darwin-module>>
+
+  <<forgejo-runner-wrapper-shared>>
+
+  <<forgejo-runner-wrappers>>
+in
+{
+  # Internal registry (_class-checked): hosts enable my.services.forgejo-runner.
+  flake.modules.darwin.forgejo-runner = darwinWrapper;
+  flake.modules.nixos.forgejo-runner = nixosWrapper;
+
+  # Public API: the neutral Darwin mechanism, safe to promise (no personal opinion).
+  flake.darwinModules.forgejo-runner = darwinModule;
+}
+#+end_src
+
+*** Neutral Darwin module
+
+nix-darwin has no Actions runner, so this module supplies one and nothing
+personal — only =services.forgejo-runner=, with the same instance schema as
+nixpkgs' =services.gitea-actions-runner= (=token=/=tokenFile=, =labels=, freeform
+=settings=). Each
+enabled instance becomes its own launchd job that registers, then execs the
+daemon. Registration re-runs automatically whenever the token or labels change:
+the job records a hash of =token= plus =labels= in =.registration-state= and
+re-registers when it drifts, so a label edit takes effect on the next
+activation without manual cleanup. Forgejo registration tokens are reusable, so
+re-registering with the same token is fine.
+
+#+NAME: forgejo-runner-darwin-module
+#+begin_src nix
+darwinModule =
+  {
+    config,
+    lib,
+    pkgs,
+    ...
+  }:
+  let
+    cfg = config.services.forgejo-runner;
+    settingsFormat = pkgs.formats.yaml { };
+
+    <<forgejo-runner-instance-submodule>>
+
+    enabledInstances = lib.filterAttrs (_: i: i.enable) cfg.instances;
+  in
+  {
+    <<forgejo-runner-darwin-options>>
+
+    <<forgejo-runner-darwin-config>>
+  };
+#+end_src
+
+**** Instance options
+
+An instance carries its registration details and the tools its jobs need on
+=PATH=. The token comes from either =token= (a plaintext string) or =tokenFile=
+(an environment file holding =TOKEN==), exactly one of the two — matching the
+NixOS module so a host reads identically on either platform. =settings= is a
+freeform attrset rendered to =config.yaml= and handed to the daemon with
+=--config=. Host-executed jobs inherit only the daemon's environment, so every
+tool a workflow expects must be listed in =hostPackages=.
+
+#+NAME: forgejo-runner-instance-submodule
+#+begin_src nix
+instanceModule =
+  { name, ... }:
+  {
+    options = {
+      enable = lib.mkEnableOption "this runner instance";
+
+      name = lib.mkOption {
+        type = lib.types.str;
+        default = name;
+        defaultText = lib.literalExpression "the attribute name";
+        description = "Name the runner registers under.";
+      };
+
+      url = lib.mkOption {
+        type = lib.types.str;
+        example = "https://git.example.com";
+        description = "Address of the Forgejo instance the runner registers with.";
+      };
+
+      token = lib.mkOption {
+        type = lib.types.nullOr lib.types.str;
+        default = null;
+        description = ''
+          Registration token as a plaintext string. Mutually exclusive with
+          {option}`tokenFile`. Prefer {option}`tokenFile`: a token set here ends
+          up in the world-readable launchd plist and the Nix store.
+        '';
+      };
+
+      tokenFile = lib.mkOption {
+        type = lib.types.nullOr (lib.types.either lib.types.str lib.types.path);
+        default = null;
+        description = ''
+          Path to an environment file holding the registration token as
+          `TOKEN=...`. Mutually exclusive with {option}`token`. The token is read
+          on first registration and whenever it or {option}`labels` change;
+          otherwise the persisted {file}`.runner` credential in {option}`stateDir`
+          is used.
+        '';
+      };
+
+      labels = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        example = [ "macos:host" ];
+        description = "Labels the runner advertises.";
+      };
+
+      settings = lib.mkOption {
+        type = settingsFormat.type;
+        default = { };
+        description = ''
+          Runner configuration written to {file}`config.yaml` and passed to the
+          daemon with `--config`.
+        '';
+      };
+
+      hostPackages = lib.mkOption {
+        type = lib.types.listOf lib.types.package;
+        default = with pkgs; [
+          bash
+          coreutils
+          curl
+          gawk
+          gitMinimal
+          gnused
+          nodejs
+          wget
+        ];
+        defaultText = lib.literalExpression ''
+          with pkgs; [ bash coreutils curl gawk gitMinimal gnused nodejs wget ]
+        '';
+        description = ''
+          Packages put on PATH for host-executed jobs. Host jobs inherit only
+          the daemon's PATH, so every tool a workflow expects must be listed.
+        '';
+      };
+
+      stateDir = lib.mkOption {
+        type = lib.types.str;
+        default = "/var/lib/forgejo-runner/${name}";
+        defaultText = lib.literalExpression ''"/var/lib/forgejo-runner/<name>"'';
+        description = "Directory holding the runner credential and working files.";
+      };
+    };
+  };
+#+end_src
+
+**** Module options
+
+The daemons share one dedicated unprivileged user, not root. Besides least
+privilege there is a concrete reason: a root daemon is a trusted-user client of
+the nix daemon, which sends niks3-action down its post-build-hook push path — a
+path the multi-user daemon ignores, so nothing reaches the binary cache. An
+untrusted user takes the store-scan push path that actually uploads. The =_=
+prefix is the macOS convention for hidden accounts, and 530 sits in the band
+nix-darwin uses for its own service accounts (e.g. =_prometheus-node-exporter=
+at 534) while staying unused.
+
+#+NAME: forgejo-runner-darwin-options
+#+begin_src nix
+options.services.forgejo-runner = {
+  package = lib.mkPackageOption pkgs "forgejo-runner" { };
+
+  user = lib.mkOption {
+    type = lib.types.str;
+    default = "_forgejo-runner";
+    description = "Dedicated unprivileged user the runner daemons execute as.";
+  };
+
+  group = lib.mkOption {
+    type = lib.types.str;
+    default = "_forgejo-runner";
+    description = "Primary group for the runner user.";
+  };
+
+  uid = lib.mkOption {
+    type = lib.types.int;
+    default = 530;
+    description = "UID for the runner user (free system-range id on the host).";
+  };
+
+  gid = lib.mkOption {
+    type = lib.types.int;
+    default = 530;
+    description = "GID for the runner group.";
+  };
+
+  instances = lib.mkOption {
+    type = lib.types.attrsOf (lib.types.submodule instanceModule);
+    default = { };
+    description = "Runner instances; each enabled one becomes a launchd daemon.";
+  };
+};
+#+end_src
+
+**** Configuration
+
+#+NAME: forgejo-runner-darwin-config
+#+begin_src nix
+config = lib.mkIf (enabledInstances != { }) {
+  assertions = lib.mapAttrsToList (_: instance: {
+    assertion = (instance.token == null) != (instance.tokenFile == null);
+    message = "services.forgejo-runner.instances.${instance.name}: set exactly one of token or tokenFile.";
+  }) enabledInstances;
+
+  <<forgejo-runner-daemons>>
+
+  <<forgejo-runner-user>>
+
+  <<forgejo-runner-ownership>>
+};
+#+end_src
+
+***** Launchd daemons
+
+One launchd job per enabled instance. systemd reads =tokenFile= as an
+=EnvironmentFile=; launchd has no equivalent, so a =tokenFile= instance sources
+it in-script to put =TOKEN= in the environment, while an inline =token= rides on
+=EnvironmentVariables=. Either way the script sees =$TOKEN=. =coreutils= is
+prepended to =PATH= unconditionally so the script's own =sha256sum=/=cut= resolve
+even if a host trims =hostPackages=. Two launchd quirks shape each:
+
+- =WorkingDirectory= cannot be the state directory: launchd chdir()s into it
+  /before/ exec, so on first boot the spawn aborts with =EX_CONFIG= (78) before
+  the script can create it. The script sets its own cwd instead.
+- The logs live in the user-owned state directory, not =/var/log=: launchd
+  opens them as =UserName=, and an unprivileged daemon cannot create a
+  root-owned file under =/var/log=, so it would fail to spawn — silently,
+  before any log line.
+
+#+NAME: forgejo-runner-daemons
+#+begin_src nix
+launchd.daemons = lib.mapAttrs' (
+  _: instance:
+  let
+    configFile = settingsFormat.generate "config.yaml" instance.settings;
+  in
+  lib.nameValuePair "forgejo-runner-${instance.name}" {
+    script = ''
+      set -eu
+      mkdir -p ${lib.escapeShellArg instance.stateDir}
+      cd ${lib.escapeShellArg instance.stateDir}
+      ${lib.optionalString (instance.tokenFile != null) ''
+        set -a
+        . ${lib.escapeShellArg (toString instance.tokenFile)}
+        set +a
+      ''}
+      labels=${lib.escapeShellArg (lib.concatStringsSep "," instance.labels)}
+      state="$(printf '%s' "$TOKEN" | sha256sum | cut -d' ' -f1) $labels"
+
+      if [ ! -f .runner ] || [ "$(cat .registration-state 2>/dev/null)" != "$state" ]; then
+        rm -f .runner
+        ${lib.getExe cfg.package} register \
+          --no-interactive \
+          --instance ${lib.escapeShellArg instance.url} \
+          --token "$TOKEN" \
+          --name ${lib.escapeShellArg instance.name} \
+          --labels "$labels" \
+          --config ${configFile}
+        printf '%s' "$state" > .registration-state
+      fi
+
+      exec ${lib.getExe cfg.package} daemon --config ${configFile}
+    '';
+    serviceConfig = {
+      UserName = cfg.user;
+      GroupName = cfg.group;
+      KeepAlive = true;
+      RunAtLoad = true;
+      ProcessType = "Background";
+      EnvironmentVariables = {
+        HOME = instance.stateDir;
+        PATH = "${
+          lib.makeBinPath ([ pkgs.coreutils ] ++ instance.hostPackages)
+        }:/usr/bin:/bin:/usr/sbin:/sbin";
+      }
+      // lib.optionalAttrs (instance.token != null) { TOKEN = instance.token; };
+      StandardOutPath = "${instance.stateDir}/forgejo-runner.log";
+      StandardErrorPath = "${instance.stateDir}/forgejo-runner.err.log";
+    };
+  }
+) enabledInstances;
+#+end_src
+
+***** Runner user
+
+nix-darwin only manages accounts listed in =users.knownUsers= /
+=users.knownGroups=; without these entries the user declaration would be a
+no-op on an existing system.
+
+#+NAME: forgejo-runner-user
+#+begin_src nix
+users.users.${cfg.user} = {
+  uid = cfg.uid;
+  gid = cfg.gid;
+  home = "/var/lib/forgejo-runner";
+  createHome = true;
+  isHidden = true;
+  description = "Forgejo Actions runner";
+};
+users.groups.${cfg.group}.gid = cfg.gid;
+users.knownUsers = [ cfg.user ];
+users.knownGroups = [ cfg.group ];
+#+end_src
+
+***** State ownership
+
+Each instance's state directory must belong to the runner user before its
+daemon starts, or a directory left owned by root blocks the runner from reading
+its own =.runner= credential. The chown runs after the user exists
+(=activationScripts.users=); =KeepAlive= restarts a daemon cleanly if it bounces
+once before the chown lands.
+
+#+NAME: forgejo-runner-ownership
+#+begin_src nix
+system.activationScripts.postActivation.text = lib.concatMapStringsSep "\n" (instance: ''
+  if [ -d ${lib.escapeShellArg instance.stateDir} ]; then
+    chown -R ${lib.escapeShellArg cfg.user}:${lib.escapeShellArg cfg.group} ${lib.escapeShellArg instance.stateDir}
+  fi
+'') (lib.attrValues enabledInstances);
+#+end_src
+
+*** Opinionated wrappers
+
+The two platforms drive different runner options — =services.forgejo-runner= on
+Darwin, nixpkgs' =services.gitea-actions-runner= on NixOS — but the Darwin module
+mirrors the NixOS instance schema, so the wrappers can share one option surface
+and one instance builder. The shared
+=my.services.forgejo-runner= options give =enable=, an =url= (defaulting to
+my Forgejo instance), =labels= a host can override, and a =tokenFile= path;
+=mkInstance= fills the =default= instance identically from those plus the host's
+name. The token is host-issued and host-specific, so the host — not this
+feature — owns the whole secret: it declares the sops entry (and, on Darwin, the
+owner the launchd job reads it as) and hands its path to =tokenFile=. Keeping the secret
+store out of the feature is why =tokenFile= is just a path. Only the genuine
+per-platform deltas stay in each wrapper: the =labels= default (=mkDefault=, so
+the shared option can override), =hostPackages=, and — on NixOS — the
+=forgejo-runner= package and Docker for container jobs. Both push to my binary
+cache, so each =hostPackages= adds =nix= and the niks3 client.
+
+#+NAME: forgejo-runner-wrapper-shared
+#+begin_src nix
+wrapperOptions =
+  { lib, ... }:
+  {
+    options.my.services.forgejo-runner = {
+      enable = lib.mkEnableOption "Forgejo Actions runner";
+
+      url = lib.mkOption {
+        type = lib.types.str;
+        default = "https://git.natsukium.com";
+        description = "Forgejo instance the runner registers with.";
+      };
+
+      tokenFile = lib.mkOption {
+        type = lib.types.path;
+        description = ''
+          Path to an environment file holding the registration token as
+          `TOKEN=...`. The host supplies this — typically a secret-manager path —
+          so the feature stays free of any secret-store assumption.
+        '';
+      };
+
+      labels = lib.mkOption {
+        type = lib.types.listOf lib.types.str;
+        description = "Labels the runner advertises; each platform sets a default.";
+      };
+    };
+  };
+
+mkInstance = config: hostPackages: {
+  enable = true;
+  name = config.networking.hostName;
+  url = config.my.services.forgejo-runner.url;
+  tokenFile = config.my.services.forgejo-runner.tokenFile;
+  labels = config.my.services.forgejo-runner.labels;
+  inherit hostPackages;
+};
+#+end_src
+
+#+NAME: forgejo-runner-wrappers
+#+begin_src nix
+darwinWrapper =
+  {
+    config,
+    lib,
+    pkgs,
+    inputs,
+    ...
+  }:
+  {
+    imports = [
+      darwinModule
+      wrapperOptions
+    ];
+
+    config = lib.mkIf config.my.services.forgejo-runner.enable {
+      my.services.forgejo-runner.labels = lib.mkDefault [
+        "macos:host"
+        "macos-aarch64:host"
+      ];
+
+      services.forgejo-runner.instances.default = mkInstance config (
+        with pkgs;
+        [
+          bash
+          curl
+          git
+          nix
+          nodejs
+          toybox
+          inputs.niks3.packages.${pkgs.stdenv.hostPlatform.system}.niks3
+        ]
+      );
+    };
+  };
+
+nixosWrapper =
+  {
+    config,
+    lib,
+    pkgs,
+    inputs,
+    ...
+  }:
+  {
+    imports = [ wrapperOptions ];
+
+    config = lib.mkIf config.my.services.forgejo-runner.enable {
+      my.services.forgejo-runner.labels = lib.mkDefault [
+        "ubuntu-latest:docker://node:22-bookworm"
+        "nix:host"
+      ];
+
+      services.gitea-actions-runner = {
+        package = pkgs.forgejo-runner;
+        instances.default = mkInstance config (
+          with pkgs;
+          [
+            bash
+            busybox
+            curl
+            git
+            nix
+            nodejs
+            inputs.niks3.packages.${pkgs.stdenv.hostPlatform.system}.niks3
+          ]
+        );
+      };
+
+      virtualisation.docker.enable = true;
+    };
+  };
+#+end_src
+
 * Browser
 
 ** Zen Browser
