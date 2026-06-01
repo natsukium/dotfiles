@@ -1,5 +1,6 @@
 {
   config,
+  inputs,
   pkgs,
   ...
 }:
@@ -10,7 +11,7 @@
     ../../shared/hercules-ci/agent.nix
     ../common.nix
     ../desktop.nix
-    ../services/gitea-actions-runner
+    inputs.self.modules.nixos.forgejo-runner
     ../services/hydra
     ../services/llm
     ./hardware-configuration.nix
@@ -77,6 +78,12 @@
   };
 
   sops.secrets.wifi = { };
+
+  my.services.forgejo-runner = {
+    enable = true;
+    tokenFile = config.sops.secrets.forgejo-runner-token.path;
+  };
+  sops.secrets.forgejo-runner-token.sopsFile = ./secrets.yaml;
 
   nix.settings = {
     max-jobs = 4;
