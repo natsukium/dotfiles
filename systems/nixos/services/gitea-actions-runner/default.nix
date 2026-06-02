@@ -21,13 +21,10 @@
       # essentials and add Nix plus the niks3 client for cache pushes.
       hostPackages = with pkgs; [
         bash
-        coreutils
+        busybox
         curl
-        gawk
         git
-        gnused
         nodejs
-        wget
         nix
         inputs.niks3.packages.${pkgs.stdenv.hostPlatform.system}.niks3
       ];
