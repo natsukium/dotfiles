@@ -102,7 +102,7 @@ in
             "WebFetch(domain:tailscale.com)"
             "mcp__context7__get-library-docs"
             "mcp__context7__resolve-library-id"
-            "mcp__nixos*"
+            "mcp__nixos__*"
             "mcp__playwright__*"
           ];
           defaultMode = "auto";
