@@ -2060,3 +2060,67 @@ emacsWithPackagesFromUsePackage {
 #+INCLUDE: "./flake/features/emacs/early-init.org"
 *** init.org
 #+INCLUDE: "./flake/features/emacs/init.org"
+
+* Darwin
+
+** Spotlight
+
+I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming CPU, disk
+I/O, and disk space in the background, so I turn indexing off by default. Hosts that
+want it back can set =enableIndex = true=. nix-darwin has no option for this, so the
+module drives =mdutil= from an activation script.
+
+#+begin_src nix :tangle darwin/spotlight.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle darwin/spotlight.nix
+{ config, lib, ... }:
+let
+  cfg = config.my.services.spotlight;
+in
+{
+  <<spotlight-options>>
+
+  <<spotlight-config>>
+}
+#+end_src
+
+*** Options
+
+#+NAME: spotlight-options
+#+begin_src nix
+options.my.services.spotlight = {
+  enableIndex = lib.mkOption {
+    type = lib.types.bool;
+    default = false;
+    description = "Whether Spotlight indexes the volumes on this machine.";
+  };
+};
+#+end_src
+
+*** Configuration
+
+=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS splits the
+boot disk into a read-only System volume (=/=) and a writable Data volume, so
+=mdutil -i off /= silently leaves the Data volume indexing. When disabling,
+=mdutil -E= also erases the orphaned index stores to reclaim disk space.
+
+#+NAME: spotlight-config
+#+begin_src nix
+config = {
+  system.activationScripts.extraActivation.text =
+    if cfg.enableIndex then
+      ''
+        echo "enabling spotlight indexing..."
+        mdutil -i on -a &> /dev/null
+      ''
+    else
+      ''
+        echo "disabling spotlight indexing..."
+        mdutil -i off -d -a &> /dev/null
+        mdutil -E -a &> /dev/null
+      '';
+};
+#+end_src
