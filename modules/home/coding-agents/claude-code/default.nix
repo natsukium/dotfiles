@@ -108,20 +108,6 @@ in
           defaultMode = "auto";
         };
 
-        hooks = {
-          Notification = [
-            {
-              matcher = "";
-              hooks = [
-                {
-                  type = "command";
-                  command = "jq -r .message | curl -H 'Title: Claude Code' -d @- ntfy.sh/$(cat ${config.sops.secrets.ntfy-topic.path})";
-                }
-              ];
-            }
-          ];
-        };
-
         env = {
           CLAUDE_CODE_ENABLE_TELEMETRY = "1";
           OTEL_METRICS_EXPORTER = "prometheus";
