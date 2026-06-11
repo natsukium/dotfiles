@@ -90,8 +90,9 @@ in
 
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,
   # so files land on the ephemeral root. Rewrite .env and config.yaml on every
-  # boot; seed auth.json only when absent so the in-VM OAuth refresh state
-  # survives rebuilds.
+  # boot; re-seed auth.json only when the deployed credential changes, so a
+  # rotated token replaces the stale copy while codex's in-VM OAuth refresh
+  # writes survive ordinary rebuilds.
   systemd.services.hermes-agent-secrets-seed = {
     description = "Seed hermes-agent secrets from systemd credentials";
     wantedBy = [ "hermes-agent.service" ];
@@ -107,9 +108,16 @@ in
         ${hermesConfigFile} /var/lib/hermes/.hermes/config.yaml
       install -o hermes -g hermes -m 0640 \
         ${credentialsDir}/hermes-agent.env /var/lib/hermes/.hermes/.env
-      if [ ! -f /var/lib/hermes/.hermes/auth.json ]; then
+      # codex rewrites auth.json on every token refresh, so it can't be diffed
+      # against the credential directly; stamp the seeded credential's hash on
+      # the persistent volume and re-seed only when that hash changes.
+      cred=${credentialsDir}/hermes-agent.auth.json
+      stamp=/var/lib/hermes/.hermes/.auth.json.seed-hash
+      hash=$(sha256sum "$cred" | cut -d' ' -f1)
+      if [ "$(cat "$stamp" 2>/dev/null)" != "$hash" ]; then
         install -o hermes -g hermes -m 0600 \
-          ${credentialsDir}/hermes-agent.auth.json /var/lib/hermes/.hermes/auth.json
+          "$cred" /var/lib/hermes/.hermes/auth.json
+        printf '%s\n' "$hash" > "$stamp"
       fi
     '';
   };
