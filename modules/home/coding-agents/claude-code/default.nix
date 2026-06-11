@@ -125,6 +125,7 @@ in
         env = {
           CLAUDE_CODE_ENABLE_TELEMETRY = "1";
           OTEL_METRICS_EXPORTER = "prometheus";
+          CLAUDE_CODE_AUTO_COMPACT_WINDOW = "450000";
         };
       };
 
