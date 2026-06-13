@@ -191,16 +191,7 @@
 
       imports = [
         ./flake-module.nix
-        ./modules/flake/_registries.nix
-        ./modules/flake/features/emacs
-        ./modules/flake/features/neovim
-        ./modules/flake/per-system/checks.nix
-        ./modules/flake/per-system/dev-shell.nix
-        ./modules/flake/per-system/mcp-servers.nix
-        ./modules/flake/per-system/packages.nix
-        ./modules/flake/per-system/pkgs.nix
-        ./modules/flake/per-system/pre-commit.nix
-        ./modules/flake/per-system/treefmt.nix
+        ./modules/flake
       ];
 
       hosts = {
