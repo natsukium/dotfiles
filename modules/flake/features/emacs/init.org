@@ -924,6 +924,11 @@ images, which marketing platforms use as tracking pixels — Gmail's web
 UI proxies them, but notmuch fetches directly. =I= refreshes the
 current message with blocking disabled when a sender is trusted.
 
+=notmuch-show-part-button-default-action= defaults to saving an
+attachment to disk; I switch it to =notmuch-show-view-part= so the part
+opens with its mailcap viewer instead, letting me press the button on a
+PDF to open it directly.
+
 #+begin_src emacs-lisp
 (use-package notmuch
   :ensure nil
@@ -931,6 +936,7 @@ current message with blocking disabled when a sender is trusted.
   :custom
   (notmuch-fcc-dirs nil)
   (notmuch-search-oldest-first nil)
+  (notmuch-show-part-button-default-action 'notmuch-show-view-part)
   (notmuch-saved-searches
    '((:name "inbox"    :query "tag:inbox"                                      :key "i")
      (:name "unread"   :query "tag:unread"                                     :key "u")
