@@ -33,6 +33,21 @@ instead of requiring the full word =yes= / =no=.
 (setq use-short-answers t)
 #+end_src
 
+** Customize file
+
+Emacs defaults =custom-file= to =init.el=, but here =init.el= is a
+read-only symlink into the Nix store, so anything Customize tries to
+persist would fail to write. Stateful files like this must live outside
+Nix management to stay mutable: point =custom-file= at a writable path
+under =user-emacs-directory= (the directory itself is writable; only the
+symlinked files are not) and load it so the saved values take effect.
+
+#+begin_src emacs-lisp
+(setq custom-file (locate-user-emacs-file "custom.el"))
+(when (file-exists-p custom-file)
+  (load custom-file nil t))
+#+end_src
+
 ** Font
 [[https://github.com/yuru7/moralerspace][Moralerspace]] is a [[https://github.com/githubnext/monaspace][monaspace]]-based composite font family that pairs a Latin
 programming typeface with Japanese glyphs. Each variant—Argon, Krypton,
