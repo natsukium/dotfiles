@@ -2,7 +2,7 @@
 let
   # Custom components must be built against home-assistant's own Python interpreter
   # so that propagated Python deps line up with the rest of the HA wrapper.
-  homeAssistantPyPkgs = config.services.home-assistant.package.python.pkgs;
+  homeAssistantPyPkgs = config.services.home-assistant.package.python3Packages;
   pypetkitapi = homeAssistantPyPkgs.callPackage ./pypetkitapi.nix { };
   sdp-transform = homeAssistantPyPkgs.callPackage ./sdp-transform.nix { };
   petkit = homeAssistantPyPkgs.callPackage ./petkit.nix {
