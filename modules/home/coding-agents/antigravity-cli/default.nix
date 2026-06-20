@@ -5,16 +5,16 @@
   ...
 }:
 let
-  cfg = config.my.programs.gemini-cli;
+  cfg = config.my.programs.antigravity-cli;
   commonLib = import ../common/lib.nix { inherit pkgs; };
 in
 {
-  options.my.programs.gemini-cli = {
-    enable = lib.mkEnableOption "Gemini CLI LLM agent";
+  options.my.programs.antigravity-cli = {
+    enable = lib.mkEnableOption "Antigravity CLI LLM agent";
   };
 
   config = lib.mkIf cfg.enable {
-    programs.gemini-cli = {
+    programs.antigravity-cli = {
       enable = true;
 
       settings = {
@@ -38,6 +38,6 @@ in
       };
     };
 
-    home.file.".gemini/AGENTS.md".source = commonLib.rulesWithTools;
+    home.file.".antigravity-cli/AGENTS.md".source = commonLib.rulesWithTools;
   };
 }

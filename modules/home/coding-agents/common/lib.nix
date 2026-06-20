@@ -1,7 +1,7 @@
 { pkgs }:
 {
   # Generate AGENTS.md with tool instructions from skills
-  # Used by gemini-cli and opencode (Claude Code uses skills directly)
+  # Used by antigravity-cli and opencode (Claude Code uses skills directly)
   rulesWithTools =
     pkgs.runCommand "AGENTS.md"
       {
