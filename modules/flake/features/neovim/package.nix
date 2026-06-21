@@ -102,6 +102,19 @@ let
     (lib.makeBinPath (language-servers ++ tools))
   ];
 
+  # Prepend only the runtime config to the rtp, not the whole directory: the
+  # co-located flake-parts module (default.nix) and package definitions share
+  # this directory, and including them would make every Neovim rebuild on an
+  # unrelated module edit and defeat the drvPath-equality verification.
+  runtimeConfig = lib.fileset.toSource {
+    root = ./.;
+    fileset = lib.fileset.unions [
+      ./init.lua
+      ./lsp
+      ./lua
+    ];
+  };
+
 in
 wrapNeovimUnstable neovim-unwrapped' {
   withNodeJs = true; # for copilot
@@ -109,7 +122,7 @@ wrapNeovimUnstable neovim-unwrapped' {
   withPython3 = false;
   vimAlias = true;
   luaRcContent = ''
-    vim.opt.rtp:prepend('${./.}')
+    vim.opt.rtp:prepend('${runtimeConfig}')
 
     ${builtins.readFile ./init.lua}
   '';
