@@ -33,13 +33,7 @@ in
       focus-follows-mouse.enable = true;
       warp-mouse-to-focus.enable = true;
     };
-    # XWayland
-    spawn-at-startup = [
-      { command = [ "${lib.getExe pkgs.xwayland-satellite}" ]; }
-    ];
-    environment = {
-      DISPLAY = ":0";
-    };
+    xwayland-satellite.path = lib.getExe pkgs.xwayland-satellite;
     prefer-no-csd = true;
     window-rules = [
       {
