@@ -98,42 +98,65 @@
           "kilimanjaro-user"
           "android"
         ];
-        # Peers send file modes that match their local user (typically 0644
-        # without group write); applying those locally would lock hermes-agent
-        # out of files it needs to modify. Ignoring incoming perms lets the
-        # syncthing UMask=0002 below produce 0664/2775 entries that the
-        # org-sync group can write.
+        # hermes (guest) shares syncthing's uid across virtiofs, so the file
+        # owner is the same identity on both sides and owner-rw always
+        # suffices. Ignore peer-sent modes to avoid resync churn.
         ignorePerms = true;
       };
     };
   };
 
-  # Shared gid pinned on both manyara and the hermes-agent guest so virtiofs's
-  # passthrough mode lines up: files created by syncthing (host uid) and
-  # hermes-agent (guest uid) end up in the same gid namespace, and group write
-  # bits propagate across the host/guest boundary.
-  users.groups.org-sync.gid = 9001;
-  users.users.${config.services.syncthing.user}.extraGroups = [
-    # syncthing needs write access to /data/books which is owned by calibre-web
-    config.services.calibre-web.group
-    "org-sync"
-  ];
-  # microvm.nix runs virtiofsd as the `microvm` user; without org-sync
-  # membership it cannot traverse a 2770 directory to expose it to the guest.
-  users.users.microvm.extraGroups = [ "org-sync" ];
+  # syncthing (host) and the hermes-agent guest share this uid. virtiofsd runs
+  # as root and passes uids through unchanged, so files either side writes are
+  # owned by the same identity on the host: owner-rw is enough, with no shared
+  # group, umask widening, setgid, or periodic chmod to keep group access alive
+  # (hermes's atomic writer creates files 0600, which no create-time mechanism
+  # can widen for a group — only a shared owner avoids that). Pinned to
+  # syncthing's existing auto-allocated value so host ownership is unchanged;
+  # the guest pins hermes to the same number (see guest.nix). A third writer on
+  # this tree would not fit this 1:1 scheme and would need the group model back.
+  users.users.${config.services.syncthing.user} = {
+    uid = 237;
+    # syncthing needs write access to /data/books which is owned by calibre-web.
+    extraGroups = [ config.services.calibre-web.group ];
+  };
+  users.groups.${config.services.syncthing.group}.gid = 237;
 
-  # syncthing creates the folder lazily; pre-create with the org-sync group +
-  # setgid so new entries inherit the shared gid regardless of who creates
-  # them (syncthing on host, or hermes via virtiofs).
   systemd.tmpfiles.rules = [
-    "d /var/lib/syncthing/org 2770 ${config.services.syncthing.user} org-sync -"
+    # syncthing creates this lazily; pre-create it owned by syncthing (= hermes
+    # uid 237) so the guest can rw it from the first boot.
+    "d /var/lib/syncthing/org 0700 ${config.services.syncthing.user} ${config.services.syncthing.group} -"
     # setgid (2xxx) ensures new files/dirs inherit the calibre-web group,
     # so both syncthing (group member) and calibre-web (owner) can access them
     "d /data/books 2775 ${config.services.calibre-web.user} ${config.services.calibre-web.group} -"
   ];
-  # default umask 0022 strips group write, preventing calibre-web from modifying
-  # files syncthing creates — 0002 preserves group write so both services can coexist
+  # calibre-web must modify book files syncthing creates under /data/books;
+  # default umask 0022 strips group write, so 0002 keeps the shared calibre-web
+  # group writable. (The org tree no longer relies on this — see the uid pin.)
   systemd.services.syncthing.serviceConfig.UMask = "0002";
+
+  # One-time: dropping the org-sync group leaves legacy org files owned by the
+  # guest's old (pre-237) uid unreachable to syncthing. Re-own the tree once;
+  # remove this unit after the first successful deploy.
+  systemd.services.org-uid-migrate = {
+    description = "Re-own org tree to syncthing after the hermes uid alignment";
+    wantedBy = [ "syncthing.service" ];
+    before = [ "syncthing.service" ];
+    serviceConfig = {
+      Type = "oneshot";
+      RemainAfterExit = true;
+    };
+    script = ''
+      # Stamp lives outside the synced tree so syncthing never propagates it.
+      stamp=/var/lib/syncthing/.org-uid-migrated
+      if [ ! -e "$stamp" ]; then
+        ${pkgs.coreutils}/bin/chown -R \
+          ${config.services.syncthing.user}:${config.services.syncthing.group} \
+          /var/lib/syncthing/org
+        ${pkgs.coreutils}/bin/touch "$stamp"
+      fi
+    '';
+  };
 
   sops.secrets.syncthing-key = {
     sopsFile = ./syncthing.yaml;
