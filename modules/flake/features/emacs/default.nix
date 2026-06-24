@@ -49,7 +49,7 @@ let
     };
 in
 {
-  flake.homeManagerModules.emacs =
+  flake.modules.homeManager.emacs =
     {
       config,
       lib,

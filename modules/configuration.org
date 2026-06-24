@@ -2389,14 +2389,16 @@ flake-parts module pulls double duty from a single file:
 
 1. =perSystem.packages.neovim= makes =nix run .#neovim= work on every
    supported system.
-2. =flake.homeManagerModules.neovim= lets a home-manager config opt in
-   with =my.programs.neovim.enable=, which installs the wrapped Neovim
-   plus =neovim-remote= and exports =EDITOR=nvim=.
+2. =flake.modules.homeManager.neovim= registers the module in the
+   internal registry — not the public =homeManagerModules= export, since
+   the =my.*= options make it opinionated — and lets a home-manager config
+   opt in with =my.programs.neovim.enable=, which installs the wrapped
+   Neovim plus =neovim-remote= and exports =EDITOR=nvim=.
 
 #+begin_src nix :tangle flake/features/neovim/default.nix
 { ... }:
 {
-  flake.homeManagerModules.neovim =
+  flake.modules.homeManager.neovim =
     {
       config,
       lib,
@@ -2438,7 +2440,9 @@ pulls the same double duty:
    output. =init.org= is pre-tangled into =default.el= and passed to
    =emacsWithPackagesFromUsePackage= so =nix run .#emacs= loads the
    full config without home-manager.
-2. =flake.homeManagerModules.emacs= adds =my.programs.emacs.enable= for
+2. =flake.modules.homeManager.emacs= registers the module in the internal
+   registry — not the public =homeManagerModules= export, since the =my.*=
+   options make it opinionated — and adds =my.programs.emacs.enable= for
    home-manager hosts, wiring up =services.emacs= (daemon), the tangled
    =~/.config/emacs/{init,early-init}.el=, and the encrypted
    =~/.authinfo.age=.
@@ -2495,7 +2499,7 @@ let
     };
 in
 {
-  flake.homeManagerModules.emacs =
+  flake.modules.homeManager.emacs =
     {
       config,
       lib,

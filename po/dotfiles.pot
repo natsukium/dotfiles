@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-06-24 17:48+0900\n"
+"POT-Creation-Date: 2026-06-25 02:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,7 +411,7 @@ msgstr ""
 #: configuration.org:71 modules/flake/features/emacs/init.org:622
 #: modules/configuration.org:71 modules/configuration.org:326
 #: modules/configuration.org:519 modules/configuration.org:1902
-#: modules/configuration.org:2638
+#: modules/configuration.org:2642
 #, no-wrap
 msgid "Configuration"
 msgstr ""
@@ -3348,7 +3348,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/flake/features/emacs/init.org:93 modules/configuration.org:2599
+#: modules/flake/features/emacs/init.org:93 modules/configuration.org:2603
 #, no-wrap
 msgid "Darwin"
 msgstr ""
@@ -6250,7 +6250,7 @@ msgstr ""
 
 #. type: heading ***
 #: modules/configuration.org:55 modules/configuration.org:478
-#: modules/configuration.org:2625
+#: modules/configuration.org:2629
 #, no-wrap
 msgid "Options"
 msgstr ""
@@ -10710,21 +10710,23 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:2395
+#: modules/configuration.org:2397
 #, no-wrap
 msgid ""
-"=flake.homeManagerModules.neovim= lets a home-manager config opt in\n"
-"with =my.programs.neovim.enable=, which installs the wrapped Neovim\n"
-"plus =neovim-remote= and exports =EDITOR=nvim=."
+"=flake.modules.homeManager.neovim= registers the module in the\n"
+"internal registry — not the public =homeManagerModules= export, since\n"
+"the =my.*= options make it opinionated — and lets a home-manager config\n"
+"opt in with =my.programs.neovim.enable=, which installs the wrapped\n"
+"Neovim plus =neovim-remote= and exports =EDITOR=nvim=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2397
+#: modules/configuration.org:2399
 #, no-wrap
 msgid ""
 "{ ... }:\n"
 "{\n"
-"  flake.homeManagerModules.neovim =\n"
+"  flake.modules.homeManager.neovim =\n"
 "    {\n"
 "      config,\n"
 "      lib,\n"
@@ -10736,7 +10738,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2409
+#: modules/configuration.org:2411
 #, no-wrap
 msgid ""
 "  config = lib.mkIf config.my.programs.neovim.enable {\n"
@@ -10750,7 +10752,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2418
+#: modules/configuration.org:2420
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -10762,13 +10764,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2426
+#: modules/configuration.org:2428
 #, no-wrap
 msgid "Emacs"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2428
+#: modules/configuration.org:2430
 msgid ""
 "Emacs has been my second-most-used editor since early 2026. The draw is "
 "=org-mode= — the workflows built around =org-capture= and =org-agenda= are "
@@ -10778,14 +10780,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2434
+#: modules/configuration.org:2436
 msgid ""
 "The feature lives alongside Neovim under =flake/features/emacs/= and pulls "
 "the same double duty:"
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:2441
+#: modules/configuration.org:2443
 #, no-wrap
 msgid ""
 "=perSystem.packages.emacs= exposes a wrapped emacs as a flake\n"
@@ -10795,17 +10797,19 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:2445
+#: modules/configuration.org:2449
 #, no-wrap
 msgid ""
-"=flake.homeManagerModules.emacs= adds =my.programs.emacs.enable= for\n"
+"=flake.modules.homeManager.emacs= registers the module in the internal\n"
+"registry — not the public =homeManagerModules= export, since the =my.*=\n"
+"options make it opinionated — and adds =my.programs.emacs.enable= for\n"
 "home-manager hosts, wiring up =services.emacs= (daemon), the tangled\n"
 "=~/.config/emacs/{init,early-init}.el=, and the encrypted\n"
 "=~/.authinfo.age=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2448
+#: modules/configuration.org:2452
 #, no-wrap
 msgid ""
 "{ lib, inputs, ... }:\n"
@@ -10815,7 +10819,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2452
+#: modules/configuration.org:2456
 #, no-wrap
 msgid ""
 "emacsUnwrapped =\n"
@@ -10828,7 +10832,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2462
+#: modules/configuration.org:2466
 #, no-wrap
 msgid ""
 "tangle =\n"
@@ -10849,7 +10853,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2477
+#: modules/configuration.org:2481
 #, no-wrap
 msgid ""
 "tangleEl =\n"
@@ -10864,7 +10868,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2487
+#: modules/configuration.org:2491
 #, no-wrap
 msgid ""
 "  mkEmacs =\n"
@@ -10878,7 +10882,7 @@ msgid ""
 "    };\n"
 "in\n"
 "{\n"
-"  flake.homeManagerModules.emacs =\n"
+"  flake.modules.homeManager.emacs =\n"
 "    {\n"
 "      config,\n"
 "      lib,\n"
@@ -10890,7 +10894,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2508
+#: modules/configuration.org:2512
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.emacs.enable {\n"
@@ -10901,7 +10905,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2514
+#: modules/configuration.org:2518
 #, no-wrap
 msgid ""
 "services.emacs = {\n"
@@ -10911,7 +10915,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2519
+#: modules/configuration.org:2523
 #, no-wrap
 msgid ""
 "xdg.configFile.\"emacs/init.el\".source = tangleEl pkgs ./init.org;\n"
@@ -10921,7 +10925,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2523
+#: modules/configuration.org:2527
 #, no-wrap
 msgid ""
 "    home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin "
@@ -10934,7 +10938,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2529
+#: modules/configuration.org:2533
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -10946,7 +10950,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2538
+#: modules/configuration.org:2542
 #, no-wrap
 msgid ""
 "{\n"
@@ -11005,37 +11009,37 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2594
+#: modules/configuration.org:2598
 #, no-wrap
 msgid "early-init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:2595
+#: modules/configuration.org:2599
 #, no-wrap
 msgid "\"./flake/features/emacs/early-init.org\""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2596
+#: modules/configuration.org:2600
 #, no-wrap
 msgid "init.org"
 msgstr ""
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:2597
+#: modules/configuration.org:2601
 #, no-wrap
 msgid "\"./flake/features/emacs/init.org\""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2601
+#: modules/configuration.org:2605
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2603
+#: modules/configuration.org:2607
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -11045,7 +11049,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2614
+#: modules/configuration.org:2618
 #, no-wrap
 msgid ""
 "{ config, lib, ... }:\n"
@@ -11057,7 +11061,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2621
+#: modules/configuration.org:2625
 #, no-wrap
 msgid ""
 "  <<spotlight-config>>\n"
@@ -11065,13 +11069,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2627
+#: modules/configuration.org:2631
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2629
+#: modules/configuration.org:2633
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -11085,7 +11089,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2640
+#: modules/configuration.org:2644
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -11095,13 +11099,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2645
+#: modules/configuration.org:2649
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2647
+#: modules/configuration.org:2651
 #, no-wrap
 msgid ""
 "config = {\n"

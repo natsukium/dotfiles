@@ -1,7 +1,7 @@
 { inputs, ... }:
 {
   imports = [
-    inputs.self.homeManagerModules.emacs
+    inputs.self.modules.homeManager.emacs
     ../applications/kitty
     ../applications/qutebrowser
     ../applications/vscode
