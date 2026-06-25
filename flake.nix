@@ -119,6 +119,13 @@
       inputs.nixpkgs-stable.follows = "nixpkgs-stable";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    felis = {
+      url = "git+https://git.natsukium.com/natsukium/felis";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+      inputs.treefmt-nix.follows = "treefmt-nix";
+      inputs.git-hooks.follows = "git-hooks";
+    };
     firefox-addons = {
       url = "gitlab:rycee/nur-expressions?dir=pkgs/firefox-addons";
       inputs.nixpkgs.follows = "nixpkgs";

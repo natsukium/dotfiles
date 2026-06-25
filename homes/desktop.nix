@@ -2,6 +2,7 @@
 {
   imports = [
     inputs.self.modules.homeManager.emacs
+    inputs.self.modules.homeManager.felis
     inputs.self.modules.homeManager.vicinae
     ../applications/kitty
     ../applications/qutebrowser
@@ -14,6 +15,7 @@
   ];
 
   my.programs.emacs.enable = true;
+  my.programs.felis.enable = true;
   my.programs.vicinae.enable = true;
 
   my.services.copyq.enable = true;
