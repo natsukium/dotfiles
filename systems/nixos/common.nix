@@ -16,6 +16,7 @@ in
   imports = [
     ../../modules/nixos
     ../common.nix
+    inputs.self.modules.nixos.felis
     inputs.self.modules.nixos.fish
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko

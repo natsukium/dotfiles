@@ -12,6 +12,7 @@ in
   imports = [
     ../../modules/darwin
     ../common.nix
+    inputs.self.modules.darwin.felis
     inputs.self.modules.darwin.fish
     inputs.comin.darwinModules.comin
     inputs.sops-nix.darwinModules.sops
