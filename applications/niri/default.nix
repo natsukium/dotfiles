@@ -18,6 +18,9 @@ in
   programs.niri.settings = {
     binds = defaultKeyBind // {
       "Mod+Return".action.spawn = terminal;
+      # felis has no "new window" of its own (bare `felis` creates a
+      # fresh session + window); the WM owns that spawn.
+      "Mod+Shift+Return".action.spawn = "felis";
       "Mod+D".action.spawn = launcher;
       # mod shift space floating # not support yet https://github.com/YaLTeR/niri/issues/122
       "Mod+T".action.spawn = [
