@@ -3,14 +3,15 @@
   imports = [
     ../../../modules/profiles/nixos/base.nix
     ../../../modules/profiles/nixos/server.nix
-    ../../shared/hercules-ci/agent.nix
-    ../common.nix
-    ../services/attic
-    ./hardware-configuration.nix
+    ../../../systems/shared/hercules-ci/agent.nix
+    ../../../systems/nixos/common.nix
     inputs.impermanence.nixosModules.impermanence
+    inputs.nixos-facter-modules.nixosModules.facter
   ];
 
-  inherit (import ./disko-config.nix { disks = [ "/dev/sda" ]; }) disko;
+  nixpkgs.hostPlatform = "x86_64-linux";
+
+  inherit (import ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 
   environment.persistence."/persistent" = {
     hideMounts = true;
@@ -32,30 +33,12 @@
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 
-  # https://github.com/nix-community/nixos-anywhere/issues/178
-  security.sudo.wheelNeedsPassword = false;
-
   networking = {
-    hostName = "serengeti";
-  };
-
-  services.cloudflared = {
-    enable = true;
-    certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
-  };
-  sops.secrets.cloudflared-tunnel-cert = { };
-
-  my.services.cloudflared-tunnel = {
-    enable = true;
-    id = "1af5e046-7d0f-4fa4-9366-69eb490d5119";
-    credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
-  };
-
-  sops.secrets.cloudflared-tunnel = {
-    sopsFile = ./secrets.yaml;
+    hostName = "tarangire";
+    interfaces.enp111s0.wakeOnLan.enable = true;
   };
 
   nix.settings = {
-    max-jobs = 2;
+    max-jobs = 12;
   };
 }

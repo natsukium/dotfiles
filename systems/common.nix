@@ -1,9 +1,8 @@
 {
   inputs,
-  self,
+  config,
   lib,
   pkgs,
-  specialArgs,
   ...
 }:
 let
@@ -13,7 +12,6 @@ let
     firefox-addons
     nur-packages
     ;
-  inherit (specialArgs) username;
 in
 {
   imports = [
@@ -27,11 +25,11 @@ in
     firefox-addons.overlays.default
     nur-packages.overlays.default
   ]
-  ++ lib.attrValues self.overlays;
+  ++ lib.attrValues inputs.self.overlays;
 
   environment.shells = [ pkgs.fish ];
   programs.fish.enable = true;
-  users.users.${username}.shell = pkgs.fish;
+  users.users.${config.my.username}.shell = pkgs.fish;
 
   # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
   # https://github.com/LnL7/nix-darwin/issues/663

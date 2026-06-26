@@ -33,4 +33,22 @@ in
   user = {
     shell = "${lib.getExe pkgs.fish}";
   };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    # nix-on-droid drives a single home config rather than per-user; inject the
+    # Home Manager registry into it directly (the system loader's sharedModules
+    # path does not reach nix-on-droid).
+    config = {
+      imports = [ ../../homes/common.nix ] ++ builtins.attrValues inputs.self.modules.homeManager;
+    };
+    backupFileExtension = "backup";
+    extraSpecialArgs = {
+      inherit inputs;
+      # disabledModules not working
+      # https://github.com/nix-community/home-manager/issues/1792
+      modulesPath = "${inputs.home-manager}/modules";
+    };
+  };
 }

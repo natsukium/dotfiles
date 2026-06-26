@@ -190,40 +190,8 @@
       ];
 
       imports = [
-        ./flake-module.nix
         ./modules/flake
       ];
-
-      hosts = {
-        katavi = {
-          system = "aarch64-darwin";
-        };
-        mikumi = {
-          system = "aarch64-darwin";
-        };
-        work = {
-          system = "aarch64-darwin";
-        };
-        kilimanjaro = {
-          system = "x86_64-linux";
-        };
-        arusha = {
-          system = "x86_64-linux";
-        };
-        manyara = {
-          system = "x86_64-linux";
-        };
-        serengeti = {
-          system = "aarch64-linux";
-        };
-        tarangire = {
-          system = "x86_64-linux";
-        };
-        android = {
-          system = "aarch64-linux";
-          platform = "android";
-        };
-      };
 
       flake = {
         overlays = import ./overlays { inherit inputs; };

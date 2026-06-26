@@ -1,12 +1,13 @@
-{ config, inputs, ... }:
+{ config, ... }:
 {
   imports = [
     ../../../modules/profiles/darwin/base.nix
     ../../../modules/profiles/darwin/server.nix
-    ../../shared/hercules-ci/agent.nix
-    ../common.nix
-    inputs.self.modules.darwin.forgejo-runner
+    ../../../systems/shared/hercules-ci/agent.nix
+    ../../../systems/darwin/common.nix
   ];
+
+  nixpkgs.hostPlatform = "aarch64-darwin";
 
   networking = {
     hostName = "mikumi";

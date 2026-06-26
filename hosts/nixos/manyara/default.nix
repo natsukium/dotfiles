@@ -8,24 +8,26 @@
   imports = [
     ../../../modules/profiles/nixos/base.nix
     ../../../modules/profiles/nixos/server.nix
-    ../../shared/comin/prometheus.nix
-    ../common.nix
-    ../services/adguardhome
-    ../services/atuin
-    ../services/calibre-web
-    ../services/continuwuity
-    ../services/forgejo
-    ../services/grafana
-    ../services/hermes-agent
-    ../services/home-assistant
-    ../services/loki
-    ../services/miniflux
-    ../services/niks3
-    ../services/prometheus
-    ../services/searxng
+    ../../../systems/shared/comin/prometheus.nix
+    ../../../systems/nixos/common.nix
+    ../../../systems/nixos/services/adguardhome
+    ../../../systems/nixos/services/atuin
+    ../../../systems/nixos/services/calibre-web
+    ../../../systems/nixos/services/continuwuity
+    ../../../systems/nixos/services/forgejo
+    ../../../systems/nixos/services/grafana
+    ../../../systems/nixos/services/hermes-agent
+    ../../../systems/nixos/services/home-assistant
+    ../../../systems/nixos/services/loki
+    ../../../systems/nixos/services/miniflux
+    ../../../systems/nixos/services/niks3
+    ../../../systems/nixos/services/prometheus
+    ../../../systems/nixos/services/searxng
     ./hardware-configuration.nix
     inputs.simple-wol-manager.nixosModules.default
   ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 

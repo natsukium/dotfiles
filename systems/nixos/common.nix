@@ -1,6 +1,5 @@
 {
   config,
-  username,
   inputs,
   pkgs,
   ...
@@ -90,8 +89,8 @@ in
     mutableUsers = false;
   };
 
-  users.users.${username} = {
-    home = "/home/${username}";
+  users.users.${config.my.username} = {
+    home = "/home/${config.my.username}";
     isNormalUser = true;
     hashedPasswordFile = config.sops.secrets.login-password.path;
     extraGroups = [ "wheel" ];

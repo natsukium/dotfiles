@@ -8,14 +8,16 @@
   imports = [
     ../../../modules/profiles/nixos/base.nix
     ../../../modules/profiles/nixos/desktop.nix
-    ../../shared/hercules-ci/agent.nix
-    ../common.nix
-    ../desktop.nix
-    inputs.self.modules.nixos.forgejo-runner
-    ../services/hydra
-    ../services/llm
+    ../../../systems/shared/hercules-ci/agent.nix
+    ../../../systems/nixos/common.nix
+    ../../../systems/nixos/desktop.nix
+    ../../../systems/nixos/services/hydra
+    ../../../systems/nixos/services/llm
     ./hardware-configuration.nix
+    inputs.home-manager.nixosModules.home-manager
   ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
 
   inherit
     (pkgs.callPackage ./disko-config.nix {
@@ -141,6 +143,23 @@
       "wireplumber.settings" = {
         "node.restore-default-targets" = false;
       };
+    };
+  };
+
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    sharedModules = builtins.attrValues inputs.self.modules.homeManager;
+    users.${config.my.username}.imports = [
+      ../../../homes/common.nix
+      ../../../homes/nixos/desktop.nix
+      ../../../modules/profiles/home/base.nix
+      ../../../modules/profiles/home/desktop.nix
+      ../../../modules/profiles/home/development.nix
+    ];
+    backupFileExtension = "backup";
+    extraSpecialArgs = {
+      inherit inputs;
     };
   };
 }

@@ -2,11 +2,8 @@
   lib,
   pkgs,
   config,
-  specialArgs,
   ...
 }:
-let
-in
 {
   system = {
     defaults = {
@@ -29,7 +26,7 @@ in
         wvous-tl-corner = 10;
         persistent-apps =
           let
-            inherit (config.home-manager.users.${specialArgs.username}) programs;
+            inherit (config.home-manager.users.${config.my.username}) programs;
           in
           [ "${programs.zen-browser.package}/Applications/Zen Browser (Beta).app" ]
           ++ lib.optional programs.kitty.enable "${programs.kitty.package}/Applications/kitty.app"

@@ -1,0 +1,868 @@
+#+TITLE: Dotfiles Architecture
+#+STARTUP: overview
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup
+#+OPTIONS: ^:{} tags:nil
+
+* About
+
+This document captures the architectural decisions that shape this repository.
+It is the companion to the literate configuration sources
+([[file:configuration.org][configuration.org]], [[file:modules/configuration.org][modules/configuration.org]],
+[[file:overlays/configuration.org][overlays/configuration.org]]). Where those files explain /what/ each piece of
+configuration does, this document explains /how/ the repository is organized
+and /why/ the structure looks the way it does.
+
+The architecture is inspired by the [[https://github.com/mightyiam/dendritic][dendritic pattern]] (and the writeup at
+[[https://not-a-number.io/2025/refactoring-my-infrastructure-as-code-configurations/][not-a-number.io]]) but adapts rather than adopts it wholesale. Where dendritic
+choices were taken, adapted, or rejected, the reasoning is recorded inline.
+
+This document is intentionally not registered in ~po4a.cfg~ yet; it will
+change with every migration phase, and translation churn would dwarf the
+content. It joins the translated set once the architecture stabilizes.
+
+* Goals
+
+1. *Feature-centric organization.* A single feature (e.g. /emacs/, /fish/,
+   /email/) lives in one place, not scattered across system and home-manager
+   directories.
+2. *Option-based wiring.* Hosts opt into features by setting options, not by
+   editing import lists. A host's declaration reads as intent.
+3. *Single source of truth for cross-platform features.* When the same feature
+   applies to both NixOS and nix-darwin (and home-manager), it is expressible
+   in one file.
+4. *Package and module co-location.* When a feature owns a custom package
+   (~neovim~, ~emacs~, etc.), the package definition and the module that
+   consumes it live together.
+5. *Preserve literate programming.* The Org-mode literate workflow is
+   non-negotiable. The architecture must not force the prose layer into shapes
+   that fight Org.
+6. *One organizing idea.* Everything above the host body is a flake-parts
+   module; everything below it is an ordinary NixOS/Darwin/Home Manager
+   module. No second taxonomy, no parallel module tiers, no helper the layout
+   cannot explain by itself.
+
+* Architecture Overview
+
+One layer of machinery, not two. Every file under ~modules/~ is a
+*flake-parts module*: it contributes to the
+~flake.modules.{nixos,darwin,homeManager}~ registry (provided by flake-parts'
+own ~flakeModules.modules~, see [[*The Module Registry]]), and may additionally
+provide overlays, packages, or ~perSystem~ outputs in the same file.
+
+Host bodies under ~hosts/~ are the only non-flake-parts code: plain
+NixOS/nix-darwin modules consumed /by/ the machinery, readable without
+knowing it exists.
+
+An earlier draft of this architecture carried a second tier —
+~modules/{nixos,darwin,home-manager}/~ as "generic, publicly exported
+modules" following the RFC 163 modular services convention. That tier is
+dropped, but module /export/ survives in a lighter form: generic modules
+stay in the one ~modules/features/~ tree and a curated list publishes the
+public subset (see [[*Exporting Modules]]). What was dropped is the second
+directory and the mandatory testing ceremony, not the public surface; see
+[[*A separate generic-module tier]] for that reasoning.
+
+* Top-Level Layout
+
+#+BEGIN_EXAMPLE
+flake.nix                          # inputs + nixConfig + mkFlake call only
+modules/                           # flake-parts modules, all of them
+├── default.nix                    # imports flakeModules.modules + collectFlakeModules
+├── hosts.nix                      # readDir hosts/<platform>/, construct configurations
+├── overlays.nix                   # flake.overlays = import ../overlays {...};
+├── per-system/                    # perSystem block split per concern
+│   ├── checks.nix
+│   ├── dev-shell.nix
+│   ├── mcp-servers.nix
+│   ├── packages.nix
+│   ├── pkgs.nix
+│   ├── pre-commit.nix
+│   └── treefmt.nix
+├── features/                      # one feature, one place
+│   ├── emacs/
+│   │   ├── default.nix            # the flake-parts module
+│   │   ├── package.nix
+│   │   ├── init.org
+│   │   └── early-init.org
+│   ├── neovim/
+│   │   ├── default.nix
+│   │   └── package.nix
+│   └── fish.nix                   # single-file feature
+└── profiles/                      # cascade-enable bundles
+    ├── desktop.nix
+    ├── server.nix
+    └── development.nix
+
+hosts/                             # per-host configuration (system + home unified)
+├── nixos/
+│   ├── kilimanjaro/
+│   │   ├── default.nix            # the entire host declaration
+│   │   ├── hardware-configuration.nix
+│   │   └── disko-config.nix
+│   └── ...
+├── darwin/
+│   ├── katavi/
+│   └── ...
+└── android/                       # nix-on-droid (single device)
+
+lib/                               # helper functions
+├── attrsets.nix
+└── collectFlakeModules.nix        # recursive module discovery (default.nix = boundary)
+
+overlays/                          # nixpkgs overlays (unchanged)
+pkgs/                              # generic utility packages only
+                                   # feature-coupled packages live in modules/features/<name>/
+infra/                             # terraform (unchanged)
+#+END_EXAMPLE
+
+** What changed from the legacy layout
+
+- ~applications/~, ~modules/home/~, ~modules/home-manager/~, ~modules/nixos/~,
+  ~modules/darwin/~, and ~modules/shared/~ are all *absorbed* into
+  ~modules/features/~. The duplication this resolves is real: /starship/ and
+  /nushell/ currently exist in both ~modules/home/~ and
+  ~modules/home-manager/~.
+- ~modules/profiles/~ moves to ~modules/profiles/~ (flattened out of its
+  per-platform split) and gains option-based cascade enable (see [[*Profiles]]).
+- ~systems/<plat>/<host>/~ and ~homes/<plat>/<host>/~ are *merged* into
+  ~hosts/<platform>/<host>/~. The platform moves into the path; the
+  architecture moves into the body as ~nixpkgs.hostPlatform~.
+- ~flake-module.nix~ at the top level is *retired*; its construction loop
+  becomes ~modules/hosts.nix~, its ~hosts~ schema is deleted (see
+  [[*A ~hosts~ option schema]]).
+
+** Auto-import
+
+~flake.nix~ carries a single import:
+
+#+BEGIN_SRC nix
+imports = [ ./modules ];
+#+END_SRC
+
+~modules/default.nix~ pulls in the upstream registry module and then
+auto-imports its own directory:
+
+#+BEGIN_SRC nix
+{ inputs, ... }:
+{
+  imports = [
+    inputs.flake-parts.flakeModules.modules
+  ]
+  ++ import ../lib/collectFlakeModules.nix ./.;
+}
+#+END_SRC
+
+~inputs~ is a special argument provided by ~mkFlake { inherit inputs; }~, so
+referencing it inside ~imports~ does not cause infinite recursion — the same
+pattern used to import any third-party flakeModule.
+
+~lib/collectFlakeModules.nix~ discovers modules recursively, with ~default.nix~ as the
+*stopping rule*. For each directory entry (skipping the starting directory's
+own ~default.nix~):
+
+- a ~*.nix~ file is imported as a module;
+- a directory containing ~default.nix~ is imported as a whole (Nix resolves
+  the directory path to its ~default.nix~) and is /not/ descended into;
+- a directory without ~default.nix~ is a namespace: recurse.
+
+The rule reads both ways: ~default.nix~ marks a module boundary, its absence
+marks a namespace. The boundary is what protects feature-internal helper
+files — ~features/neovim/default.nix~ makes that directory opaque, so
+~package.nix~ and ~lua/*.lua~ underneath are never seen by the importer.
+Conversely, namespace directories (~features/~, ~profiles/~, ~per-system/~,
+or any future grouping inside them) need no boilerplate ~default.nix~ of
+their own.
+
+Auto-import means adding a feature is a file operation only: no edit to
+~flake.nix~, which in this repository also means no edit to
+~configuration.org~, no re-tangle, and no translation churn.
+
+No naming convention separates framework from content inside ~modules/~; the
+layout already encodes it. Bare ~.nix~ files at the root (~hosts.nix~,
+~overlays.nix~, ...) are the machinery, subdirectories (~features/~,
+~profiles/~, ~per-system/~) are the content.
+
+* The Module Registry
+
+flake-parts ships a registry as an optional flakeModule:
+~inputs.flake-parts.flakeModules.modules~ provides
+~flake.modules.<class>.<name>~, typed as a lazy attrset of lazy attrsets of
+~deferredModule~. A hand-rolled registry option would be ~15 lines of
+equivalent code, but the upstream version adds *class checking*: a module
+registered under ~flake.modules.nixos~ carries ~_class = "nixos"~, so
+accidentally importing a Home Manager module into a NixOS host fails loudly
+at evaluation instead of producing confusing option errors.
+
+The host loader in ~hosts.nix~ injects the registry into every host:
+
+- ~builtins.attrValues config.flake.modules.${platformClass}~ goes into the
+  ~modules~ list of each ~nixosSystem~ / ~darwinSystem~ call.
+- ~builtins.attrValues config.flake.modules.homeManager~ goes into
+  ~home-manager.sharedModules~.
+
+Every feature module is therefore present in every host, and inert until its
+~enable~ option is set. The "import everything, gate by option" wiring is
+what makes option-based host declarations and profile cascades possible.
+
+~flake.modules~ is itself an ordinary flake output, visible to other flakes
+as ~self.modules~. It carries /no stability promise/ — it is this
+repository's internal wiring, not a public API.
+
+* Namespaces
+
+** ~my.*~ — self-defined options (canonical)
+
+All options defined by this repository live under ~my.*~. The namespace is
+already in active use (~my.programs.neovim.enable~,
+~my.programs.claude-code~, ~my.services.pizauth~, ...). The category
+sub-namespaces are:
+
+| Category        | Example                        | Purpose                                |
+|-----------------+--------------------------------+----------------------------------------|
+| ~my.username~   | ~my.username = "natsukium";~   | Primary user identity (replaces specialArgs) |
+| ~my.profiles.*~ | ~my.profiles.desktop.enable~   | High-level feature bundles             |
+| ~my.programs.*~ | ~my.programs.emacs.enable~     | User-space programs (feature toggles)  |
+| ~my.services.*~ | ~my.services.tailscale.enable~ | System or user services                |
+| ~my.nix~        | nix daemon configuration       | Nix-specific tuning                    |
+| ~my.nixpkgs~    | nixpkgs configuration          | Overlays, allowUnfree, etc.            |
+
+Standard feature module shape:
+
+#+BEGIN_SRC nix
+options.my.programs.<name> = {
+  enable = lib.mkEnableOption "<name>";
+  # ...feature-specific options...
+};
+
+config = lib.mkIf config.my.programs.<name>.enable {
+  # ...the actual configuration...
+};
+#+END_SRC
+
+An existing idiom worth preserving: when a feature only needs to re-expose an
+upstream option set under the toggle, mirror it instead of redefining it —
+
+#+BEGIN_SRC nix
+options.my.services = { inherit (options.services) pueue; };
+#+END_SRC
+
+** ~my.*~ is scoped per class
+
+A ~my.*~ option declared in a homeManager-class module exists only inside
+the Home Manager evaluation; a nixos/darwin-class declaration exists only at
+the system level. There is no automatic mirroring between the two scopes —
+a system-level module that wants to set a Home Manager toggle must say so
+explicitly, through ~home-manager.sharedModules~:
+
+#+BEGIN_SRC nix
+home-manager.sharedModules = [ { my.programs.neovim.enable = true; } ];
+#+END_SRC
+
+This is deliberate. An automatic bridge (forwarding ~config.my~ wholesale
+into the user's Home Manager configuration) fails whenever a toggle exists
+on one side only, and hides which evaluation a setting lands in. One
+explicit line per crossing keeps the two option trees independent and the
+data flow visible. Profiles are the designated crossing point, so hosts
+rarely write this themselves (see [[*Profiles]]).
+
+** ~ext.*~ — obsolete
+
+The ~ext.*~ namespace (~ext.xdg.*~, ~ext.security.*~) predates ~my.*~. It is
+folded into ~my.*~ during the feature sweep (migration phase 3), which
+touches every defining file anyway. No ~ext.*~ option survives the
+migration; "fold opportunistically" was the earlier plan and was rejected
+because opportunistic cleanups never finish.
+
+** Direct upstream options
+
+For trivial features without a toggle or shared configuration, modules write
+directly to upstream options (~programs.git~, ~services.openssh~, etc.). The
+~my.*~ wrapper is added only when there is a real abstraction.
+
+* Feature Modules
+
+Every file under ~modules/features/~ is a flake-parts module. It contributes
+one or more entries to the registry, and may additionally provide overlays,
+packages, or ~perSystem~ outputs.
+
+There is no separate tier for "generic" modules. A feature that defines
+reusable options (today's ~modules/darwin/spotlight.nix~,
+~modules/nixos/tailscale.nix~, ...) registers them like any other feature;
+the registry makes option declarations inert until something sets them. When
+such a module is generic enough to be useful outside this repository, it is
+offered to the world by adding it to the export list — not by moving it to a
+second directory. See [[*Exporting Modules]].
+
+** Minimal feature shape
+
+#+BEGIN_SRC nix
+# modules/features/fish.nix
+{ ... }:
+let
+  module =
+    { config, lib, ... }:
+    {
+      options.my.programs.fish.enable = lib.mkEnableOption "fish";
+      config = lib.mkIf config.my.programs.fish.enable {
+        programs.fish.enable = true;
+      };
+    };
+in
+{
+  flake.modules.nixos.fish = module;
+  flake.modules.darwin.fish = module;
+}
+#+END_SRC
+
+** Single file vs sub-directory
+
+Single file (~fish.nix~) is the default. Promote to a sub-directory
+(~fish/default.nix~ + siblings) when the feature carries auxiliary files:
+
+- a custom package (~package.nix~)
+- generated content (~init.org~, ~config.toml~)
+- multiple platform-divergent halves that don't fit in a ~let~ binding
+
+** Cross-platform option asymmetry
+
+When an option exists on both NixOS and nix-darwin with compatible shape
+(~programs.fish~, ~environment.systemPackages~), one module serves both —
+bound to ~flake.modules.nixos~ AND ~flake.modules.darwin~.
+
+When an option exists on only one platform (~launchd.daemons~ on Darwin,
+~systemd.services~ on NixOS), define separate modules for each side under
+~flake.modules.{nixos,darwin}.<name>~. ~lib.mkIf isPlatform~ does not help
+because it guards values, not option lookups.
+
+** Package and module co-location
+
+Features that own a package keep the package alongside the module:
+
+#+BEGIN_SRC nix
+# modules/features/neovim/default.nix
+{ ... }:
+{
+  perSystem =
+    { pkgs, ... }:
+    {
+      packages.neovim = pkgs.callPackage ./package.nix { };
+    };
+
+  flake.modules.homeManager.neovim =
+    { config, lib, pkgs, ... }:
+    {
+      options.my.programs.neovim.enable = lib.mkEnableOption "neovim";
+      config = lib.mkIf config.my.programs.neovim.enable {
+        home.packages = [ (pkgs.callPackage ./package.nix { }) ];
+      };
+    };
+}
+#+END_SRC
+
+This is the primary motivation for adopting flake-parts modules as the
+universal feature shape: ~package + module + (overlay)~ in one file.
+
+*Caveat — keep a package's source filtered.* Co-location puts the module file
+(~default.nix~) in the same directory as the package definition. If that package
+copies the directory into the store as build input — Neovim did, prepending
+~${./.}~ to its runtime path — then editing the /module/ silently changes the
+/package/'s hash, rebuilding it and shifting every consuming host's ~drvPath~.
+That breaks the ~drvPath~-equality verification ([[*Verification]]) for what is a
+pure wiring change. Packages must therefore take a *filtered* source (e.g.
+~lib.fileset~ over the actual runtime files), never the bare directory, so the
+co-located ~.nix~ files stay out of the build. Neovim was converted to
+~lib.fileset.toSource~ for exactly this reason during phase 1.
+
+** Input-module imports belong in features
+
+A feature whose configuration depends on a third-party module
+(~inputs.disko.nixosModules.disko~, ~inputs.sops-nix.nixosModules.sops~, ...)
+imports it inside its registry entry. At the flake-parts layer ~inputs~ is a
+lexical binding, so the import is resolved statically:
+
+#+BEGIN_SRC nix
+# modules/features/disko.nix
+{ inputs, ... }:
+{
+  flake.modules.nixos.disko = {
+    imports = [ inputs.disko.nixosModules.disko ];
+  };
+}
+#+END_SRC
+
+Hosts then never need to import input modules themselves; whatever a host
+could want from an input is already present (and inert) via the registry.
+
+* Exporting Modules
+
+Some modules in this repository are generic — they define neutral options
+(plain upstream namespaces, never ~my.*~) and would work unchanged in a
+stranger's flake. The nix-darwin modules maintained here (~caffeinate~,
+~spotlight~, ~timemachine~, ~newsyslog~, ...) are the clearest case:
+nix-darwin lacks them upstream and they carry no personal opinion. These are
+worth offering through the conventional ~flake.nixosModules~ /
+~flake.darwinModules~ / ~flake.homeManagerModules~ outputs.
+
+The guiding rule: *export is a property of a module, not a location.* Generic
+and opinionated modules share the one ~modules/features/~ tree; nothing is
+split into a second directory. What makes a module public is a single curated
+entry in ~modules/exports.nix~:
+
+#+BEGIN_SRC nix
+# modules/exports.nix — the public surface, in one place
+{ config, ... }:
+let
+  inherit (config.flake) modules;
+in
+{
+  # nixosModules is declared (and _class-tagged) by flake-parts;
+  # darwinModules / homeManagerModules are declared in modules/default.nix.
+  flake.nixosModules = {
+    inherit (modules.nixos) calibre-web cloudflared-tunnel;
+  };
+  flake.darwinModules = {
+    inherit (modules.darwin) caffeinate spotlight timemachine newsyslog;
+  };
+}
+#+END_SRC
+
+The export references the same module value already in the registry, so an
+exported module is simultaneously available to this repository's own hosts
+(inert until enabled) and to external consumers. The registry remains the
+single source for host wiring; ~exports.nix~ is the single, reviewable list
+of what carries a stability promise — the public API in one place rather than
+scattered across feature files.
+
+Two supporting points:
+
+- *Declaring the output options.* flake-parts declares ~flake.nixosModules~
+  and applies ~_class = "nixos"~ tagging, so NixOS exports get class checking
+  for free. It does /not/ declare ~darwinModules~ or ~homeManagerModules~;
+  the repository declares them itself as merging
+  ~lazyAttrsOf deferredModule~ options — the same one-liner
+  ~modules/flake/_registries.nix~ already uses for ~homeManagerModules~,
+  generalized to all three classes and moved into ~modules/default.nix~. A
+  declared, merging type is also what keeps the central list robust against a
+  second definition site.
+
+- *Eligibility is the old litmus test, minus the directory.* "Does it touch
+  ~my.*~ or a personal default?" If yes, it is opinionated and stays
+  unexported. If it only defines neutral options, it is a candidate for
+  ~exports.nix~. The test now decides one line in a list, not which of two
+  trees a file lives in. A module that needs both a neutral public form and
+  personal defaults splits the old way — neutral core exported, opinionated
+  ~my.*~ wrapper kept private — but that is per-module surgery, not a
+  standing second tier.
+
+Stability discipline is kept proportional to a personal repository: the
+exported set is small and curated by hand. A module actually being upstreamed
+(a PR to nixpkgs or nix-darwin) earns a VM test and ~meta.maintainers~ at that
+point. The rest do not pay that ceremony preemptively — this is the narrow,
+justified core of the RFC 163 convention an earlier draft adopted wholesale.
+
+* Profiles
+
+Profiles bundle related features. Each profile is a flake-parts module
+contributing to the same registry, and cascades ~mkDefault~ enables to its
+constituent features.
+
+A profile usually spans both evaluation scopes: system features are enabled
+directly, Home Manager features through the explicit
+~home-manager.sharedModules~ crossing. The same option name
+(~my.profiles.<name>.enable~) exists in both scopes; the system side
+forwards it, so a host sets it once:
+
+#+BEGIN_SRC nix
+# modules/profiles/desktop.nix
+{ ... }:
+let
+  systemModule =
+    { config, lib, ... }:
+    {
+      options.my.profiles.desktop.enable = lib.mkEnableOption "desktop profile";
+      config = lib.mkIf config.my.profiles.desktop.enable {
+        my.services.tailscale.enable = lib.mkDefault true;
+        home-manager.sharedModules = [
+          { my.profiles.desktop.enable = lib.mkDefault true; }
+        ];
+      };
+    };
+  homeModule =
+    { config, lib, ... }:
+    {
+      options.my.profiles.desktop.enable = lib.mkEnableOption "desktop profile";
+      config = lib.mkIf config.my.profiles.desktop.enable {
+        my.programs.emacs.enable = lib.mkDefault true;
+        my.programs.neovim.enable = lib.mkDefault true;
+      };
+    };
+in
+{
+  flake.modules.nixos.profile-desktop = systemModule;
+  flake.modules.darwin.profile-desktop = systemModule;
+  flake.modules.homeManager.profile-desktop = homeModule;
+}
+#+END_SRC
+
+(An earlier draft had the system-class profile set
+~my.programs.emacs.enable~ directly — a class-scoping error, since that
+option only exists inside the Home Manager evaluation. The two-halves shape
+above is the corrected form.)
+
+Because the cascade uses ~mkDefault~, hosts retain the ability to opt /out/
+of individual features. System-side toggles are overridden in the host body;
+Home Manager-side toggles go through the same explicit crossing:
+
+#+BEGIN_SRC nix
+{
+  my.profiles.desktop.enable = true;
+  my.services.tailscale.enable = false;                          # system-side override
+  home-manager.sharedModules = [ { my.programs.emacs.enable = false; } ];  # HM-side override
+}
+#+END_SRC
+
+* Host Declaration
+
+A host is a directory: ~hosts/<platform>/<name>/~. There is no registration
+step and no per-host metadata file — a loader (~modules/hosts.nix~) reads
+the tree and constructs a configuration for every directory it finds.
+
+#+BEGIN_SRC nix
+# hosts/nixos/kilimanjaro/default.nix
+{
+  nixpkgs.hostPlatform = "x86_64-linux";
+  my.username = "natsukium";
+  my.profiles.desktop.enable = true;
+  my.profiles.development.enable = true;
+}
+#+END_SRC
+
+Only two facts are needed before module evaluation can start, and neither
+requires a schema:
+
+- /Which constructor/ (~nixosSystem~ vs ~darwinSystem~) — the platform
+  segment of the path.
+- /Which architecture/ — ~nixpkgs.hostPlatform~, an ordinary option inside
+  the body. ~nixosSystem~ accepts this in place of the ~system~ argument,
+  and nix-darwin mandates the style anyway.
+
+Everything else a host wants — hardware modules, disko layouts, extra
+imports — is plain ~imports~ inside ~default.nix~; nothing is passed at
+construction time. The loader is correspondingly small:
+
+#+BEGIN_SRC nix
+# modules/hosts.nix (sketch)
+{ config, inputs, lib, ... }:
+let
+  hostsIn = dir: builtins.attrNames (builtins.readDir dir);
+  mkHost =
+    class: mkSystem: name:
+    mkSystem {
+      specialArgs = { inherit inputs; };
+      modules = [
+        (../hosts + "/${class}/${name}")
+        { home-manager.sharedModules = builtins.attrValues config.flake.modules.homeManager; }
+      ]
+      ++ builtins.attrValues config.flake.modules.${class};
+    };
+in
+{
+  flake.nixosConfigurations = lib.genAttrs (hostsIn ../hosts/nixos) (
+    mkHost "nixos" inputs.nixpkgs.lib.nixosSystem
+  );
+  flake.darwinConfigurations = lib.genAttrs (hostsIn ../hosts/darwin) (
+    mkHost "darwin" inputs.darwin.lib.darwinSystem
+  );
+}
+#+END_SRC
+
+The Home Manager system module itself (and ~useGlobalPkgs~ /
+~backupFileExtension~ defaults) is provided by a /home-manager/ feature
+registered per class, not by the loader — the loader only injects the
+registry.
+
+Adding or removing a host is a directory operation; the ~hosts/~ tree is
+itself the manifest, so there is no list to keep in sync and nothing to
+forget.
+
+** nix-on-droid
+
+~hosts/android/~ gets its own branch in the loader:
+~nixOnDroidConfiguration~ instead of ~nixosSystem~, ~extraSpecialArgs~
+instead of ~specialArgs~, and an explicit ~pkgs~ import. The registry
+classes do not cover nix-on-droid, so the android host receives only its own
+directory. This is acceptable for a single phone; generalize only if a
+second android device appears.
+
+* Trimming ~specialArgs~
+
+Today, hosts are constructed with ~specialArgs = { self, inputs, username,
+... }~. The replacement keeps exactly one entry:
+
+- ~inputs~ *stays in* ~specialArgs~. An earlier draft replaced it with a
+  ~_module.args~ bridge module; that was wrong. ~_module.args~ is part of
+  the fixpoint, so it cannot be referenced from ~imports~ — any module
+  writing ~imports = [ inputs.disko.nixosModules.disko ]~ would recurse
+  infinitely. ~specialArgs~ exists precisely to make arguments available
+  during import resolution, costs one line in the loader, and consumers
+  write ~{ inputs, ... }: ...~ either way. (With input-module imports moving
+  into features, host-level need for this shrinks — but correctness should
+  not depend on nobody ever writing the natural thing.)
+- ~username~ becomes a regular option (~my.username~). Consumers write
+  ~${config.my.username}~.
+- ~self~ disappears as a consumer-facing argument. Its current main use —
+  ~self.homeManagerModules.<name>~ imports — is subsumed by the registry
+  auto-import. (No host defines additional ~specialArgs~ entries today, so
+  nothing else needs a home.)
+
+Once this lands, no per-host data remains outside the host's own directory;
+the loader in [[*Host Declaration]] needs nothing but the tree.
+
+* Inputs
+
+Flake inputs remain centralized in ~flake.nix~. Nix flake spec requires this:
+inputs are resolved before evaluation, and tooling (~nix flake metadata~, the
+lock file mechanism) reads the ~inputs~ attribute statically.
+
+Feature modules document their input dependencies in a leading comment, as
+~modules/features/emacs/default.nix~ already does:
+
+#+BEGIN_SRC nix
+# Requires: inputs.emacs-overlay
+{ ... }: { ... }
+#+END_SRC
+
+This is convention-and-grep, not a build-time enforcement.
+
+* Literate Org Integration
+
+** Emacs configuration stays monolithic
+
+~modules/features/emacs/init.org~ remains one file. Features with an Emacs
+side (e.g. /email/ providing ~notmuch~) do *not* split their elisp into the
+feature's directory. The corresponding section in ~init.org~ guards itself
+at load time:
+
+#+BEGIN_SRC emacs-lisp
+(use-package notmuch
+  :if (executable-find "notmuch")
+  ...)
+#+END_SRC
+
+This keeps the Emacs configuration readable end-to-end while making it inert
+when the related feature is disabled. The trade-off is that elisp lives at a
+different layer of locality than the rest of the feature; the gain is that
+~init.org~ remains an Emacs configuration, not a build artifact.
+
+** Org file granularity
+
+The current Org files (~configuration.org~, ~modules/configuration.org~,
+~overlays/configuration.org~, the emacs feature's ~init.org~ /
+~early-init.org~) stay as they are during the migration. As individual
+sections grow large, they may be split into their own Org files; this is done
+case by case, not preemptively. The ~Makefile~ already detects tangle targets
+automatically; new Org files need only an addition to ~po4a.cfg~ if they are
+to be translated.
+
+* Verification
+
+Every migration phase ends with a working repository, checked mechanically:
+
+- *Pure moves* (file relocation, import rewiring with no semantic change)
+  must leave every host's derivation unchanged:
+
+  #+BEGIN_SRC bash
+  nix eval .#nixosConfigurations.<host>.config.system.build.toplevel.drvPath
+  nix eval .#darwinConfigurations.<host>.config.system.build.toplevel.drvPath
+  #+END_SRC
+
+  Identical ~drvPath~ before and after proves the refactor is behavior-free —
+  "it evaluates the same" rather than "it seems to work".
+
+- *Semantic phases* (introducing ~enable~ options, profile cascades) may
+  change derivations. They rely on ~nix flake check~, whose ~checks~ already
+  build every host's toplevel for the current system.
+
+- *Translation* (~po4a~) runs once per phase boundary, not per commit;
+  translations may lag as fuzzy entries until a phase settles.
+
+* What This Architecture Deliberately Does /Not/ Do
+
+** A separate generic-module tier
+
+An earlier draft kept ~modules/{nixos,darwin,home-manager}/~ as a second
+/location/ for "generic" modules, each shaped after the full nixpkgs modular
+services convention (RFC 163, with ~_class = "service"~, mandatory VM tests,
+~meta.maintainers~), discovered and exported by a dedicated mechanism.
+
+The /export/ survives — see [[*Exporting Modules]] — but the second /tier/ does
+not. Keeping generic and opinionated modules in one ~modules/features/~ tree
+and curating a one-file export list reaches the same public surface without a
+parallel directory, a location-based litmus test, or a testing discipline
+sized for nixpkgs rather than a personal configuration. Export becomes a
+one-line property; ceremony (a VM test, maintainers) attaches per-module, and
+only when a module is actually upstreamed.
+
+** An automatic system→home option bridge
+
+A ~my.home~ deferred-module option (or wholesale forwarding of ~config.my~
+into the user's Home Manager configuration) would save the explicit
+~home-manager.sharedModules~ line at each crossing. Rejected: wholesale
+forwarding breaks whenever an option exists in one scope only, and the sugar
+hides which evaluation a setting lands in. ~home-manager.sharedModules~ is
+upstream, already understood, and the crossings are few because profiles
+concentrate them.
+
+** ~import-tree~ from dendritic
+
+~lib/collectFlakeModules.nix~ differs from the ~import-tree~ flake input in one rule:
+recursion stops at ~default.nix~. ~import-tree~ imports every ~*.nix~ file in
+the tree unconditionally, so non-module files must be opted out with a ~_~
+path marker; with a stopping rule, module boundaries are expressed by the
+~default.nix~ files that define them and no marker convention is needed. At
+that size the helper is a dozen lines of ~readDir~, not worth a flake input.
+
+** A ~hosts~ option schema
+
+The legacy ~flake-module.nix~ declares ~hosts.<name>~ as a submodule
+(~system~, ~platform~, ~modules~, ~username~, ~specialArgs~) interpreted by
+a construction loop, and ~flake.nix~ carries the matching attrset. In
+practice every host sets exactly one field — ~system~. Once ~username~ and
+~specialArgs~ are trimmed, the platform fits in the path and the
+architecture in ~nixpkgs.hostPlatform~, leaving a DSL that carries no
+information. The loader reads the tree instead; see [[*Host Declaration]].
+
+** A flat ~hosts/<name>/~ layout
+
+Flattening the per-platform segment away (~hosts/kilimanjaro/~ instead of
+~hosts/nixos/kilimanjaro/~) was considered and rejected. The platform cannot
+be eliminated, only relocated: the loader must know /which constructor/
+(~nixosSystem~ vs ~darwinSystem~) before it can evaluate a host body at all,
+and that choice cannot be read back /from/ the body — evaluating a Darwin
+host through the NixOS constructor fails on undeclared Darwin options, so
+there is no cheap, universal pre-evaluation that recovers the platform. A
+flat layout therefore forces the platform back as data: either a central
+~{ name = system; }~ map in the loader (the minimal ~hosts~ schema this
+design just deleted, reborn) or a per-host marker file (a metadata file this
+design boasts of not having). The ~hosts/<platform>/<name>/~ segment encodes
+that same one irreducible fact /structurally and for free/, and doubles as
+the ~readDir~ grouping. Flattening trades a free path segment for a paid
+artifact; it is kept nested.
+
+** Dual-registration sugar
+
+Cross-platform features are registered under both ~nixos~ and ~darwin~ with
+two explicit assignment lines. Both shortcuts — the registry's ~generic~
+class and a ~registerEverywhere~ helper — would hide the supported-platform
+list at the definition site, and ~generic~ additionally drops class
+checking. Two lines do not need sugar.
+
+** ~ez-configs~
+
+A community flakeModule that maps ~{nixos,darwin,home}-configurations/~
+directories to flake outputs. Rejected: it re-splits system and home
+configuration per platform — the opposite of the unified ~hosts/~ goal —
+and has no nix-on-droid story. The ~hosts.nix~ loader covers construction
+in a few dozen lines.
+
+** ~partitions~ — not yet
+
+flake-parts can evaluate parts of the flake in separate module-system
+evaluations, so that dev-only inputs (~treefmt-nix~, ~pre-commit-hooks~,
+...) are never fetched when only packages or host configurations are
+evaluated. Deferred rather than rejected: it requires a second flake (and
+lock file) under ~./dev~, which complicates the automated input-update flow,
+and it is orthogonal to this reorganization. Revisit once the migration
+settles.
+
+** Strict 4-layer hierarchy (from the original ~design.md~)
+
+The earlier draft prescribed "Profile → Home → System → Shared" with strict
+upward-only dependencies. This was found to obstruct natural cross-cutting
+features and is dropped. Layering is a useful description of where code tends
+to live, not a build-enforced rule.
+
+** A cross-platform ~mkService~ abstraction
+
+A helper translating between systemd units and launchd agents was considered
+and rejected: no feature has demanded it. Add when a real cross-platform
+service appears.
+
+** ~my.machine.*~ hardware metadata
+
+Not reserved, not implemented. Will be designed if and when a feature needs
+to dispatch on hardware (e.g. a GPU kind); reserving namespace for
+unimplemented options is speculation, not design.
+
+** Feature-local flake inputs
+
+Nix flake spec requires inputs at the top of ~flake.nix~. The architecture
+does not attempt to simulate per-feature input ownership. See [[*Inputs]].
+
+* Migration Plan
+
+Four phases, each ending with the checks described in [[*Verification]]; the
+repository builds at every boundary and the migration may pause at any of
+them.
+
+** Done
+
+- ~perSystem~ outputs split into ~modules/flake/per-system/*.nix~ (path
+  flattens to ~modules/per-system/~ once the flatten runs — see phase 3).
+- /neovim/ and /emacs/ migrated to feature shape with
+  ~my.programs.<name>.enable~ toggles.
+- *Wiring (phase 1).* ~lib/collectFlakeModules.nix~ and the auto-import entry
+  point (~modules/flake/default.nix~) discover every flake-parts module; the
+  ~flake.nix~ import list collapses to ~./modules/flake~ and ~flake.nix~ is now
+  inputs + nixConfig + ~mkFlake~ (the transitional ~hosts~ attrset aside).
+  ~flake-module.nix~ moved to the auto-imported ~modules/flake/hosts-legacy.nix~
+  and the overlay export to ~modules/flake/overlays.nix~. /emacs/ and /neovim/
+  re-registered under ~flake.modules.homeManager~; the host loader injects the
+  registry through ~home-manager.sharedModules~ (scoped to home-enabled hosts —
+  server hosts never import home-manager). ~_registries.nix~ folded into
+  ~modules/flake/default.nix~, which now declares the
+  ~flake.{darwin,homeManager}Modules~ export options. Explicit ~homes/~ imports
+  of /emacs/ and /neovim/ dropped. Verified ~drvPath~-equal on every host that
+  uses no Neovim runtime; see the Neovim co-location caveat under
+  [[*Package and module co-location]] for the one expected, behaviour-free shift.
+
+** Remaining
+
+1. *The flatten, deferred.* Flattening ~modules/flake/*~ to ~modules/*~ — so
+   ~modules/~ itself becomes the auto-import root — *cannot* run during phase 1
+   as the original plan assumed. ~collectFlakeModules~ treats any directory with
+   a ~default.nix~ as a module to import whole and any other directory as a
+   namespace to recurse; pointed at ~modules/~ today it would sweep the still-
+   present legacy trees (~modules/{home,home-manager,nixos,darwin,shared,
+   profiles}/~) and feed NixOS/Home-Manager modules into the flake-parts layer,
+   which rejects their options. Those trees only leave ~modules/~ in the feature
+   sweep, so the flatten is a pure rename appended to phase 3, once
+   ~modules/features/~ is the sole occupant. Until then the flake-parts root
+   stays at ~modules/flake/~ and ~flake.nix~ imports ~./modules/flake~.
+2. *Host unification.* Add the ~modules/hosts.nix~ loader with
+   ~specialArgs = { inherit inputs; }~ and ~my.username~. One host at a
+   time, starting with ~kilimanjaro~: merge ~systems/<plat>/<host>/~ and
+   ~homes/<plat>/<host>/~ into ~hosts/<platform>/<host>/~, set
+   ~nixpkgs.hostPlatform~ in the body, drop ~username~ and ~self~ from
+   ~specialArgs~, and delete the host's entry from ~hosts-legacy.nix~.
+   Migrated and legacy hosts coexist — they define disjoint configuration
+   names. Delete ~hosts-legacy.nix~ when its last entry moves. Hosts keep
+   importing legacy profile paths directly until phase 4.
+3. *Feature sweep.* Move ~applications/*~ and every file in
+   ~modules/{home,home-manager,nixos,darwin,shared}/~ into
+   ~modules/features/~ in dependency order — small leaves first, resolving
+   the ~modules/home~ / ~modules/home-manager~ duplicates as they are
+   touched. Fold ~ext.xdg.*~ and ~ext.security.*~ into ~my.*~ in the same
+   pass; the sweep visits every defining file anyway. Input-module imports
+   move from hosts/profiles into the features that need them. As each generic
+   (no ~my.*~) module lands, add it to ~modules/exports.nix~ to populate the
+   public ~flake.{nixos,darwin,homeManager}Modules~ surface. Once
+   ~modules/features/~ is the sole content of ~modules/~, run the *deferred
+   flatten*: rename ~modules/flake/*~ to ~modules/*~, point the auto-import
+   entry at ~modules/~, fix the ~../../~ relatives in ~per-system/~ to ~../~,
+   move ~po4a.cfg~'s emacs-org paths, and collapse ~flake.nix~'s import to
+   ~./modules~. A pure rename — require ~drvPath~ equality.
+4. *Profile conversion.* Convert ~modules/profiles/{home,nixos,darwin}/~
+   into the two-halves cascade shape under ~modules/profiles/~. Hosts switch
+   from ~imports~ to option setters; this is the point where host bodies
+   reach their final, intent-only form.

@@ -899,55 +899,26 @@ pushed here.
 
 *** Hosts
 
-Machine definitions for all managed systems.
+Each machine is a directory under =hosts/<platform>/<name>/=. I add or remove a
+host by adding or removing its directory: =modules/flake/hosts.nix= reads the
+tree and builds a configuration for every entry, so there is no list to keep in
+sync here. The platform segment (=nixos=, =darwin=, =android=) selects the
+constructor, and the architecture lives in =nixpkgs.hostPlatform= inside each
+host body.
 
-#+NAME: hosts
-#+begin_src nix
-hosts = {
-  <<host-katavi>>
-  <<host-mikumi>>
-  <<host-work>>
-  <<host-kilimanjaro>>
-  <<host-arusha>>
-  <<host-manyara>>
-  <<host-serengeti>>
-  <<host-tarangire>>
-  <<host-android>>
-};
-#+end_src
+The subsections below keep the per-host notes (hardware, BIOS, setup steps).
 
 **** katavi
 
 Main laptop (M1 MacBook Air).
 
-#+NAME: host-katavi
-#+begin_src nix
-katavi = {
-  system = "aarch64-darwin";
-};
-#+end_src
-
 **** mikumi
 
 Build server (M1 Mac mini).
 
-#+NAME: host-mikumi
-#+begin_src nix
-mikumi = {
-  system = "aarch64-darwin";
-};
-#+end_src
-
 **** work
 
 Laptop for work (M4 MacBook Pro).
-
-#+NAME: host-work
-#+begin_src nix
-work = {
-  system = "aarch64-darwin";
-};
-#+end_src
 
 **** kilimanjaro
 
@@ -955,13 +926,6 @@ Main desktop (Intel Core i5-12400F).
 
 Wake-on-LAN (WoL) is enabled via the following BIOS setting:
 =Advanced > APM Configuration > Power On By PCI-E > Enabled=
-
-#+NAME: host-kilimanjaro
-#+begin_src nix
-kilimanjaro = {
-  system = "x86_64-linux";
-};
-#+end_src
 
 **** arusha
 
@@ -1014,13 +978,6 @@ sudo nixos-rebuild switch --flake github:natsukium/dotfiles#arusha
 Windows 24H2 includes a built-in =sudo= command, so =winget= can be elevated
 inline without a separate UAC prompt.
 
-#+NAME: host-arusha
-#+begin_src nix
-arusha = {
-  system = "x86_64-linux";
-};
-#+end_src
-
 **** manyara
 
 A mini PC with Intel N100, serving as a lightweight home server.
@@ -1029,23 +986,9 @@ https://www.bee-link.com/products/beelink-mini-s12-pro-n100
 BIOS is configured with the following setting to automatically power on after an outage:
 =Chipset > PCH-IO Configuration > State After G3 > S0 State=
 
-#+NAME: host-manyara
-#+begin_src nix
-manyara = {
-  system = "x86_64-linux";
-};
-#+end_src
-
 **** serengeti
 
 Build server (OCI A1 Flex).
-
-#+NAME: host-serengeti
-#+begin_src nix
-serengeti = {
-  system = "aarch64-linux";
-};
-#+end_src
 
 **** tarangire
 
@@ -1054,24 +997,9 @@ Build server (Ryzen 9 9950X).
 Wake-on-LAN (WoL) is enabled via the following BIOS setting:
 =Advanced > APM Configuration > Power On By PCI-E > Enabled=
 
-#+NAME: host-tarangire
-#+begin_src nix
-tarangire = {
-  system = "x86_64-linux";
-};
-#+end_src
-
 **** android
 
 Phone (Pixel 7a).
-
-#+NAME: host-android
-#+begin_src nix
-android = {
-  system = "aarch64-linux";
-  platform = "android";
-};
-#+end_src
 
 *** Outputs
 
@@ -1088,11 +1016,8 @@ systems = [
 ];
 
 imports = [
-  ./flake-module.nix
   ./modules/flake
 ];
-
-<<hosts>>
 
 flake = {
   overlays = import ./overlays { inherit inputs; };
@@ -1461,7 +1386,7 @@ keeps the default priority and runs in parallel under =prek=.
                   "homes/shared/gpg/keys.txt"
                   "secrets.yaml"
                   "secrets/default.yaml"
-                  "systems/nixos/tarangire/facter.json"
+                  "hosts/nixos/tarangire/facter.json"
                   "systems/shared/hercules-ci/binary-caches.json"
                 ];
                 settings.configPath = "typos.toml";

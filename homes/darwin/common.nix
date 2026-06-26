@@ -1,12 +1,12 @@
 {
   inputs,
+  config,
   lib,
   pkgs,
-  specialArgs,
   ...
 }:
 let
-  inherit (specialArgs) username;
+  inherit (config.my) username;
 in
 {
   imports = [ inputs.home-manager.darwinModules.home-manager ];
@@ -14,6 +14,9 @@ in
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
+    # Home Manager registry modules cross into every user's evaluation here;
+    # the system registry is injected by the host loader.
+    sharedModules = builtins.attrValues inputs.self.modules.homeManager;
     users.${username} = {
       imports = [
         ../common.nix
