@@ -8,7 +8,6 @@
     {
       config,
       lib,
-      pkgs,
       ...
     }:
     {
@@ -17,7 +16,10 @@
       options.my.programs.vicinae.enable = lib.mkEnableOption "vicinae launcher";
 
       config = lib.mkIf config.my.programs.vicinae.enable {
-        programs.vicinae.enable = true;
+        programs.vicinae = {
+          enable = true;
+          systemd.enable = true;
+        };
       };
     };
 }

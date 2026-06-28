@@ -2624,7 +2624,6 @@ On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described l
     {
       config,
       lib,
-      pkgs,
       ...
     }:
     {
@@ -2633,7 +2632,10 @@ On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described l
       options.my.programs.vicinae.enable = lib.mkEnableOption "vicinae launcher";
 
       config = lib.mkIf config.my.programs.vicinae.enable {
-        programs.vicinae.enable = true;
+        programs.vicinae = {
+          enable = true;
+          systemd.enable = true;
+        };
       };
     };
 }
