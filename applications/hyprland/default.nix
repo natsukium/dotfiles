@@ -98,13 +98,13 @@
       # windowrule = float, ^(kitty)$
       # Example windowrule v2
       # windowrulev2 = float,class:^(kitty)$,title:^(kitty)$
-      windowrulev2 = opacity 0.9,class:^(kitty|fuzzel)$
+      windowrulev2 = opacity 0.9,class:^(kitty)$
       # See https://wiki.hyprland.org/Configuring/Window-Rules/ for more
 
       # See https://wiki.hyprland.org/Configuring/Keywords/ for more
       $mainMod = SUPER
       $terminal = kitty
-      $launcher = fuzzel
+      $launcher = vicinae toggle
 
       # Example binds, see https://wiki.hyprland.org/Configuring/Binds/ for more
       bind = $mainMod, RETURN, exec, $terminal

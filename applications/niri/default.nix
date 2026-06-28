@@ -8,7 +8,10 @@
 let
   defaultKeyBind = import ./defaultKeyBind.nix;
   terminal = "kitty";
-  launcher = "fuzzel";
+  launcher = [
+    "vicinae"
+    "toggle"
+  ];
 in
 {
   imports = [ inputs.niri-flake.homeModules.niri ];

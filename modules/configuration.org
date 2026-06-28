@@ -2600,6 +2600,45 @@ emacsWithPackagesFromUsePackage {
 *** init.org
 #+INCLUDE: "./flake/features/emacs/init.org"
 
+* Launcher
+
+** Vicinae
+
+[[https://github.com/vicinae/vicinae][Vicinae]] is a cross-platform launcher for Linux and macOS, designed to run extensions
+from Raycast, the popular macOS launcher. I use both Linux and macOS day to day, so
+having the same experience on both platforms matters a lot to me.
+
+
+On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described later.
+
+#+begin_src nix :tangle flake/features/vicinae/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle flake/features/vicinae/default.nix
+# Requires: inputs.vicinae
+{ inputs, ... }:
+{
+  flake.modules.homeManager.vicinae =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      imports = [ inputs.vicinae.homeManagerModules.default ];
+
+      options.my.programs.vicinae.enable = lib.mkEnableOption "vicinae launcher";
+
+      config = lib.mkIf config.my.programs.vicinae.enable {
+        programs.vicinae.enable = true;
+      };
+    };
+}
+#+end_src
+
 * Darwin
 
 ** Spotlight

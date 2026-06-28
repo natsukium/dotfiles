@@ -25,14 +25,6 @@ in
     # inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
-  programs.fuzzel = {
-    enable = true;
-    settings = {
-      main.terminal = "kitty";
-      main.width = 50;
-    };
-  };
-
   programs.wlogout = {
     enable = true;
   };

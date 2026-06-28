@@ -28,8 +28,6 @@ in
     shottr
   ];
 
-  services.raycast.enable = true;
-
   services.wallpaper = {
     enable = true;
     imagePath = "${wallpaper}/share/wallpapers/nixos-wallpaper.png";

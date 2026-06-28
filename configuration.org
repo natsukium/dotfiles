@@ -127,6 +127,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<nur-packages>>
     <<paneru>>
     <<simple-wol-manager>>
+    <<vicinae>>
     <<zen-browser>>
   };
 
@@ -819,6 +820,25 @@ simple-wol-manager = {
 };
 #+end_src
 
+***** vicinae
+
+https://github.com/vicinae/vicinae (fork: https://github.com/natsukium/vicinae)
+
+#+BEGIN_QUOTE
+A focused, keyboard-driven launcher for getting things done.
+#+END_QUOTE
+
+Vicinae is a Raycast-style native launcher.
+I use my fork until the home-manager module for darwin is merged upstream.
+
+#+NAME: vicinae
+#+begin_src nix
+vicinae = {
+  url = "github:natsukium/vicinae/nix/hm-module-for-darwin";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
 ***** zen-browser
 
 https://github.com/0xc000022070/zen-browser-flake
@@ -870,12 +890,14 @@ extra-substituters = [
   "https://nix-cache.natsukium.com"
   "https://natsukium.cachix.org"
   "https://nix-community.cachix.org"
+  "https://vicinae.cachix.org"
 ];
 
 extra-trusted-public-keys = [
   "niks3-1:SoIFTPtiPoCW3/OzUkIBKlLG5znMZfbihlr11XAOles="
   "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
   "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+  "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
 ];
 #+end_src
 
@@ -896,6 +918,12 @@ https://discourse.nixos.org/t/nix-flox-nvidia-opening-up-cuda-redistribution-on-
 Personal binary cache containing outputs from this flake. Packages not available in the
 official =cache.nixos.org= or =nix-community.cachix.org= are built on GitHub Actions and
 pushed here.
+
+***** vicinae.cachix.org
+
+Upstream binary cache for the Vicinae launcher. Vicinae is a large Qt application, so
+this avoids compiling it from source — relevant on macOS, where the package is not yet
+in =cache.nixos.org=.
 
 *** Hosts
 
