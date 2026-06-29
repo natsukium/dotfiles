@@ -21,10 +21,6 @@ in
     mcp-servers.programs = {
       context7.enable = true;
       playwright.enable = true;
-      time = {
-        enable = true;
-        args = [ "--local-timezone=Asia/Tokyo" ];
-      };
     };
   };
 }
