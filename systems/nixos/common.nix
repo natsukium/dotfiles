@@ -16,11 +16,14 @@ in
   imports = [
     ../../modules/nixos
     ../common.nix
+    inputs.self.modules.nixos.fish
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
     inputs.tsnsrv.nixosModules.default
   ];
+
+  my.programs.fish.enable = true;
 
   sops = {
     defaultSopsFile = ../../secrets/default.yaml;

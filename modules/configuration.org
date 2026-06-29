@@ -691,25 +691,91 @@ syntax highlighting, autosuggestions, and tab completions work without configura
 or plugins. Among shells with broad environment and software support, fish provides the
 most convenient and extensible interactive experience with the least setup effort.
 
-#+begin_src nix :tangle home/fish/default.nix :exports none
+#+begin_src nix :tangle flake/features/fish/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/fish/default.nix
-{ pkgs, ... }:
+#+begin_src nix :tangle flake/features/fish/default.nix
+{ ... }:
+let
+  # System scope: install fish, register it as a login shell, and make it the
+  # primary user's default shell.
+  systemModule =
+    {
+      config,
+      lib,
+      pkgs,
+      username,
+      ...
+    }:
+    {
+      options.my.programs.fish.enable = lib.mkEnableOption "fish";
+
+      config = lib.mkIf config.my.programs.fish.enable {
+        programs.fish.enable = true;
+        environment.shells = [ pkgs.fish ];
+        users.users.${username}.shell = pkgs.fish;
+      };
+    };
+
+  # Darwin layers macOS-only setup on top of the shared system config.
+  darwinModule =
+    {
+      config,
+      lib,
+      username,
+      ...
+    }:
+    {
+      imports = [ systemModule ];
+
+      config = lib.mkIf config.my.programs.fish.enable {
+        # distributed builds fail with "fish: Unknown command: nix-store" over SSH;
+        # source the nix-daemon vars so nix-store is reachable.
+        # https://github.com/NixOS/nix/issues/7508#issuecomment-2597403478
+        programs.fish.shellInit = ''
+          if test -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish' && test -n "$SSH_CONNECTION"
+            source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish'
+          end
+        '';
+
+        # nix-darwin only manages a user's shell when the account is "known" and its
+        # uid matches the existing one, so the shell setting above takes effect.
+        # https://github.com/LnL7/nix-darwin/issues/1237#issuecomment-2562242340
+        users.users.${username}.uid = lib.mkDefault 501;
+        users.knownUsers = [ username ];
+      };
+    };
+in
 {
-  programs.fish = {
-    enable = true;
+  flake.modules.nixos.fish = systemModule;
+  flake.modules.darwin.fish = darwinModule;
 
-    <<fish-interactive-shell-init>>
+  flake.modules.homeManager.fish =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      options.my.programs.fish.enable = lib.mkEnableOption "fish";
 
-    <<fish-abbreviations>>
+      config = lib.mkIf config.my.programs.fish.enable {
+        programs.fish = {
+          enable = true;
 
-    <<fish-functions>>
+          <<fish-interactive-shell-init>>
 
-    <<fish-plugins>>
-  };
+          <<fish-abbreviations>>
+
+          <<fish-functions>>
+
+          <<fish-plugins>>
+        };
+      };
+    };
 }
 #+end_src
 
@@ -769,19 +835,6 @@ abbr -a L --position anywhere --set-cursor "% | less"
 abbr -a !! --position anywhere --function _abbr_last_history_item
 abbr -a extract_tar_gz --position command --regex ".+\.tar\.gz" --function _abbr_extract_tar_gz
 abbr -a dotdot --regex '^\.\.+$' --function _abbr_multicd
-#+end_src
-
-**** any-nix-shell
-
-[[https://github.com/haslersn/any-nix-shell][any-nix-shell]] keeps fish as the interactive shell inside =nix shell= and =nix develop=
-environments. Without it, entering a Nix shell drops into bash (the default builder
-shell), losing fish's interactive features. This is sourced at the end of
-=interactiveShellInit= so it can wrap the shell entry point after all other
-configuration is applied.
-
-#+NAME: fish-any-nix-shell
-#+begin_src nix :noweb no
-${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
 #+end_src
 
 *** Abbreviations
@@ -856,6 +909,20 @@ functions = {
   _abbr_extract_tar_gz = "echo tar avfx $argv";
   _abbr_multicd = "echo cd (string repeat -n (math (string length -- $argv[1]) - 1) ../)";
 };
+#+end_src
+
+**** any-nix-shell
+
+[[https://github.com/haslersn/any-nix-shell][any-nix-shell]] keeps fish as the interactive shell inside =nix shell= and
+=nix develop= environments; without it, entering a Nix shell drops into bash and
+loses fish's interactive features.
+
+It is sourced at the end of =interactiveShellInit= so its =nix= and =nix-shell=
+wrappers are defined after the rest of the interactive configuration.
+
+#+NAME: fish-any-nix-shell
+#+begin_src nix :noweb no
+${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
 #+end_src
 
 *** Plugins

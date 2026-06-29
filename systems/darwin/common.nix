@@ -12,9 +12,12 @@ in
   imports = [
     ../../modules/darwin
     ../common.nix
+    inputs.self.modules.darwin.fish
     inputs.comin.darwinModules.comin
     inputs.sops-nix.darwinModules.sops
   ];
+
+  my.programs.fish.enable = true;
 
   sops = {
     defaultSopsFile = ../../secrets/default.yaml;
@@ -25,15 +28,7 @@ in
     };
   };
 
-  # uid and knownUsers are needed to set fish as the default shell
-  # https://github.com/LnL7/nix-darwin/issues/1237#issuecomment-2562242340
-  users = {
-    users.${username} = {
-      home = "/Users/${username}";
-      uid = lib.mkDefault 501;
-    };
-    knownUsers = [ username ];
-  };
+  users.users.${username}.home = "/Users/${username}";
 
   system.primaryUser = username;
 
@@ -62,16 +57,6 @@ in
   '';
 
   system.stateVersion = lib.mkDefault 4;
-
-  # distributed builds fail with the following error
-  # fish: Unknown command: nix-store
-  # see the workaround
-  # https://github.com/NixOS/nix/issues/7508#issuecomment-2597403478
-  programs.fish.shellInit = ''
-    if test -e '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish' && test -n "$SSH_CONNECTION"
-      source '/nix/var/nix/profiles/default/etc/profile.d/nix-daemon.fish'
-    end
-  '';
 
   services.prometheus.exporters.node.enable = true;
 

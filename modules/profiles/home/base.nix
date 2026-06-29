@@ -1,9 +1,12 @@
+{ inputs, ... }:
 {
   imports = [
     ../../home/bash
-    ../../home/fish
+    inputs.self.modules.homeManager.fish
     ../../home/nix
     ../../home/nushell
     ../../home/starship
   ];
+
+  my.programs.fish.enable = true;
 }
