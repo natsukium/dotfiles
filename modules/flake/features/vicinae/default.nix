@@ -19,6 +19,7 @@
         programs.vicinae = {
           enable = true;
           systemd.enable = true;
+          launchd.enable = true;
         };
       };
     };
