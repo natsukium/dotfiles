@@ -64,6 +64,20 @@ in
       pkgs,
       ...
     }:
+    let
+      # Generate any-nix-shell's fish wrappers at build time. Each call extracts one
+      # function definition into its own file for fish's autoload directory, so the
+      # wrappers stay in sync with the package rather than being hardcoded.
+      anyNixShellFunction =
+        name:
+        pkgs.runCommand "any-nix-shell-${name}.fish" { nativeBuildInputs = [ pkgs.any-nix-shell ]; } ''
+          any-nix-shell fish | awk -v want=${name} '
+            $1 == "function" { current = $2 }
+            current == want { print }
+            $1 == "end" && current == want { current = "" }
+          ' > $out
+        '';
+    in
     {
       options.my.programs.fish.enable = lib.mkEnableOption "fish";
 
@@ -87,8 +101,6 @@ in
             abbr -a !! --position anywhere --function _abbr_last_history_item
             abbr -a extract_tar_gz --position command --regex ".+\.tar\.gz" --function _abbr_extract_tar_gz
             abbr -a dotdot --regex '^\.\.+$' --function _abbr_multicd
-
-            ${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
           '';
 
           shellAbbrs = {
@@ -140,6 +152,11 @@ in
               src = pkgs.fishPlugins.fzf-fish.src;
             }
           ];
+        };
+
+        xdg.configFile = {
+          "fish/functions/nix.fish".source = anyNixShellFunction "nix";
+          "fish/functions/nix-shell.fish".source = anyNixShellFunction "nix-shell";
         };
       };
     };

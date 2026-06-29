@@ -772,6 +772,9 @@ in
       pkgs,
       ...
     }:
+    let
+      <<fish-any-nix-shell>>
+    in
     {
       options.my.programs.fish.enable = lib.mkEnableOption "fish";
 
@@ -786,6 +789,11 @@ in
           <<fish-functions>>
 
           <<fish-plugins>>
+        };
+
+        xdg.configFile = {
+          "fish/functions/nix.fish".source = anyNixShellFunction "nix";
+          "fish/functions/nix-shell.fish".source = anyNixShellFunction "nix-shell";
         };
       };
     };
@@ -807,8 +815,6 @@ interactiveShellInit = ''
   <<fish-pinentry>>
 
   <<fish-extra-abbrs>>
-
-  <<fish-any-nix-shell>>
 '';
 #+end_src
 
@@ -930,12 +936,28 @@ functions = {
 =nix develop= environments; without it, entering a Nix shell drops into bash and
 loses fish's interactive features.
 
-It is sourced at the end of =interactiveShellInit= so its =nix= and =nix-shell=
-wrappers are defined after the rest of the interactive configuration.
+=any-nix-shell fish= only emits two function definitions (=nix= and =nix-shell=),
+but generating them shells out to =/bin/sh= plus three =which= lookups — ~24ms on
+every interactive startup if sourced eagerly. Running it once at build time and
+splitting the output into fish's autoload directory moves that cost off the hot path
+(fish parses each function on first call), and uses any-nix-shell's real wrappers
+rather than a hardcoded copy, so its =nix run= version gate and =--pure= handling
+stay in sync with the upstream package.
 
 #+NAME: fish-any-nix-shell
 #+begin_src nix :noweb no
-${pkgs.any-nix-shell}/bin/any-nix-shell fish | source
+# Generate any-nix-shell's fish wrappers at build time. Each call extracts one
+# function definition into its own file for fish's autoload directory, so the
+# wrappers stay in sync with the package rather than being hardcoded.
+anyNixShellFunction =
+  name:
+  pkgs.runCommand "any-nix-shell-${name}.fish" { nativeBuildInputs = [ pkgs.any-nix-shell ]; } ''
+    any-nix-shell fish | awk -v want=${name} '
+      $1 == "function" { current = $2 }
+      current == want { print }
+      $1 == "end" && current == want { current = "" }
+    ' > $out
+  '';
 #+end_src
 
 *** Plugins
