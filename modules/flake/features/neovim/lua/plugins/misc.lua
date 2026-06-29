@@ -200,13 +200,6 @@ return {
 		end,
 	},
 	{
-		"CopilotChat.nvim",
-		after = function()
-			require("CopilotChat").setup()
-		end,
-		event = "DeferredUIEnter",
-	},
-	{
 		"snacks.nvim",
 		after = function()
 			require("snacks").setup({

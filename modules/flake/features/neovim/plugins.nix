@@ -18,7 +18,6 @@ toLazyPlugins [
   bufferline-nvim
   comment-nvim
   copilot-lua
-  CopilotChat-nvim
   diffview-nvim
   dressing-nvim
   flit-nvim
