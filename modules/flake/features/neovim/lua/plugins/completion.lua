@@ -38,6 +38,7 @@ return {
 	},
 	{
 		"copilot.lua",
+		event = { "InsertEnter", "CmdlineEnter" },
 		after = function()
 			require("copilot").setup({
 				suggestion = { enabled = false },
@@ -48,5 +49,6 @@ return {
 	},
 	{
 		"blink-cmp-copilot",
+		lazy = true,
 	},
 }
