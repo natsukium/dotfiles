@@ -691,6 +691,18 @@ syntax highlighting, autosuggestions, and tab completions work without configura
 or plugins. Among shells with broad environment and software support, fish provides the
 most convenient and extensible interactive experience with the least setup effort.
 
+Both NixOS and nix-darwin hand fish its environment by sourcing each
+=environment.*Init= snippet -- and on NixOS the whole session environment -- through a
+bash foreign-env round-trip on every interactive startup. Spawning bash is a fixed cost
+paid even when a snippet is empty; I measured ~22ms across those calls on one of my NixOS
+hosts. So I enable =useBabelfish= to translate the environment to native fish once at
+build time instead.
+
+#+NAME: useBabelfish
+#+begin_src nix :noweb no
+programs.fish.useBabelfish = true;
+#+end_src
+
 #+begin_src nix :tangle flake/features/fish/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -716,6 +728,7 @@ let
         programs.fish.enable = true;
         environment.shells = [ pkgs.fish ];
         users.users.${username}.shell = pkgs.fish;
+        <<useBabelfish>>
       };
     };
 
