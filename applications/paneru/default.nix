@@ -1,4 +1,3 @@
-{ inputs, ... }:
 {
   services.paneru = {
     enable = true;
@@ -12,8 +11,6 @@
           0.66
         ];
       };
-
-      padding.left = 40;
 
       windows.default = {
         title = ".*";

@@ -15,7 +15,6 @@ in
 {
   imports = [
     ../../applications/paneru
-    ../../applications/sketchybar
     ../desktop.nix
     ./gui-apps-utils
   ];

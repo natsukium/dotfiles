@@ -107,7 +107,6 @@ in
     });
   };
 
-  services.sketchybar.enable = true;
   system.defaults.NSGlobalDomain._HIHideMenuBar = true;
 
   security.pam.services.sudo_local.touchIdAuth = true;
