@@ -54,7 +54,6 @@ vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" 
 vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
 require("lz.n").load("plugins")
-require("misc")
 
 -- Load nix-helper only for nix files
 vim.api.nvim_create_autocmd("FileType", {
