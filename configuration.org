@@ -128,6 +128,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<paneru>>
     <<simple-wol-manager>>
     <<vicinae>>
+    <<vicinae-extensions>>
     <<zen-browser>>
   };
 
@@ -835,6 +836,26 @@ I use my fork until the home-manager module for darwin is merged upstream.
 #+begin_src nix
 vicinae = {
   url = "github:natsukium/vicinae/nix/hm-module-for-darwin";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** vicinae-extensions
+
+https://github.com/vicinaehq/extensions
+
+#+BEGIN_QUOTE
+Extensions for the Vicinae launcher
+#+END_QUOTE
+
+Prebuilt Vicinae extension packages, one per directory in the repo. Referenced by
+the launcher module so extensions like the Nix one are installed declaratively
+instead of through Vicinae's GUI store.
+
+#+NAME: vicinae-extensions
+#+begin_src nix
+vicinae-extensions = {
+  url = "github:vicinaehq/extensions";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 #+end_src

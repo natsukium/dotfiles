@@ -5,6 +5,7 @@
     inputs.self.modules.homeManager.vicinae
     ../applications/kitty
     ../applications/qutebrowser
+    ../applications/vicinae
     ../applications/vscode
     ../applications/zotero
     ./shared/claude.nix

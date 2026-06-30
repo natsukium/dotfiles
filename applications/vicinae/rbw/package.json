@@ -1,0 +1,62 @@
+{
+	"$schema": "https://raw.githubusercontent.com/vicinaehq/vicinae/refs/heads/main/extra/schemas/extension.json",
+	"name": "rbw",
+	"title": "rbw",
+	"description": "Browse your Bitwarden vault through rbw and copy or paste credentials",
+	"categories": [
+		"Security"
+	],
+	"license": "MIT",
+	"author": "natsukium",
+	"icon": "extension_icon.png",
+	"commands": [
+		{
+			"name": "rbw",
+			"title": "Search Vault",
+			"subtitle": "rbw",
+			"description": "Search Bitwarden entries and copy or paste their fields",
+			"mode": "view"
+		}
+	],
+	"preferences": [
+		{
+			"name": "action",
+			"type": "dropdown",
+			"title": "Default Action",
+			"description": "Action performed when pressing Enter on a field",
+			"required": true,
+			"default": "paste",
+			"data": [
+				{
+					"title": "Paste",
+					"value": "paste"
+				},
+				{
+					"title": "Copy",
+					"value": "copy"
+				}
+			]
+		},
+		{
+			"name": "additionalPath",
+			"type": "textfield",
+			"title": "Additional PATH Entries",
+			"description": "Colon-separated paths prepended to PATH so rbw and its agent are found",
+			"default": "",
+			"required": false
+		}
+	],
+	"scripts": {
+		"build": "vici build",
+		"dev": "vici develop"
+	},
+	"dependencies": {
+		"@vicinae/api": "0.16.8",
+		"react": "^19.0.0"
+	},
+	"devDependencies": {
+		"@types/node": "^20.0.0",
+		"@types/react": "^19.0.0",
+		"typescript": "^5.9.3"
+	}
+}
