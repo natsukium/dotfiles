@@ -20,6 +20,10 @@
           enable = true;
           systemd.enable = true;
           launchd.enable = true;
+          settings = {
+            keybinding = "emacs";
+            theme.dark.name = "nord";
+          };
         };
       };
     };
