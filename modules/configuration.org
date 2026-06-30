@@ -2743,7 +2743,7 @@ On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described l
             environment.PATH = "${lib.makeBinPath [ pkgs.rbw ]}:/usr/bin:/bin:/usr/sbin:/sbin";
           };
           extensions = [
-            (inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension {
+            (inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension (finalAttrs: {
               pname = "rbw";
               version = "0-unstable-2026-07-01";
               src = pkgs.fetchFromGitea {
@@ -2753,7 +2753,12 @@ On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described l
                 rev = "66444c3c02bd4121f7127ced30dfc5b1d29b5bcf";
                 hash = "sha256-jhbn2eICx7Sf8lm7d5/6cYM3Cl1b/llQyVKuAQvWVWE=";
               };
-            })
+              npmDeps = pkgs.fetchNpmDeps {
+                inherit (finalAttrs) src;
+                hash = "sha256-Mo+OxyoCaDIbwoW5KRFl0GZarWVp0iFNW/NtkUlr35Q=";
+              };
+              npmConfigHook = pkgs.npmHooks.npmConfigHook;
+            }))
           ];
           settings = {
             keybinding = "emacs";

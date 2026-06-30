@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-07-01 02:04+0900\n"
+"POT-Creation-Date: 2026-07-01 08:56+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -436,7 +436,7 @@ msgstr ""
 #: configuration.org:71 modules/flake/features/emacs/init.org:622
 #: modules/configuration.org:71 modules/configuration.org:326
 #: modules/configuration.org:519 modules/configuration.org:2004
-#: modules/configuration.org:2807
+#: modules/configuration.org:2812
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -3581,7 +3581,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/flake/features/emacs/init.org:93 modules/configuration.org:2768
+#: modules/flake/features/emacs/init.org:93 modules/configuration.org:2773
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -6703,7 +6703,7 @@ msgstr ""
 
 #. type: heading ***
 #: modules/configuration.org:55 modules/configuration.org:478
-#: modules/configuration.org:2794
+#: modules/configuration.org:2799
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -11992,7 +11992,7 @@ msgid ""
 "            environment.PATH = \"${lib.makeBinPath [ pkgs.rbw ]}:/usr/bin:/bin:/usr/sbin:/sbin\";\n"
 "          };\n"
 "          extensions = [\n"
-"            (inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension {\n"
+"            (inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension (finalAttrs: {\n"
 "              pname = \"rbw\";\n"
 "              version = \"0-unstable-2026-07-01\";\n"
 "              src = pkgs.fetchFromGitea {\n"
@@ -12002,7 +12002,12 @@ msgid ""
 "                rev = \"66444c3c02bd4121f7127ced30dfc5b1d29b5bcf\";\n"
 "                hash = \"sha256-jhbn2eICx7Sf8lm7d5/6cYM3Cl1b/llQyVKuAQvWVWE=\";\n"
 "              };\n"
-"            })\n"
+"              npmDeps = pkgs.fetchNpmDeps {\n"
+"                inherit (finalAttrs) src;\n"
+"                hash = \"sha256-Mo+OxyoCaDIbwoW5KRFl0GZarWVp0iFNW/NtkUlr35Q=\";\n"
+"              };\n"
+"              npmConfigHook = pkgs.npmHooks.npmConfigHook;\n"
+"            }))\n"
 "          ];\n"
 "          settings = {\n"
 "            keybinding = \"emacs\";\n"
@@ -12015,13 +12020,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2770
+#: modules/configuration.org:2775
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2772
+#: modules/configuration.org:2777
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -12031,7 +12036,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2783
+#: modules/configuration.org:2788
 #, no-wrap
 msgid ""
 "{ config, lib, ... }:\n"
@@ -12043,7 +12048,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2790
+#: modules/configuration.org:2795
 #, no-wrap
 msgid ""
 "  <<spotlight-config>>\n"
@@ -12051,13 +12056,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2796
+#: modules/configuration.org:2801
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2798
+#: modules/configuration.org:2803
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -12070,7 +12075,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2809
+#: modules/configuration.org:2814
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -12080,13 +12085,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2814
+#: modules/configuration.org:2819
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2816
+#: modules/configuration.org:2821
 #, no-wrap
 msgid ""
 "config = {\n"
