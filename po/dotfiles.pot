@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-06-30 22:50+0900\n"
+"POT-Creation-Date: 2026-07-01 02:04+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -411,7 +411,7 @@ msgstr ""
 #: configuration.org:71 modules/flake/features/emacs/init.org:622
 #: modules/configuration.org:71 modules/configuration.org:326
 #: modules/configuration.org:519 modules/configuration.org:2004
-#: modules/configuration.org:2790
+#: modules/configuration.org:2807
 #, no-wrap
 msgid "Configuration"
 msgstr ""
@@ -3400,7 +3400,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/flake/features/emacs/init.org:93 modules/configuration.org:2751
+#: modules/flake/features/emacs/init.org:93 modules/configuration.org:2768
 #, no-wrap
 msgid "Darwin"
 msgstr ""
@@ -6302,7 +6302,7 @@ msgstr ""
 
 #. type: heading ***
 #: modules/configuration.org:55 modules/configuration.org:478
-#: modules/configuration.org:2777
+#: modules/configuration.org:2794
 #, no-wrap
 msgid "Options"
 msgstr ""
@@ -11264,6 +11264,7 @@ msgid ""
 "    {\n"
 "      config,\n"
 "      lib,\n"
+"      pkgs,\n"
 "      ...\n"
 "    }:\n"
 "    {\n"
@@ -11271,7 +11272,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2734
+#: modules/configuration.org:2735
 #, no-wrap
 msgid ""
 "options.my.programs.vicinae.enable = lib.mkEnableOption \"vicinae "
@@ -11279,14 +11280,34 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2736
+#: modules/configuration.org:2737
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.vicinae.enable {\n"
 "        programs.vicinae = {\n"
 "          enable = true;\n"
 "          systemd.enable = true;\n"
-"          launchd.enable = true;\n"
+"          launchd = {\n"
+"            enable = true;\n"
+"            environment.PATH = \"${lib.makeBinPath [ pkgs.rbw "
+"]}:/usr/bin:/bin:/usr/sbin:/sbin\";\n"
+"          };\n"
+"          extensions = [\n"
+"            "
+"(inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension "
+"{\n"
+"              pname = \"rbw\";\n"
+"              version = \"0-unstable-2026-07-01\";\n"
+"              src = pkgs.fetchFromGitea {\n"
+"                domain = \"git.natsukium.com\";\n"
+"                owner = \"natsukium\";\n"
+"                repo = \"vicinae-extension-rbw\";\n"
+"                rev = \"66444c3c02bd4121f7127ced30dfc5b1d29b5bcf\";\n"
+"                hash = "
+"\"sha256-jhbn2eICx7Sf8lm7d5/6cYM3Cl1b/llQyVKuAQvWVWE=\";\n"
+"              };\n"
+"            })\n"
+"          ];\n"
 "          settings = {\n"
 "            keybinding = \"emacs\";\n"
 "            theme.dark.name = \"nord\";\n"
@@ -11298,13 +11319,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2753
+#: modules/configuration.org:2770
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2755
+#: modules/configuration.org:2772
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -11314,7 +11335,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2766
+#: modules/configuration.org:2783
 #, no-wrap
 msgid ""
 "{ config, lib, ... }:\n"
@@ -11326,7 +11347,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2773
+#: modules/configuration.org:2790
 #, no-wrap
 msgid ""
 "  <<spotlight-config>>\n"
@@ -11334,13 +11355,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2779
+#: modules/configuration.org:2796
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2781
+#: modules/configuration.org:2798
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -11354,7 +11375,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2792
+#: modules/configuration.org:2809
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -11364,13 +11385,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2797
+#: modules/configuration.org:2814
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2799
+#: modules/configuration.org:2816
 #, no-wrap
 msgid ""
 "config = {\n"
