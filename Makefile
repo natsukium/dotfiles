@@ -1,10 +1,12 @@
-.PHONY: build build-all x86_64-linux aarch64-linux aarch64-darwin tangle
+.PHONY: build build-all x86_64-linux aarch64-linux aarch64-darwin tangle tangle-all
 
 #──────────────────────────────────────────────
 # Org-babel tangle
 #──────────────────────────────────────────────
 
-EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t org-resource-download-policy t)'
+# download-policy nil skips the remote #+SETUPFILE fetch (HTML-theme only, irrelevant
+# to tangle/export output) so exports don't hit the network on every run.
+EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t org-resource-download-policy nil)'
 
 define tangle-org
 	$(EMACS) --eval '(dolist (file (org-babel-tangle-file "$(1)")) (with-current-buffer (find-file-noselect file) (delete-trailing-whitespace) (save-buffer)))'
@@ -16,7 +18,11 @@ CONF_TANGLE    := $(call tangle-targets,configuration.org)
 MODULES_TANGLE := $(addprefix modules/,$(call tangle-targets,modules/configuration.org))
 OVERLAYS_TANGLE := $(addprefix overlays/,$(call tangle-targets,overlays/configuration.org))
 
-tangle: $(CONF_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
+# Each tangle/export target is an independent emacs process; recurse in parallel
+tangle:
+	@$(MAKE) --no-print-directory -j tangle-all
+
+tangle-all: $(CONF_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
 
 # org-babel skips writing files whose content is unchanged, leaving their mtime
 # stale and causing make to re-tangle on every invocation.
