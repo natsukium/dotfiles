@@ -171,11 +171,15 @@ in
   # ttyS0 forwarding ships the guest journal out as
   # microvm@hermes-agent.service on the host, where alloy picks it up. Without
   # this the journal stays inside the ephemeral guest root and is lost on
-  # reboot — there is no persistent /var/log mount and no inbound shell.
+  # reboot — there is no persistent /var/log mount.
   services.journald.extraConfig = ''
     ForwardToConsole=yes
     MaxLevelConsole=info
   '';
+
+  # hermes stamps the system clock into its prompt (and cron fires in local
+  # time), so leaving the guest on its default UTC makes its sense of "now" 9h off.
+  time.timeZone = "Asia/Tokyo";
 
   system.stateVersion = "25.11";
 }
