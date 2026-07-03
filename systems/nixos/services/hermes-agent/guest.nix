@@ -2,6 +2,7 @@
   config,
   pkgs,
   self,
+  operatorKeys,
   ...
 }:
 let
@@ -27,6 +28,17 @@ in
         # address (02: prefix) so the guest's interface name stays the same
         # across rebuilds.
         mac = "02:00:00:00:48:01";
+      }
+    ];
+
+    # Loopback-only inbound SSH (the serial is taken by journal forwarding).
+    # 127.0.0.1 limits reach to holders of a manyara shell.
+    forwardPorts = [
+      {
+        from = "host";
+        host.address = "127.0.0.1";
+        host.port = 2222;
+        guest.port = 22;
       }
     ];
 
@@ -103,6 +115,23 @@ in
   # subtrees hermes creates without a separate UMask override here.
   users.groups.org-sync.gid = 9001;
   users.users.hermes.extraGroups = [ "org-sync" ];
+
+  # Pin ids; the ephemeral guest root re-derives uids each boot, so an
+  # auto-allocated uid drifts on redeploy and orphans files on the persistent
+  # /var/lib/hermes volume (hermes can then no longer open its own gateway.lock).
+  users.users.hermes.uid = 9000;
+  users.groups.hermes.gid = 9000;
+
+  # Key-only root login for occasional inspection and state repair.
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      KbdInteractiveAuthentication = false;
+      PermitRootLogin = "prohibit-password";
+    };
+  };
+  users.users.root.openssh.authorizedKeys.keys = operatorKeys;
 
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,
   # so files land on the ephemeral root. Rewrite .env and config.yaml on every
