@@ -1800,8 +1800,8 @@ use nixpkgs' =services.gitea-actions-runner=; macOS has no such module, so I add
 =services.forgejo-runner= for Darwin, driven by launchd and shaped like the
 NixOS option so a runner reads the same on either platform.
 
-I split this into three modules. The nix-darwin mechanism is neutral, so I publish
-it as the public =flake.darwinModules.forgejo-runner=. The
+I split this into three modules. The nix-darwin mechanism is neutral, so I
+publish it as =flake.darwinModules.forgejo-runner= via [[file:../exports.nix][exports.nix]]. The
 =my.services.forgejo-runner= wrappers bake my defaults (instance URL, labels,
 niks3 client) and live in the internal =flake.modules.{darwin,nixos}= registry.
 A host enables a wrapper and supplies its own registration token.
@@ -1814,17 +1814,11 @@ A host enables a wrapper and supplies its own registration token.
 #+begin_src nix :tangle flake/features/forgejo-runner/default.nix
 { ... }:
 let
-  <<forgejo-runner-darwin-module>>
-
   <<forgejo-runner-wrapper-shared>>
 
   <<forgejo-runner-wrappers>>
 in
 {
-  # Public API: the neutral nix-darwin mechanism
-  flake.darwinModules.forgejo-runner = darwinModule;
-
-  # Internal registry: hosts enable my.services.forgejo-runner.
   flake.modules.darwin.forgejo-runner = darwinWrapper;
   flake.modules.nixos.forgejo-runner = nixosWrapper;
 }
@@ -1839,28 +1833,31 @@ becomes a launchd job that registers, then execs the daemon. I record a hash of
 =token= plus =labels= in =.registration-state= so registration re-runs when
 either changes; the token is reusable, so re-registering is fine.
 
-#+NAME: forgejo-runner-darwin-module
-#+begin_src nix
-darwinModule =
-  {
-    config,
-    lib,
-    pkgs,
-    ...
-  }:
-  let
-    cfg = config.services.forgejo-runner;
-    settingsFormat = pkgs.formats.yaml { };
+#+begin_src nix :tangle flake/features/forgejo-runner/darwin-module.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
 
-    <<forgejo-runner-instance-submodule>>
+#+begin_src nix :tangle flake/features/forgejo-runner/darwin-module.nix
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.services.forgejo-runner;
+  settingsFormat = pkgs.formats.yaml { };
 
-    enabledInstances = lib.filterAttrs (_: i: i.enable) cfg.instances;
-  in
-  {
-    <<forgejo-runner-darwin-options>>
+  <<forgejo-runner-instance-submodule>>
 
-    <<forgejo-runner-darwin-config>>
-  };
+  enabledInstances = lib.filterAttrs (_: i: i.enable) cfg.instances;
+in
+{
+  <<forgejo-runner-darwin-options>>
+
+  <<forgejo-runner-darwin-config>>
+}
 #+end_src
 
 **** Instance options
@@ -2196,7 +2193,7 @@ darwinWrapper =
   }:
   {
     imports = [
-      darwinModule
+      ./darwin-module.nix
       wrapperOptions
     ];
 
