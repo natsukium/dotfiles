@@ -3,7 +3,9 @@
   home-manager = {
     useGlobalPkgs = true;
     useUserPackages = true;
-    config = ../common.nix;
+    config = {
+      imports = [ ../common.nix ] ++ builtins.attrValues inputs.self.modules.homeManager;
+    };
     backupFileExtension = "backup";
     extraSpecialArgs = {
       inherit inputs;

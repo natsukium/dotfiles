@@ -2781,15 +2781,29 @@ On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described l
 persistence across hosts. Apart from the client set up on desktops, deploying
 the daemon in every environment keeps a session running stably even over SSH.
 
+#+begin_src nix :tangle flake/features/felis/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
 #+begin_src nix :tangle flake/features/felis/default.nix
 { inputs, ... }:
 let
   daemon =
-    { pkgs, ... }:
     {
-      environment.systemPackages = [
-        inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default
-      ];
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      options.my.programs.felis.enable = lib.mkEnableOption "felis";
+
+      config = lib.mkIf config.my.programs.felis.enable {
+        environment.systemPackages = [
+          inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default
+        ];
+      };
     };
 in
 {

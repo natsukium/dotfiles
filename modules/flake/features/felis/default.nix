@@ -1,11 +1,23 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 { inputs, ... }:
 let
   daemon =
-    { pkgs, ... }:
     {
-      environment.systemPackages = [
-        inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default
-      ];
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      options.my.programs.felis.enable = lib.mkEnableOption "felis";
+
+      config = lib.mkIf config.my.programs.felis.enable {
+        environment.systemPackages = [
+          inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default
+        ];
+      };
     };
 in
 {

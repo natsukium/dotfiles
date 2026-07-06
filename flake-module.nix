@@ -80,6 +80,13 @@ in
                   ./systems/nix-on-droid
                   ./homes/nix-on-droid
                 ]
+                # Inject every registry module
+                ++ lib.optionals (cfg.platform != "android") (
+                  attrValues config.flake.modules.${cfg.platform}
+                  ++ lib.optionals (maybePath ./homes/${cfg.platform}/${name} != null) [
+                    { home-manager.sharedModules = attrValues config.flake.modules.homeManager; }
+                  ]
+                )
                 ++ cfg.modules;
               "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
                 inherit self inputs;

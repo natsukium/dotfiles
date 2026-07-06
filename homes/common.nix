@@ -8,7 +8,6 @@ let
     nix-colors
     paneru
     sops-nix
-    self
     ;
 in
 {
@@ -35,7 +34,6 @@ in
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
     paneru.homeModules.paneru
-    self.modules.homeManager.neovim
     ../modules/home-manager
     ../modules/home/org-sync
     ../applications/atuin

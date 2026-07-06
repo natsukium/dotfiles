@@ -1,6 +1,5 @@
 {
   config,
-  inputs,
   pkgs,
   ...
 }:
@@ -11,7 +10,6 @@
     ../../shared/hercules-ci/agent.nix
     ../common.nix
     ../desktop.nix
-    inputs.self.modules.nixos.forgejo-runner
     ../services/hydra
     ../services/llm
     ./hardware-configuration.nix

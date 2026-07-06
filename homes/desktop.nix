@@ -1,9 +1,6 @@
-{ inputs, ... }:
+{ ... }:
 {
   imports = [
-    inputs.self.modules.homeManager.emacs
-    inputs.self.modules.homeManager.felis
-    inputs.self.modules.homeManager.vicinae
     ../applications/kitty
     ../applications/qutebrowser
     ../applications/vscode

@@ -16,14 +16,13 @@ in
   imports = [
     ../../modules/nixos
     ../common.nix
-    inputs.self.modules.nixos.felis
-    inputs.self.modules.nixos.fish
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
     inputs.tsnsrv.nixosModules.default
   ];
 
+  my.programs.felis.enable = true;
   my.programs.fish.enable = true;
 
   sops = {
