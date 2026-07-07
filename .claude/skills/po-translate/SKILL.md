@@ -122,6 +122,9 @@ Include these checks in the prompt:
 6. **Markup**: `[[`/`]]` count matches, URLs unchanged, `=code=`/`~verbatim~` preserved
 7. **Internal links**: `[[*heading][desc]]` — verify `*heading` matches the translated heading name in the corresponding heading entry's msgstr
 8. **Register**: Sample entries for consistent です/ます form
+9. **Japanese prose norms**: No em dash or 中黒-enumeration introduced in msgstr;
+   no LLM-ish filler (「重要なのは」「掘り下げる」etc. — see style-guide.md);
+   hedging level matches the English msgid
 
 The review subagent should:
 - Fix minor issues (structural/terminology) directly

@@ -114,6 +114,42 @@ Japanese: これは*重要*です。なぜなら...
 - Parentheses: use full-width （） for Japanese text, half-width () around English
   terms/code within Japanese sentences
 
+## Japanese Prose Norms
+
+Adapted from k16shikano's japanese-tech-writing standard
+(https://gist.github.com/k16shikano/fd287c3133457c4fd8f5601d34aa817d).
+
+### Typography
+
+- Do not carry English em dashes (`—`) into Japanese prose. Parenthetical
+  insertions ("A—aside—B") become full-width parentheses （）; appositive
+  rephrasings ("A—B") become two sentences or a 読点 join. The en dash in
+  ranges, compound proper nouns (Curry–Howard), and anything inside
+  code/verbatim markers stays.
+- Do not use 中黒（・）for parallel enumeration; join with 「と」「や」 or 読点.
+  中黒 inside a single proper noun is fine.
+
+### Banned LLM-ish Japanese
+
+These phrases add a "ちゃんと書いている感" without adding content. Do not
+introduce them, even when the English is loose:
+
+- **Previews and wrap-ups**: 「重要なのは〜です」「ここでは〜について見ていきます」
+  「まとめると」「要するに」(when it only restates)、「〜に他なりません」
+- **Empty adjectives**: 「不可欠」「核心的」「鍵となる」「根本的な」「多角的」
+  「包括的」— emphasis without explaining the claim
+- **Empty verbs**: 「掘り下げる」「深掘りする」「言語化する」
+- **Connective tics**: 「〜において」「〜の観点から」(no new information)、
+  「さらに」「また」「加えて」の連打
+- **Weak hedges and hollow intensifiers**: 「〜と言えるでしょう」「〜かもしれません」
+  (only when they weaken a claim without grounds — see below)、「非常に」「極めて」
+
+### Hedging Fidelity
+
+Preserve the certainty level of the English. "should", "probably", "seems"
+stay hedged in Japanese; a plain assertion stays plain. Do not add hedges the
+English does not have, and do not flatten its hedges into assertions.
+
 ## Things to Preserve Exactly
 
 - URLs
