@@ -72,9 +72,12 @@ in
         name:
         pkgs.runCommand "any-nix-shell-${name}.fish" { nativeBuildInputs = [ pkgs.any-nix-shell ]; } ''
           any-nix-shell fish | awk -v want=${name} '
-            $1 == "function" { current = $2 }
-            current == want { print }
-            $1 == "end" && current == want { current = "" }
+            $1 == "function" { current = $2; depth = 0 }
+            current == want {
+              print
+              if ($1 ~ /^(function|begin|if|for|while|switch)$/) depth++
+              else if ($1 == "end" && --depth == 0) current = ""
+            }
           ' > $out
         '';
     in
