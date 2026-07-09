@@ -121,7 +121,18 @@ in
 
       commandsDir = ./commands;
 
-      skills = ../common/skills;
+      # Exclude the shared gh skill here: Claude Code already ships built-in
+      # gh tooling and commands, so the skill only duplicates them. Other
+      # agents keep the full shared set, hence the per-agent filter rather than
+      # dropping gh from ../common/skills.
+      skills =
+        let
+          skillsDir = ../common/skills;
+          names = builtins.attrNames (
+            lib.filterAttrs (_: type: type == "directory") (builtins.readDir skillsDir)
+          );
+        in
+        lib.genAttrs (lib.subtractLists [ "gh" ] names) (name: skillsDir + "/${name}");
 
       lspServers = {
         nix = {
