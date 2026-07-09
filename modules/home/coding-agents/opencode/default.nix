@@ -1,12 +1,10 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
   cfg = config.my.programs.opencode;
-  commonLib = import ../common/lib.nix { inherit pkgs; };
 in
 {
   options.my.programs.opencode = {
@@ -18,6 +16,10 @@ in
       enable = true;
       enableMcpIntegration = true;
 
+      context = ../common/AGENTS.md;
+
+      skills = ../common/skills;
+
       settings = {
         instructions = [ "CLAUDE.md" ];
 
@@ -28,8 +30,6 @@ in
         theme = "nord";
       };
     };
-
-    xdg.configFile."opencode/AGENTS.md".source = commonLib.rulesWithTools;
 
     home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";
   };

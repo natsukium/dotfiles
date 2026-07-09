@@ -1,12 +1,10 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
   cfg = config.my.programs.antigravity-cli;
-  commonLib = import ../common/lib.nix { inherit pkgs; };
 in
 {
   options.my.programs.antigravity-cli = {
@@ -16,6 +14,10 @@ in
   config = lib.mkIf cfg.enable {
     programs.antigravity-cli = {
       enable = true;
+
+      context.AGENTS = ../common/AGENTS.md;
+
+      skills = ../common/skills;
 
       settings = {
         selectedAuthType = "oauth-personal";
@@ -37,7 +39,5 @@ in
         mcpServers = config.programs.mcp.servers;
       };
     };
-
-    home.file.".antigravity-cli/AGENTS.md".source = commonLib.rulesWithTools;
   };
 }

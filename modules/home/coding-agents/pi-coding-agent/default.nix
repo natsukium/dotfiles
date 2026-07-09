@@ -1,12 +1,10 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
   cfg = config.my.programs.pi-coding-agent;
-  commonLib = import ../common/lib.nix { inherit pkgs; };
 in
 {
   options.my.programs.pi-coding-agent = {
@@ -17,7 +15,9 @@ in
     programs.pi-coding-agent = {
       enable = true;
       configDir = "${config.xdg.configHome}/pi/agent";
-      context = commonLib.rulesWithTools;
+      context = ../common/AGENTS.md;
     };
+
+    xdg.configFile."pi/agent/skills".source = ../common/skills;
   };
 }
