@@ -8,7 +8,6 @@
     ../applications/qutebrowser
     ../applications/vscode
     ../applications/zotero
-    ./shared/claude.nix
     ./shared/email.nix
     ./shared/gpg
     ./shared/weechat.nix
