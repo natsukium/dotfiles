@@ -119,8 +119,6 @@ in
 
       agentsDir = ./agents;
 
-      commandsDir = ./commands;
-
       # Exclude the shared gh skill here: Claude Code already ships built-in
       # gh tooling and commands, so the skill only duplicates them. Other
       # agents keep the full shared set, hence the per-agent filter rather than
