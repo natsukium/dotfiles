@@ -184,9 +184,5 @@ in
     programs.git.ignores = [
       "**/.claude/settings.local.json"
     ];
-
-    sops.secrets.ntfy-topic = {
-      sopsFile = ./../../../../homes/shared/secrets.yaml;
-    };
   };
 }
