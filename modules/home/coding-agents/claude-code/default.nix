@@ -64,7 +64,6 @@ in
             "Bash(cargo clippy *)"
             "Bash(cargo fmt *)"
             "Bash(cargo test *)"
-            "Bash(cat *)"
             "Bash(deno check *)"
             "Bash(docker compose logs *)"
             "Bash(find *)"
@@ -104,6 +103,32 @@ in
             "mcp__context7__resolve-library-id"
             "mcp__nixos__*"
             "mcp__playwright__*"
+          ];
+          # deny wins over allow and over the auto-mode classifier, so it is the
+          # only rule intent cannot talk past. Guard secret material here rather
+          # than trusting the allow-list to stay tight.
+          deny = [
+            # ~/.ssh holds plaintext private keys and the agent never needs any
+            # of it, so block the whole tree (config included) instead of
+            # guessing key filenames.
+            "Read(**/.ssh/**)"
+            "Bash(cat *.ssh/*)"
+            # .env secrets sit in plaintext, so the read itself is the leak.
+            "Read(**/.env)"
+            "Read(**/.env.*)"
+            "Bash(cat *.env*)"
+            # age/sops files are ciphertext at rest, so reading them leaks
+            # nothing; the exposure is decryption to stdout. Block only the
+            # commands that dump plaintext to stdout. sops exec-env/exec-file are
+            # deliberately excluded: they inject secrets into a subprocess env or
+            # temp file to *avoid* exposing them, and are the legitimate way to
+            # use secrets. String-matching is evadable, so this is a speed-bump.
+            "Bash(sops -d *)"
+            "Bash(sops --decrypt *)"
+            "Bash(sops decrypt *)"
+            "Bash(age -d *)"
+            "Bash(age --decrypt *)"
+            "Bash(rage -d *)"
           ];
           defaultMode = "auto";
         };
