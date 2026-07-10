@@ -1,5 +1,4 @@
 {
-  self,
   inputs,
   lib,
   config,
@@ -87,7 +86,7 @@ in
                 )
                 ++ cfg.modules;
               "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
-                inherit self inputs;
+                inherit inputs;
               }
               // cfg.specialArgs;
             }

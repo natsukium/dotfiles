@@ -1,7 +1,6 @@
 {
   config,
   inputs,
-  self,
   ...
 }:
 let
@@ -59,7 +58,7 @@ in
     config = {
       imports = [ ./guest.nix ];
       _module.args = {
-        inherit self;
+        self = inputs.self;
         operatorKeys = config.users.users.${config.my.username}.openssh.authorizedKeys.keys;
       };
       microvm.credentialFiles = {

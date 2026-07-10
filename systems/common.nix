@@ -1,6 +1,5 @@
 {
   inputs,
-  self,
   lib,
   pkgs,
   ...
@@ -25,7 +24,7 @@ in
     firefox-addons.overlays.default
     nur-packages.overlays.default
   ]
-  ++ lib.attrValues self.overlays;
+  ++ lib.attrValues inputs.self.overlays;
 
   # system.activationScripts only runs specific hardcoded activation scripts on nix-darwin
   # https://github.com/LnL7/nix-darwin/issues/663
