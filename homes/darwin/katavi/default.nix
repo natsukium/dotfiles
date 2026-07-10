@@ -1,6 +1,6 @@
-{ pkgs, specialArgs, ... }:
+{ pkgs, config, ... }:
 let
-  inherit (specialArgs) username;
+  inherit (config.my) username;
 in
 {
   imports = [ ../common.nix ];

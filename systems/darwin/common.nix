@@ -1,12 +1,12 @@
 {
+  config,
   inputs,
   pkgs,
-  specialArgs,
   ...
 }:
 let
   inherit (pkgs) lib stdenv;
-  inherit (specialArgs) username;
+  inherit (config.my) username;
 in
 {
   imports = [

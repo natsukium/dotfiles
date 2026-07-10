@@ -1,12 +1,12 @@
 {
+  config,
   inputs,
   lib,
   pkgs,
-  specialArgs,
   ...
 }:
 let
-  inherit (specialArgs) username;
+  inherit (config.my) username;
 in
 {
   imports = [ inputs.home-manager.darwinModules.home-manager ];

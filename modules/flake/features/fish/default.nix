@@ -10,7 +10,6 @@ let
       config,
       lib,
       pkgs,
-      username,
       ...
     }:
     {
@@ -19,7 +18,7 @@ let
       config = lib.mkIf config.my.programs.fish.enable {
         programs.fish.enable = true;
         environment.shells = [ pkgs.fish ];
-        users.users.${username}.shell = pkgs.fish;
+        users.users.${config.my.username}.shell = pkgs.fish;
         programs.fish.useBabelfish = true;
       };
     };
@@ -29,7 +28,6 @@ let
     {
       config,
       lib,
-      username,
       ...
     }:
     {
@@ -48,8 +46,8 @@ let
         # nix-darwin only manages a user's shell when the account is "known" and its
         # uid matches the existing one, so the shell setting above takes effect.
         # https://github.com/LnL7/nix-darwin/issues/1237#issuecomment-2562242340
-        users.users.${username}.uid = lib.mkDefault 501;
-        users.knownUsers = [ username ];
+        users.users.${config.my.username}.uid = lib.mkDefault 501;
+        users.knownUsers = [ config.my.username ];
       };
     };
 in

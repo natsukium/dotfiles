@@ -50,10 +50,6 @@ in
               default = [ ];
               type = types.listOf types.path;
             };
-            username = mkOption {
-              default = "natsukium";
-              type = types.str;
-            };
             specialArgs = mkOption {
               default = { };
               type = types.attrs;
@@ -84,13 +80,14 @@ in
                 ++ lib.optionals (cfg.platform != "android") (
                   attrValues config.flake.modules.${cfg.platform}
                   ++ lib.optionals (maybePath ./homes/${cfg.platform}/${name} != null) [
-                    { home-manager.sharedModules = attrValues config.flake.modules.homeManager; }
+                    {
+                      home-manager.sharedModules = attrValues config.flake.modules.homeManager;
+                    }
                   ]
                 )
                 ++ cfg.modules;
               "${if (cfg.platform == "android") then "extraS" else "s"}pecialArgs" = {
                 inherit self inputs;
-                inherit (cfg) username;
               }
               // cfg.specialArgs;
             }

@@ -2,7 +2,6 @@
   config,
   inputs,
   self,
-  username,
   ...
 }:
 let
@@ -61,7 +60,7 @@ in
       imports = [ ./guest.nix ];
       _module.args = {
         inherit self;
-        operatorKeys = config.users.users.${username}.openssh.authorizedKeys.keys;
+        operatorKeys = config.users.users.${config.my.username}.openssh.authorizedKeys.keys;
       };
       microvm.credentialFiles = {
         "hermes-agent.env" = config.sops.templates."hermes-agent.env".path;

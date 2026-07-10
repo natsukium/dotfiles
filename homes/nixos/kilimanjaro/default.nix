@@ -1,11 +1,11 @@
 {
   inputs,
   pkgs,
-  specialArgs,
+  config,
   ...
 }:
 let
-  inherit (specialArgs) username;
+  inherit (config.my) username;
 in
 {
   imports = [ inputs.home-manager.nixosModules.home-manager ];

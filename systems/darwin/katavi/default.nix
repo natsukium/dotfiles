@@ -1,4 +1,4 @@
-{ pkgs, specialArgs, ... }:
+{ pkgs, config, ... }:
 {
   imports = [
     ../../../modules/profiles/darwin/base.nix
@@ -6,7 +6,7 @@
     ../desktop.nix
   ];
 
-  users.users.${specialArgs.username}.uid = 502;
+  users.users.${config.my.username}.uid = 502;
 
   networking = {
     hostName = "katavi";
