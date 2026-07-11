@@ -13,7 +13,6 @@ let
 in
 {
   imports = [
-    ../../modules/nixos
     ../common.nix
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko

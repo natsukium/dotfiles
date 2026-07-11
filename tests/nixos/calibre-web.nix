@@ -2,9 +2,9 @@
   name = "calibre-web";
 
   nodes.machine =
-    { pkgs, ... }:
+    { self, pkgs, ... }:
     {
-      imports = [ ../../modules/nixos/calibre-web.nix ];
+      imports = [ self.modules.nixos.calibre-web ];
 
       services.calibre-web = {
         enable = true;
