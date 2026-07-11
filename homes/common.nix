@@ -34,8 +34,6 @@ in
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
     paneru.homeModules.paneru
-    ../modules/home-manager
-    ../modules/home/org-sync
     ../applications/atuin
     ../applications/gh-dash
     ../applications/misc
