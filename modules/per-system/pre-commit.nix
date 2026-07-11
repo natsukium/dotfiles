@@ -9,13 +9,13 @@
         check.enable = true;
         settings = {
           package = pkgs.prek;
-          src = ../../..;
+          src = ../..;
           hooks =
             let
               check-git-changes = pkgs.writeShellApplication {
                 name = "check-git-changes";
                 runtimeInputs = [ pkgs.git ];
-                text = builtins.readFile ../../../scripts/check-git-changes.sh;
+                text = builtins.readFile ../../scripts/check-git-changes.sh;
               };
               emacs-with-org = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.org ]);
             in
@@ -79,7 +79,7 @@
                       pkgs.gettext
                       check-git-changes
                     ];
-                    text = builtins.readFile ../../../scripts/check-po4a.sh;
+                    text = builtins.readFile ../../scripts/check-po4a.sh;
                   }
                 );
                 files = "(\\.org|po/.*\\.po)$";
@@ -99,7 +99,7 @@
                       pkgs.gnumake
                       check-git-changes
                     ];
-                    text = builtins.readFile ../../../scripts/check-org-tangle.sh;
+                    text = builtins.readFile ../../scripts/check-org-tangle.sh;
                   }
                 );
                 files = "\\.org$";

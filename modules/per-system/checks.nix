@@ -3,7 +3,7 @@
   perSystem =
     { pkgs, ... }:
     {
-      checks = import ../../../tests {
+      checks = import ../../tests {
         inherit (inputs) nixpkgs;
         inherit pkgs self;
       };

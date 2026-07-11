@@ -1,9 +1,9 @@
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+
 { ... }:
 {
   flake.modules.homeManager."zen-browser" =
-    # This file is auto-generated from configuration.org.
-    # Do not edit directly.
-
     {
       inputs,
       config,

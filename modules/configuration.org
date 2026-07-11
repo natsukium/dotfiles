@@ -22,33 +22,42 @@ nix-darwin, providing consistent Nix behavior on all machines.
 Core Nix daemon configuration including flakes, garbage collection, binary caches,
 and sandbox settings.
 
-#+begin_src nix :tangle shared/nix/default.nix :exports none
+#+begin_src nix :tangle features/nix.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle shared/nix/default.nix
-{
-  config,
-  lib,
-  pkgs,
-  ...
-}:
+Registered under both NixOS and nix-darwin, since Nix daemon behavior is shared
+across platforms; the =systemModule= binding lets both classes reuse the exact
+same module rather than duplicating it. The user-level counterpart
+([[*User-Level Settings][User-Level Settings]]) is a distinct =flake.modules.homeManager.nix= entry in this
+same file, since XDG base directories and the global gitignore belong to the
+home-manager scope, not the system scope.
+
+#+begin_src nix :tangle features/nix.nix
+{ ... }:
 let
-  cfg = config.my.nix;
-  inherit (lib)
-    mkEnableOption
-    mkIf
-    mkMerge
-    mkOption
-    optional
-    types
-    ;
+  systemModule =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.nix;
+    in
+    {
+      <<nix-options>>
+
+      <<nix-config>>
+    };
 in
 {
-  <<nix-options>>
+  flake.modules.nixos.nix = systemModule;
+  flake.modules.darwin.nix = systemModule;
 
-  <<nix-config>>
+  <<nix-home-manager>>
 }
 #+end_src
 
@@ -57,13 +66,13 @@ in
 #+NAME: nix-options
 #+begin_src nix
 options.my.nix = {
-  enable = mkEnableOption "Nix configuration";
+  enable = lib.mkEnableOption "Nix configuration";
 
-  enableFlakes = mkOption {
+  enableFlakes = lib.mkOption {
     default = true;
     example = false;
     description = "Whether to enable flakes.";
-    type = types.bool;
+    type = lib.types.bool;
   };
 };
 #+end_src
@@ -72,24 +81,26 @@ options.my.nix = {
 
 #+NAME: nix-config
 #+begin_src nix
-config = mkIf cfg.enable (mkMerge [
-  <<nix-flakes>>
-  {
-    <<nix-store-optimisation>>
+config = lib.mkIf cfg.enable (
+  lib.mkMerge [
+    <<nix-flakes>>
+    {
+      <<nix-store-optimisation>>
 
-    <<nix-warn-dirty>>
+      <<nix-warn-dirty>>
 
-    <<nix-substituters>>
+      <<nix-substituters>>
 
-    <<nix-sandbox>>
+      <<nix-sandbox>>
 
-    <<nix-trusted-users>>
+      <<nix-trusted-users>>
 
-    <<nix-gc>>
+      <<nix-gc>>
 
-    <<nix-extra-options>>
-  }
-]);
+      <<nix-extra-options>>
+    }
+  ]
+);
 #+end_src
 
 **** Flakes
@@ -105,7 +116,7 @@ continue to work on all machines managed by this dotfiles repository.
 
 #+NAME: nix-flakes
 #+begin_src nix
-(mkIf cfg.enableFlakes {
+(lib.mkIf cfg.enableFlakes {
   nix = {
     settings.experimental-features = [
       "flakes"
@@ -213,7 +224,7 @@ nix.settings.trusted-users = [
   "root"
   "@wheel"
 ]
-++ optional pkgs.stdenv.hostPlatform.isDarwin "@admin";
+++ lib.optional pkgs.stdenv.hostPlatform.isDarwin "@admin";
 #+end_src
 
 **** Extra Options
@@ -238,191 +249,57 @@ unfree drivers and CUDA libraries, and specifying each unfree package individual
 =allowUnfreePredicate= would be prohibitively tedious for the number of transitive
 dependencies involved.
 
-#+begin_src nix :tangle shared/nixpkgs/default.nix :exports none
+#+begin_src nix :tangle features/nixpkgs.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle shared/nixpkgs/default.nix
-{ config, lib, ... }:
+Registered under both NixOS and nix-darwin from the same module binding, since
+nixpkgs configuration has no platform-specific behavior.
+
+#+begin_src nix :tangle features/nixpkgs.nix
+{ ... }:
 let
-  cfg = config.my.nixpkgs;
-  inherit (lib)
-    mkEnableOption
-    mkIf
-    mkOption
-    types
-    ;
+  module =
+    {
+      config,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.my.nixpkgs;
+    in
+    {
+      options.my.nixpkgs = {
+        enable = lib.mkEnableOption "Nixpkgs configuration";
+
+        allowUnfree = lib.mkOption {
+          default = true;
+          example = false;
+          description = "Whether to allow unfree packages.";
+          type = lib.types.bool;
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
+        nixpkgs = {
+          config.allowUnfree = cfg.allowUnfree;
+        };
+      };
+    };
 in
 {
-  options.my.nixpkgs = {
-    enable = mkEnableOption "Nixpkgs configuration";
-
-    allowUnfree = mkOption {
-      default = true;
-      example = false;
-      description = "Whether to allow unfree packages.";
-      type = types.bool;
-    };
-  };
-
-  config = mkIf cfg.enable {
-    nixpkgs = {
-      config.allowUnfree = cfg.allowUnfree;
-    };
-  };
+  flake.modules.nixos.nixpkgs = module;
+  flake.modules.darwin.nixpkgs = module;
 }
 #+end_src
 
 ** Distributed Builds
 
-[[https://nix.dev/manual/nix/latest/advanced-topics/distributed-builds][Distributed build]] configuration using Nix's built-in =buildMachines= support. This allows
-any machine in the fleet to offload builds to other machines, significantly reducing build
-times for resource-intensive derivations.
-
-=nix.distributedBuilds= is set to =mkDefault true= here so that server profiles can
-override it to =false=. =nix.buildMachines= is harmless when distributed builds are
-disabled, so no conditional wrapping is needed. The server profiles
-(=profiles/nixos/server.nix= and =profiles/darwin/server.nix=) disable it because build
-servers have the resources to build locally, and offloading from one build server to
-another creates unnecessary network overhead and potential circular dependencies.
-
-#+begin_src nix :tangle shared/nix/build-machines.nix :exports none
-# This file is auto-generated from configuration.org.
-# Do not edit directly.
-#+end_src
-
-#+begin_src nix :tangle shared/nix/build-machines.nix
-{
-  inputs,
-  config,
-  lib,
-  ...
-}:
-let
-  <<build-machines-let>>
-in
-{
-  <<distributed-builds-config>>
-
-  <<build-machines-known-hosts>>
-}
-#+end_src
-
-*** Protocol Selection
-
-The =ssh-ng= protocol is preferred over plain =ssh= because it supports content-addressed
-derivations and more efficient store path transfers. However, Hydra does not support
-=ssh-ng= (see [[https://github.com/NixOS/hydra/issues/688][NixOS/hydra#688]]), so the protocol is dynamically selected based on whether
-Hydra is enabled on the current machine.
-
-#+NAME: build-machines-let
-#+begin_src nix
-protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
-inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
-inherit (inputs.self.outputs.darwinConfigurations) mikumi;
-#+end_src
-
-*** Configuration
-
-#+NAME: distributed-builds-config
-#+begin_src nix
-nix = {
-  distributedBuilds = lib.mkDefault true;
-
-  extraOptions = ''
-    builders-use-substitutes = true
-  '';
-
-  <<build-machines-list>>
-};
-#+end_src
-
-*** Build Machines
-
-Each machine excludes itself from the build machine list (via =config.networking.hostName=
-checks) to avoid circular build delegation. The =mikumi= machine is also excluded from
-the =work= host because the work machine should not offload builds to personal
-infrastructure.
-
-Machine capabilities (=maxJobs=, =system-features=) are referenced from each machine's
-configuration rather than hardcoded. See each machine's definition under =hosts/= for
-the actual values (e.g., =hosts/nixos/tarangire/default.nix= for =max-jobs = 12=).
-
-#+NAME: build-machines-list
-#+begin_src nix
-buildMachines =
-  [ ]
-  ++ lib.optional (config.networking.hostName != "tarangire") {
-    inherit (tarangire.config.networking) hostName;
-    systems = [
-      "x86_64-linux"
-      "i686-linux"
-    ];
-    sshUser = "natsukium";
-    inherit protocol;
-    maxJobs = tarangire.config.nix.settings.max-jobs;
-    speedFactor = 1;
-    supportedFeatures = tarangire.config.nix.settings.system-features;
-    mandatoryFeatures = [ ];
-  }
-  ++ lib.optional (config.networking.hostName != "kilimanjaro") {
-    inherit (kilimanjaro.config.networking) hostName;
-    systems = [
-      "x86_64-linux"
-      "i686-linux"
-    ];
-    sshUser = "natsukium";
-    inherit protocol;
-    maxJobs = kilimanjaro.config.nix.settings.max-jobs;
-    speedFactor = 1;
-    supportedFeatures = kilimanjaro.config.nix.settings.system-features;
-    mandatoryFeatures = [ ];
-  }
-  ++ lib.optional (config.networking.hostName != "serengeti") {
-    inherit (serengeti.config.networking) hostName;
-    system = "aarch64-linux";
-    sshUser = "natsukium";
-    inherit protocol;
-    maxJobs = serengeti.config.nix.settings.max-jobs;
-    speedFactor = 1;
-    supportedFeatures = serengeti.config.nix.settings.system-features;
-    mandatoryFeatures = [ ];
-  }
-  ++ lib.optional (config.networking.hostName != "mikumi" && config.networking.hostName != "work") {
-    inherit (mikumi.config.networking) hostName;
-    systems = [
-      "aarch64-darwin"
-      "x86_64-darwin"
-    ];
-    sshUser = "natsukium";
-    inherit protocol;
-    maxJobs = mikumi.config.nix.settings.max-jobs;
-    speedFactor = 1;
-    supportedFeatures = [
-      "apple-virt"
-      "benchmark"
-      "big-parallel"
-      "nixos-test"
-    ];
-    mandatoryFeatures = [ ];
-  };
-#+end_src
-
-*** SSH Known Hosts
-
-Distributed builds connect to remote machines over SSH, so each build machine's host
-key must be registered to avoid interactive verification prompts during unattended builds.
-
-#+NAME: build-machines-known-hosts
-#+begin_src nix
-programs.ssh.knownHosts = {
-  tarangire.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJJYgE/dmYLXYBrVnPicd0qsaUeqcBtXB8H9LHkJ2j4";
-  kilimanjaro.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILhpfAalh6A5xDSE+HOdNE29ZgIjlP7tdlhHs82boSwp";
-  serengeti.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDWwhfhDSZ+M2XDwP2MlC/zFfVpk3WjUxV/JWFgGzgNW";
-  mikumi.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfWOWKBFuDV08g6xP9MMY78CERI02CNG+5dy8CXQmXs";
-};
-#+end_src
+Machine-to-machine build offloading (=nix.buildMachines=) is documented alongside
+=configuration.org='s top-level [[file:../configuration.org::*Distributed Builds][Distributed Builds]] section rather than here: it has
+no enable toggle and applies unconditionally, so it is not a =flake.modules= registry
+entry and does not tangle into anything under =modules/=.
 
 ** User-Level Settings
 
@@ -437,18 +314,26 @@ The =result= symlink is added to git ignores because =nix build= creates =result
 in the project root by default, and these should never be committed. This applies to the
 user's global gitignore, not to any specific repository.
 
-#+begin_src nix :tangle home/nix/default.nix :exports none
-# This file is auto-generated from configuration.org.
-# Do not edit directly.
-#+end_src
+#+NAME: nix-home-manager
+#+begin_src nix
+flake.modules.homeManager.nix =
+  {
+    config,
+    lib,
+    ...
+  }:
+  let
+    cfg = config.my.nix;
+  in
+  {
+    options.my.nix.enable = lib.mkEnableOption "nix";
 
-#+begin_src nix :tangle home/nix/default.nix
-{ config, ... }:
-{
-  nix.settings.use-xdg-base-directories = config.xdg.enable;
+    config = lib.mkIf cfg.enable {
+      nix.settings.use-xdg-base-directories = config.xdg.enable;
 
-  programs.git.ignores = [ "result" ];
-}
+      programs.git.ignores = [ "result" ];
+    };
+  };
 #+end_src
 
 * Networking
@@ -458,20 +343,24 @@ user's global gitignore, not to any specific repository.
 Opinionated Tailscale VPN configuration for NixOS systems. This module provides sensible defaults
 for running Tailscale with MagicDNS, SSH access, and proper firewall configuration.
 
-#+begin_src nix :tangle nixos/tailscale.nix :exports none
+#+begin_src nix :tangle features/tailscale.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle nixos/tailscale.nix
-{ config, lib, ... }:
-let
-  cfg = config.my.services.tailscale;
-in
+#+begin_src nix :tangle features/tailscale.nix
+{ ... }:
 {
-  <<tailscale-options>>
+  flake.modules.nixos.tailscale =
+    { config, lib, ... }:
+    let
+      cfg = config.my.services.tailscale;
+    in
+    {
+      <<tailscale-options>>
 
-  <<tailscale-config>>
+      <<tailscale-config>>
+    };
 }
 #+end_src
 
@@ -624,57 +513,61 @@ This is a user-level =services.syncthing= instance, separate from the
 system-level daemon kilimanjaro already runs; its ports are shifted off the
 defaults so the two do not collide.
 
-#+begin_src nix :tangle home/org-sync/default.nix :exports none
+#+begin_src nix :tangle features/org-sync.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/org-sync/default.nix
+#+begin_src nix :tangle features/org-sync.nix
+{ ... }:
 {
-  config,
-  lib,
-  ...
-}:
-let
-  cfg = config.my.services.org-sync;
-in
-{
-  options.my.services.org-sync = {
-    enable = lib.mkEnableOption "syncing the org folder across the user's devices";
+  flake.modules.homeManager."org-sync" =
+    {
+      config,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.my.services.org-sync;
+    in
+    {
+      options.my.services.org-sync = {
+        enable = lib.mkEnableOption "syncing the org folder across the user's devices";
 
-    devices = lib.mkOption {
-      type = lib.types.attrsOf (
-        lib.types.submodule {
-          options.id = lib.mkOption {
-            type = lib.types.str;
-            description = "Syncthing device ID.";
+        devices = lib.mkOption {
+          type = lib.types.attrsOf (
+            lib.types.submodule {
+              options.id = lib.mkOption {
+                type = lib.types.str;
+                description = "Syncthing device ID.";
+              };
+            }
+          );
+          default = { };
+          description = "Peer devices that participate in the org folder.";
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
+        services.syncthing = {
+          enable = true;
+          guiAddress = "127.0.0.1:8385";
+          overrideDevices = true;
+          overrideFolders = true;
+          settings = {
+            options.listenAddresses = [
+              "tcp://0.0.0.0:22001"
+              "quic://0.0.0.0:22001"
+            ];
+            devices = cfg.devices;
+            folders.org = {
+              path = "${config.home.homeDirectory}/dropbox/org";
+              devices = lib.attrNames cfg.devices;
+            };
           };
-        }
-      );
-      default = { };
-      description = "Peer devices that participate in the org folder.";
-    };
-  };
-
-  config = lib.mkIf cfg.enable {
-    services.syncthing = {
-      enable = true;
-      guiAddress = "127.0.0.1:8385";
-      overrideDevices = true;
-      overrideFolders = true;
-      settings = {
-        options.listenAddresses = [
-          "tcp://0.0.0.0:22001"
-          "quic://0.0.0.0:22001"
-        ];
-        devices = cfg.devices;
-        folders.org = {
-          path = "${config.home.homeDirectory}/dropbox/org";
-          devices = lib.attrNames cfg.devices;
         };
       };
     };
-  };
 }
 #+end_src
 
@@ -703,12 +596,12 @@ build time instead.
 programs.fish.useBabelfish = true;
 #+end_src
 
-#+begin_src nix :tangle flake/features/fish/default.nix :exports none
+#+begin_src nix :tangle features/fish/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle flake/features/fish/default.nix
+#+begin_src nix :tangle features/fish/default.nix
 { ... }:
 let
   # System scope: install fish, register it as a login shell, and make it the
@@ -1002,31 +895,46 @@ assume bash. It also serves as a testing environment when fish exhibits unexpect
 behaviour — having a clean bash available helps isolate whether an issue is
 fish-specific.
 
-#+begin_src nix :tangle home/bash/default.nix :exports none
+Registered as a home-manager feature behind =my.programs.bash.enable=, matching
+the toggle every other shell in this section already has, rather than applying
+unconditionally to every home that imports the profile it used to live in.
+
+#+begin_src nix :tangle features/bash.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/bash/default.nix
+#+begin_src nix :tangle features/bash.nix
+{ ... }:
 {
-  pkgs,
-  lib,
-  config,
-  ...
-}:
-{
-  home.packages = with pkgs; [ bashInteractive ];
-  programs.bash = {
-    enable = true;
+  flake.modules.homeManager.bash =
+    {
+      pkgs,
+      lib,
+      config,
+      ...
+    }:
+    let
+      cfg = config.my.programs.bash;
+    in
+    {
+      options.my.programs.bash.enable = lib.mkEnableOption "bash";
 
-    <<bash-history>>
+      config = lib.mkIf cfg.enable {
+        home.packages = with pkgs; [ bashInteractive ];
+        programs.bash = {
+          enable = true;
 
-    <<bash-completion>>
+          <<bash-history>>
 
-    <<bash-aliases>>
+          <<bash-completion>>
 
-    <<bash-init>>
-  };
+          <<bash-aliases>>
+
+          <<bash-init>>
+        };
+      };
+    };
 }
 #+end_src
 
@@ -1136,18 +1044,89 @@ interactive shell.
 No custom configuration is added yet — the defaults are sufficient for exploratory
 use, and committing to Nushell-specific workflows would be premature.
 
-#+begin_src nix :tangle home/nushell/default.nix :exports none
+Registered behind =my.programs.nushell.enable=, like the other shells in this section.
+
+#+begin_src nix :tangle features/nushell.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/nushell/default.nix
-{ config, ... }:
+#+begin_src nix :tangle features/nushell.nix
+{ ... }:
 {
-  programs.nushell = {
-    enable = true;
-  };
+  flake.modules.homeManager.nushell =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.programs.nushell;
+      completerCfg = config.ext.programs.nushell.externalCompleter;
+    in
+    {
+      options.my.programs.nushell.enable = lib.mkEnableOption "nushell";
+
+      <<nushell-external-completer-option>>
+
+      config = lib.mkMerge [
+        (lib.mkIf cfg.enable {
+          programs.nushell.enable = true;
+        })
+
+        <<nushell-external-completer-config>>
+      ];
+    };
 }
+#+end_src
+
+*** External Completer
+
+Nushell has no built-in tab-completion source for external (non-Nushell)
+commands. Piping candidates through fish's own completion engine reuses every
+completion already defined for fish — package names, git subcommands, CLI
+flags — instead of duplicating that logic in Nushell's completer syntax.
+
+=externalCompleter= defaults to following whether Nushell itself is enabled, so
+enabling the shell is enough to get external completions without a second
+toggle; =enableFishCompleter= exists to opt out if fish is not the shell doing
+the completing.
+
+#+NAME: nushell-external-completer-option
+#+begin_src nix
+options.ext.programs.nushell.externalCompleter = {
+  enable = lib.mkOption {
+    type = lib.types.bool;
+    default = config.programs.nushell.enable;
+  };
+  enableFishCompleter = lib.mkOption {
+    type = lib.types.bool;
+    default = true;
+  };
+};
+#+end_src
+
+#+NAME: nushell-external-completer-config
+#+begin_src nix
+(lib.mkIf completerCfg.enable {
+  programs.nushell.extraConfig = lib.mkIf completerCfg.enableFishCompleter ''
+    let fish_completer = {|spans|
+        ${lib.getExe pkgs.fish} --command $'complete "--do-complete=($spans | str join " ")"'
+        | $"value(char tab)description(char newline)" + $in
+        | from tsv --flexible --no-infer
+    }
+
+    $env.config = ($env.config? | default {})
+    $env.config.completions = ($env.config.completions? | default {})
+    $env.config.completions.external = (
+        $env.config.completions.external?
+        | default {}
+        | insert enable { true }
+        | insert completer { $fish_completer }
+    )
+  '';
+})
 #+end_src
 
 ** Starship
@@ -1159,23 +1138,52 @@ here to provide a consistent prompt experience. It has been used since its prede
 Starship does not natively support asynchronous prompt rendering, so this section also
 includes a custom async prompt module for fish.
 
-#+begin_src nix :tangle home/starship/default.nix :exports none
+Registered behind =my.programs.starship.enable=, with =enableFishAsyncPrompt=
+as a second, independent toggle on the same module — a host can run starship
+without the async prompt, but not the reverse.
+
+#+begin_src nix :tangle features/starship/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/starship/default.nix
-{ pkgs, ... }:
+#+begin_src nix :tangle features/starship/default.nix
+{ ... }:
 {
-  programs.starship = {
-    enable = true;
-    settings = builtins.fromTOML (builtins.readFile ./starship.toml);
-  };
-  my.programs.starship.enableFishAsyncPrompt = true;
+  flake.modules.homeManager.starship =
+    {
+      config,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.my.programs.starship;
+    in
+    {
+      options.my.programs.starship = {
+        enable = lib.mkEnableOption "starship";
+
+        enableFishAsyncPrompt = lib.mkOption {
+          type = lib.types.bool;
+          default = false;
+        };
+      };
+
+      config = lib.mkMerge [
+        (lib.mkIf cfg.enable {
+          programs.starship = {
+            enable = true;
+            settings = builtins.fromTOML (builtins.readFile ./starship.toml);
+          };
+        })
+
+        <<starship-async-prompt-config>>
+      ];
+    };
 }
 #+end_src
 
-#+begin_src toml :tangle home/starship/starship.toml :exports none
+#+begin_src toml :tangle features/starship/starship.toml :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
@@ -1186,7 +1194,7 @@ The prompt format prepends a shell indicator before the default modules.
 This makes it immediately visible which shell is active, useful when switching
 between fish and bash for testing or debugging.
 
-#+begin_src toml :tangle home/starship/starship.toml
+#+begin_src toml :tangle features/starship/starship.toml
 "$schema" = "https://starship.rs/config-schema.json"
 
 format = "$shell$all$line_break$character"
@@ -1197,7 +1205,7 @@ format = "$shell$all$line_break$character"
 Each shell has a distinct icon: =󰈺= (fish icon) for fish. Bash and nushell
 use the default indicator.
 
-#+begin_src toml :tangle home/starship/starship.toml
+#+begin_src toml :tangle features/starship/starship.toml
 [shell]
 fish_indicator = "󰈺"
 powershell_indicator = "󰨊"
@@ -1211,7 +1219,7 @@ A custom module detects when running inside a VS Code Remote Container
 displaying a whale emoji (🐋) as a visual reminder. This has not been used for
 several years and may no longer be relevant.
 
-#+begin_src toml :tangle home/starship/starship.toml
+#+begin_src toml :tangle features/starship/starship.toml
 [custom.remote-container]
 when = """ test "$REMOTE_CONTAINERS" """
 symbol = "🐋"
@@ -1224,69 +1232,43 @@ format = " in $symbol "
 home directory (=~/.config/gcloud/=), causing it to appear in every repository
 regardless of whether the project uses GCP.
 
-#+begin_src toml :tangle home/starship/starship.toml
+#+begin_src toml :tangle features/starship/starship.toml
 [gcloud]
 disabled = true
 #+end_src
 
 *** Async Prompt Module
 
-A custom home-manager module that replaces starship's default fish integration with
-an asynchronous variant. The async prompt script is cherry-picked from
+Starship's default fish integration is replaced with an asynchronous variant,
+gated on the same module's =enableFishAsyncPrompt= toggle rather than a
+separate file, since the two options always travel together. The async prompt
+script is cherry-picked from
 [[https://gist.github.com/duament/bac0181935953b97ca71640727c9c029][duament's gist]], based on [[https://github.com/acomagu/fish-async-prompt][fish-async-prompt]].
 See also [[https://github.com/fish-shell/fish-shell/issues/8223][fish-shell#8223]] for upstream discussion on async prompt support.
 
-#+begin_src nix :tangle home-manager/starship/default.nix :exports none
-# This file is auto-generated from configuration.org.
-# Do not edit directly.
-#+end_src
+#+NAME: starship-async-prompt-config
+#+begin_src nix
+(lib.mkIf cfg.enableFishAsyncPrompt {
+  # use my own script to ensure the execution order
+  programs.starship.enableFishIntegration = lib.mkForce false;
 
-#+begin_src nix :tangle home-manager/starship/default.nix
-{
-  config,
-  lib,
-  ...
-}:
-let
-  inherit (lib)
-    mkForce
-    mkIf
-    mkOption
-    types
-    ;
-  cfg = config.my.programs.starship;
-in
-{
-  options = {
-    my.programs.starship = {
-      enableFishAsyncPrompt = mkOption {
-        type = types.bool;
-        default = false;
-      };
-    };
-  };
-  config = mkIf cfg.enableFishAsyncPrompt {
-    # use my own script to ensure the execution order
-    programs.starship.enableFishIntegration = mkForce false;
-
-    programs.fish.interactiveShellInit = ''
-      if test "$TERM" != dumb
-          ${lib.getExe config.programs.starship.package} init fish | source
-          source ${./async_prompt.fish}
-      end
-    '';
-  };
-}
+  programs.fish.interactiveShellInit = ''
+    if test "$TERM" != dumb
+        ${lib.getExe config.programs.starship.package} init fish | source
+        source ${./async_prompt.fish}
+    end
+  '';
+})
 #+end_src
 
 **** Async Prompt Script
 
-#+begin_src fish :tangle home-manager/starship/async_prompt.fish :exports none
+#+begin_src fish :tangle features/starship/async_prompt.fish :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src fish :tangle home-manager/starship/async_prompt.fish
+#+begin_src fish :tangle features/starship/async_prompt.fish
 # cherry picked from https://gist.github.com/duament/bac0181935953b97ca71640727c9c029
 status is-interactive
 or exit 0
@@ -1361,35 +1343,61 @@ end
 Git version control configuration. Git is configured directly through home-manager's
 =programs.git= module, which generates =~/.config/git/config= declaratively.
 
-#+begin_src nix :tangle home/development/git/default.nix :exports none
+Registered behind =my.programs.git.enable=. The [[*Scalar][Scalar]] performance tuning below is
+a second, independent toggle on the same module rather than a separate file, since
+scalar has no meaning without the git module it extends.
+
+#+begin_src nix :tangle features/git.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/development/git/default.nix
-{ pkgs, config, ... }:
+#+begin_src nix :tangle features/git.nix
+{ ... }:
 {
-  programs.git = {
-    enable = true;
+  flake.modules.homeManager.git =
+    {
+      config,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.my.programs.git;
+      scalarCfg = config.programs.git.scalar;
+    in
+    {
+      options.my.programs.git.enable = lib.mkEnableOption "git";
 
-    <<git-settings>>
+      <<git-scalar-option>>
 
-    <<git-signing>>
+      config = lib.mkMerge [
+        (lib.mkIf cfg.enable {
+          programs.git = {
+            enable = true;
 
-    <<git-ignores>>
+            <<git-settings>>
 
-    <<git-scalar>>
-  };
+            <<git-signing>>
 
-  <<git-gh>>
+            <<git-ignores>>
 
-  <<git-delta>>
+            <<git-scalar>>
+          };
 
-  <<git-difftastic>>
+          <<git-gh>>
 
-  <<git-lazygit>>
+          <<git-delta>>
 
-  <<git-fish-abbreviations>>
+          <<git-difftastic>>
+
+          <<git-lazygit>>
+
+          <<git-fish-abbreviations>>
+        })
+
+        <<git-scalar-config>>
+      ];
+    };
 }
 #+end_src
 
@@ -1588,9 +1596,24 @@ nixpkgs repository, which contains over 600,000 commits and benefits significant
 Scalar's background maintenance (prefetch, commit-graph, loose-objects) and filesystem
 monitor integration.
 
-The Scalar module (=programs.git.scalar=) is a custom home-manager module defined in
-[[file:home-manager/git-scalar.nix][home-manager/git-scalar.nix]] that configures git's built-in performance optimizations
-(multipack index, preload index, untracked cache, fsmonitor).
+=programs.git.scalar= is a custom option this module extends git with, configuring
+git's built-in performance optimizations (multipack index, preload index, untracked
+cache, fsmonitor) whenever a repository is registered. It is a second toggle rather
+than folded into the base git config unconditionally, since these settings only pay
+off on the handful of very large repositories that need them.
+
+#+NAME: git-scalar-option
+#+begin_src nix
+options.programs.git.scalar = {
+  enable = lib.mkEnableOption "scalar";
+
+  repo = lib.mkOption {
+    type = lib.types.listOf lib.types.str;
+    default = [ ];
+    example = [ "${config.home.homeDirectory}/NixOS/nixpkgs" ];
+  };
+};
+#+end_src
 
 #+NAME: git-scalar
 #+begin_src nix
@@ -1598,6 +1621,64 @@ scalar = {
   enable = true;
   repo = [ "${config.programs.git.settings.ghq.root}/github.com/natsukium/nixpkgs" ];
 };
+#+end_src
+
+The performance settings themselves are only applied once a repository is actually
+registered (=scalarCfg.enable=, which the block above turns on), so a host that
+never touches a large repository never pays for tracking it.
+
+#+NAME: git-scalar-config
+#+begin_src nix
+(lib.mkIf scalarCfg.enable {
+  programs.git.settings = {
+    scalar.repo = scalarCfg.repo;
+    core = {
+      multipackindex = true;
+      preloadindex = true;
+      untrackedcache = true;
+      autocrlf = false;
+      safecrlf = false;
+      fsmonitor = true;
+    };
+    am.keepcr = true;
+    credential = {
+      "https://dev.azure.com".usehttppath = true;
+      validate = false;
+    };
+    gc.auto = 0;
+    gui.gcwarning = false;
+    index = {
+      threads = true;
+      version = 4;
+    };
+    merge = {
+      stat = false;
+      renames = true;
+    };
+    pack = {
+      usebitmaps = false;
+      usesparse = true;
+    };
+    receive.autogc = false;
+    feature = {
+      manyfiles = false;
+      experimental = false;
+    };
+    fetch = {
+      unpacklimit = 1;
+      writecommitgraph = false;
+      showforcedupdates = false;
+    };
+    status.aheadbehind = false;
+    commitgraph.generationversion = 1;
+    log.excludedecoration = "refs/prefetch/*";
+    maintenance = {
+      repo = scalarCfg.repo;
+      auto = false;
+      strategy = "incremental";
+    };
+  };
+})
 #+end_src
 
 *** GitHub CLI
@@ -1799,17 +1880,17 @@ use nixpkgs' =services.gitea-actions-runner=; macOS has no such module, so I add
 NixOS option so a runner reads the same on either platform.
 
 I split this into three modules. The nix-darwin mechanism is neutral, so I
-publish it as =flake.darwinModules.forgejo-runner= via [[file:flake/exports.nix][exports.nix]]. The
+publish it as =flake.darwinModules.forgejo-runner= via [[file:exports.nix][exports.nix]]. The
 =my.services.forgejo-runner= wrappers bake my defaults (instance URL, labels,
 niks3 client) and live in the internal =flake.modules.{darwin,nixos}= registry.
 A host enables a wrapper and supplies its own registration token.
 
-#+begin_src nix :tangle flake/features/forgejo-runner/default.nix :exports none
+#+begin_src nix :tangle features/forgejo-runner/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle flake/features/forgejo-runner/default.nix
+#+begin_src nix :tangle features/forgejo-runner/default.nix
 { ... }:
 let
   <<forgejo-runner-wrapper-shared>>
@@ -1831,12 +1912,12 @@ becomes a launchd job that registers, then execs the daemon. I record a hash of
 =token= plus =labels= in =.registration-state= so registration re-runs when
 either changes; the token is reusable, so re-registering is fine.
 
-#+begin_src nix :tangle flake/features/forgejo-runner/darwin-module.nix :exports none
+#+begin_src nix :tangle features/forgejo-runner/darwin-module.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle flake/features/forgejo-runner/darwin-module.nix
+#+begin_src nix :tangle features/forgejo-runner/darwin-module.nix
 {
   config,
   lib,
@@ -2266,41 +2347,45 @@ ecosystem has mature tooling for managing Firefox profiles declaratively via hom
 Zen Browser was chosen over vanilla Firefox for its improved UI/UX while retaining full
 Firefox compatibility — extensions, search engines, and profile settings work identically.
 
-#+begin_src nix :tangle home/zen-browser/default.nix :exports none
+#+begin_src nix :tangle features/zen-browser.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle home/zen-browser/default.nix
+#+begin_src nix :tangle features/zen-browser.nix
+{ ... }:
 {
-  inputs,
-  config,
-  lib,
-  pkgs,
-  ...
-}:
-let
-  cfg = config.my.programs.zen-browser;
-in
-{
-  imports = [ inputs.zen-browser.homeModules.beta ];
+  flake.modules.homeManager."zen-browser" =
+    {
+      inputs,
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.programs.zen-browser;
+    in
+    {
+      imports = [ inputs.zen-browser.homeModules.beta ];
 
-  options.my.programs.zen-browser = {
-    enable = lib.mkEnableOption "Zen Browser";
-  };
+      options.my.programs.zen-browser = {
+        enable = lib.mkEnableOption "Zen Browser";
+      };
 
-  config = lib.mkIf cfg.enable {
-    programs.zen-browser = {
-      enable = true;
-      profiles.natsukium = {
-        <<zen-browser-settings>>
+      config = lib.mkIf cfg.enable {
+        programs.zen-browser = {
+          enable = true;
+          profiles.natsukium = {
+            <<zen-browser-settings>>
 
-        <<zen-browser-search>>
+            <<zen-browser-search>>
 
-        <<zen-browser-extensions>>
+            <<zen-browser-extensions>>
+          };
+        };
       };
     };
-  };
 }
 #+end_src
 
@@ -2483,7 +2568,7 @@ Neovim is the editor I spend the most time in, primarily for coding —
 though the gravitational pull of =org-mode= is slowly dragging me over
 to Emacs.
 
-Everything Neovim-related lives under =flake/features/neovim/=: the
+Everything Neovim-related lives under =features/neovim/=: the
 wrapped derivation (=package.nix=) and the lua configuration. The
 flake-parts module pulls double duty from a single file:
 
@@ -2495,7 +2580,7 @@ flake-parts module pulls double duty from a single file:
    opt in with =my.programs.neovim.enable=, which installs the wrapped
    Neovim plus =neovim-remote= and exports =EDITOR=nvim=.
 
-#+begin_src nix :tangle flake/features/neovim/default.nix
+#+begin_src nix :tangle features/neovim/default.nix
 { ... }:
 {
   flake.modules.homeManager.neovim =
@@ -2533,7 +2618,7 @@ are slowly winning me over, and a widening set of daily inputs (email,
 RSS feeds, and more) now lives inside emacs, where the ongoing
 experiment is wiring each of them back into org.
 
-The feature lives alongside Neovim under =flake/features/emacs/= and
+The feature lives alongside Neovim under =features/emacs/= and
 pulls the same double duty:
 
 1. =perSystem.packages.emacs= exposes a wrapped emacs as a flake
@@ -2547,7 +2632,7 @@ pulls the same double duty:
    =~/.config/emacs/{init,early-init}.el=, and the encrypted
    =~/.authinfo.age=.
 
-#+begin_src nix :tangle flake/features/emacs/default.nix
+#+begin_src nix :tangle features/emacs/default.nix
 # Requires: inputs.emacs-overlay
 { lib, inputs, ... }:
 let
@@ -2638,7 +2723,7 @@ in
 }
 #+end_src
 
-#+begin_src nix :tangle flake/features/emacs/package.nix
+#+begin_src nix :tangle features/emacs/package.nix
 {
   stdenv,
   age,
@@ -2696,9 +2781,9 @@ emacsWithPackagesFromUsePackage {
 #+end_src
 
 *** early-init.org
-#+INCLUDE: "./flake/features/emacs/early-init.org"
+#+INCLUDE: "./features/emacs/early-init.org"
 *** init.org
-#+INCLUDE: "./flake/features/emacs/init.org"
+#+INCLUDE: "./features/emacs/init.org"
 
 * Launcher
 
@@ -2711,12 +2796,12 @@ having the same experience on both platforms matters a lot to me.
 
 On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described later.
 
-#+begin_src nix :tangle flake/features/vicinae/default.nix :exports none
+#+begin_src nix :tangle features/vicinae/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle flake/features/vicinae/default.nix
+#+begin_src nix :tangle features/vicinae/default.nix
 # Requires: inputs.vicinae
 { inputs, ... }:
 {
@@ -2776,12 +2861,12 @@ On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as described l
 persistence across hosts. Apart from the client set up on desktops, deploying
 the daemon in every environment keeps a session running stably even over SSH.
 
-#+begin_src nix :tangle flake/features/felis/default.nix :exports none
+#+begin_src nix :tangle features/felis/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle flake/features/felis/default.nix
+#+begin_src nix :tangle features/felis/default.nix
 { inputs, ... }:
 let
   daemon =
@@ -2883,20 +2968,24 @@ I/O, and disk space in the background, so I turn indexing off by default. Hosts 
 want it back can set =enableIndex = true=. nix-darwin has no option for this, so the
 module drives =mdutil= from an activation script.
 
-#+begin_src nix :tangle darwin/spotlight.nix :exports none
+#+begin_src nix :tangle features/spotlight.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle darwin/spotlight.nix
-{ config, lib, ... }:
-let
-  cfg = config.my.services.spotlight;
-in
+#+begin_src nix :tangle features/spotlight.nix
+{ ... }:
 {
-  <<spotlight-options>>
+  flake.modules.darwin.spotlight =
+    { config, lib, ... }:
+    let
+      cfg = config.my.services.spotlight;
+    in
+    {
+      <<spotlight-options>>
 
-  <<spotlight-config>>
+      <<spotlight-config>>
+    };
 }
 #+end_src
 

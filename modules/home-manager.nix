@@ -24,7 +24,7 @@ let
           backupFileExtension = "backup";
           extraSpecialArgs = { inherit inputs; };
           sharedModules = homeManagerModules;
-          users.${config.my.username}.imports = [ ../../homes/common.nix ];
+          users.${config.my.username}.imports = [ ../homes/common.nix ];
         };
       };
     };

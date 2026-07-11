@@ -67,7 +67,7 @@ translation tools (po4a, gettext), and build utilities (nix-fast-build).
 On entry, it automatically sets up pre-commit hooks, configures MCP servers,
 and syncs =CLAUDE.md= from the literate source.
 
-#+begin_src nix :tangle modules/flake/per-system/dev-shell.nix
+#+begin_src nix :tangle modules/per-system/dev-shell.nix
 { ... }:
 {
   perSystem =
@@ -126,7 +126,7 @@ before everything else: if Org files are out of sync, formatters and linters
 downstream would otherwise fail against stale tangle output. Every other hook
 keeps the default priority and runs in parallel under =prek=.
 
-#+begin_src nix :tangle modules/flake/per-system/pre-commit.nix
+#+begin_src nix :tangle modules/per-system/pre-commit.nix
 { inputs, ... }:
 {
   imports = [ inputs.git-hooks.flakeModule ];
@@ -138,13 +138,13 @@ keeps the default priority and runs in parallel under =prek=.
         check.enable = true;
         settings = {
           package = pkgs.prek;
-          src = ../../..;
+          src = ../..;
           hooks =
             let
               check-git-changes = pkgs.writeShellApplication {
                 name = "check-git-changes";
                 runtimeInputs = [ pkgs.git ];
-                text = builtins.readFile ../../../scripts/check-git-changes.sh;
+                text = builtins.readFile ../../scripts/check-git-changes.sh;
               };
               emacs-with-org = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.org ]);
             in
@@ -208,7 +208,7 @@ keeps the default priority and runs in parallel under =prek=.
                       pkgs.gettext
                       check-git-changes
                     ];
-                    text = builtins.readFile ../../../scripts/check-po4a.sh;
+                    text = builtins.readFile ../../scripts/check-po4a.sh;
                   }
                 );
                 files = "(\\.org|po/.*\\.po)$";
@@ -228,7 +228,7 @@ keeps the default priority and runs in parallel under =prek=.
                       pkgs.gnumake
                       check-git-changes
                     ];
-                    text = builtins.readFile ../../../scripts/check-org-tangle.sh;
+                    text = builtins.readFile ../../scripts/check-org-tangle.sh;
                   }
                 );
                 files = "\\.org$";
@@ -246,7 +246,7 @@ Formatters are aggregated via [[https://github.com/numtide/treefmt-nix][treefmt-
 pre-commit hook, so a single declaration covers both editor integrations and
 the commit-time check.
 
-#+begin_src nix :tangle modules/flake/per-system/treefmt.nix
+#+begin_src nix :tangle modules/per-system/treefmt.nix
 { inputs, ... }:
 {
   imports = [ inputs.treefmt-nix.flakeModule ];
@@ -281,7 +281,7 @@ Enabled servers:
 The =passwordCommand= option retrieves secrets at runtime using =rbw= (Bitwarden CLI),
 avoiding plaintext credentials in the repository.
 
-#+begin_src nix :tangle modules/flake/per-system/mcp-servers.nix
+#+begin_src nix :tangle modules/per-system/mcp-servers.nix
 { inputs, ... }:
 {
   imports = [ inputs.mcp-servers.flakeModule ];
@@ -343,8 +343,8 @@ even if the translation is incomplete
 [po4a_paths] po/dotfiles.pot $lang:po/$lang.po
 [type: org] configuration.org $lang:configuration.$lang.org opt:"-k 0"
 [type: org] .github/README.org $lang:.github/README.$lang.org opt:"-k 0"
-[type: org] modules/flake/features/emacs/init.org $lang:modules/flake/features/emacs/init.$lang.org opt:"-k 0"
-[type: org] modules/flake/features/emacs/early-init.org $lang:modules/flake/features/emacs/early-init.$lang.org opt:"-k 0"
+[type: org] modules/features/emacs/init.org $lang:modules/features/emacs/init.$lang.org opt:"-k 0"
+[type: org] modules/features/emacs/early-init.org $lang:modules/features/emacs/early-init.$lang.org opt:"-k 0"
 [type: org] overlays/configuration.org $lang:overlays/configuration.$lang.org opt:"-k 0"
 [type: org] modules/configuration.org $lang:modules/configuration.$lang.org opt:"-k 0"
 #+end_src

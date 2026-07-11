@@ -949,7 +949,7 @@ in =cache.nixos.org=.
 
 An overview of the managed machines. Each host's full configuration lives in
 its own =hosts/<platform>/<name>/= directory, picked up by the loader in
-=modules/flake/hosts.nix=.
+=modules/hosts.nix=.
 
 **** katavi
 
@@ -1046,7 +1046,7 @@ Phone (Pixel 7a).
 
 *** Outputs
 
-Each per-system concern lives in its own =modules/flake/per-system/*.nix= file,
+Each per-system concern lives in its own =modules/per-system/*.nix= file,
 documented in =[[Per-system modules]]= below. The outputs body wires them via
 =imports=; flake-parts merges =perSystem= contributions across all modules.
 
@@ -1059,7 +1059,7 @@ systems = [
 ];
 
 imports = [
-  ./modules/flake
+  ./modules
 ];
 
 flake = {
@@ -1096,7 +1096,7 @@ Constructs the per-system =pkgs= with overlays applied, exposed to all other
 (NVIDIA drivers on =kilimanjaro=, =1password=, etc.) and gating each call-site
 with an override would only add noise.
 
-#+begin_src nix :tangle modules/flake/per-system/pkgs.nix
+#+begin_src nix :tangle modules/per-system/pkgs.nix
 { self, inputs, ... }:
 {
   perSystem =
@@ -1117,15 +1117,15 @@ Re-exports the NixOS VM tests under =./tests= as flake checks for the current
 system. Kept in its own module so the test wiring is easy to find independent
 of the per-system =pkgs= construction.
 
-#+begin_src nix :tangle modules/flake/per-system/checks.nix
-{ inputs, ... }:
+#+begin_src nix :tangle modules/per-system/checks.nix
+{ inputs, self, ... }:
 {
   perSystem =
     { pkgs, ... }:
     {
-      checks = import ../../../tests {
+      checks = import ../../tests {
         inherit (inputs) nixpkgs;
-        inherit pkgs;
+        inherit pkgs self;
       };
     };
 }
@@ -1135,7 +1135,7 @@ of the per-system =pkgs= construction.
 
 Per-system packages exposed as flake outputs.
 
-#+begin_src nix :tangle modules/flake/per-system/packages.nix
+#+begin_src nix :tangle modules/per-system/packages.nix
 { ... }:
 {
   perSystem =
@@ -1146,7 +1146,7 @@ Per-system packages exposed as flake outputs.
     }:
     {
       packages = {
-        fastfetch = pkgs.callPackage ../../../pkgs/fastfetch { };
+        fastfetch = pkgs.callPackage ../../pkgs/fastfetch { };
         html =
           with pkgs;
           let
@@ -1154,11 +1154,11 @@ Per-system packages exposed as flake outputs.
               url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
               hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
             };
-            org-to-html = ../../../scripts/org-to-html.el;
+            org-to-html = ../../scripts/org-to-html.el;
           in
           stdenvNoCC.mkDerivation {
             name = "dotfiles";
-            src = lib.cleanSource ../../..;
+            src = lib.cleanSource ../..;
             postPatch = ''
               substituteInPlace configuration.org \
                 --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
@@ -1196,6 +1196,161 @@ Per-system packages exposed as flake outputs.
 
 ** Modules
 #+INCLUDE: "./modules/configuration.org"
+
+** Distributed Builds
+
+[[https://nix.dev/manual/nix/latest/advanced-topics/distributed-builds][Distributed build]] configuration using Nix's built-in =buildMachines= support. This allows
+any machine in the fleet to offload builds to other machines, significantly reducing build
+times for resource-intensive derivations.
+
+This lives outside the =modules/= registry because it has no enable toggle: every
+non-server host applies it unconditionally, and the profiles that need to opt out
+(=profile-server=) do so by overriding =nix.distributedBuilds= directly rather than
+through a toggle here.
+
+=nix.distributedBuilds= is set to =mkDefault true= here so that server profiles can
+override it to =false=. =nix.buildMachines= is harmless when distributed builds are
+disabled, so no conditional wrapping is needed. The server profile
+(=modules/profiles/server.nix=) disables it because build servers have the resources to
+build locally, and offloading from one build server to another creates unnecessary
+network overhead and potential circular dependencies.
+
+#+begin_src nix :tangle systems/build-machines.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle systems/build-machines.nix
+{
+  inputs,
+  config,
+  lib,
+  ...
+}:
+let
+  <<build-machines-let>>
+in
+{
+  <<distributed-builds-config>>
+
+  <<build-machines-known-hosts>>
+}
+#+end_src
+
+*** Protocol Selection
+
+The =ssh-ng= protocol is preferred over plain =ssh= because it supports content-addressed
+derivations and more efficient store path transfers. However, Hydra does not support
+=ssh-ng= (see [[https://github.com/NixOS/hydra/issues/688][NixOS/hydra#688]]), so the protocol is dynamically selected based on whether
+Hydra is enabled on the current machine.
+
+#+NAME: build-machines-let
+#+begin_src nix
+protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
+inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
+inherit (inputs.self.outputs.darwinConfigurations) mikumi;
+#+end_src
+
+*** Configuration
+
+#+NAME: distributed-builds-config
+#+begin_src nix
+nix = {
+  distributedBuilds = lib.mkDefault true;
+
+  extraOptions = ''
+    builders-use-substitutes = true
+  '';
+
+  <<build-machines-list>>
+};
+#+end_src
+
+*** Build Machines
+
+Each machine excludes itself from the build machine list (via =config.networking.hostName=
+checks) to avoid circular build delegation. The =mikumi= machine is also excluded from
+the =work= host because the work machine should not offload builds to personal
+infrastructure.
+
+Machine capabilities (=maxJobs=, =system-features=) are referenced from each machine's
+configuration rather than hardcoded. See each machine's definition under =hosts/= for
+the actual values (e.g., =hosts/nixos/tarangire/default.nix= for =max-jobs = 12=).
+
+#+NAME: build-machines-list
+#+begin_src nix
+buildMachines =
+  [ ]
+  ++ lib.optional (config.networking.hostName != "tarangire") {
+    inherit (tarangire.config.networking) hostName;
+    systems = [
+      "x86_64-linux"
+      "i686-linux"
+    ];
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = tarangire.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = tarangire.config.nix.settings.system-features;
+    mandatoryFeatures = [ ];
+  }
+  ++ lib.optional (config.networking.hostName != "kilimanjaro") {
+    inherit (kilimanjaro.config.networking) hostName;
+    systems = [
+      "x86_64-linux"
+      "i686-linux"
+    ];
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = kilimanjaro.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = kilimanjaro.config.nix.settings.system-features;
+    mandatoryFeatures = [ ];
+  }
+  ++ lib.optional (config.networking.hostName != "serengeti") {
+    inherit (serengeti.config.networking) hostName;
+    system = "aarch64-linux";
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = serengeti.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = serengeti.config.nix.settings.system-features;
+    mandatoryFeatures = [ ];
+  }
+  ++ lib.optional (config.networking.hostName != "mikumi" && config.networking.hostName != "work") {
+    inherit (mikumi.config.networking) hostName;
+    systems = [
+      "aarch64-darwin"
+      "x86_64-darwin"
+    ];
+    sshUser = "natsukium";
+    inherit protocol;
+    maxJobs = mikumi.config.nix.settings.max-jobs;
+    speedFactor = 1;
+    supportedFeatures = [
+      "apple-virt"
+      "benchmark"
+      "big-parallel"
+      "nixos-test"
+    ];
+    mandatoryFeatures = [ ];
+  };
+#+end_src
+
+*** SSH Known Hosts
+
+Distributed builds connect to remote machines over SSH, so each build machine's host
+key must be registered to avoid interactive verification prompts during unattended builds.
+
+#+NAME: build-machines-known-hosts
+#+begin_src nix
+programs.ssh.knownHosts = {
+  tarangire.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJJYgE/dmYLXYBrVnPicd0qsaUeqcBtXB8H9LHkJ2j4";
+  kilimanjaro.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILhpfAalh6A5xDSE+HOdNE29ZgIjlP7tdlhHs82boSwp";
+  serengeti.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDWwhfhDSZ+M2XDwP2MlC/zFfVpk3WjUxV/JWFgGzgNW";
+  mikumi.publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfWOWKBFuDV08g6xP9MMY78CERI02CNG+5dy8CXQmXs";
+};
+#+end_src
 
 ** Scripts
 
@@ -1314,7 +1469,7 @@ translation tools (po4a, gettext), and build utilities (nix-fast-build).
 On entry, it automatically sets up pre-commit hooks, configures MCP servers,
 and syncs =CLAUDE.md= from the literate source.
 
-#+begin_src nix :tangle modules/flake/per-system/dev-shell.nix
+#+begin_src nix :tangle modules/per-system/dev-shell.nix
 { ... }:
 {
   perSystem =
@@ -1374,7 +1529,7 @@ before everything else: if Org files are out of sync, formatters and linters
 downstream would otherwise fail against stale tangle output. Every other hook
 keeps the default priority and runs in parallel under =prek=.
 
-#+begin_src nix :tangle modules/flake/per-system/pre-commit.nix
+#+begin_src nix :tangle modules/per-system/pre-commit.nix
 { inputs, ... }:
 {
   imports = [ inputs.git-hooks.flakeModule ];
@@ -1386,13 +1541,13 @@ keeps the default priority and runs in parallel under =prek=.
         check.enable = true;
         settings = {
           package = pkgs.prek;
-          src = ../../..;
+          src = ../..;
           hooks =
             let
               check-git-changes = pkgs.writeShellApplication {
                 name = "check-git-changes";
                 runtimeInputs = [ pkgs.git ];
-                text = builtins.readFile ../../../scripts/check-git-changes.sh;
+                text = builtins.readFile ../../scripts/check-git-changes.sh;
               };
               emacs-with-org = (pkgs.emacsPackagesFor pkgs.emacs).emacsWithPackages (epkgs: [ epkgs.org ]);
             in
@@ -1456,7 +1611,7 @@ keeps the default priority and runs in parallel under =prek=.
                       pkgs.gettext
                       check-git-changes
                     ];
-                    text = builtins.readFile ../../../scripts/check-po4a.sh;
+                    text = builtins.readFile ../../scripts/check-po4a.sh;
                   }
                 );
                 files = "(\\.org|po/.*\\.po)$";
@@ -1476,7 +1631,7 @@ keeps the default priority and runs in parallel under =prek=.
                       pkgs.gnumake
                       check-git-changes
                     ];
-                    text = builtins.readFile ../../../scripts/check-org-tangle.sh;
+                    text = builtins.readFile ../../scripts/check-org-tangle.sh;
                   }
                 );
                 files = "\\.org$";
@@ -1495,7 +1650,7 @@ Formatters are aggregated via [[https://github.com/numtide/treefmt-nix][treefmt-
 pre-commit hook, so a single declaration covers both editor integrations and
 the commit-time check.
 
-#+begin_src nix :tangle modules/flake/per-system/treefmt.nix
+#+begin_src nix :tangle modules/per-system/treefmt.nix
 { inputs, ... }:
 {
   imports = [ inputs.treefmt-nix.flakeModule ];
@@ -1531,7 +1686,7 @@ Enabled servers:
 The =passwordCommand= option retrieves secrets at runtime using =rbw= (Bitwarden CLI),
 avoiding plaintext credentials in the repository.
 
-#+begin_src nix :tangle modules/flake/per-system/mcp-servers.nix
+#+begin_src nix :tangle modules/per-system/mcp-servers.nix
 { inputs, ... }:
 {
   imports = [ inputs.mcp-servers.flakeModule ];
@@ -1596,8 +1751,8 @@ even if the translation is incomplete
 [po4a_paths] po/dotfiles.pot $lang:po/$lang.po
 [type: org] configuration.org $lang:configuration.$lang.org opt:"-k 0"
 [type: org] .github/README.org $lang:.github/README.$lang.org opt:"-k 0"
-[type: org] modules/flake/features/emacs/init.org $lang:modules/flake/features/emacs/init.$lang.org opt:"-k 0"
-[type: org] modules/flake/features/emacs/early-init.org $lang:modules/flake/features/emacs/early-init.$lang.org opt:"-k 0"
+[type: org] modules/features/emacs/init.org $lang:modules/features/emacs/init.$lang.org opt:"-k 0"
+[type: org] modules/features/emacs/early-init.org $lang:modules/features/emacs/early-init.$lang.org opt:"-k 0"
 [type: org] overlays/configuration.org $lang:overlays/configuration.$lang.org opt:"-k 0"
 [type: org] modules/configuration.org $lang:modules/configuration.$lang.org opt:"-k 0"
 #+end_src

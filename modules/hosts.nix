@@ -17,15 +17,15 @@ let
     mkSystem {
       specialArgs = { inherit inputs; };
       modules = [
-        (../../hosts + "/${class}/${name}")
+        (../hosts + "/${class}/${name}")
       ]
       ++ builtins.attrValues config.flake.modules.${class};
     };
 
-  nixosConfigurations = lib.genAttrs (hostsIn ../../hosts/nixos) (
+  nixosConfigurations = lib.genAttrs (hostsIn ../hosts/nixos) (
     mkHost "nixos" inputs.nixpkgs.lib.nixosSystem
   );
-  darwinConfigurations = lib.genAttrs (hostsIn ../../hosts/darwin) (
+  darwinConfigurations = lib.genAttrs (hostsIn ../hosts/darwin) (
     mkHost "darwin" inputs.darwin.lib.darwinSystem
   );
 
@@ -39,7 +39,7 @@ let
       config.allowUnfree = true;
     };
     extraSpecialArgs = { inherit inputs; };
-    modules = [ ../../hosts/android ];
+    modules = [ ../hosts/android ];
   };
 in
 {

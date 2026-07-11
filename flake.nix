@@ -203,7 +203,7 @@
       ];
 
       imports = [
-        ./modules/flake
+        ./modules
       ];
 
       flake = {

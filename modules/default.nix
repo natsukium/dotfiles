@@ -6,7 +6,7 @@
   imports = [
     inputs.flake-parts.flakeModules.modules
   ]
-  ++ import ../../lib/collectFlakeModules.nix ./.;
+  ++ import ../lib/collectFlakeModules.nix ./.;
 
   # flake-parts declares flake.nixosModules upstream, but not the darwin/home
   # equivalents; declare them here so feature modules can publish to them. Kept

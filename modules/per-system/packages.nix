@@ -8,7 +8,7 @@
     }:
     {
       packages = {
-        fastfetch = pkgs.callPackage ../../../pkgs/fastfetch { };
+        fastfetch = pkgs.callPackage ../../pkgs/fastfetch { };
         html =
           with pkgs;
           let
@@ -16,11 +16,11 @@
               url = "https://raw.githubusercontent.com/fniessen/org-html-themes/b3898f4c5b09b3365fd93fd1566f46ecd0a8911f/org/theme-readtheorg.setup";
               hash = "sha256-+5gy+S6NcuvlV61fudbCNoCKmSrCdA9P5CHeGKlDrSM=";
             };
-            org-to-html = ../../../scripts/org-to-html.el;
+            org-to-html = ../../scripts/org-to-html.el;
           in
           stdenvNoCC.mkDerivation {
             name = "dotfiles";
-            src = lib.cleanSource ../../..;
+            src = lib.cleanSource ../..;
             postPatch = ''
               substituteInPlace configuration.org \
                 --replace-fail "https://fniessen.github.io/org-html-themes/org/theme-readtheorg.setup" "${org-html-themes}"
