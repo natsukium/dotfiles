@@ -1,13 +1,14 @@
 { config, ... }:
 {
   imports = [
-    ../../../modules/profiles/darwin/base.nix
-    ../../../modules/profiles/darwin/server.nix
     ../../../systems/shared/hercules-ci/agent.nix
     ../../../systems/darwin/common.nix
   ];
 
   nixpkgs.hostPlatform = "aarch64-darwin";
+
+  my.profiles.base.enable = true;
+  my.profiles.server.enable = true;
 
   networking = {
     hostName = "mikumi";

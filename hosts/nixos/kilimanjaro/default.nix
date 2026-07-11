@@ -5,8 +5,6 @@
 }:
 {
   imports = [
-    ../../../modules/profiles/nixos/base.nix
-    ../../../modules/profiles/nixos/desktop.nix
     ../../../systems/shared/hercules-ci/agent.nix
     ../../../systems/nixos/common.nix
     ../../../systems/nixos/desktop.nix
@@ -17,12 +15,13 @@
 
   nixpkgs.hostPlatform = "x86_64-linux";
 
+  my.profiles.base.enable = true;
+  my.profiles.desktop.enable = true;
+  my.profiles.development.enable = true;
+
   my.home.enable = true;
   home-manager.users.${config.my.username}.imports = [
     ../../../homes/nixos/desktop.nix
-    ../../../modules/profiles/home/base.nix
-    ../../../modules/profiles/home/desktop.nix
-    ../../../modules/profiles/home/development.nix
   ];
 
   inherit

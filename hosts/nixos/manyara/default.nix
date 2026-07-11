@@ -6,8 +6,6 @@
 }:
 {
   imports = [
-    ../../../modules/profiles/nixos/base.nix
-    ../../../modules/profiles/nixos/server.nix
     ../../../systems/shared/comin/prometheus.nix
     ../../../systems/nixos/common.nix
     ../../../systems/nixos/services/adguardhome
@@ -28,6 +26,9 @@
   ];
 
   nixpkgs.hostPlatform = "x86_64-linux";
+
+  my.profiles.base.enable = true;
+  my.profiles.server.enable = true;
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 

@@ -1,8 +1,6 @@
 { inputs, config, ... }:
 {
   imports = [
-    ../../../modules/profiles/nixos/base.nix
-    ../../../modules/profiles/nixos/server.nix
     ../../../systems/shared/hercules-ci/agent.nix
     ../../../systems/nixos/common.nix
     ../../../systems/nixos/services/attic
@@ -11,6 +9,9 @@
   ];
 
   nixpkgs.hostPlatform = "aarch64-linux";
+
+  my.profiles.base.enable = true;
+  my.profiles.server.enable = true;
 
   inherit (import ./disko-config.nix { disks = [ "/dev/sda" ]; }) disko;
 

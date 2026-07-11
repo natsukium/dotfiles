@@ -3,11 +3,10 @@ let
   inherit (config.my) username;
 in
 {
-  imports = [
-    ../../modules/profiles/home/development.nix
-    ../../modules/profiles/home/generic-linux.nix
-    ../common.nix
-  ];
+  imports = [ ../common.nix ];
+
+  my.profiles.development.enable = true;
+  my.nix.enable = true;
 
   targets.genericLinux.enable = true;
   home = {

@@ -1,8 +1,6 @@
 { inputs, config, ... }:
 {
   imports = [
-    ../../../modules/profiles/nixos/base.nix
-    ../../../modules/profiles/nixos/server.nix
     ../../../systems/shared/hercules-ci/agent.nix
     ../../../systems/nixos/common.nix
     inputs.impermanence.nixosModules.impermanence
@@ -10,6 +8,9 @@
   ];
 
   nixpkgs.hostPlatform = "x86_64-linux";
+
+  my.profiles.base.enable = true;
+  my.profiles.server.enable = true;
 
   inherit (import ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 
