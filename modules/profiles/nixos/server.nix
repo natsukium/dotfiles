@@ -4,7 +4,7 @@ let
 in
 {
   imports = [
-    ../../shared/documentation/server.nix
+    ../documentation-server.nix
   ];
 
   documentation.nixos.enable = mkDefault false;

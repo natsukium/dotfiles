@@ -14,7 +14,7 @@ let
 in
 {
   imports = [
-    ../modules/shared/nix/build-machines.nix
+    ./build-machines.nix
     ./shared/comin
   ];
 

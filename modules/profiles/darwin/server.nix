@@ -1,6 +1,6 @@
 {
   imports = [
-    ../../shared/documentation/server.nix
+    ../documentation-server.nix
   ];
 
   nix.distributedBuilds = false;
