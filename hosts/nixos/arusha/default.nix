@@ -1,10 +1,28 @@
-{ inputs, pkgs, ... }:
+{
+  inputs,
+  pkgs,
+  config,
+  ...
+}:
 {
   imports = [
     inputs.nixos-wsl.nixosModules.wsl
     ../../../modules/profiles/nixos/base.nix
-    ../common.nix
+    ../../../systems/nixos/common.nix
   ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
+
+  my.home.enable = true;
+  home-manager.users.${config.my.username} = {
+    imports = [
+      ../../../modules/profiles/home/base.nix
+      ../../../modules/profiles/home/development.nix
+    ];
+    home.sessionVariablesExtra = ''
+      export WIN_HOME=$(wslpath $(wslvar USERPROFILE))
+    '';
+  };
 
   wsl = {
     enable = true;

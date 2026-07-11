@@ -33,4 +33,22 @@ in
   user = {
     shell = "${lib.getExe pkgs.fish}";
   };
+
+  # nix-on-droid is not covered by the registry classes, so the home config
+  # pulls the Home Manager registry in by hand rather than through the
+  # home-manager module used by the nixos/darwin hosts.
+  home-manager = {
+    useGlobalPkgs = true;
+    useUserPackages = true;
+    config = {
+      imports = [ ../../homes/common.nix ] ++ builtins.attrValues inputs.self.modules.homeManager;
+    };
+    backupFileExtension = "backup";
+    extraSpecialArgs = {
+      inherit inputs;
+      # disabledModules not working
+      # https://github.com/nix-community/home-manager/issues/1792
+      modulesPath = "${inputs.home-manager}/modules";
+    };
+  };
 }

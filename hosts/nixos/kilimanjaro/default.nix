@@ -7,12 +7,22 @@
   imports = [
     ../../../modules/profiles/nixos/base.nix
     ../../../modules/profiles/nixos/desktop.nix
-    ../../shared/hercules-ci/agent.nix
-    ../common.nix
-    ../desktop.nix
-    ../services/hydra
-    ../services/llm
+    ../../../systems/shared/hercules-ci/agent.nix
+    ../../../systems/nixos/common.nix
+    ../../../systems/nixos/desktop.nix
+    ../../../systems/nixos/services/hydra
+    ../../../systems/nixos/services/llm
     ./hardware-configuration.nix
+  ];
+
+  nixpkgs.hostPlatform = "x86_64-linux";
+
+  my.home.enable = true;
+  home-manager.users.${config.my.username}.imports = [
+    ../../../homes/nixos/desktop.nix
+    ../../../modules/profiles/home/base.nix
+    ../../../modules/profiles/home/desktop.nix
+    ../../../modules/profiles/home/development.nix
   ];
 
   inherit
@@ -36,6 +46,8 @@
 
   networking = {
     hostName = "kilimanjaro";
+    # Wake-on-LAN also needs a BIOS setting:
+    # Advanced > APM Configuration > Power On By PCI-E > Enabled
     interfaces.enp5s0.wakeOnLan.enable = true;
     wireless = {
       enable = true;

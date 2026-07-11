@@ -1,0 +1,63 @@
+{ inputs, config, ... }:
+{
+  imports = [
+    ../../../modules/profiles/nixos/base.nix
+    ../../../modules/profiles/nixos/server.nix
+    ../../../systems/shared/hercules-ci/agent.nix
+    ../../../systems/nixos/common.nix
+    ../../../systems/nixos/services/attic
+    ./hardware-configuration.nix
+    inputs.impermanence.nixosModules.impermanence
+  ];
+
+  nixpkgs.hostPlatform = "aarch64-linux";
+
+  inherit (import ./disko-config.nix { disks = [ "/dev/sda" ]; }) disko;
+
+  environment.persistence."/persistent" = {
+    hideMounts = true;
+    directories = [
+      "/var/lib/nixos"
+      "/var/lib/systemd"
+      "/var/lib/tailscale"
+      "/var/log"
+    ];
+    files = [ "/etc/machine-id" ];
+  };
+
+  # workaround for https://github.com/NixOS/nixpkgs/pull/351151#issuecomment-2440083015
+  boot.initrd.systemd.suppressedUnits = [ "systemd-machine-id-commit.service" ];
+  systemd.suppressedSystemUnits = [ "systemd-machine-id-commit.service" ];
+
+  fileSystems."/persistent".neededForBoot = true;
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  # https://github.com/nix-community/nixos-anywhere/issues/178
+  security.sudo.wheelNeedsPassword = false;
+
+  networking = {
+    hostName = "serengeti";
+  };
+
+  services.cloudflared = {
+    enable = true;
+    certificateFile = config.sops.secrets.cloudflared-tunnel-cert.path;
+  };
+  sops.secrets.cloudflared-tunnel-cert = { };
+
+  my.services.cloudflared-tunnel = {
+    enable = true;
+    id = "1af5e046-7d0f-4fa4-9366-69eb490d5119";
+    credentialsFile = config.sops.secrets.cloudflared-tunnel.path;
+  };
+
+  sops.secrets.cloudflared-tunnel = {
+    sopsFile = ./secrets.yaml;
+  };
+
+  nix.settings = {
+    max-jobs = 2;
+  };
+}

@@ -10,15 +10,16 @@ on:
       - '.github/actions/setup-nix/**'
       - '.github/workflows/test.yml'
       - 'applications/**'
-      - 'flake-module.nix'
       - 'flake.lock'
       - 'flake.nix'
       - 'homes/**'
+      - 'hosts/**'
       - 'lib/**'
       - 'modules/**'
       - 'overlays/**'
       - 'pkgs/**'
       - 'systems/**'
+      - 'tests/**'
 jobs:
   changes:
     if: github.event_name == 'pull_request'
@@ -38,15 +39,16 @@ jobs:
               - '.github/actions/setup-nix/**'
               - '.github/workflows/test.yml'
               - 'applications/**'
-              - 'flake-module.nix'
               - 'flake.lock'
               - 'flake.nix'
               - 'homes/**'
+              - 'hosts/**'
               - 'lib/**'
               - 'modules/**'
               - 'overlays/**'
               - 'pkgs/**'
               - 'systems/**'
+              - 'tests/**'
   check:
     needs: changes
     if: ${{ !cancelled() && (needs.changes.outputs.nix == 'true' || github.event_name == 'push') }}

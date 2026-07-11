@@ -52,7 +52,7 @@
                   "homes/shared/gpg/keys.txt"
                   "secrets.yaml"
                   "secrets/default.yaml"
-                  "systems/nixos/tarangire/facter.json"
+                  "hosts/nixos/tarangire/facter.json"
                   "systems/shared/hercules-ci/binary-caches.json"
                 ];
                 settings.configPath = "typos.toml";
