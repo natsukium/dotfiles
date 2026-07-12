@@ -2335,6 +2335,72 @@ nixosWrapper =
   };
 #+end_src
 
+* Devices
+
+Peripherals that move between machines belong here, not in
+=hardware-configuration=, which describes a host's fixed internals. Each device
+is a switch under =my.devices.*=, exposed through the
+=flake.modules.nixos.devices= registry; a host enables only the ones it has
+plugged in.
+
+** Audio
+
+*** AT2040 microphone
+
+The AT2040 is a USB microphone that also exposes a headphone output. WirePlumber
+gives that output a higher default priority (1109) than the HDMI sink (1000), so
+plugging the mic in silently hijacks the default output. I demote the AT2040
+sink to the lowest priority so the host's existing output stays selected; the
+=media.class= guard holds back the sink alone, leaving the mic input at its own
+high priority to still become the default source.
+
+The rule matches on =alsa.card_name= rather than the serial-bearing =node.name=,
+so it survives re-plugging and would apply to a replacement unit.
+
+#+begin_src nix :tangle features/devices.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/devices.nix
+{ ... }:
+{
+  # Internal registry: hosts enable my.devices.*.
+  flake.modules.nixos.devices =
+    {
+      config,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.my.devices;
+    in
+    {
+      options.my.devices.audio.at2040.enable =
+        lib.mkEnableOption "AT2040 USB mic sink demotion so it does not steal the default output";
+
+      config = lib.mkIf cfg.audio.at2040.enable {
+        services.pipewire.wireplumber.extraConfig."51-at2040-demote-sink" = {
+          "monitor.alsa.rules" = [
+            {
+              matches = [
+                {
+                  "media.class" = "Audio/Sink";
+                  "alsa.card_name" = "AT2040USB";
+                }
+              ];
+              actions.update-props = {
+                "priority.driver" = 0;
+                "priority.session" = 0;
+              };
+            }
+          ];
+        };
+      };
+    };
+}
+#+end_src
+
 * Browser
 
 ** Zen Browser
