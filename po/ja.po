@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-07-12 22:50+0900\n"
+"POT-Creation-Date: 2026-07-12 22:51+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -436,7 +436,7 @@ msgstr ""
 #: configuration.org:71 configuration.org:1254
 #: modules/features/emacs/init.org:622 modules/configuration.org:80
 #: modules/configuration.org:408 modules/configuration.org:2083
-#: modules/configuration.org:3071
+#: modules/configuration.org:3184
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -3737,7 +3737,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:93 modules/configuration.org:3028
+#: modules/features/emacs/init.org:93 modules/configuration.org:3141
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -6876,7 +6876,7 @@ msgstr "home-manager"
 
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:367
-#: modules/configuration.org:3058
+#: modules/configuration.org:3171
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -12330,17 +12330,177 @@ msgstr "\"./applications/emacs/init.ja.org\""
 #. type: heading *
 #: modules/configuration.org:2854
 #, no-wrap
-msgid "Launcher"
+msgid "Speech to Text"
 msgstr ""
 
 #. type: heading **
 #: modules/configuration.org:2856
 #, no-wrap
-msgid "Vicinae"
+msgid "Handy"
 msgstr ""
 
 #. type: paragraph
 #: modules/configuration.org:2858
+msgid ""
+"[[https://handy.computer][Handy]] is an offline speech-to-text app: press a "
+"hotkey, speak, and the transcription is typed into the focused field. The "
+"binary is in nixpkgs (=pkgs.handy=, Linux and macOS), but neither nixpkgs "
+"nor home-manager ships a module, and the upstream flake's own modules are "
+"thin and Linux-only. So I wrote my own, driven from one switch across every "
+"desktop."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:2864
+msgid ""
+"Almost everything is per-user and cross-platform, so it lives in a home-"
+"manager module: the package plus an autostart agent, a systemd user service "
+"on Linux and a launchd agent on macOS. Each platform's block is guarded with "
+"=mkIf= so it only references options that exist there, and to avoid an "
+"attribute-name-versus-=pkgs= evaluation cycle under =useGlobalPkgs=."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:2870
+msgid ""
+"The one piece home-manager cannot express is system-level. Handy reads its "
+"global hotkey straight from =/dev/input/event*= via evdev, which only the "
+"=input= group may read, and group membership is a NixOS setting. So a thin "
+"=flake.modules.nixos.handy= adds the user to that group, sharing the "
+"=my.programs.handy.enable= switch with the home module. (=/dev/uinput=, used "
+"to type the result back, is already granted to the session user by uaccess, "
+"so no udev rule is needed.) macOS has no evdev and no group to join; there "
+"the hotkey and microphone need Accessibility and Microphone permissions, "
+"granted once by hand, since TCC has no declarative path."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:2880
+msgid ""
+"The desktop profile enables it by default, setting the home switch on every "
+"desktop and, on NixOS only, adding the =input= group through its =nixos= "
+"block."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:2889
+#, no-wrap
+msgid ""
+"{ ... }:\n"
+"let\n"
+"  homeModule =\n"
+"    {\n"
+"      config,\n"
+"      lib,\n"
+"      pkgs,\n"
+"      ...\n"
+"    }:\n"
+"    let\n"
+"      cfg = config.my.programs.handy;\n"
+"    in\n"
+"    {\n"
+"      options.my.programs.handy = {\n"
+"        enable = lib.mkEnableOption \"Handy offline speech-to-text\";\n"
+"        autostart = lib.mkOption {\n"
+"          type = lib.types.bool;\n"
+"          default = true;\n"
+"          description = \"Start Handy on login.\";\n"
+"        };\n"
+"      };"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:2911
+#, no-wrap
+msgid ""
+"config = lib.mkIf cfg.enable (\n"
+"  lib.mkMerge [\n"
+"    { home.packages = [ pkgs.handy ]; }"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:2915
+#, no-wrap
+msgid ""
+"(lib.mkIf pkgs.stdenv.hostPlatform.isLinux {\n"
+"  systemd.user.services.handy = lib.mkIf cfg.autostart {\n"
+"    Unit = {\n"
+"      Description = \"Handy speech-to-text\";\n"
+"      PartOf = [ \"graphical-session.target\" ];\n"
+"      After = [ \"graphical-session.target\" ];\n"
+"    };\n"
+"    Service = {\n"
+"      ExecStart = lib.getExe pkgs.handy;\n"
+"      Restart = \"on-failure\";\n"
+"      RestartSec = 5;\n"
+"    };\n"
+"    Install.WantedBy = [ \"graphical-session.target\" ];\n"
+"  };\n"
+"})"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:2931
+#, no-wrap
+msgid ""
+"      (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {\n"
+"        launchd.agents.handy = lib.mkIf cfg.autostart {\n"
+"          enable = true;\n"
+"          config = {\n"
+"            ProgramArguments = [ (lib.getExe pkgs.handy) ];\n"
+"            RunAtLoad = true;\n"
+"            KeepAlive = true;\n"
+"          };\n"
+"        };\n"
+"      })\n"
+"    ]\n"
+"  );\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:2945
+#, no-wrap
+msgid ""
+"nixosModule =\n"
+"  {\n"
+"    config,\n"
+"    lib,\n"
+"    ...\n"
+"  }:\n"
+"  {\n"
+"    options.my.programs.handy.enable = lib.mkEnableOption \"Handy offline speech-to-text\";"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:2954
+#, no-wrap
+msgid ""
+"      config = lib.mkIf config.my.programs.handy.enable {\n"
+"        users.users.${config.my.username}.extraGroups = [ \"input\" ];\n"
+"      };\n"
+"    };\n"
+"in\n"
+"{\n"
+"  flake.modules.homeManager.handy = homeModule;\n"
+"  flake.modules.nixos.handy = nixosModule;\n"
+"}"
+msgstr ""
+
+#. type: heading *
+#: modules/configuration.org:2967
+#, no-wrap
+msgid "Launcher"
+msgstr ""
+
+#. type: heading **
+#: modules/configuration.org:2969
+#, no-wrap
+msgid "Vicinae"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:2971
 msgid ""
 "[[https://github.com/vicinae/vicinae][Vicinae]] is a cross-platform launcher "
 "for Linux and macOS, designed to run extensions from Raycast, the popular "
@@ -12349,14 +12509,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2863
+#: modules/configuration.org:2976
 msgid ""
 "On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as "
 "described later."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2872
+#: modules/configuration.org:2985
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -12373,13 +12533,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2884
+#: modules/configuration.org:2997
 #, no-wrap
 msgid "options.my.programs.vicinae.enable = lib.mkEnableOption \"vicinae launcher\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2886
+#: modules/configuration.org:2999
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.vicinae.enable {\n"
@@ -12419,20 +12579,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:2922
+#: modules/configuration.org:3035
 #, fuzzy, no-wrap
 #| msgid "terminal"
 msgid "Terminal"
 msgstr "ターミナル"
 
 #. type: heading **
-#: modules/configuration.org:2924
+#: modules/configuration.org:3037
 #, no-wrap
 msgid "Felis"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2926
+#: modules/configuration.org:3039
 msgid ""
 "[[https://git.natsukium.com/natsukium/felis][felis]] is a daemon/client "
 "terminal whose defining feature is session persistence across hosts. Apart "
@@ -12441,7 +12601,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2936
+#: modules/configuration.org:3049
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -12458,7 +12618,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2948
+#: modules/configuration.org:3061
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -12474,7 +12634,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2959
+#: modules/configuration.org:3072
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -12501,13 +12661,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2981
+#: modules/configuration.org:3094
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2983
+#: modules/configuration.org:3096
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -12517,7 +12677,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2988
+#: modules/configuration.org:3101
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -12529,7 +12689,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2995
+#: modules/configuration.org:3108
 #, no-wrap
 msgid ""
 "            theme = {\n"
@@ -12566,13 +12726,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3030
+#: modules/configuration.org:3143
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3032
+#: modules/configuration.org:3145
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -12582,7 +12742,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3043
+#: modules/configuration.org:3156
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -12597,7 +12757,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3053
+#: modules/configuration.org:3166
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -12606,13 +12766,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3060
+#: modules/configuration.org:3173
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3062
+#: modules/configuration.org:3175
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -12625,7 +12785,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3073
+#: modules/configuration.org:3186
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -12635,13 +12795,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3078
+#: modules/configuration.org:3191
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3080
+#: modules/configuration.org:3193
 #, no-wrap
 msgid ""
 "config = {\n"

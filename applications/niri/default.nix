@@ -23,6 +23,21 @@ in
       "Mod+Return".action.spawn = terminal;
       "Mod+D".action.spawn = launcher;
       # mod shift space floating # not support yet https://github.com/YaLTeR/niri/issues/122
+
+      # niri does not deliver Handy's own global hotkey, so drive it via signals.
+      # Match by "bin/handy" because the Nix wrapper renames the process to .handy-wrapped.
+      "Mod+Space".action.spawn = [
+        "pkill"
+        "-USR2"
+        "-f"
+        "bin/handy"
+      ];
+      "Mod+Ctrl+Space".action.spawn = [
+        "pkill"
+        "-USR1"
+        "-f"
+        "bin/handy"
+      ];
       "Mod+T".action.spawn = [
         "sh"
         "-c"

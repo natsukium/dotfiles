@@ -2851,6 +2851,119 @@ emacsWithPackagesFromUsePackage {
 *** init.org
 #+INCLUDE: "./features/emacs/init.org"
 
+* Speech to Text
+
+** Handy
+
+[[https://handy.computer][Handy]] is an offline speech-to-text app: press a
+hotkey, speak, and the transcription is typed into the focused field. The binary
+is in nixpkgs (=pkgs.handy=, Linux and macOS), but neither nixpkgs nor
+home-manager ships a module, and the upstream flake's own modules are thin and
+Linux-only. So I wrote my own, driven from one switch across every desktop.
+
+Almost everything is per-user and cross-platform, so it lives in a home-manager
+module: the package plus an autostart agent, a systemd user service on Linux and
+a launchd agent on macOS. Each platform's block is guarded with =mkIf= so it
+only references options that exist there, and to avoid an
+attribute-name-versus-=pkgs= evaluation cycle under =useGlobalPkgs=.
+
+The one piece home-manager cannot express is system-level. Handy reads its
+global hotkey straight from =/dev/input/event*= via evdev, which only the
+=input= group may read, and group membership is a NixOS setting. So a thin
+=flake.modules.nixos.handy= adds the user to that group, sharing the
+=my.programs.handy.enable= switch with the home module. (=/dev/uinput=, used to
+type the result back, is already granted to the session user by uaccess, so no
+udev rule is needed.) macOS has no evdev and no group to join; there the hotkey
+and microphone need Accessibility and Microphone permissions, granted once by
+hand, since TCC has no declarative path.
+
+The desktop profile enables it by default, setting the home switch on every
+desktop and, on NixOS only, adding the =input= group through its =nixos= block.
+
+#+begin_src nix :tangle features/handy/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/handy/default.nix
+{ ... }:
+let
+  homeModule =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.programs.handy;
+    in
+    {
+      options.my.programs.handy = {
+        enable = lib.mkEnableOption "Handy offline speech-to-text";
+        autostart = lib.mkOption {
+          type = lib.types.bool;
+          default = true;
+          description = "Start Handy on login.";
+        };
+      };
+
+      config = lib.mkIf cfg.enable (
+        lib.mkMerge [
+          { home.packages = [ pkgs.handy ]; }
+
+          (lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+            systemd.user.services.handy = lib.mkIf cfg.autostart {
+              Unit = {
+                Description = "Handy speech-to-text";
+                PartOf = [ "graphical-session.target" ];
+                After = [ "graphical-session.target" ];
+              };
+              Service = {
+                ExecStart = lib.getExe pkgs.handy;
+                Restart = "on-failure";
+                RestartSec = 5;
+              };
+              Install.WantedBy = [ "graphical-session.target" ];
+            };
+          })
+
+          (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+            launchd.agents.handy = lib.mkIf cfg.autostart {
+              enable = true;
+              config = {
+                ProgramArguments = [ (lib.getExe pkgs.handy) ];
+                RunAtLoad = true;
+                KeepAlive = true;
+              };
+            };
+          })
+        ]
+      );
+    };
+
+  nixosModule =
+    {
+      config,
+      lib,
+      ...
+    }:
+    {
+      options.my.programs.handy.enable = lib.mkEnableOption "Handy offline speech-to-text";
+
+      config = lib.mkIf config.my.programs.handy.enable {
+        # Handy reads /dev/input/event* via evdev for its global hotkey, which is
+        # only readable by the input group; home-manager cannot grant it.
+        users.users.${config.my.username}.extraGroups = [ "input" ];
+      };
+    };
+in
+{
+  flake.modules.homeManager.handy = homeModule;
+  flake.modules.nixos.handy = nixosModule;
+}
+#+end_src
+
 * Launcher
 
 ** Vicinae
