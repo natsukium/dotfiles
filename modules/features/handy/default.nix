@@ -49,7 +49,9 @@ let
               config = {
                 ProgramArguments = [ (lib.getExe pkgs.handy) ];
                 RunAtLoad = true;
-                KeepAlive = true;
+                # Relaunch only on a crash, not on a clean quit, so closing the
+                # settings window does not immediately resurrect Handy.
+                KeepAlive.SuccessfulExit = false;
               };
             };
           })
