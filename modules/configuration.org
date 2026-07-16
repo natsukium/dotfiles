@@ -1623,60 +1623,63 @@ scalar = {
 };
 #+end_src
 
-The performance settings themselves are only applied once a repository is actually
-registered (=scalarCfg.enable=, which the block above turns on), so a host that
-never touches a large repository never pays for tracking it.
-
 #+NAME: git-scalar-config
 #+begin_src nix
 (lib.mkIf scalarCfg.enable {
-  programs.git.settings = {
-    scalar.repo = scalarCfg.repo;
-    core = {
-      multipackindex = true;
-      preloadindex = true;
-      untrackedcache = true;
-      autocrlf = false;
-      safecrlf = false;
-      fsmonitor = true;
+  programs.git = {
+    settings = {
+      scalar.repo = scalarCfg.repo;
+      maintenance.repo = scalarCfg.repo;
     };
-    am.keepcr = true;
-    credential = {
-      "https://dev.azure.com".usehttppath = true;
-      validate = false;
-    };
-    gc.auto = 0;
-    gui.gcwarning = false;
-    index = {
-      threads = true;
-      version = 4;
-    };
-    merge = {
-      stat = false;
-      renames = true;
-    };
-    pack = {
-      usebitmaps = false;
-      usesparse = true;
-    };
-    receive.autogc = false;
-    feature = {
-      manyfiles = false;
-      experimental = false;
-    };
-    fetch = {
-      unpacklimit = 1;
-      writecommitgraph = false;
-      showforcedupdates = false;
-    };
-    status.aheadbehind = false;
-    commitgraph.generationversion = 1;
-    log.excludedecoration = "refs/prefetch/*";
-    maintenance = {
-      repo = scalarCfg.repo;
-      auto = false;
-      strategy = "incremental";
-    };
+    includes = map (repo: {
+      condition = "gitdir:${repo}/";
+      contents = {
+        core = {
+          multipackindex = true;
+          preloadindex = true;
+          untrackedcache = true;
+          autocrlf = false;
+          safecrlf = false;
+          fsmonitor = true;
+        };
+        am.keepcr = true;
+        credential = {
+          "https://dev.azure.com".usehttppath = true;
+          validate = false;
+        };
+        gc.auto = 0;
+        gui.gcwarning = false;
+        index = {
+          threads = true;
+          version = 4;
+        };
+        merge = {
+          stat = false;
+          renames = true;
+        };
+        pack = {
+          usebitmaps = false;
+          usesparse = true;
+        };
+        receive.autogc = false;
+        feature = {
+          manyfiles = false;
+          experimental = false;
+        };
+        fetch = {
+          unpacklimit = 1;
+          writecommitgraph = false;
+          showforcedupdates = false;
+        };
+        status.aheadbehind = false;
+        commitgraph.generationversion = 1;
+        log.excludedecoration = "refs/prefetch/*";
+        maintenance = {
+          auto = false;
+          strategy = "incremental";
+        };
+      };
+    }) scalarCfg.repo;
   };
 })
 #+end_src
