@@ -44,6 +44,36 @@ CLAUDE.md: configuration.org scripts/export-claude-md.el
 	$(EMACS) --visit $< --eval '(setq export-readme-dest "$@")' -l scripts/export-readme-org.el
 
 #──────────────────────────────────────────────
+# sops secrets
+#──────────────────────────────────────────────
+
+ATTMCOJP_CLAUDE_MD := hosts/darwin/work/attmcojp-claude.md
+
+# Plaintext is kept outside every git repository, so no `git add` anywhere can
+# stage it by accident and an agent editing it is never working inside a tree
+# that is about to be committed.
+SECRET_SCRATCH := $(HOME)/.cache/dotfiles/secrets
+
+.PHONY: attmcojp-claude-md-open attmcojp-claude-md-seal
+
+attmcojp-claude-md-open:
+	@mkdir -p $(SECRET_SCRATCH)
+	@chmod 700 $(SECRET_SCRATCH)
+	@sops decrypt --output $(SECRET_SCRATCH)/attmcojp-claude.md $(ATTMCOJP_CLAUDE_MD)
+	@chmod 600 $(SECRET_SCRATCH)/attmcojp-claude.md
+	@echo $(SECRET_SCRATCH)/attmcojp-claude.md
+
+# sops edit invokes $EDITOR with the decrypted tempfile as its argument, so cp
+# replaces that buffer wholesale. Going through edit rather than a fresh
+# `sops encrypt` reuses the existing data key, keeping the ciphertext diff
+# confined to the payload instead of rewriting every recipient block per edit.
+attmcojp-claude-md-seal:
+	@test -f $(SECRET_SCRATCH)/attmcojp-claude.md \
+		|| { echo "no plaintext at $(SECRET_SCRATCH)/attmcojp-claude.md; run attmcojp-claude-md-open first" >&2; exit 1; }
+	@EDITOR="cp $(SECRET_SCRATCH)/attmcojp-claude.md" sops edit $(ATTMCOJP_CLAUDE_MD)
+	@rm -f $(SECRET_SCRATCH)/attmcojp-claude.md
+
+#──────────────────────────────────────────────
 # Nix build
 #──────────────────────────────────────────────
 

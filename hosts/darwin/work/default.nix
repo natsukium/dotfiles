@@ -18,6 +18,7 @@
       ../../../homes/darwin/common.nix
       ../../../homes/darwin/desktop.nix
       ./accounts.nix
+      ./claude-code.nix
       ./git.nix
     ];
 
