@@ -43,6 +43,10 @@
     binfmt.emulatedSystems = [ "aarch64-linux" ];
   };
 
+  # 64 GiB RAM but no swap, so parallel Nix C++ builds spike memory and the
+  # kernel OOM killer culls desktop apps. Compressed zram gives a reclaim buffer.
+  zramSwap.enable = true;
+
   networking = {
     hostName = "kilimanjaro";
     # Wake-on-LAN also needs a BIOS setting:
