@@ -24,7 +24,7 @@ buildPythonPackage (finalAttrs: {
   meta = {
     description = "Simple Python parser and writer of SDP";
     homepage = "https://pypi.org/project/sdp-transform/";
-    changelog = "https://github.com/skymaze/sdp-transform/releases/tag/${finalAttrs.tag}";
+    changelog = "https://github.com/skymaze/sdp-transform/releases/tag/${finalAttrs.src.tag}";
     license = lib.licenses.mit;
   };
 })
