@@ -21,8 +21,6 @@
 
           context = ../common/AGENTS.md;
 
-          skills = ../common/skills;
-
           settings = {
             instructions = [ "CLAUDE.md" ];
 

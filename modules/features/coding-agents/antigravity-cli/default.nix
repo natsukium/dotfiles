@@ -20,8 +20,6 @@
 
           context.AGENTS = ../common/AGENTS.md;
 
-          skills = ../common/skills;
-
           settings = {
             selectedAuthType = "oauth-personal";
 

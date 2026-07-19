@@ -20,8 +20,6 @@
           configDir = "${config.xdg.configHome}/pi/agent";
           context = ../common/AGENTS.md;
         };
-
-        xdg.configFile."pi/agent/skills".source = ../common/skills;
       };
     };
 }

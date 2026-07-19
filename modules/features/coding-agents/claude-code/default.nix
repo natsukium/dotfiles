@@ -16,6 +16,10 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # Claude Code ships built-in gh tooling and commands, so the shared gh
+        # skill only duplicates them.
+        my.programs.coding-agents.excludedSkills.claude-code = [ "gh" ];
+
         programs.claude-code = {
           enable = true;
           enableMcpIntegration = true;
@@ -146,19 +150,6 @@
           context = ../common/AGENTS.md;
 
           agentsDir = ./agents;
-
-          # Exclude the shared gh skill here: Claude Code already ships built-in
-          # gh tooling and commands, so the skill only duplicates them. Other
-          # agents keep the full shared set, hence the per-agent filter rather than
-          # dropping gh from ../common/skills.
-          skills =
-            let
-              skillsDir = ../common/skills;
-              names = builtins.attrNames (
-                lib.filterAttrs (_: type: type == "directory") (builtins.readDir skillsDir)
-              );
-            in
-            lib.genAttrs (lib.subtractLists [ "gh" ] names) (name: skillsDir + "/${name}");
 
           lspServers = {
             nix = {

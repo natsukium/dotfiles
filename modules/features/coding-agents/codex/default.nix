@@ -19,7 +19,6 @@
           enable = true;
           enableMcpIntegration = true;
           context = ../common/AGENTS.md;
-          skills = ../common/skills;
         };
       };
     };
