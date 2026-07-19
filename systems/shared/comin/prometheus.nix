@@ -16,6 +16,28 @@ let
 
   nodeExporterUser = config.services.prometheus.exporters.node.user;
   nodeExporterGroup = config.services.prometheus.exporters.node.group;
+
+  # Hosts expected to answer around the clock, so their silence is a fault worth
+  # paging on. Everything else is a laptop or tarangire, the on-demand builder
+  # kept powered off for its consumption; those going quiet is routine.
+  # Deliberately not derived from my.profiles.server: that profile describes how
+  # a host is built, not whether anyone should be woken when it disappears.
+  alwaysOnHosts = [
+    "manyara"
+    "serengeti"
+    "mikumi"
+  ];
+
+  cominTarget =
+    name: value:
+    let
+      inherit (value.config.services.comin.exporter) listen_address port;
+      listen_address' = if listen_address == "" then "localhost" else listen_address;
+    in
+    "${if name == config.networking.hostName then listen_address' else name}:${toString port}";
+
+  machines = linux-machines // darwin-machines;
+  isAlwaysOn = name: _: builtins.elem name alwaysOnHosts;
 in
 {
   services.prometheus.scrapeConfigs = [
@@ -23,17 +45,52 @@ in
       job_name = "comin";
       static_configs = [
         {
-          targets = lib.mapAttrsToList (
-            name: value:
-            let
-              inherit (value.config.services.comin.exporter) listen_address port;
-              listen_address' = if listen_address == "" then "localhost" else listen_address;
-            in
-            "${if name == config.networking.hostName then listen_address' else name}:${toString port}"
-          ) (linux-machines // darwin-machines);
+          labels.always_on = "true";
+          targets = lib.mapAttrsToList cominTarget (lib.filterAttrs isAlwaysOn machines);
+        }
+        {
+          targets = lib.mapAttrsToList cominTarget (lib.filterAttrs (name: v: !(isAlwaysOn name v)) machines);
         }
       ];
     }
+  ];
+
+  # Alerts on comin's own metrics live next to the scrape config and the
+  # expected-commit metric they join against.
+  services.prometheus.ruleFiles = [
+    ((pkgs.formats.yaml { }).generate "comin-rules.yaml" {
+      groups = [
+        {
+          name = "comin";
+          rules = [
+            {
+              alert = "CominDeploymentFailed";
+              expr = ''comin_deployment_info{status="failed"} == 1'';
+              for = "5m";
+              labels.severity = "warning";
+              annotations.summary = "comin deployment failed on {{ $labels.instance }} (commit {{ $labels.commit_id }})";
+            }
+            {
+              # comin marks the last deploy done even when newer commits exist on
+              # origin, so a lagging host looks healthy; joining against the
+              # main-HEAD textfile metric surfaces the drift.
+              alert = "CominDeploymentDrift";
+              expr = ''(comin_deployment_info{status="done"} unless on(commit_id) comin_expected_commit_info) and on() (count(comin_expected_commit_info) > 0)'';
+              for = "30m";
+              labels.severity = "warning";
+              annotations.summary = "{{ $labels.instance }} is not on main HEAD (deployed {{ $labels.commit_id }})";
+            }
+            {
+              alert = "CominRebootRequired";
+              expr = ''comin_host_info{need_to_reboot="1"} == 1'';
+              for = "15m";
+              labels.severity = "warning";
+              annotations.summary = "{{ $labels.instance }} needs a reboot to activate its latest generation";
+            }
+          ];
+        }
+      ];
+    })
   ];
 
   services.prometheus.exporters.node.extraFlags = [

@@ -30,6 +30,7 @@
   my.services.grafana.enable = true;
   my.services.prometheus.enable = true;
   my.services.loki.enable = true;
+  my.services.alertmanager.enable = true;
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 
