@@ -24,7 +24,18 @@ let
         path = d + "/${name}";
       in
       if entries.${name} == "directory" then
-        (if pathExists (path + "/default.nix") then [ path ] else collect path)
+        # A directory with its own flake.nix is a separate flake — template
+        # sources, vendored inputs — so it is opaque, not a namespace to
+        # recurse into. Checked first: its flake.nix would otherwise be
+        # imported as a flake-parts module.
+        (
+          if pathExists (path + "/flake.nix") then
+            [ ]
+          else if pathExists (path + "/default.nix") then
+            [ path ]
+          else
+            collect path
+        )
       else if match ".*\\.nix" name != null then
         [ path ]
       else
