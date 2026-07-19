@@ -430,7 +430,7 @@
 					"refId": "A",
 					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
 					"editorMode": "code",
-					"expr": "100 * (1 - node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"})",
+					"expr": "100 * (1 - node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"}) or 100 * ((node_memory_active_bytes{instance=~\"$instance\"} + node_memory_wired_bytes{instance=~\"$instance\"} + node_memory_compressed_bytes{instance=~\"$instance\"}) / node_memory_total_bytes{instance=~\"$instance\"})",
 					"legendFormat": "{{instance}}",
 					"range": true
 				}

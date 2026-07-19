@@ -97,11 +97,27 @@
                     annotations.summary = "OOM killer active on {{ $labels.instance }}";
                   }
                   {
+                    # The macOS node exporter exposes none of the Linux memory
+                    # metrics, so the first term never matches the Darwin hosts.
+                    # The fallback term approximates used memory there as
+                    # active + wired + compressed, leaving out inactive since
+                    # macOS can reclaim it on demand.
                     alert = "MemoryPressureHigh";
-                    expr = "100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) > 90";
+                    expr = "(100 * (1 - node_memory_MemAvailable_bytes / node_memory_MemTotal_bytes) or 100 * ((node_memory_active_bytes + node_memory_wired_bytes + node_memory_compressed_bytes) / node_memory_total_bytes)) > 90";
                     for = "30m";
                     labels.severity = "warning";
                     annotations.summary = "{{ $labels.instance }} memory above 90% for 30m";
+                  }
+                  {
+                    # The macOS equivalent of SystemdUnitFailed: the metric comes
+                    # from the launchd-health textfile job on the Darwin hosts,
+                    # since the node exporter has no launchd collector. 15m so a
+                    # daemon restarting between scrapes does not page.
+                    alert = "LaunchdDaemonDown";
+                    expr = "launchd_keepalive_daemon_running == 0";
+                    for = "15m";
+                    labels.severity = "warning";
+                    annotations.summary = "{{ $labels.label }} is not running on {{ $labels.instance }}";
                   }
                 ];
               }

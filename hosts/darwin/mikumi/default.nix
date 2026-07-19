@@ -10,6 +10,10 @@
   my.profiles.base.enable = true;
   my.profiles.server.enable = true;
 
+  # The only always-on Darwin host Prometheus scrapes, so it is where launchd
+  # daemon liveness is worth surfacing.
+  my.services.launchd-health.enable = true;
+
   networking = {
     hostName = "mikumi";
     knownNetworkServices = [
