@@ -30,6 +30,7 @@ msgstr ""
 ```
 
 Key rules:
+
 - The first line after `msgid`/`msgstr` is `""` (empty string)
 - Each continuation line is a separate quoted string
 - Trailing spaces inside quotes are significant (they join the lines)
@@ -37,10 +38,10 @@ Key rules:
 
 ## Flags (`#,` lines)
 
-| Flag        | Meaning                                                    |
-|-------------|------------------------------------------------------------|
-| `no-wrap`   | Content must not be line-wrapped; msgstr is a single line  |
-| `fuzzy`     | Translation is uncertain — needs review                    |
+| Flag      | Meaning                                                   |
+| --------- | --------------------------------------------------------- |
+| `no-wrap` | Content must not be line-wrapped; msgstr is a single line |
+| `fuzzy`   | Translation is uncertain — needs review                   |
 
 For `no-wrap` entries, the msgstr must be a single quoted string (no continuation lines):
 
@@ -55,23 +56,23 @@ msgstr "セクションタイトル"
 The `#. type:` comment tells you what kind of Org element this entry comes from.
 This is critical for classification:
 
-| Type                        | Translate? | Notes                          |
-|-----------------------------|------------|--------------------------------|
-| `paragraph`                 | Yes        | Main prose content             |
-| `heading *` to `*****`      | Yes        | Section headings               |
-| `plain list -` / `+`        | Yes        | List items                     |
-| `paragraph in QUOTE/quote`  | Yes        | Block quote content            |
-| `paragraph in example`      | Yes        | Example block text             |
-| `cell column N`             | Maybe      | Table cells (check content)    |
-| `keyword title`             | Yes        | Document title                 |
-| `paragraph in src`          | **No**     | Source code block              |
-| `keyword NAME/name`         | **No**     | Source block identifier        |
-| `keyword SETUPFILE`         | **No**     | Org setup file path            |
-| `keyword PROPERTY`          | **No**     | Property drawer value          |
-| `keyword OPTIONS`           | **No**     | Export options                  |
-| `keyword STARTUP`           | **No**     | Startup keywords               |
-| `keyword INCLUDE`           | **No**     | File include directive         |
-| `property (*)`              | **No**     | Property values                |
+| Type                       | Translate? | Notes                       |
+| -------------------------- | ---------- | --------------------------- |
+| `paragraph`                | Yes        | Main prose content          |
+| `heading *` to `*****`     | Yes        | Section headings            |
+| `plain list -` / `+`       | Yes        | List items                  |
+| `paragraph in QUOTE/quote` | Yes        | Block quote content         |
+| `paragraph in example`     | Yes        | Example block text          |
+| `cell column N`            | Maybe      | Table cells (check content) |
+| `keyword title`            | Yes        | Document title              |
+| `paragraph in src`         | **No**     | Source code block           |
+| `keyword NAME/name`        | **No**     | Source block identifier     |
+| `keyword SETUPFILE`        | **No**     | Org setup file path         |
+| `keyword PROPERTY`         | **No**     | Property drawer value       |
+| `keyword OPTIONS`          | **No**     | Export options              |
+| `keyword STARTUP`          | **No**     | Startup keywords            |
+| `keyword INCLUDE`          | **No**     | File include directive      |
+| `property (*)`             | **No**     | Property values             |
 
 ## Source References (`#:` lines)
 

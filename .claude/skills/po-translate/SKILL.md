@@ -15,16 +15,16 @@ Scan `po/ja.po` and classify every entry into three buckets.
 
 ### Skip (leave msgstr empty)
 
-| PO type comment (`#. type:`)    | Reason                        |
-|----------------------------------|-------------------------------|
-| `paragraph in src`               | Code block content            |
-| `keyword NAME` / `keyword name`  | Source block identifiers      |
-| `keyword SETUPFILE`              | Org directive                 |
-| `keyword PROPERTY`               | Property drawer value         |
-| `keyword OPTIONS`                | Export option string          |
-| `keyword STARTUP`                | Startup keyword               |
-| `keyword INCLUDE`                | po4a handles path swap        |
-| `property (*)`                   | Property values               |
+| PO type comment (`#. type:`)    | Reason                   |
+| ------------------------------- | ------------------------ |
+| `paragraph in src`              | Code block content       |
+| `keyword NAME` / `keyword name` | Source block identifiers |
+| `keyword SETUPFILE`             | Org directive            |
+| `keyword PROPERTY`              | Property drawer value    |
+| `keyword OPTIONS`               | Export option string     |
+| `keyword STARTUP`               | Startup keyword          |
+| `keyword INCLUDE`               | po4a handles path swap   |
+| `property (*)`                  | Property values          |
 
 Also skip: bare URLs as msgid, table cells with hardware models/hostnames/platforms.
 
@@ -40,6 +40,7 @@ Everything else: `paragraph`, `heading *`–`*****`, `plain list`, `paragraph in
 ### Grouping
 
 Group translatable entries by primary source file into sequential batches:
+
 1. `configuration.org`
 2. `applications/emacs/init.org`
 3. `overlays/configuration.org` + `applications/emacs/early-init.org` + `.github/README.org`
@@ -127,6 +128,7 @@ Include these checks in the prompt:
    hedging level matches the English msgid
 
 The review subagent should:
+
 - Fix minor issues (structural/terminology) directly
 - Report translation quality issues with line numbers
 - Re-run `msgfmt --check po/ja.po` after fixes
@@ -134,6 +136,7 @@ The review subagent should:
 ## Phase 4: Iterate (do this yourself)
 
 Evaluate the review subagent's report:
+
 - If **PASS** on all checks → done
 - If issues remain → spawn targeted translation subagents to fix only the
   flagged entries, then re-run review (Phase 3)
@@ -142,6 +145,7 @@ Evaluate the review subagent's report:
 ## Final Validation
 
 After review passes:
+
 ```sh
 msgfmt --check po/ja.po
 po4a po4a.cfg

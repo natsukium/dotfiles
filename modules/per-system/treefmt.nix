@@ -6,7 +6,7 @@
     treefmt = {
       projectRootFile = "flake.nix";
       programs = {
-        biome.enable = true;
+        oxfmt.enable = true;
         nixfmt.enable = true;
         shfmt.enable = true;
         stylua.enable = true;

@@ -7,7 +7,7 @@ description: Verify a rendering or window-chrome change in any macOS GUI app una
 
 Verify a rendering or window-chrome change by launching the app,
 capturing **just its window**, and probing pixels. None of this needs
-Accessibility permission. (System Events / keystroke injection *does*
+Accessibility permission. (System Events / keystroke injection _does_
 need it and is usually blocked — don't plan on typing into the window
 unattended.) Screen Recording permission is required for screenshots:
 if `screencapture -x /tmp/full.png` produces a non-black image, you

@@ -24,7 +24,7 @@
                 enable = true;
                 priority = 10;
               };
-              biome = {
+              oxlint = {
                 enable = true;
                 priority = 10;
               };
