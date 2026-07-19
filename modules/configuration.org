@@ -994,19 +994,13 @@ initExtra = ''
 
 **** Terminal Settings
 
-- =stty stop undef=: Disables =Ctrl+S= from sending =XOFF= (terminal pause), freeing
-  it for use as a keybinding in fish and other TUI applications. Without this, pressing
-  =Ctrl+S= freezes the terminal until =Ctrl+Q= is pressed — a legacy flow control
-  mechanism that is rarely useful on modern terminals.
-- =stty werase undef= + =bind "\C-w":unix-filename-rubout=: Rebinds =Ctrl+W= to delete
-  the previous path component (stopping at =/=) rather than the entire word. This is
-  more useful when editing file paths, which is the common case in a shell.
+=stty stop undef= disables =Ctrl+S= from sending =XOFF=, freeing it for use as a
+keybinding in fish and other TUI applications. Without it, =Ctrl+S= freezes the terminal
+until =Ctrl+Q= is pressed.
 
 #+NAME: bash-terminal-settings
 #+begin_src nix :noweb no
 stty stop undef  # Ctrl-s
-stty werase undef
-bind "\C-w":unix-filename-rubout  # Ctrl-w
 #+end_src
 
 **** TMUX Auto-attach
@@ -1030,6 +1024,58 @@ if type tmux > /dev/null 2>&1; then
     tmux attach || break
   done
 fi
+#+end_src
+
+** Readline
+
+readline provides line editing for bash and for most REPLs with a plain prompt, such as
+the Python interpreter and =psql=. Configuring it here rather than through bash
+keybindings covers all of them at once.
+
+=Ctrl+W= deletes back to the previous =/= rather than the previous word boundary, which
+suits the paths that make up most of what I type at a prompt. The binding only holds
+with =bind-tty-special-chars= off: readline otherwise copies the terminal's =werase=
+character into its keymap after reading =inputrc=, which puts =Ctrl+W= back on
+=unix-word-rubout=.
+
+=completion-ignore-case= makes tab completion case-insensitive.
+
+#+begin_src nix :tangle features/readline.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/readline.nix
+{ ... }:
+{
+  flake.modules.homeManager.readline =
+    {
+      lib,
+      config,
+      ...
+    }:
+    let
+      cfg = config.my.programs.readline;
+    in
+    {
+      options.my.programs.readline.enable = lib.mkEnableOption "readline";
+
+      config = lib.mkIf cfg.enable {
+        programs.readline = {
+          enable = true;
+
+          variables = {
+            completion-ignore-case = true;
+            bind-tty-special-chars = false;
+          };
+
+          bindings = {
+            "\\C-w" = "unix-filename-rubout";
+          };
+        };
+      };
+    };
+}
 #+end_src
 
 ** Nushell

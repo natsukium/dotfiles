@@ -34,8 +34,6 @@
 
           initExtra = ''
             stty stop undef  # Ctrl-s
-            stty werase undef
-            bind "\C-w":unix-filename-rubout  # Ctrl-w
           ''
           + lib.optionalString (!config.programs.kitty.enable) ''
             # TMUX (from ArchWiki)

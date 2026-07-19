@@ -17,12 +17,6 @@
     jq.enable = true;
     lsd.enable = true;
     nix-index.enable = true;
-    readline = {
-      enable = true;
-      variables = {
-        completion-ignore-case = true;
-      };
-    };
     zoxide.enable = true;
   };
   my.services.pueue.enable = true;
