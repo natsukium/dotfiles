@@ -1,6 +1,6 @@
 ---
-name: wayland-gui-debug
-description: Verify a rendering or window-chrome change in a GUI app unattended on Linux/Wayland under the niri compositor — enumerate windows and read output scale via niri msg --json, capture a specific window to a file with niri msg action screenshot-window --id, and probe exact pixel RGBA with ImageMagick. Use for layout/glyph/color/HiDPI rendering bugs where a screenshot or pixel value is the ground truth. For macOS use macos-gui-debug instead.
+name: gui-debug
+description: Verify a rendering or window-chrome change in a GUI app unattended on Linux/Wayland under the niri compositor — enumerate windows and read output scale via niri msg --json, capture a specific window to a file with niri msg action screenshot-window --id, and probe exact pixel RGBA with ImageMagick. Use for layout/glyph/color/HiDPI rendering bugs where a screenshot or pixel value is the ground truth.
 ---
 
 # Wayland (niri) GUI debugging

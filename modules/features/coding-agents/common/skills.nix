@@ -12,7 +12,12 @@
 { ... }:
 {
   flake.modules.homeManager.coding-agent-skills =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.my.programs.coding-agents;
 
@@ -56,7 +61,13 @@
 
       config = {
         my.programs.coding-agents = {
-          skillDirs = [ ./skills ];
+          # skills-darwin and skills-linux hold the same skill names under
+          # different implementations, so only the host's own directory is read.
+          skillDirs = [
+            ./skills
+          ]
+          ++ lib.optional pkgs.stdenv.hostPlatform.isDarwin ./skills-darwin
+          ++ lib.optional pkgs.stdenv.hostPlatform.isLinux ./skills-linux;
           skills = lib.mergeAttrsList (map skillsIn cfg.skillDirs);
         };
 

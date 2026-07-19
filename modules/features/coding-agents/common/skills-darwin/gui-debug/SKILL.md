@@ -1,6 +1,6 @@
 ---
-name: macos-gui-debug
-description: Verify a rendering or window-chrome change in any macOS GUI app unattended — find its CGWindowID via JXA, capture that window alone (with per-pixel alpha) using screencapture -l, and read exact RGBA via NSBitmapImageRep. Use for blur/opacity/corner-radius/glyph/color rendering bugs where a screenshot or pixel value is the ground truth. No Python and no Accessibility permission needed; for Linux/Wayland use wayland-gui-debug instead.
+name: gui-debug
+description: Verify a rendering or window-chrome change in any macOS GUI app unattended — find its CGWindowID via JXA, capture that window alone (with per-pixel alpha) using screencapture -l, and read exact RGBA via NSBitmapImageRep. Use for blur/opacity/corner-radius/glyph/color rendering bugs where a screenshot or pixel value is the ground truth. No Python and no Accessibility permission needed.
 ---
 
 # macOS GUI debugging
