@@ -3099,6 +3099,8 @@ in
       options.my.programs.felis.enable = lib.mkEnableOption "felis";
 
       config = lib.mkIf config.my.programs.felis.enable {
+        my.programs.coding-agents.skills.felis = "${inputs.felis}/skills/felis";
+
         programs.felis = {
           enable = true;
           package = inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default;
