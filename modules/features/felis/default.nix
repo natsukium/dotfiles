@@ -88,6 +88,19 @@ in
             window = {
               decorations = false;
             };
+
+            keymap = {
+              "¥" = {
+                kind = "send_string";
+                text = "\\";
+                escapes = "none";
+              };
+              "shift+enter" = {
+                kind = "send_string";
+                text = "\\e\\r";
+                escapes = "cstyle";
+              };
+            };
           };
         };
       };

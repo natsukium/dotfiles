@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-07-20 01:35+0900\n"
+"POT-Creation-Date: 2026-07-20 02:12+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -436,7 +436,7 @@ msgstr ""
 #: configuration.org:71 configuration.org:1254
 #: modules/features/emacs/init.org:622 modules/configuration.org:80
 #: modules/configuration.org:408 modules/configuration.org:2132
-#: modules/configuration.org:3237
+#: modules/configuration.org:3259
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -3742,7 +3742,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:93 modules/configuration.org:3194
+#: modules/features/emacs/init.org:93 modules/configuration.org:3216
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -6881,7 +6881,7 @@ msgstr "home-manager"
 
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:367
-#: modules/configuration.org:3224
+#: modules/configuration.org:3246
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -12679,8 +12679,21 @@ msgid ""
 "environment keeps a session running stably even over SSH."
 msgstr ""
 
+#. type: paragraph
+#: modules/configuration.org:3094
+msgid ""
+"Two keymap entries work around problems that live outside felis. On a JIS "
+"keyboard the yen key still types =¥= even though macOS is configured to emit "
+"=\\=, because winit drops the substituted character unless an IME preedit is "
+"active; rebinding the key here avoids waiting for a winit release. "
+"Shift+Enter is already sent as =CSI 13;2u= under the Kitty keyboard "
+"protocol, but Claude Code enables that protocol only for terminals on a "
+"hardcoded list, so I send the Option+Enter sequence it does recognize as a "
+"newline instead. Both entries go away once upstream catches up."
+msgstr ""
+
 #. type: paragraph in src
-#: modules/configuration.org:3100
+#: modules/configuration.org:3109
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -12697,7 +12710,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3112
+#: modules/configuration.org:3121
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -12713,7 +12726,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3123
+#: modules/configuration.org:3132
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -12740,13 +12753,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3145
+#: modules/configuration.org:3154
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3147
+#: modules/configuration.org:3156
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -12754,7 +12767,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3150
+#: modules/configuration.org:3159
 #, no-wrap
 msgid ""
 "programs.felis = {\n"
@@ -12763,7 +12776,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3154
+#: modules/configuration.org:3163
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -12775,34 +12788,52 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3161
+#: modules/configuration.org:3170
 #, no-wrap
 msgid ""
-"            theme = {\n"
-"              fg = \"#${palette.base05}\";\n"
-"              bg = \"#${palette.base00}\";\n"
-"              cursor = \"#${palette.base05}\";\n"
-"              palette = {\n"
-"                black = \"#${palette.base00}\";\n"
-"                red = \"#${palette.base08}\";\n"
-"                green = \"#${palette.base0B}\";\n"
-"                yellow = \"#${palette.base0A}\";\n"
-"                blue = \"#${palette.base0D}\";\n"
-"                magenta = \"#${palette.base0E}\";\n"
-"                cyan = \"#${palette.base0C}\";\n"
-"                white = \"#${palette.base05}\";\n"
-"                bright_black = \"#${palette.base03}\";\n"
-"                bright_red = \"#${palette.base08}\";\n"
-"                bright_green = \"#${palette.base0B}\";\n"
-"                bright_yellow = \"#${palette.base0A}\";\n"
-"                bright_blue = \"#${palette.base0D}\";\n"
-"                bright_magenta = \"#${palette.base0E}\";\n"
-"                bright_cyan = \"#${palette.base0C}\";\n"
-"                bright_white = \"#${palette.base07}\";\n"
+"theme = {\n"
+"  fg = \"#${palette.base05}\";\n"
+"  bg = \"#${palette.base00}\";\n"
+"  cursor = \"#${palette.base05}\";\n"
+"  palette = {\n"
+"    black = \"#${palette.base00}\";\n"
+"    red = \"#${palette.base08}\";\n"
+"    green = \"#${palette.base0B}\";\n"
+"    yellow = \"#${palette.base0A}\";\n"
+"    blue = \"#${palette.base0D}\";\n"
+"    magenta = \"#${palette.base0E}\";\n"
+"    cyan = \"#${palette.base0C}\";\n"
+"    white = \"#${palette.base05}\";\n"
+"    bright_black = \"#${palette.base03}\";\n"
+"    bright_red = \"#${palette.base08}\";\n"
+"    bright_green = \"#${palette.base0B}\";\n"
+"    bright_yellow = \"#${palette.base0A}\";\n"
+"    bright_blue = \"#${palette.base0D}\";\n"
+"    bright_magenta = \"#${palette.base0E}\";\n"
+"    bright_cyan = \"#${palette.base0C}\";\n"
+"    bright_white = \"#${palette.base07}\";\n"
+"  };\n"
+"};\n"
+"window = {\n"
+"  decorations = false;\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:3197
+#, no-wrap
+msgid ""
+"            keymap = {\n"
+"              \"¥\" = {\n"
+"                kind = \"send_string\";\n"
+"                text = \"\\\\\";\n"
+"                escapes = \"none\";\n"
 "              };\n"
-"            };\n"
-"            window = {\n"
-"              decorations = false;\n"
+"              \"shift+enter\" = {\n"
+"                kind = \"send_string\";\n"
+"                text = \"\\\\e\\\\r\";\n"
+"                escapes = \"cstyle\";\n"
+"              };\n"
 "            };\n"
 "          };\n"
 "        };\n"
@@ -12812,13 +12843,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3196
+#: modules/configuration.org:3218
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3198
+#: modules/configuration.org:3220
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -12828,7 +12859,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3209
+#: modules/configuration.org:3231
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -12843,7 +12874,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3219
+#: modules/configuration.org:3241
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -12852,13 +12883,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3226
+#: modules/configuration.org:3248
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3228
+#: modules/configuration.org:3250
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -12871,7 +12902,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3239
+#: modules/configuration.org:3261
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -12881,13 +12912,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3244
+#: modules/configuration.org:3266
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3246
+#: modules/configuration.org:3268
 #, no-wrap
 msgid ""
 "config = {\n"
