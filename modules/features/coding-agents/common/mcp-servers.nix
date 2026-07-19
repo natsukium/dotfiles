@@ -23,7 +23,6 @@
 
         mcp-servers.programs = {
           context7.enable = true;
-          playwright.enable = true;
         };
       };
     };

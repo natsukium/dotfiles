@@ -94,6 +94,7 @@
                 "Bash(nix-build *)"
                 "Bash(pnpm run check *)"
                 "Bash(pnpm run lint *)"
+                "Bash(playwright-cli *)"
                 "Bash(pnpm run test *)"
                 "Bash(rg *)"
                 "Bash(tree *)"
@@ -109,7 +110,6 @@
                 "mcp__context7__get-library-docs"
                 "mcp__context7__resolve-library-id"
                 "mcp__nixos__*"
-                "mcp__playwright__*"
               ];
               # deny wins over allow and over the auto-mode classifier, so it is the
               # only rule intent cannot talk past. Guard secret material here rather

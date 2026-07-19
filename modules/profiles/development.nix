@@ -11,5 +11,6 @@ import ../../lib/mkProfile.nix { inherit lib; } {
     my.programs.git.enable = lib.mkDefault true;
     my.programs.opencode.enable = lib.mkDefault true;
     my.programs.pi-coding-agent.enable = lib.mkDefault true;
+    my.programs.playwright-cli.enable = lib.mkDefault true;
   };
 }
