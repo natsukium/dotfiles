@@ -1,0 +1,712 @@
+{
+	"annotations": {
+		"list": []
+	},
+	"editable": false,
+	"graphTooltip": 1,
+	"links": [],
+	"panels": [
+		{
+			"type": "stat",
+			"title": "Firing Alerts",
+			"gridPos": { "h": 4, "w": 6, "x": 0, "y": 0 },
+			"id": 1,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "count(ALERTS{alertstate=\"firing\"}) or vector(0)",
+					"instant": true,
+					"range": false,
+					"legendFormat": "firing"
+				}
+			],
+			"options": {
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"colorMode": "background",
+				"graphMode": "none",
+				"textMode": "auto",
+				"justifyMode": "auto",
+				"orientation": "auto"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"unit": "short",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "green", "value": null },
+							{ "color": "red", "value": 1 }
+						]
+					}
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "stat",
+			"title": "Pending Alerts",
+			"gridPos": { "h": 4, "w": 6, "x": 6, "y": 0 },
+			"id": 2,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "count(ALERTS{alertstate=\"pending\"}) or vector(0)",
+					"instant": true,
+					"range": false,
+					"legendFormat": "pending"
+				}
+			],
+			"options": {
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"colorMode": "background",
+				"graphMode": "none",
+				"textMode": "auto",
+				"justifyMode": "auto",
+				"orientation": "auto"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"unit": "short",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "green", "value": null },
+							{ "color": "yellow", "value": 1 }
+						]
+					}
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "stat",
+			"title": "Service Probes Failing",
+			"gridPos": { "h": 4, "w": 6, "x": 12, "y": 0 },
+			"id": 3,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "count(probe_success == 0) or vector(0)",
+					"instant": true,
+					"range": false,
+					"legendFormat": "failing"
+				}
+			],
+			"options": {
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"colorMode": "background",
+				"graphMode": "none",
+				"textMode": "auto",
+				"justifyMode": "auto",
+				"orientation": "auto"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"unit": "short",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "green", "value": null },
+							{ "color": "red", "value": 1 }
+						]
+					}
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "stat",
+			"title": "Scrape Targets Down",
+			"gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
+			"id": 4,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "count(up == 0) or vector(0)",
+					"instant": true,
+					"range": false,
+					"legendFormat": "down"
+				}
+			],
+			"options": {
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"colorMode": "background",
+				"graphMode": "none",
+				"textMode": "auto",
+				"justifyMode": "auto",
+				"orientation": "auto"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"unit": "short",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "green", "value": null },
+							{ "color": "yellow", "value": 1 }
+						]
+					}
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "table",
+			"title": "Active Alerts",
+			"description": "Every alert Prometheus currently holds in pending or firing state.",
+			"gridPos": { "h": 9, "w": 24, "x": 0, "y": 4 },
+			"id": 5,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "ALERTS",
+					"format": "table",
+					"instant": true,
+					"range": false
+				}
+			],
+			"transformations": [
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": { "Time": true, "Value": true, "__name__": true },
+						"indexByName": {
+							"alertname": 0,
+							"alertstate": 1,
+							"severity": 2,
+							"instance": 3,
+							"job": 4
+						},
+						"renameByName": {}
+					}
+				},
+				{
+					"id": "sortBy",
+					"options": {
+						"fields": {},
+						"sort": [{ "field": "alertstate", "desc": true }]
+					}
+				}
+			],
+			"options": {
+				"showHeader": true,
+				"cellHeight": "sm",
+				"footer": {
+					"show": false,
+					"reducer": ["sum"],
+					"countRows": false,
+					"fields": ""
+				}
+			},
+			"fieldConfig": {
+				"defaults": {
+					"custom": {
+						"align": "auto",
+						"cellOptions": { "type": "auto" },
+						"filterable": true
+					}
+				},
+				"overrides": [
+					{
+						"matcher": { "id": "byName", "options": "alertstate" },
+						"properties": [
+							{
+								"id": "custom.cellOptions",
+								"value": { "type": "color-text" }
+							},
+							{
+								"id": "mappings",
+								"value": [
+									{
+										"type": "value",
+										"options": {
+											"firing": { "color": "red", "index": 0 },
+											"pending": { "color": "yellow", "index": 1 }
+										}
+									}
+								]
+							}
+						]
+					},
+					{
+						"matcher": { "id": "byName", "options": "severity" },
+						"properties": [
+							{
+								"id": "custom.cellOptions",
+								"value": { "type": "color-text" }
+							},
+							{
+								"id": "mappings",
+								"value": [
+									{
+										"type": "value",
+										"options": {
+											"critical": { "color": "red", "index": 0 },
+											"warning": { "color": "orange", "index": 1 }
+										}
+									}
+								]
+							}
+						]
+					}
+				]
+			}
+		},
+		{
+			"type": "timeseries",
+			"title": "Service Probe Success",
+			"description": "Blackbox HTTP probes against each service on loopback. 1 = responding.",
+			"gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
+			"id": 6,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "probe_success",
+					"legendFormat": "{{instance}}",
+					"range": true
+				}
+			],
+			"options": {
+				"legend": {
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true,
+					"calcs": ["lastNotNull"]
+				},
+				"tooltip": { "mode": "multi", "sort": "none" }
+			},
+			"fieldConfig": {
+				"defaults": {
+					"min": 0,
+					"max": 1,
+					"unit": "short",
+					"custom": {
+						"drawStyle": "line",
+						"lineInterpolation": "stepAfter",
+						"lineWidth": 2,
+						"fillOpacity": 10,
+						"showPoints": "never",
+						"spanNulls": false
+					},
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "red", "value": null },
+							{ "color": "green", "value": 1 }
+						]
+					},
+					"color": { "mode": "thresholds" }
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "timeseries",
+			"title": "Probe Duration",
+			"description": "How long each probe took. A rising trend precedes an outright probe failure.",
+			"gridPos": { "h": 8, "w": 12, "x": 12, "y": 13 },
+			"id": 7,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "probe_duration_seconds",
+					"legendFormat": "{{instance}}",
+					"range": true
+				}
+			],
+			"options": {
+				"legend": {
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true,
+					"calcs": ["mean", "max"]
+				},
+				"tooltip": { "mode": "multi", "sort": "desc" }
+			},
+			"fieldConfig": {
+				"defaults": {
+					"min": 0,
+					"unit": "s",
+					"custom": {
+						"drawStyle": "line",
+						"lineInterpolation": "smooth",
+						"lineWidth": 1,
+						"fillOpacity": 0,
+						"showPoints": "never",
+						"spanNulls": false
+					},
+					"color": { "mode": "palette-classic" }
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "timeseries",
+			"title": "CPU Usage",
+			"gridPos": { "h": 8, "w": 8, "x": 0, "y": 21 },
+			"id": 8,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "100 - (avg by (instance) (rate(node_cpu_seconds_total{mode=\"idle\",instance=~\"$instance\"}[5m])) * 100)",
+					"legendFormat": "{{instance}}",
+					"range": true
+				}
+			],
+			"options": {
+				"legend": {
+					"displayMode": "list",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": { "mode": "multi", "sort": "desc" }
+			},
+			"fieldConfig": {
+				"defaults": {
+					"min": 0,
+					"max": 100,
+					"unit": "percent",
+					"custom": {
+						"drawStyle": "line",
+						"lineInterpolation": "smooth",
+						"lineWidth": 1,
+						"fillOpacity": 15,
+						"showPoints": "never",
+						"spanNulls": false
+					},
+					"color": { "mode": "palette-classic" }
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "timeseries",
+			"title": "Memory Usage",
+			"gridPos": { "h": 8, "w": 8, "x": 8, "y": 21 },
+			"id": 9,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "100 * (1 - node_memory_MemAvailable_bytes{instance=~\"$instance\"} / node_memory_MemTotal_bytes{instance=~\"$instance\"})",
+					"legendFormat": "{{instance}}",
+					"range": true
+				}
+			],
+			"options": {
+				"legend": {
+					"displayMode": "list",
+					"placement": "bottom",
+					"showLegend": true
+				},
+				"tooltip": { "mode": "multi", "sort": "desc" }
+			},
+			"fieldConfig": {
+				"defaults": {
+					"min": 0,
+					"max": 100,
+					"unit": "percent",
+					"custom": {
+						"drawStyle": "line",
+						"lineInterpolation": "smooth",
+						"lineWidth": 1,
+						"fillOpacity": 15,
+						"showPoints": "never",
+						"spanNulls": false
+					},
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "green", "value": null },
+							{ "color": "orange", "value": 80 },
+							{ "color": "red", "value": 90 }
+						]
+					},
+					"color": { "mode": "palette-classic" }
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "timeseries",
+			"title": "Filesystem Free",
+			"description": "Percentage free per mount. The FilesystemSpaceLow alert trips below 15%.",
+			"gridPos": { "h": 8, "w": 8, "x": 16, "y": 21 },
+			"id": 10,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "100 * node_filesystem_avail_bytes{fstype!~\"tmpfs|ramfs|overlay\",mountpoint!~\"/boot.*\",instance=~\"$instance\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|ramfs|overlay\",mountpoint!~\"/boot.*\",instance=~\"$instance\"}",
+					"legendFormat": "{{instance}} {{mountpoint}}",
+					"range": true
+				}
+			],
+			"options": {
+				"legend": {
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true,
+					"calcs": ["lastNotNull"]
+				},
+				"tooltip": { "mode": "multi", "sort": "asc" }
+			},
+			"fieldConfig": {
+				"defaults": {
+					"min": 0,
+					"max": 100,
+					"unit": "percent",
+					"custom": {
+						"drawStyle": "line",
+						"lineInterpolation": "smooth",
+						"lineWidth": 1,
+						"fillOpacity": 0,
+						"showPoints": "never",
+						"spanNulls": false,
+						"thresholdsStyle": { "mode": "dashed" }
+					},
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "red", "value": null },
+							{ "color": "orange", "value": 5 },
+							{ "color": "green", "value": 15 }
+						]
+					},
+					"color": { "mode": "thresholds" }
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "table",
+			"title": "Failed systemd Units",
+			"description": "Empty is healthy. Populated means SystemdUnitFailed is about to fire.",
+			"gridPos": { "h": 8, "w": 12, "x": 0, "y": 29 },
+			"id": 11,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "node_systemd_unit_state{state=\"failed\"} == 1",
+					"format": "table",
+					"instant": true,
+					"range": false
+				}
+			],
+			"transformations": [
+				{
+					"id": "organize",
+					"options": {
+						"excludeByName": {
+							"Time": true,
+							"Value": true,
+							"__name__": true,
+							"job": true,
+							"state": true,
+							"type": true,
+							"role": true
+						},
+						"indexByName": { "instance": 0, "name": 1 },
+						"renameByName": {}
+					}
+				}
+			],
+			"options": {
+				"showHeader": true,
+				"cellHeight": "sm",
+				"footer": {
+					"show": false,
+					"reducer": ["sum"],
+					"countRows": false,
+					"fields": ""
+				}
+			},
+			"fieldConfig": {
+				"defaults": {
+					"custom": {
+						"align": "auto",
+						"cellOptions": { "type": "auto" },
+						"filterable": true
+					}
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "timeseries",
+			"title": "Scrape Target Availability",
+			"description": "up per target. Gaps and zeroes are what InstanceDown watches.",
+			"gridPos": { "h": 8, "w": 12, "x": 12, "y": 29 },
+			"id": 12,
+			"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+					"editorMode": "code",
+					"expr": "up",
+					"legendFormat": "{{job}} {{instance}}",
+					"range": true
+				}
+			],
+			"options": {
+				"legend": {
+					"displayMode": "table",
+					"placement": "bottom",
+					"showLegend": true,
+					"calcs": ["lastNotNull"]
+				},
+				"tooltip": { "mode": "multi", "sort": "none" }
+			},
+			"fieldConfig": {
+				"defaults": {
+					"min": 0,
+					"max": 1,
+					"unit": "short",
+					"custom": {
+						"drawStyle": "line",
+						"lineInterpolation": "stepAfter",
+						"lineWidth": 2,
+						"fillOpacity": 10,
+						"showPoints": "never",
+						"spanNulls": false
+					},
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{ "color": "red", "value": null },
+							{ "color": "green", "value": 1 }
+						]
+					},
+					"color": { "mode": "thresholds" }
+				},
+				"overrides": []
+			}
+		},
+		{
+			"type": "logs",
+			"title": "Recent Errors and Warnings",
+			"description": "Every host's logs filtered to error and warning levels.",
+			"gridPos": { "h": 10, "w": 24, "x": 0, "y": 37 },
+			"id": 13,
+			"datasource": { "type": "loki", "uid": "loki" },
+			"targets": [
+				{
+					"refId": "A",
+					"datasource": { "type": "loki", "uid": "loki" },
+					"editorMode": "code",
+					"expr": "{host=~\"$host\"} | detected_level =~ \"error|warn\"",
+					"queryType": "range"
+				}
+			],
+			"options": {
+				"showTime": true,
+				"showLabels": false,
+				"showCommonLabels": false,
+				"wrapLogMessage": true,
+				"prettifyLogMessage": false,
+				"enableLogDetails": true,
+				"dedupStrategy": "none",
+				"sortOrder": "Descending"
+			}
+		}
+	],
+	"preload": false,
+	"refresh": "1m",
+	"schemaVersion": 42,
+	"tags": ["nixos", "infra", "alerting"],
+	"templating": {
+		"list": [
+			{
+				"name": "instance",
+				"label": "Instance",
+				"type": "query",
+				"datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+				"query": {
+					"qryType": 1,
+					"query": "label_values(node_uname_info, instance)",
+					"refId": "PrometheusVariableQueryEditor-VariableQuery"
+				},
+				"refresh": 1,
+				"includeAll": true,
+				"allValue": ".*",
+				"multi": true,
+				"current": { "text": ["All"], "value": ["$__all"] },
+				"options": [],
+				"sort": 1
+			},
+			{
+				"name": "host",
+				"label": "Log host",
+				"type": "query",
+				"datasource": { "type": "loki", "uid": "loki" },
+				"query": {
+					"label": "host",
+					"refId": "LokiVariableQueryEditor-VariableQuery",
+					"stream": "",
+					"type": 1
+				},
+				"refresh": 1,
+				"includeAll": true,
+				"allValue": ".+",
+				"multi": true,
+				"current": { "text": ["All"], "value": ["$__all"] },
+				"options": [],
+				"sort": 1
+			}
+		]
+	},
+	"time": { "from": "now-6h", "to": "now" },
+	"timepicker": {},
+	"timezone": "browser",
+	"title": "Infrastructure Overview",
+	"uid": "infra-overview",
+	"weekStart": ""
+}
