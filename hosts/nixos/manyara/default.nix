@@ -13,13 +13,10 @@
     ../../../systems/nixos/services/calibre-web
     ../../../systems/nixos/services/continuwuity
     ../../../systems/nixos/services/forgejo
-    ../../../systems/nixos/services/grafana
     ../../../systems/nixos/services/hermes-agent
     ../../../systems/nixos/services/home-assistant
-    ../../../systems/nixos/services/loki
     ../../../systems/nixos/services/miniflux
     ../../../systems/nixos/services/niks3
-    ../../../systems/nixos/services/prometheus
     ../../../systems/nixos/services/searxng
     ./hardware-configuration.nix
     inputs.simple-wol-manager.nixosModules.default
@@ -29,6 +26,10 @@
 
   my.profiles.base.enable = true;
   my.profiles.server.enable = true;
+
+  my.services.grafana.enable = true;
+  my.services.prometheus.enable = true;
+  my.services.loki.enable = true;
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
 
