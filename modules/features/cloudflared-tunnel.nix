@@ -10,6 +10,10 @@
         types
         ;
       cfg = config.my.services.cloudflared-tunnel;
+
+      # Loopback-only metrics port. cloudflared picks a random port when --metrics
+      # is left unset, which cannot be scraped, so pin it here.
+      metricsPort = 60123;
     in
     {
       options.my.services.cloudflared-tunnel = {
@@ -56,6 +60,19 @@
           # first in the merged attrset
           default = "http_status:404";
         };
+
+        # cloudflared reads --metrics from TUNNEL_METRICS. A dropped tunnel
+        # silently breaks the write path (reads bypass it), so expose connection
+        # state to the co-located Prometheus while keeping the endpoint on loopback.
+        systemd.services."cloudflared-tunnel-${cfg.id}".environment.TUNNEL_METRICS =
+          "127.0.0.1:${toString metricsPort}";
+
+        services.prometheus.scrapeConfigs = [
+          {
+            job_name = "cloudflared";
+            static_configs = [ { targets = [ "127.0.0.1:${toString metricsPort}" ]; } ];
+          }
+        ];
       };
     };
 }
