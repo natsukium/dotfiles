@@ -26,6 +26,7 @@
         miniflux = "http://127.0.0.1:${config.services.miniflux.config.PORT}/healthcheck";
         searx = "http://127.0.0.1:${toString config.services.searx.settings.server.port}/";
         adguardhome = "http://127.0.0.1:${toString config.services.adguardhome.port}/";
+        niks3 = "http://${config.services.niks3.httpAddr}/health";
       };
     in
     {

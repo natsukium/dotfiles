@@ -50,6 +50,7 @@ in
     signKeyFiles = [ config.sops.secrets.niks3-signing-key.path ];
 
     cacheUrl = "https://${cacheDomain}";
+
     serverUrl = "https://${serverDomain}";
 
     gc.olderThan = "168h";
