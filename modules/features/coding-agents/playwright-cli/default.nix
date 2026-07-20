@@ -22,10 +22,22 @@
       config = lib.mkIf cfg.enable {
         home.packages = [ pkgs.playwright-cli ];
 
-        # The upstream package carries its own SKILL.md, so track it rather than
-        # copying a snapshot that would drift on every version bump.
+        # The skills option probes the path with `pathIsDirectory`, so pointing
+        # it at the package (or its `src` derivation) is an import-from-derivation
+        # that `nix flake check --no-build` refuses. fetchTarball runs in the
+        # evaluator instead, and reusing `src`'s coordinates keeps one version pin
+        # that follows nur-packages; a fetchFromGitHub `outputHash` is the
+        # unpacked-tree NAR hash fetchTarball verifies.
         my.programs.coding-agents.skills.playwright-cli =
-          "${pkgs.playwright-cli}/lib/node_modules/@playwright/cli/skills/playwright-cli";
+          let
+            inherit (pkgs.playwright-cli.src) url outputHash;
+          in
+          "${
+            fetchTarball {
+              inherit url;
+              sha256 = outputHash;
+            }
+          }/skills/playwright-cli";
       };
     };
 }
