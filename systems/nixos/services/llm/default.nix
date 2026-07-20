@@ -2,12 +2,13 @@
 {
   services.ollama = {
     enable = true;
+    syncModels = true;
     loadModels = [
-      "gemma3:12b"
-      "gemma3:27b"
-      "gemma3:4b"
-      "gpt-oss:20b"
-      "qwen3:14b"
+      "gemma4:12b"
+      "gemma4:31b"
+      "gemma4:e4b"
+      "qwen3.5:9b"
+      "qwen3.6:27b"
     ];
   };
 
