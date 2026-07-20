@@ -50,6 +50,7 @@ in
     signKeyFiles = [ config.sops.secrets.niks3-signing-key.path ];
 
     cacheUrl = "https://${cacheDomain}";
+    serverUrl = "https://${serverDomain}";
 
     gc.olderThan = "168h";
 
@@ -70,6 +71,13 @@ in
   my.services.cloudflared-tunnel.ingress.${serverDomain} = {
     service = "http://localhost:${niks3Port}";
   };
+
+  services.prometheus.scrapeConfigs = [
+    {
+      job_name = "niks3";
+      static_configs = [ { targets = [ "127.0.0.1:${niks3Port}" ]; } ];
+    }
+  ];
 
   sops.secrets = {
     niks3-api-token = {
