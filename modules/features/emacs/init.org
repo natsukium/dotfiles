@@ -99,6 +99,11 @@ so [[https://github.com/purcell/exec-path-from-shell][exec-path-from-shell]] is 
 Merging =my/nix-exec-path= back after initialization
 preserves wrapper-provided paths.
 
+A daemon started by =services.emacs= has no =window-system= at init time,
+so the guard must also match =daemonp=; otherwise initialization is skipped
+and the daemon keeps the minimal launchd ~PATH~, unable to find binaries
+like =notmuch= or =ghq=.
+
 When launched from an application launcher (Dock, Spotlight), Emacs
 inherits only the minimal launchd environment, which lacks Nix-related
 variables. Without these, =direnv export= may produce incomplete
@@ -117,7 +122,7 @@ constructed—even though envrc itself applied the correct environment.
 (use-package exec-path-from-shell
   :ensure t
   :config
-  (when (memq window-system '(mac ns x))
+  (when (or (daemonp) (memq window-system '(mac ns x)))
     (dolist (var '("SSH_AUTH_SOCK" "SSH_AGENT_PID" "GPG_AGENT_INFO"
                    "LANG" "LC_CTYPE" "NIX_SSL_CERT_FILE" "NIX_PATH"
                    "__fish_nixos_env_preinit_sourced"
@@ -997,6 +1002,64 @@ which can then be inserted into org-capture templates via =%a=.
 (use-package ol-notmuch
   :ensure t
   :after (notmuch org))
+#+end_src
+
+** github notifications
+
+Most of my notmuch inbox is GitHub notification mail, and from a message I
+usually want to act on the issue or PR it refers to. These commands read the
+owner, repository, and number off the message and hand them to the tools I
+already use: =C-c g v= opens the topic through consult-gh (which routes into a
+forge buffer), and =C-c g p= opens the repository in magit, resolving—or
+=ghq get='ing—the local clone through ghq.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'notmuch-show
+  (defun my/notmuch-github-topic ()
+    "Return (OWNER REPO KIND NUMBER) for the GitHub notification at point.
+KIND is \"pull\" or \"issues\"."
+    (let ((id (or (notmuch-show-get-message-id t) "")))
+      (when (string-match
+             "\\([A-Za-z0-9._-]+\\)/\\([A-Za-z0-9._-]+\\)/\\(pull\\|issues\\)/\\([0-9]+\\)"
+             id)
+        (list (match-string 1 id) (match-string 2 id)
+              (match-string 3 id) (match-string 4 id)))))
+
+  (defun my/notmuch-github-visit-topic ()
+    "View the GitHub PR/issue for the notification at point via consult-gh."
+    (interactive)
+    (require 'consult-gh)
+    (pcase (my/notmuch-github-topic)
+      (`(,owner ,repo ,kind ,number)
+       (let ((slug (concat owner "/" repo)))
+         (if (equal kind "pull")
+             (consult-gh--pr-view slug number)
+           (consult-gh--issue-view slug number))))
+      (_ (user-error "No GitHub issue/PR reference in this message"))))
+
+  (defun my/notmuch-github-visit-project ()
+    "Open magit-status for the repo of the GitHub notification at point.
+Resolve the local clone through ghq, offering to `ghq get' it if absent."
+    (interactive)
+    (pcase (my/notmuch-github-topic)
+      (`(,owner ,repo ,_ ,_)
+       (let* ((slug (concat owner "/" repo))
+              (find (lambda () (string-trim
+                                (shell-command-to-string
+                                 (format "ghq list -p -e %s"
+                                         (shell-quote-argument slug))))))
+              (dir (funcall find)))
+         (when (and (string-empty-p dir)
+                    (yes-or-no-p (format "Clone %s with ghq? " slug)))
+           (call-process "ghq" nil nil nil "get" slug)
+           (setq dir (funcall find)))
+         (if (and (not (string-empty-p dir)) (file-directory-p dir))
+             (magit-status dir)
+           (user-error "No local clone for %s" slug))))
+      (_ (user-error "No GitHub repo reference in this message"))))
+
+  (keymap-set notmuch-show-mode-map "C-c g v" #'my/notmuch-github-visit-topic)
+  (keymap-set notmuch-show-mode-map "C-c g p" #'my/notmuch-github-visit-project))
 #+end_src
 
 * terminal
