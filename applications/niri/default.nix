@@ -7,7 +7,7 @@
 }:
 let
   defaultKeyBind = import ./defaultKeyBind.nix;
-  terminal = "kitty";
+  terminal = "felis";
   launcher = [
     "vicinae"
     "toggle"

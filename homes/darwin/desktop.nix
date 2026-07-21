@@ -29,4 +29,6 @@ in
     enable = true;
     imagePath = "${wallpaper}/share/wallpapers/nixos-wallpaper.png";
   };
+
+  my.services.skhd.enable = true;
 }
