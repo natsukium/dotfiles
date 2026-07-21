@@ -128,6 +128,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<nur-packages>>
     <<paneru>>
     <<simple-wol-manager>>
+    <<spoor>>
     <<vicinae>>
     <<zen-browser>>
   };
@@ -837,6 +838,28 @@ and managing device configurations.
 simple-wol-manager = {
   url = "git+https://git.natsukium.com/natsukium/simple-wol-manager";
   inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** spoor
+
+https://git.natsukium.com/natsukium/spoor
+
+#+begin_quote
+A standalone, terminal-agnostic hint picker for scrollback.
+#+end_quote
+
+My own take on tmux-thumbs' standalone mode: pipe text in, it labels the
+matches, and on selection it copies, opens, or runs a command with the pick.
+The felis terminal uses it for URL hints — spoor links felis' own VT parser
+and cell grid, so its overlay lands on exactly the columns felis drew.
+
+#+NAME: spoor
+#+begin_src nix
+spoor = {
+  url = "git+https://git.natsukium.com/natsukium/spoor";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.flake-parts.follows = "flake-parts";
 };
 #+end_src
 

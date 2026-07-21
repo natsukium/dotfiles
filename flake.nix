@@ -166,6 +166,11 @@
       url = "git+https://git.natsukium.com/natsukium/simple-wol-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    spoor = {
+      url = "git+https://git.natsukium.com/natsukium/spoor";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
     vicinae = {
       url = "github:natsukium/vicinae/nix/hm-module-for-darwin";
       inputs.nixpkgs.follows = "nixpkgs";
