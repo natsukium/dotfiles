@@ -76,7 +76,6 @@
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.flake-compat.follows = "";
-      inputs.gitignore.follows = "";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     treefmt-nix = {
