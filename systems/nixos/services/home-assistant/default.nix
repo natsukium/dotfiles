@@ -11,6 +11,8 @@ let
   };
 in
 {
+  imports = [ ./prometheus.nix ];
+
   services.home-assistant = {
     enable = true;
     extraComponents = [
@@ -19,6 +21,7 @@ in
       "switchbot"
       "switchbot_cloud"
       "ecovacs"
+      "prometheus"
     ];
     customComponents = [ petkit ];
     config = {
@@ -26,6 +29,7 @@ in
         name = "Home";
         unit_system = "metric";
       };
+      prometheus = { };
       http = {
         use_x_forwarded_for = true;
         trusted_proxies = [
