@@ -11,7 +11,7 @@
         grafana = {
           enable = true;
           env = {
-            GRAFANA_URL = "http://manyara:3001";
+            GRAFANA_URL = "http://monitor.home.natsukium.com";
             GRAFANA_USERNAME = "admin";
           };
           passwordCommand = {

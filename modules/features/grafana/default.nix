@@ -18,6 +18,8 @@
               http_addr = "0.0.0.0";
               http_port = 3001;
               enable_gzip = true;
+              domain = "monitor.home.natsukium.com";
+              root_url = "http://monitor.home.natsukium.com/";
             };
             security.secret_key = "$__file{${config.sops.secrets.grafana-secret-key.path}}";
           };
@@ -50,6 +52,11 @@
             };
           };
         };
+
+        services.caddy.virtualHosts."http://${config.services.grafana.settings.server.domain}".extraConfig =
+          ''
+            reverse_proxy localhost:${toString config.services.grafana.settings.server.http_port}
+          '';
 
         sops.secrets.grafana-secret-key = {
           sopsFile = ./secrets.yaml;
