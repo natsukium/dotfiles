@@ -11,10 +11,9 @@
   (load-theme 'doom-nord :no-confirm))
 #+end_src
 
-Enable visual-line-mode globally instead of using auto-fill-mode here
-to preserve logical line structure
-while still wrapping long lines visually for better readability
-without modifying the actual file.
+visual-line-mode wraps long lines visually without modifying the file,
+so the logical line structure is preserved;
+auto-fill-mode would hard-wrap them instead.
 
 #+begin_src emacs-lisp
 (visual-line-mode 1)
@@ -135,8 +134,8 @@ based on direnv. This enables Emacs to recognize project-specific
 development environments managed by direnv.
 
 Unlike direnv.el which sets environment variables globally,
-envrc.el keeps them buffer-local. This is essential when working
-on multiple projects simultaneously, each with its own .envrc.
+envrc.el keeps them buffer-local. That matters when several
+projects are open at once, each with its own =.envrc=.
 
 The mode must be enabled early (via after-init hook) so that
 other packages can inherit the correct environment.
@@ -382,12 +381,12 @@ on the same buffer (e.g. a language server alongside a linter or formatter).
 lsp-mode handles multiple concurrent servers natively
 and provides more granular control over LSP behavior.
 
-Using =lsp-deferred= instead of =lsp= to delay server startup
+I use =lsp-deferred= instead of =lsp= to delay server startup
 until the buffer is visible,
-avoiding unnecessary processes for buffers opened in the background.
+avoiding processes for buffers opened in the background.
 
-Disabling =lsp-headerline-breadcrumb-mode=
-to avoid conflict with the existing =breadcrumb= package in the header line.
+=lsp-headerline-breadcrumb-mode= is disabled
+because the =breadcrumb= package already occupies the header line.
 
 #+begin_src emacs-lisp
 (use-package lsp-mode
@@ -403,7 +402,7 @@ to avoid conflict with the existing =breadcrumb= package in the header line.
 
 ** tree-sitter
 
-Use maximum font-lock level for tree-sitter modes.
+Tree-sitter modes get the maximum font-lock level.
 
 #+begin_src emacs-lisp
 (setq treesit-font-lock-level 4)
@@ -548,7 +547,7 @@ well.
 [[https://github.com/hcl-emacs/terraform-mode][terraform-mode]] provides syntax highlighting and indentation for Terraform (HCL) files.
 
 No tree-sitter variant is available in MELPA,
-so using the traditional major mode.
+so I use the traditional major mode.
 
 [[https://github.com/hashicorp/terraform-ls][terraform-ls]] (configured via lsp-mode) provides IDE features
 such as completion, diagnostics via =terraform validate=,
@@ -862,7 +861,7 @@ and lacking interactive features like text selection, incremental search, and an
 providing sharp rendering, isearch integration, annotation support,
 and SyncTeX for LaTeX workflows.
 
-Using =pdf-loader-install= instead of =pdf-tools-install=
+I use =pdf-loader-install= instead of =pdf-tools-install=
 to defer initialization until a PDF is actually opened.
 With Nix's pre-built =epdfinfo= binary, both functions behave identically,
 but the loader variant avoids unnecessary work at startup.
@@ -878,10 +877,10 @@ but the loader variant avoids unnecessary work at startup.
 * RSS
 
 [[https://github.com/skeeto/elfeed][elfeed]] is a web feed reader for Emacs.
-Using it with [[https://github.com/fasheng/elfeed-protocol][elfeed-protocol]]
-to read feeds from Miniflux via the Fever API.
-This keeps feed management centralized in Miniflux
-and avoids duplicating the subscription list across devices.
+I pair it with [[https://github.com/fasheng/elfeed-protocol][elfeed-protocol]]
+to read feeds from Miniflux via the Fever API,
+which keeps feed management centralized in Miniflux
+instead of duplicating the subscription list on every device.
 
 The Fever API must be enabled in Miniflux
 (Settings -> Integrations -> Fever API)
@@ -917,10 +916,10 @@ machine rss.home.natsukium.com login natsukium password <fever-password>"
 [[https://notmuchmail.org/notmuch-emacs/][notmuch.el]] provides an Emacs interface for reading and organizing email.
 It reads mail from a local maildir synced by mbsync.
 
-notmuch was chosen over mu4e because the notmuch indexer
-is already configured for all email accounts.
-Adding notmuch.el only requires the Emacs frontend,
-avoiding a second indexer for the same maildir.
+I chose notmuch over mu4e because the notmuch indexer
+is already configured for all my email accounts;
+adding notmuch.el only adds the Emacs frontend,
+not a second indexer over the same maildir.
 
 notmuch has no built-in delete operation; it manages metadata (tags)
 rather than maildir folder placement.
@@ -1016,8 +1015,8 @@ making it suitable for running interactive CLI tools like Claude Code.
 [[https://github.com/anticomputer/age.el][age.el]] provides transparent encryption and decryption
 of =.age= files in Emacs using the [[https://age-encryption.org/][age]] encryption tool.
 
-Using SSH keys as identity/recipient
-so that no separate age keypair is needed.
+I use my SSH keys as identity and recipient,
+so no separate age keypair is needed.
 
 #+begin_src emacs-lisp
 (use-package age

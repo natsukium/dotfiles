@@ -8,7 +8,7 @@ This file defines custom modules that extend the standard NixOS, nix-darwin, and
 module systems. Each module addresses specific use cases or provides opinionated defaults not
 available upstream.
 
-Modules are organized by functional domain (e.g., Shell, Networking, Version Control) rather
+I organize modules by functional domain (e.g., Shell, Networking, Version Control) rather
 than by module system target. When a domain contains both system-level and user-level
 configuration, subheaders separate them explicitly.
 
@@ -431,9 +431,9 @@ Core Tailscale service configuration.
 All machines in this configuration can potentially serve as exit nodes for other devices,
 providing flexibility when traveling or on restricted networks.
 
-=authKeyFile= points to a SOPS-managed secret containing a Tailscale auth key. Using auth keys
-enables unattended authentication, which is essential for automated deployments and GitOps
-workflows with tools like comin.
+=authKeyFile= points to a SOPS-managed secret containing a Tailscale auth key. Auth keys
+allow unattended authentication, which automated deployments and GitOps tools like comin
+depend on.
 
 =--ssh= enables Tailscale SSH, allowing SSH access over the Tailscale network without managing
 SSH keys or exposing port 22 to the public internet.
@@ -579,10 +579,10 @@ support, and extensibility.
 
 ** Fish
 
-Fish is the primary interactive shell, chosen for its out-of-the-box experience:
+Fish is my primary interactive shell. I chose it for its out-of-the-box experience:
 syntax highlighting, autosuggestions, and tab completions work without configuration
-or plugins. Among shells with broad environment and software support, fish provides the
-most convenient and extensible interactive experience with the least setup effort.
+or plugins. Among shells with broad environment and software support, fish gives the
+most convenient and extensible interactive experience for the least setup effort.
 
 Both NixOS and nix-darwin hand fish its environment by sourcing each
 =environment.*Init= snippet -- and on NixOS the whole session environment -- through a
@@ -977,10 +977,10 @@ shellAliases = {
 
 *** Init
 
-This configuration is a remnant from before fish was set as the default login shell.
-Previously, bash was the login shell and =.bashrc= launched fish, so these settings
-were needed in every interactive session. They are retained because bash is still
-used as a fallback.
+This configuration is a remnant from before I made fish the default login shell.
+Back then bash was the login shell and =.bashrc= launched fish, so these settings
+ran in every interactive session. I keep them because bash still serves as the
+fallback.
 
 #+NAME: bash-init
 #+begin_src nix
@@ -1080,15 +1080,15 @@ character into its keymap after reading =inputrc=, which puts =Ctrl+W= back on
 
 ** Nushell
 
-Nushell is enabled for its ability to handle structured data natively, similar to
+I enable Nushell for its native handling of structured data, similar to
 PowerShell. Where traditional shells pipe text between commands, Nushell operates on
 serialised data formats (JSON, YAML, CSV, etc.) as first-class tables and records,
 making simple data manipulation possible without reaching for external tools like =jq=.
 Like fish, it is non-POSIX, but POSIX compatibility is not a requirement for an
 interactive shell.
 
-No custom configuration is added yet — the defaults are sufficient for exploratory
-use, and committing to Nushell-specific workflows would be premature.
+I have not added any custom configuration yet — the defaults are enough for
+exploratory use, and committing to Nushell-specific workflows would be premature.
 
 Registered behind =my.programs.nushell.enable=, like the other shells in this section.
 
@@ -1177,9 +1177,9 @@ options.ext.programs.nushell.externalCompleter = {
 
 ** Starship
 
-[[https://starship.rs/][Starship]] is a cross-shell prompt written in Rust, used across all shells configured
-here to provide a consistent prompt experience. It has been used since its predecessor
-[[https://github.com/matchai/spacefish][spacefish]], and its easy TOML-based configuration is the main reason it has been kept.
+[[https://starship.rs/][Starship]] is a cross-shell prompt written in Rust; I use it in every shell configured
+here so the prompt looks the same everywhere. I have used it since its predecessor
+[[https://github.com/matchai/spacefish][spacefish]], and its easy TOML-based configuration is the main reason it has stayed.
 
 Starship does not natively support asynchronous prompt rendering, so this section also
 includes a custom async prompt module for fish.
@@ -1262,8 +1262,8 @@ disabled = false
 
 A custom module detects when running inside a VS Code Remote Container
 (Dev Container) by checking the =REMOTE_CONTAINERS= environment variable,
-displaying a whale emoji (🐋) as a visual reminder. This has not been used for
-several years and may no longer be relevant.
+displaying a whale emoji (🐋) as a visual reminder. I have not used this in
+several years, and it may no longer be relevant.
 
 #+begin_src toml :tangle features/starship/starship.toml
 [custom.remote-container]
@@ -1521,10 +1521,11 @@ push.useForceIfIncludes = true;
 
 *** Commit Signing
 
-SSH-based commit signing. SSH keys were chosen over GPG because SSH keys are already
-required for push authentication, eliminating the need to manage a separate GPG keychain.
-Git's SSH signing support (added in Git 2.34) provides the same integrity guarantees as
-GPG signing with simpler key management — one key pair for both authentication and signing.
+SSH-based commit signing. I chose SSH keys over GPG back when the key was already
+required for push authentication, which spared me a separate GPG keychain. Git's SSH
+signing support (added in Git 2.34) provides the same integrity guarantees as GPG
+signing with simpler key management. Pushes have since moved to HTTPS (see
+[[*GitHub CLI][GitHub CLI]]), so signing is now the one job the SSH key still does.
 
 GitHub has [[https://github.blog/changelog/2022-08-23-ssh-commit-verification-now-supported/][supported SSH commit verification since August 2022]], and since
 [[https://github.blog/changelog/2024-11-12-persistent-commit-signature-verification-now-in-public-preview/][November 2024]] verification results are persisted server-side. This persistent verification
@@ -1620,10 +1621,10 @@ documentation that should never be shared.
 
 *** Scalar
 
-[[https://git-scm.com/docs/scalar][Scalar]] optimizes git performance for large repositories. Enabled specifically for the
-nixpkgs repository, which contains over 600,000 commits and benefits significantly from
-Scalar's background maintenance (prefetch, commit-graph, loose-objects) and filesystem
-monitor integration.
+[[https://git-scm.com/docs/scalar][Scalar]] optimizes git performance for large repositories. I enable it specifically for
+the nixpkgs repository, which contains over 600,000 commits and benefits from Scalar's
+background maintenance (prefetch, commit-graph, loose-objects) and filesystem monitor
+integration.
 
 =programs.git.scalar= is a custom option this module extends git with, configuring
 git's built-in performance optimizations (multipack index, preload index, untracked
@@ -1738,7 +1739,7 @@ programs.gh.enable = true;
 *** Delta
 
 [[https://github.com/dandavison/delta][delta]] provides syntax-highlighted diffs in the terminal with line numbers and side-by-side
-view support. Chosen for its clean visual presentation.
+view support. I chose it for its clean visual presentation.
 
 #+NAME: git-delta
 #+begin_src nix
@@ -1770,14 +1771,14 @@ programs.difftastic = {
 
 *** Lazygit
 
-[[https://github.com/jesseduffield/lazygit][Lazygit]] is a terminal UI for git. A TUI was chosen over raw git commands for interactive
+[[https://github.com/jesseduffield/lazygit][Lazygit]] is a terminal UI for git. I chose a TUI over raw git commands for interactive
 operations like staging individual hunks, interactive rebase, and conflict resolution,
-where the visual feedback loop significantly reduces errors. Previously used gitui, but
+where the visual feedback keeps me from mis-staging things. I used gitui before, but
 switched to lazygit for its broader feature set — gitui's performance advantage did not
-materialize in practice, and it lacked several workflow-critical operations.
+materialize in practice, and it lacked several operations my workflow needs.
 
 Performance degrades noticeably on large repositories like nixpkgs, but the ergonomics
-and active development make it a trusted part of the workflow despite this tradeoff.
+and active development are worth that tradeoff to me.
 
 #+NAME: git-lazygit
 #+begin_src nix
@@ -2447,12 +2448,12 @@ so it survives re-plugging and would apply to a replacement unit.
 ** Zen Browser
 
 [[https://zen-browser.app/][Zen Browser]] is a Firefox-based browser with a focus on privacy and customization.
-Firefox derivatives were preferred over Chromium-based browsers because Firefox's extension
-ecosystem and =about:config= provide deeper control over browser behavior, and the Nix
+I prefer Firefox derivatives over Chromium-based browsers because Firefox's extension
+ecosystem and =about:config= give deeper control over browser behavior, and the Nix
 ecosystem has mature tooling for managing Firefox profiles declaratively via home-manager.
 
-Zen Browser was chosen over vanilla Firefox for its improved UI/UX while retaining full
-Firefox compatibility — extensions, search engines, and profile settings work identically.
+I chose Zen over vanilla Firefox for its better UI while keeping full Firefox
+compatibility — extensions, search engines, and profile settings work identically.
 
 #+begin_src nix :tangle features/zen-browser.nix :exports none
 # This file is auto-generated from configuration.org.

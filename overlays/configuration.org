@@ -11,7 +11,7 @@ would otherwise block the system build or cause runtime problems.
 For details on overlay mechanics (=final: prev:= pattern, composition order, etc.),
 see [[https://nixos.org/manual/nixpkgs/stable/#chap-overlays][nixpkgs overlay documentation]].
 
-Overlays are organized into four categories based on their purpose and expected lifetime:
+I organize overlays into four categories by purpose and expected lifetime:
 
 - *stable*: Packages fetched from nixpkgs-stable when broken in unstable and the fix would
   trigger excessive rebuilds or is too complex to patch locally.
@@ -54,9 +54,9 @@ stable = final: prev: {
 ** temporary-fix
 
 Local overrides for packages that build but have failing tests or minor issues.
-Unlike the =stable= overlay, these don't require fetching packages from a different
-nixpkgs branch. We simply override specific attributes (like =doCheck=) on the
-existing packages. Remove these overrides once the issues are fixed upstream.
+Unlike the =stable= overlay, these don't fetch packages from a different nixpkgs
+branch; they only override specific attributes (like =doCheck=) on the existing
+packages. Remove these overrides once the issues are fixed upstream.
 
 #+NAME: temporary-fix
 #+begin_src nix
@@ -69,11 +69,10 @@ temporary-fix = final: prev: {
 
 Override problematic Python packages using =packageOverrides=.
 
-Python packages in nixpkgs form an interconnected dependency graph. The =packageOverrides=
-mechanism ensures that when a package is overridden, all dependent packages automatically
-see the modified version. This is essential for consistency—a direct overlay override
-(e.g., =python313Packages.foo = ...=) would only affect top-level access, leaving
-internal dependencies using the original broken version.
+Python packages in nixpkgs form an interconnected dependency graph. Going through
+=packageOverrides= makes every dependent package see the modified version. A direct
+overlay override (e.g., =python313Packages.foo = ...=) would only change top-level
+access, leaving internal dependencies on the original broken version.
 
 See [[https://nixos.org/manual/nixpkgs/stable/#overriding-python-packages][nixpkgs Python documentation]] for details.
 
@@ -89,11 +88,11 @@ python313 = prev.python313.override {
 
 **** rapidocr-onnxruntime
 
-The test suite causes a segmentation fault during execution. The root cause is still
-under investigation.
+The test suite causes a segmentation fault during execution; I have not tracked
+down the root cause.
 
-This package is pulled in as a transitive dependency. Runtime functionality has been
-verified to work correctly in actual use, so disabling the test suite is a safe workaround.
+This package is only pulled in as a transitive dependency, and it has worked
+correctly in actual use, so disabling the test suite is a workaround I can live with.
 
 #+NAME: rapidocr-onnxruntime
 #+begin_src nix
@@ -154,8 +153,8 @@ characters (particularly CJK characters and some emoji). This causes text wrappi
 alignment to break.
 
 Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while preserving UTF-8
-encoding support, which fixes the rendering issue. We use =writeShellApplication= to create
-a wrapper that sets this environment variable before invoking the real binary.
+encoding support, which fixes the rendering issue. I wrap the real binary with
+=writeShellApplication= so that variable is set before it runs.
 
 Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]].
 

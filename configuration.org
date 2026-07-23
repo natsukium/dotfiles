@@ -161,16 +161,16 @@ https://github.com/NixOS/nixpkgs
 Nix Packages collection & NixOS
 #+END_QUOTE
 
-The primary package set. Using =nixos-unstable-small= instead of =nixos-unstable= for faster
-channel updates. The =-small= variant skips some less critical CI tests, allowing new package
-versions to propagate faster while maintaining stability for core packages.
+The primary package set. I track =nixos-unstable-small= instead of =nixos-unstable= for
+faster channel updates. The =-small= variant skips some less critical CI tests, allowing new
+package versions to propagate faster while maintaining stability for core packages.
 
 For channel selection guidance, see https://nix.dev/concepts/faq.html#which-channel-branch-should-i-use
 
 Channel status can be checked at https://status.nixos.org/
 
-Using =git+https://= with =shallow=1= instead of =github:= for slightly faster file extraction
-on large repositories like nixpkgs.
+I fetch via =git+https://= with =shallow=1= instead of =github:= for slightly faster file
+extraction on large repositories like nixpkgs.
 
 #+NAME: nixpkgs
 #+begin_src nix
@@ -197,8 +197,8 @@ https://github.com/hercules-ci/flake-parts
 Simplify Nix Flakes with the module system
 #+END_QUOTE
 
-Framework for organizing flake outputs. Provides module system for flakes,
-making complex configurations more maintainable through separation of concerns.
+Framework for organizing flake outputs. It brings the module system to flakes,
+so each concern can live in its own module.
 
 #+NAME: flake-parts
 #+begin_src nix
@@ -236,8 +236,8 @@ https://github.com/nix-darwin/nix-darwin
 Manage your macOS using Nix
 #+END_QUOTE
 
-nix-darwin provides NixOS-style system configuration for macOS. Essential for managing
-macOS system settings, launchd services, and Homebrew declaratively.
+nix-darwin provides NixOS-style system configuration for macOS: system settings,
+launchd services, and Homebrew, all managed declaratively.
 
 #+NAME: darwin
 #+begin_src nix
@@ -274,8 +274,7 @@ https://github.com/nix-community/nixos-wsl
 NixOS on WSL
 #+END_QUOTE
 
-NixOS on Windows Subsystem for Linux. Provides NixOS experience within WSL2,
-useful for Windows machines that need Linux development environments.
+NixOS on Windows Subsystem for Linux; arusha runs on it.
 
 #+NAME: nixos-wsl
 #+begin_src nix
@@ -318,8 +317,8 @@ https://github.com/nix-community/disko
 Declarative disk partitioning and formatting using nix
 #+END_QUOTE
 
-Used for reproducible NixOS installations with automated partition layout, filesystem
-creation, and encryption setup.
+I use it for reproducible NixOS installations with automated partition layout,
+filesystem creation, and encryption setup.
 
 #+NAME: disko
 #+begin_src nix
@@ -337,8 +336,8 @@ https://github.com/nix-community/impermanence
 Modules to help you handle persistent state on systems with ephemeral root storage
 #+END_QUOTE
 
-Manages stateful paths on systems with ephemeral root filesystems. Used with btrfs
-snapshots to ensure only explicitly declared state persists across reboots.
+Manages stateful paths on systems with ephemeral root filesystems. I use it with
+btrfs snapshots so only explicitly declared state persists across reboots.
 
 #+NAME: impermanence
 #+begin_src nix
@@ -410,9 +409,9 @@ NixOS modules for declaring & running virtual machines from within your system F
 #+END_QUOTE
 
 Lightweight per-VM isolation suitable for running somewhat untrusted code.
-Used to sandbox third-party agent code (hermes-agent) so crashes, runaway
+I use it to sandbox third-party agent code (hermes-agent) so crashes, runaway
 tool invocations, or compromise of the agent runtime cannot reach the host's
-service stack. A microvm is preferred over a plain systemd-nspawn container
+service stack. I prefer a microvm over a plain systemd-nspawn container
 because the qemu/firecracker boundary blocks kernel-level escapes that
 container namespacing alone does not.
 
@@ -498,8 +497,8 @@ https://github.com/cachix/git-hooks.nix
 Seamless integration of pre-commit.com git hooks with Nix.
 #+END_QUOTE
 
-Pre-commit hooks as Nix derivations. Ensures code quality checks run consistently
-across all development environments without requiring global tool installation.
+Pre-commit hooks as Nix derivations, so the same checks run in every development
+environment without any globally installed tools.
 
 Inputs that don't affect this flake are removed to prevent lockfile bloat.
 
@@ -522,7 +521,7 @@ treefmt nix configuration
 #+END_QUOTE
 
 Unified code formatter configuration. Runs multiple formatters (oxfmt, nixfmt, shfmt, etc.)
-through a single interface, ensuring consistent formatting across the repository.
+through a single interface, so formatting stays consistent across the repository.
 
 #+NAME: treefmt-nix
 #+begin_src nix
@@ -561,7 +560,7 @@ https://github.com/natsukium/nix-wallpaper
 A configurable wallpaper for nix systems
 #+END_QUOTE
 
-Generates Nix logo wallpapers. Using a custom branch (=custom-logo=) that supports
+Generates Nix logo wallpapers. I use a custom branch (=custom-logo=) that supports
 additional logo variants.
 
 #+NAME: nix-wallpaper
@@ -584,8 +583,8 @@ https://github.com/BatteredBunny/brew-nix
 Experimental nix expression to package all MacOS casks from homebrew automatically
 #+END_QUOTE
 
-Provides Homebrew casks as Nix packages for darwin. Useful for proprietary macOS applications
-not available in nixpkgs.
+Provides Homebrew casks as Nix packages on darwin. I use it for proprietary macOS
+applications that are not in nixpkgs.
 
 The =brew-api= input is marked as non-flake because it's just a data source (JSON API dump
 from Homebrew's API).
@@ -612,7 +611,7 @@ https://github.com/k3d3/claude-desktop-linux-flake
 Nix Flake for Claude Desktop on Linux
 #+END_QUOTE
 
-Provides Claude Desktop for Linux. Using a community flake since Anthropic doesn't
+Provides Claude Desktop for Linux. I use a community flake since Anthropic doesn't
 officially support Linux yet.
 
 #+NAME: claude-desktop
@@ -650,7 +649,7 @@ Bleeding edge emacs overlay
 
 Provides latest Emacs builds including native compilation and pure GTK variants.
 Also includes MELPA packages updated more frequently than nixpkgs.
-Mainly used for the utility that parses org files and automatically configures
+I mainly use it for the utility that parses org files and automatically configures
 dependency packages.
 
 #+NAME: emacs-overlay
@@ -802,14 +801,14 @@ A sliding, tiling window manager for MacOS.
 #+end_quote
 
 Paneru brings the Niri-style scrollable tiling workflow used on Linux machines
-to macOS. Among the window managers tried for this purpose, it has run the
-most stably in day-to-day use, which is why it was chosen.
+to macOS. Among the window managers I tried for this, it has run the most
+stably in day-to-day use, which is why I chose it.
 
 The =natsukium/paneru= fork exists for a single reason: upstream tiles Emacs
 child frames — the floating windows used by completion UIs such as Corfu —
 alongside their parent, which collapses the popup. The fork keeps child
-frames floating. Once the patch has been confirmed stable in daily use, the
-plan is to send it upstream and switch this input back to =karinushka/paneru=.
+frames floating. Once the patch has proven stable in daily use, I plan to send
+it upstream and switch this input back to =karinushka/paneru=.
 
 #+NAME: paneru
 #+begin_src nix
@@ -918,13 +917,12 @@ allow sharing these values across both the flake and machine-specific settings.
 **** Binary Caches
 
 Binary cache (substituter) configuration for building this flake. While optional, configuring
-these caches significantly reduces build times by downloading pre-built binaries instead of
-compiling from source.
+these caches cuts build times by downloading pre-built binaries instead of compiling from
+source.
 
-Using =extra-substituters= and =extra-trusted-public-keys= instead of =substituters= and
-=trusted-public-keys= ensures this flake's cache configuration is additive rather than
-replacing the user's existing settings. This respects any caches the user has already
-configured in their =nix.conf= or system configuration.
+=extra-substituters= and =extra-trusted-public-keys=, rather than =substituters= and
+=trusted-public-keys=, make this flake's cache configuration additive: any caches the user
+has already configured in =nix.conf= or their system configuration stay in place.
 
 #+NAME: nix-config
 #+begin_src nix
@@ -1216,9 +1214,9 @@ by [[file:scripts/org-to-html.el][=scripts/org-to-html.el=]], so a page loads no
 
 ** Distributed Builds
 
-[[https://nix.dev/manual/nix/latest/advanced-topics/distributed-builds][Distributed build]] configuration using Nix's built-in =buildMachines= support. This allows
-any machine in the fleet to offload builds to other machines, significantly reducing build
-times for resource-intensive derivations.
+[[https://nix.dev/manual/nix/latest/advanced-topics/distributed-builds][Distributed build]] configuration using Nix's built-in =buildMachines= support. This lets
+any machine in the fleet offload builds to the others, cutting build times for
+resource-intensive derivations.
 
 This lives outside the =modules/= registry because it has no enable toggle: every
 non-server host applies it unconditionally, and the profiles that need to opt out
@@ -1893,8 +1891,8 @@ The =org-export-with-author= setting is explicitly disabled because
 Emacs variable =user-full-name=. On macOS, this variable is populated from
 the system directory service (=dscl= / =getpwuid=), producing an unwanted
 =#+author:= line. On Linux, especially in CI environments, the value is
-typically empty, so the line is omitted. Disabling the setting ensures
-consistent output across platforms.
+typically empty, so the line is omitted. Disabling the setting keeps the
+output identical across platforms.
 
 #+begin_src emacs-lisp :tangle scripts/export-readme-org.el :mkdirp yes
 (require 'ox-org)
