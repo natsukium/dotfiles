@@ -2,8 +2,8 @@
 * About
 
 This repository manages system configurations for multiple machines using
-[[https://nixos.org/][Nix]] and [[https://orgmode.org/][Org mode]]. All configuration is written as literate
-programs—Org documents where prose explains the reasoning behind each decision,
+[[https://nixos.org/][Nix]] and [[https://orgmode.org/][Org mode]]. I write every configuration as a literate
+program: an Org document where prose explains the reasoning behind each decision,
 and Nix code blocks are tangled into the actual configuration files.
 ** Documentation
 
@@ -41,18 +41,17 @@ Nix is declarative. Reading a Nix expression reveals what the system should beco
 and Nix itself handles how to get there. But neither the code nor the build system
 captures why a particular configuration exists, or why alternatives were rejected.
 
-Why was fish chosen over zsh or bash? Why does the desktop profile enable this
-specific set of services? Why was a particular package pinned to an older version?
-The code shows the decision, but not the reasoning behind it.
-Without this context, future changes risk undoing intentional tradeoffs or
-repeating previously rejected approaches.
+In practice, the code shows that fish is my shell, which services the desktop
+profile enables, and which packages are pinned to older versions, but not the
+reasoning behind any of it. Without that context, a future change risks undoing
+an intentional tradeoff or repeating an approach I already rejected.
 
-This repository uses literate programming to preserve intent. Configuration lives
-in Org mode documents where prose surrounds code.
+So the configuration lives in Org mode documents where prose surrounds code, and
+the prose carries the intent.
 
-For most settings, one or two sentences—what it enables and the visible
-effect—is enough. Reserve the full problem-and-alternatives form for non-obvious
-trade-offs: architectural choices, package pins, temporary workarounds.
+Most settings get one or two sentences: what they enable and the visible effect.
+I save the full problem-and-alternatives account for non-obvious trade-offs:
+architectural choices, package pins, temporary workarounds.
 * Development
 
 This repository provides a Nix development shell with all the tools needed
@@ -117,8 +116,8 @@ and syncs =CLAUDE.md= from the literate source.
 #+end_src
 ** Pre-commit hooks
 
-Hooks run by [[https://github.com/cachix/git-hooks.nix][git-hooks.nix]] on every commit. =prek= is used as the runner
-because it is the actively-maintained Rust port of =pre-commit=, with a faster
+Hooks run by [[https://github.com/cachix/git-hooks.nix][git-hooks.nix]] on every commit. I use =prek= as the runner
+because it is the actively maintained Rust port of =pre-commit=, with a faster
 cold start and parallel hook execution out of the box.
 
 =check-org-tangle= is the only hook with =priority = 0= because it must run
@@ -242,7 +241,7 @@ keeps the default priority and runs in parallel under =prek=.
 #+end_src
 ** Formatting
 
-Formatters are aggregated via [[https://github.com/numtide/treefmt-nix][treefmt-nix]] and invoked from the =treefmt=
+I aggregate formatters with [[https://github.com/numtide/treefmt-nix][treefmt-nix]] and invoke them from the =treefmt=
 pre-commit hook, so a single declaration covers both editor integrations and
 the commit-time check.
 
@@ -269,9 +268,9 @@ the commit-time check.
 #+end_src
 ** MCP Servers
 
-Configuration for [[https://github.com/natsukium/mcp-servers-nix][mcp-servers-nix]], enabled in the development shell.
-The =flavors.claude-code= preset generates a =.mcp.json= file compatible with
-Claude Code's expected format.
+The development shell also configures MCP servers through [[https://github.com/natsukium/mcp-servers-nix][mcp-servers-nix]];
+the =flavors.claude-code= preset generates a =.mcp.json= file in the format
+Claude Code expects.
 
 Enabled servers:
 - =nixos=: NixOS package/option search and Home Manager documentation
@@ -313,7 +312,7 @@ avoiding plaintext credentials in the repository.
 #+end_src
 ** Translation
 
-This project uses po4a to manage translations.
+I manage translations with po4a.
 *** Requirements
 
 The required packages are included in the development shell.
@@ -324,19 +323,15 @@ gettext
 po4a
 #+end_src
 
-- =gettext=: provides msgfmt and other internationalization utilities
-- =po4a=: po4a >= 0.74 is required for Org mode support.
+- =gettext=: provides =msgfmt= and other internationalization utilities.
+- =po4a=: Org mode support needs version 0.74 or newer.
 *** Translation workflow
 
 **** Create po4a configuration
 
-Configure the target language,
-location for generated po files,
-and documents
-to translate as follows.
-The =-k 0= option forces output of translated files
-even if the translation is incomplete
-(default threshold is 80%).
+Configure the target language, the location of the generated po files, and the
+documents to translate as follows. The =-k 0= option forces output of translated
+files even when a translation is incomplete (the default threshold is 80%).
 
 #+begin_src conf :tangle po4a.cfg
 [po4a_langs] ja
@@ -352,28 +347,21 @@ even if the translation is incomplete
 For detailed information about =po4a.cfg= configuration, see =man po4a=.
 **** Create/Update po
 
-When documents are updated and you need to create/update po files,
-run the following command.
-This generates template (pot) and po files for each language
-at the paths configured in =po4a.cfg=.
+When the documents change, regenerate the po files with the following command.
+It writes the template (pot) and a po file for each language at the paths
+configured in =po4a.cfg=.
 
 #+begin_src bash
 po4a --no-translations po4a.cfg
 #+end_src
 **** Translate
 
-Edit the target language po using a po editor.
-Popular options include
-Emacs po-mode,
-poedit,
-GNOME's Gtranslator,
-and KDE's Lokalize.
+Edit the target language po file with a po editor. Popular options include Emacs
+po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize.
 **** Create/Update translation file
 
-After completing translations,
-generate files with the following command.
-Since po files are also updated at this time,
-in practice you only need to run this command.
+After translating, generate the translated documents with the following command.
+It also updates the po files, so in practice this is the only command you need.
 
 #+begin_src bash
 po4a po4a.cfg
