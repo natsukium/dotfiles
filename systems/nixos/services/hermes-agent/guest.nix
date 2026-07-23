@@ -140,13 +140,37 @@ in
   # hermes discovers user plugins under its home, which lives on the
   # persistent volume; tmpfiles re-points the link on each boot so a rebuilt
   # plugin takes effect without the stale copy surviving in the state image.
-  systemd.tmpfiles.settings."10-hermes-plugins" = {
-    "/var/lib/hermes/.hermes/plugins/web/localextract"."L+" = {
-      user = "hermes";
-      group = "hermes";
-      argument = "${webExtractPlugin}";
+  # Every parent is declared: left implicit, tmpfiles creates them root-owned,
+  # then refuses to descend from the hermes-owned home into them and abandons
+  # the link ("Detected unsafe path transition").
+  systemd.tmpfiles.settings."10-hermes-plugins" =
+    let
+      dir = {
+        d = {
+          user = "hermes";
+          group = "hermes";
+          mode = "0750";
+        };
+      };
+    in
+    {
+      # tmpfiles runs at sysinit, long before the seed unit that would
+      # otherwise be the first thing to create the home.
+      "/var/lib/hermes/.hermes" = {
+        d = {
+          user = "hermes";
+          group = "hermes";
+          mode = "2770";
+        };
+      };
+      "/var/lib/hermes/.hermes/plugins" = dir;
+      "/var/lib/hermes/.hermes/plugins/web" = dir;
+      "/var/lib/hermes/.hermes/plugins/web/localextract"."L+" = {
+        user = "hermes";
+        group = "hermes";
+        argument = "${webExtractPlugin}";
+      };
     };
-  };
 
   # Shared with the manyara host (same gid 9001) so virtiofs passthrough
   # preserves the group identity: files hermes writes land on the host with
