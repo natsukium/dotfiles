@@ -2973,7 +2973,9 @@ let
             launchd.agents.handy = lib.mkIf cfg.autostart {
               enable = true;
               config = {
-                ProgramArguments = [ (lib.getExe pkgs.handy) ];
+                ProgramArguments = [
+                  "${pkgs.handy}/Applications/Handy.app/Contents/MacOS/handy"
+                ];
                 RunAtLoad = true;
                 # Relaunch only on a crash, not on a clean quit, so closing the
                 # settings window does not immediately resurrect Handy.
