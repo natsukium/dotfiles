@@ -20,7 +20,6 @@ in
   ];
 
   home.packages = with pkgs; [
-    brewCasks.aqua-voice
     monitorcontrol
     nowplaying-cli
   ];
