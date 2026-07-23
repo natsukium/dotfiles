@@ -1459,7 +1459,6 @@ settings = {
   <<git-color>>
   <<git-default-branch>>
   <<git-push-safety>>
-  <<git-url-rewrite>>
 };
 #+end_src
 
@@ -1518,22 +1517,6 @@ prevents accidentally overwriting commits pushed by others since the last fetch,
 #+NAME: git-push-safety
 #+begin_src nix
 push.useForceIfIncludes = true;
-#+end_src
-
-**** URL Rewriting
-
-=url."git@github.com:".pushInsteadOf= rewrites push URLs from HTTPS to SSH. This allows
-=git clone https://github.com/...= to work without SSH (useful in CI or ephemeral
-environments) while ensuring pushes always use SSH authentication, avoiding the need
-for personal access tokens.
-
-In practice, [[*GitHub CLI][=gh=]] provides its own credential helper that handles HTTPS authentication
-transparently, so this rewrite rule may not be exercised for GitHub repositories. It is
-retained as an intentional fallback for environments where =gh= is not available.
-
-#+NAME: git-url-rewrite
-#+begin_src nix
-url."git@github.com:".pushInsteadOf = "https://github.com/";
 #+end_src
 
 *** Commit Signing
@@ -1733,10 +1716,19 @@ scalar = {
 *** GitHub CLI
 
 [[https://cli.github.com/][gh]] (GitHub CLI) is enabled alongside git because it provides a credential helper
-([[https://nix-community.github.io/home-manager/options.xhtml#opt-programs.gh.gitCredentialHelper.enable][=programs.gh.gitCredentialHelper.enable=]], on by default) that transparently handles
-HTTPS authentication for GitHub repositories. This is why the [[*URL Rewriting][=pushInsteadOf=]] setting
-may not be exercised in practice — =gh='s auth context covers both fetch and push over
-HTTPS.
+([[https://nix-community.github.io/home-manager/options.xhtml#opt-programs.gh.gitCredentialHelper.enable][=programs.gh.gitCredentialHelper.enable=]], on by default) that handles HTTPS
+authentication for GitHub repositories, for fetch and push alike. So git talks to
+GitHub over HTTPS only, and an SSH key is never needed to move commits — signing is
+the one thing SSH is still used for.
+
+I used to rewrite push URLs to SSH with =url."git@github.com:".pushInsteadOf=, on the
+theory that it was a harmless fallback for machines without =gh=. It was not harmless:
+URL rewriting happens before the credential helper is ever consulted, so pushes really
+did go over SSH, and the fallback could never fire anyway because the rewrite is
+tangled from the same module that installs =gh=. Since the work account needs pushes to
+authenticate as the right GitHub user, one auth path is easier to reason about than
+two, and I dropped the rewrite. The work host narrows the same helper to a second =gh=
+config directory for repositories under its own root.
 
 #+NAME: git-gh
 #+begin_src nix

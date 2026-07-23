@@ -46,7 +46,6 @@
               };
               init.defaultBranch = "main";
               push.useForceIfIncludes = true;
-              url."git@github.com:".pushInsteadOf = "https://github.com/";
             };
 
             signing = {
