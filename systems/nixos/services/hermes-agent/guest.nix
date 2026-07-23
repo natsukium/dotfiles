@@ -13,6 +13,32 @@ let
     builtins.toJSON config.services.hermes-agent.settings
   );
   credentialsDir = "/run/credentials/@system";
+
+  # web_extract had no usable backend: SearXNG only searches, and every
+  # extract-capable provider hermes ships is a paid API. trafilatura covers it
+  # locally, but it cannot go into the venv — its closure propagates certifi,
+  # charset-normalizer and urllib3, which the packaging's collision check
+  # rejects — so it runs as its own executable that the plugin drives.
+  webExtractor = pkgs.writers.writePython3Bin "hermes-web-extract" {
+    libraries = with pkgs.python3Packages; [
+      trafilatura
+      httpx
+    ];
+    # The writer's flake8 defaults to 79 columns; the rest of the tree is
+    # formatted at 88, and reflowing signatures to satisfy it reads worse.
+    flakeIgnore = [ "E501" ];
+  } (builtins.readFile ./web-extract/extract.py);
+
+  # The store path is baked in rather than resolved from PATH: the plugin is
+  # imported by hermes' own interpreter, whose environment need not contain
+  # the guest's user profile.
+  webExtractPlugin = pkgs.linkFarm "hermes-web-localextract" {
+    "plugin.yaml" = ./web-extract/plugin.yaml;
+    "__init__.py" = ./web-extract/__init__.py;
+    "provider.py" = pkgs.replaceVars ./web-extract/provider.py {
+      extractor = "${webExtractor}/bin/hermes-web-extract";
+    };
+  };
 in
 {
   microvm = {
@@ -97,6 +123,10 @@ in
       model.provider = "openai-codex";
       model.default = "gpt-5.4-mini";
       web.search_backend = "searxng";
+      web.extract_backend = "localextract";
+      # Bundled backends auto-load, but a plugin under the hermes home is
+      # user-installed and stays inert until it is named here.
+      plugins.enabled = [ "web/localextract" ];
     };
     addToSystemPackages = true;
     extraPackages = [
@@ -105,6 +135,17 @@ in
       self.packages.${pkgs.stdenv.hostPlatform.system}.emacs
     ];
     extraDependencyGroups = [ "matrix" ];
+  };
+
+  # hermes discovers user plugins under its home, which lives on the
+  # persistent volume; tmpfiles re-points the link on each boot so a rebuilt
+  # plugin takes effect without the stale copy surviving in the state image.
+  systemd.tmpfiles.settings."10-hermes-plugins" = {
+    "/var/lib/hermes/.hermes/plugins/web/localextract"."L+" = {
+      user = "hermes";
+      group = "hermes";
+      argument = "${webExtractPlugin}";
+    };
   };
 
   # Shared with the manyara host (same gid 9001) so virtiofs passthrough
