@@ -30,6 +30,7 @@
             attribution = {
               commit = "Assisted-by: Claude Code Opus 4.8";
               pr = "";
+              sessionUrl = false;
             };
 
             statusLine = {
