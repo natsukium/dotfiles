@@ -12,7 +12,7 @@ import ../../lib/mkProfile.nix { inherit lib; } {
       info.enable = lib.mkDefault false;
       man.enable = lib.mkDefault false;
     };
-    nix.distributedBuilds = false;
+    my.nix.distributedBuilds.enable = false;
   };
 
   nixos = {

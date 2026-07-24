@@ -22,7 +22,7 @@ nix-darwin, providing consistent Nix behavior on all machines.
 Core Nix daemon configuration including flakes, garbage collection, binary caches,
 and sandbox settings.
 
-#+begin_src nix :tangle features/nix.nix :exports none
+#+begin_src nix :tangle features/nix/settings.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
@@ -34,7 +34,7 @@ same module rather than duplicating it. The user-level counterpart
 same file, since XDG base directories and the global gitignore belong to the
 home-manager scope, not the system scope.
 
-#+begin_src nix :tangle features/nix.nix
+#+begin_src nix :tangle features/nix/settings.nix
 { ... }:
 let
   systemModule =
@@ -296,10 +296,200 @@ in
 
 ** Distributed Builds
 
-Machine-to-machine build offloading (=nix.buildMachines=) is documented alongside
-=configuration.org='s top-level [[file:../configuration.org::*Distributed Builds][Distributed Builds]] section rather than here: it has
-no enable toggle and applies unconditionally, so it is not a =flake.modules= registry
-entry and does not tangle into anything under =modules/=.
+Every non-server host offloads builds to the rest of the fleet over SSH, so my laptop
+can hand an =aarch64-linux= or CUDA derivation to a machine that builds it natively
+instead of emulating it. This used to sit outside the registry as an unconditional
+import, and server hosts opted out by overriding =nix.distributedBuilds= directly. I
+folded it into a =my.nix.distributedBuilds= feature so that the =base= profile turns it
+on and the =server= profile turns it off the same way every other feature is toggled,
+instead of through a setting only this one subsystem knew about.
+
+The build machines, their host keys, and the SSH connection tuning all derive from one
+=machines= attrset. Without that single source the set of hostnames would appear three
+times — in =nix.buildMachines=, in =programs.ssh.knownHosts=, and in the =ssh_config=
+=Host= line — and the three copies would drift as machines join and leave.
+
+#+begin_src nix :tangle features/nix/distributed-builds.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+Registered under both NixOS and nix-darwin from one =systemModule=, since the offloading
+logic and the SSH host trust it depends on are identical on both. Each host reaches the
+other machines' evaluated configurations through =inputs.self.outputs=; the options
+below explain what the builder entries read from them.
+
+#+begin_src nix :tangle features/nix/distributed-builds.nix
+{ ... }:
+let
+  systemModule =
+    {
+      inputs,
+      config,
+      lib,
+      ...
+    }:
+    let
+      cfg = config.my.nix.distributedBuilds;
+      protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
+      inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
+      inherit (inputs.self.outputs.darwinConfigurations) mikumi;
+    in
+    {
+      <<distributed-builds-options>>
+
+      <<distributed-builds-config>>
+    };
+in
+{
+  flake.modules.nixos.distributed-builds = systemModule;
+  flake.modules.darwin.distributed-builds = systemModule;
+}
+#+end_src
+
+*** Protocol
+
+=ssh-ng= is preferred over plain =ssh= because it transfers store paths more efficiently
+and supports content-addressed derivations. Hydra does not speak =ssh-ng=
+([[https://github.com/NixOS/hydra/issues/688][NixOS/hydra#688]]), so a host running Hydra falls back to =ssh=.
+
+*** Options
+
+Each machine entry hardcodes only what its host's configuration cannot answer: the host
+key and the platforms it builds for. The job limit and build features are read from the
+machine's own =config.nix.settings=, so raising =max-jobs= on tarangire updates its
+builder entry everywhere with no second edit. mikumi's feature list is the one
+exception, spelled out by hand because its configuration does not declare
+=system-features=.
+
+=excludeHosts= keeps a machine out of one host's builder list beyond the automatic
+self-exclusion. =work= is a company Mac that should not offload to =mikumi=, my personal
+one, so mikumi names =work= there.
+
+=connectTimeout= caps how long a host waits for a builder that is not answering. When a
+builder is down and its packets are silently dropped, SSH waits out the operating
+system's default connect timeout — tens of seconds — before Nix gives up and builds
+locally, so every build stalls on the dead machine first. Five seconds is long enough to
+reach a machine that is merely slow to answer and short enough that a dead one barely
+registers.
+
+#+NAME: distributed-builds-options
+#+begin_src nix
+options.my.nix.distributedBuilds = {
+  enable = lib.mkEnableOption "distributed builds";
+
+  connectTimeout = lib.mkOption {
+    type = lib.types.ints.positive;
+    default = 5;
+    description = "SSH ConnectTimeout in seconds for reaching build machines.";
+  };
+
+  machines = lib.mkOption {
+    type = lib.types.attrsOf (
+      lib.types.submodule {
+        options = {
+          publicKey = lib.mkOption { type = lib.types.str; };
+          systems = lib.mkOption { type = lib.types.listOf lib.types.str; };
+          maxJobs = lib.mkOption { type = lib.types.ints.positive; };
+          supportedFeatures = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+          };
+          excludeHosts = lib.mkOption {
+            type = lib.types.listOf lib.types.str;
+            default = [ ];
+          };
+        };
+      }
+    );
+    description = "Build machines the fleet can offload to.";
+    default = {
+      tarangire = {
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEJJYgE/dmYLXYBrVnPicd0qsaUeqcBtXB8H9LHkJ2j4";
+        systems = [
+          "x86_64-linux"
+          "i686-linux"
+        ];
+        maxJobs = tarangire.config.nix.settings.max-jobs;
+        supportedFeatures = tarangire.config.nix.settings.system-features;
+      };
+      kilimanjaro = {
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAILhpfAalh6A5xDSE+HOdNE29ZgIjlP7tdlhHs82boSwp";
+        systems = [
+          "x86_64-linux"
+          "i686-linux"
+        ];
+        maxJobs = kilimanjaro.config.nix.settings.max-jobs;
+        supportedFeatures = kilimanjaro.config.nix.settings.system-features;
+      };
+      serengeti = {
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDWwhfhDSZ+M2XDwP2MlC/zFfVpk3WjUxV/JWFgGzgNW";
+        systems = [ "aarch64-linux" ];
+        maxJobs = serengeti.config.nix.settings.max-jobs;
+        supportedFeatures = serengeti.config.nix.settings.system-features;
+      };
+      mikumi = {
+        publicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPfWOWKBFuDV08g6xP9MMY78CERI02CNG+5dy8CXQmXs";
+        systems = [
+          "aarch64-darwin"
+          "x86_64-darwin"
+        ];
+        maxJobs = mikumi.config.nix.settings.max-jobs;
+        supportedFeatures = [
+          "apple-virt"
+          "benchmark"
+          "big-parallel"
+          "nixos-test"
+        ];
+        excludeHosts = [ "work" ];
+      };
+    };
+  };
+};
+#+end_src
+
+*** Configuration
+
+A host builds its =nix.buildMachines= list from every machine except itself and any that
+named it in =excludeHosts=. The host keys go into =programs.ssh.knownHosts= for the whole
+set, since unattended SSH cannot answer an interactive host-key prompt, and the
+=ConnectTimeout= applies to the same set through an =ssh_config= =Host= block.
+
+#+NAME: distributed-builds-config
+#+begin_src nix
+config = lib.mkIf cfg.enable {
+  nix = {
+    distributedBuilds = true;
+
+    extraOptions = ''
+      builders-use-substitutes = true
+    '';
+
+    buildMachines = lib.pipe cfg.machines [
+      (lib.filterAttrs (
+        name: machine:
+        name != config.networking.hostName && !(lib.elem config.networking.hostName machine.excludeHosts)
+      ))
+      (lib.mapAttrsToList (
+        hostName: machine: {
+          inherit hostName protocol;
+          inherit (machine) systems maxJobs supportedFeatures;
+          sshUser = "natsukium";
+          speedFactor = 1;
+          mandatoryFeatures = [ ];
+        }
+      ))
+    ];
+  };
+
+  programs.ssh.knownHosts = lib.mapAttrs (_: machine: { inherit (machine) publicKey; }) cfg.machines;
+
+  programs.ssh.extraConfig = ''
+    Host ${lib.concatStringsSep " " (lib.attrNames cfg.machines)}
+      ConnectTimeout ${toString cfg.connectTimeout}
+  '';
+};
+#+end_src
 
 ** User-Level Settings
 

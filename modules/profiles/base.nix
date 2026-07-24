@@ -4,6 +4,7 @@ import ../../lib/mkProfile.nix { inherit lib; } {
 
   system = {
     my.nix.enable = lib.mkDefault true;
+    my.nix.distributedBuilds.enable = lib.mkDefault true;
     my.nixpkgs.enable = lib.mkDefault true;
   };
 
