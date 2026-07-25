@@ -46,13 +46,13 @@ let
               substituters = [
                 "https://nix-cache.natsukium.com"
                 "https://natsukium.cachix.org"
-                "https://nix-community.cachix.org"
+                "https://cache.nixos-cuda.org"
               ];
 
               trusted-public-keys = [
                 "niks3-1:SoIFTPtiPoCW3/OzUkIBKlLG5znMZfbihlr11XAOles="
                 "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
-                "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+                "cache.nixos-cuda.org:74DUi4Ye579gUqzH4ziL9IyiJBlDpMRn9MBN8oNan9M="
               ];
             };
 
