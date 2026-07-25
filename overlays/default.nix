@@ -6,6 +6,23 @@
   stable = final: prev: {
   };
 
+  cuda =
+    final: prev:
+    prev.lib.optionalAttrs (prev.config.cudaSupport or false) (
+      let
+        pkgs = import inputs.nixpkgs-cuda {
+          inherit (prev.stdenv.hostPlatform) system;
+          config = {
+            cudaSupport = true;
+            allowUnfree = true;
+          };
+        };
+      in
+      {
+        inherit (pkgs) handy ollama;
+      }
+    );
+
   temporary-fix = final: prev: {
     python313 = prev.python313.override {
       packageOverrides = pyfinal: pyprev: {
