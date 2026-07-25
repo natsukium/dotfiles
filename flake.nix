@@ -172,7 +172,7 @@
       inputs.flake-parts.follows = "flake-parts";
     };
     vicinae = {
-      url = "github:natsukium/vicinae/nix/hm-module-for-darwin";
+      url = "github:vicinaehq/vicinae";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     zen-browser = {
@@ -187,14 +187,12 @@
       "https://nix-cache.natsukium.com"
       "https://natsukium.cachix.org"
       "https://nix-community.cachix.org"
-      "https://vicinae.cachix.org"
     ];
 
     extra-trusted-public-keys = [
       "niks3-1:SoIFTPtiPoCW3/OzUkIBKlLG5znMZfbihlr11XAOles="
       "natsukium.cachix.org-1:STD7ru7/5+KJX21m2yuDlgV6PnZP/v5VZWAJ8DZdMlI="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
-      "vicinae.cachix.org-1:1kDrfienkGHPYbkpNj1mWTr7Fm1+zcenzgTizIcI3oc="
     ];
   };
 
