@@ -88,6 +88,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     # Core
     <<nixpkgs>>
     <<nixpkgs-stable>>
+    <<nixpkgs-cuda>>
     # Flake Infrastructure
     <<flake-parts>>
     # Transitive Dependencies
@@ -184,6 +185,18 @@ Provides stable packages when unstable has build failures or regressions. Mainly
 #+NAME: nixpkgs-stable
 #+begin_src nix
 nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-26.05";
+#+end_src
+
+***** nixpkgs-cuda
+
+kilimanjaro builds with =cudaSupport=, and those builds are only cached by
+[[https://cache.nixos-cuda.org][cache.nixos-cuda.org]], for the revision at the head of =nixos-unstable-cuda=. That branch
+trails =nixos-unstable-small=, so the =cuda= overlay (see [[file:overlays/configuration.org][overlays/configuration.org]]) takes
+=ollama= and =handy= from this input while the rest of the system follows the main one.
+
+#+NAME: nixpkgs-cuda
+#+begin_src nix
+nixpkgs-cuda.url = "git+https://github.com/nixos-cuda/nixpkgs?shallow=1&ref=nixos-unstable-cuda";
 #+end_src
 
 **** Flake Infrastructure
@@ -690,10 +703,15 @@ The self-improving AI agent built by Nous Research
 Provides the upstream NixOS module (=nixosModules.default=) and packaged Python
 build of hermes-agent.
 
+The URL points at my fork: upstream reads =package.json=, =pyproject.toml= and =uv.lock=
+out of =builtins.path= copies that only materialise under a writable store, so the
+=nix flake check --no-build= CI runs fails with =path '...-hermes-python-source' is not
+valid=. Back to upstream once [[https://github.com/NousResearch/hermes-agent/pull/71228][PR #71228]] merges.
+
 #+NAME: hermes-agent
 #+begin_src nix
 hermes-agent = {
-  url = "github:NousResearch/hermes-agent";
+  url = "github:natsukium/hermes-agent/fix/nix-read-only-eval";
   inputs.flake-parts.follows = "flake-parts";
   inputs.nixpkgs.follows = "nixpkgs";
 };

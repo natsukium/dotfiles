@@ -11,10 +11,12 @@ would otherwise block the system build or cause runtime problems.
 For details on overlay mechanics (=final: prev:= pattern, composition order, etc.),
 see [[https://nixos.org/manual/nixpkgs/stable/#chap-overlays][nixpkgs overlay documentation]].
 
-Overlays are organized into four categories based on their purpose and expected lifetime:
+Overlays are organized into five categories based on their purpose and expected lifetime:
 
 - *stable*: Packages fetched from nixpkgs-stable when broken in unstable and the fix would
   trigger excessive rebuilds or is too complex to patch locally.
+- *cuda*: Packages taken from the CUDA channel, the only revision whose CUDA builds are
+  cached.
 - *temporary-fix*: Local overrides (e.g., disabling tests) that don't require a different
   nixpkgs version. Remove once fixed upstream.
 - *pre-release*: Alpha, beta, or pre-release packages for testing before they land in nixpkgs.
@@ -30,6 +32,8 @@ Overlays are organized into four categories based on their purpose and expected 
 { inputs }:
 {
   <<stable>>
+
+  <<cuda>>
 
   <<temporary-fix>>
 
@@ -49,6 +53,36 @@ to patch locally.
 #+begin_src nix
 stable = final: prev: {
 };
+#+end_src
+
+** cuda
+
+[[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the head of =nixos-unstable-cuda=, so kilimanjaro takes
+its CUDA packages from =nixpkgs-cuda=. Naming =ollama= and =handy= is enough:
+=onnxruntime=, =openvino=, =opencv= and =cudnn-frontend= are only reachable through them.
+
+The package set is imported plain because the CUDA Hydra builds plain nixpkgs, and a local
+overlay reaching into that closure would move the store paths off the cache. The guard
+keeps the pin off hosts that leave =cudaSupport= unset.
+
+#+NAME: cuda
+#+begin_src nix
+cuda =
+  final: prev:
+  prev.lib.optionalAttrs (prev.config.cudaSupport or false) (
+    let
+      pkgs = import inputs.nixpkgs-cuda {
+        inherit (prev.stdenv.hostPlatform) system;
+        config = {
+          cudaSupport = true;
+          allowUnfree = true;
+        };
+      };
+    in
+    {
+      inherit (pkgs) handy ollama;
+    }
+  );
 #+end_src
 
 ** temporary-fix

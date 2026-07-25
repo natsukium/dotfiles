@@ -8,6 +8,7 @@
     # Core
     nixpkgs.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-unstable-small";
     nixpkgs-stable.url = "git+https://github.com/nixos/nixpkgs?shallow=1&ref=nixos-26.05";
+    nixpkgs-cuda.url = "git+https://github.com/nixos-cuda/nixpkgs?shallow=1&ref=nixos-unstable-cuda";
     # Flake Infrastructure
     flake-parts = {
       url = "github:hercules-ci/flake-parts";
@@ -126,7 +127,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     hermes-agent = {
-      url = "github:NousResearch/hermes-agent";
+      url = "github:natsukium/hermes-agent/fix/nix-read-only-eval";
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
     };
