@@ -125,8 +125,17 @@
           })
         ];
 
+        # Tailscale-only network, but firewall is still strict -- open the
+        # Prometheus port so Alloy clients on other hosts can remote_write the
+        # push-only Claude Code metrics (ephemeral CLI sessions cannot be
+        # scraped).
+        networking.firewall.allowedTCPPorts = [ config.services.prometheus.port ];
+
         services.prometheus = {
           enable = true;
+          # The remote-write receiver is off by default; without it the fleet's
+          # Alloy has nowhere to push the OTLP-sourced Claude Code metrics.
+          extraFlags = [ "--web.enable-remote-write-receiver" ];
           scrapeConfigs = [
             {
               job_name = "node";

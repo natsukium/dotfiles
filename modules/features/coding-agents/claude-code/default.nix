@@ -143,7 +143,29 @@
 
             env = {
               CLAUDE_CODE_ENABLE_TELEMETRY = "1";
-              OTEL_METRICS_EXPORTER = "prometheus";
+              # Traces are still beta and gated behind this flag.
+              CLAUDE_CODE_ENHANCED_TELEMETRY_BETA = "1";
+
+              # Push all three signals over OTLP to the local Alloy receiver
+              # (my.services.otel-collector) rather than exposing a Prometheus
+              # endpoint: a CLI session is too short-lived to be scraped.
+              OTEL_METRICS_EXPORTER = "otlp";
+              OTEL_LOGS_EXPORTER = "otlp";
+              OTEL_TRACES_EXPORTER = "otlp";
+              OTEL_EXPORTER_OTLP_PROTOCOL = "grpc";
+              OTEL_EXPORTER_OTLP_ENDPOINT = "http://localhost:4317";
+              # Prometheus stores cumulative counters, so emit cumulative to skip
+              # a delta-to-cumulative conversion stage in Alloy.
+              OTEL_EXPORTER_OTLP_METRICS_TEMPORALITY_PREFERENCE = "cumulative";
+              OTEL_RESOURCE_ATTRIBUTES = "service.name=claude-code";
+
+              # Personal environment: capture full prompt/response and tool
+              # detail so traces and event logs are actually inspectable.
+              OTEL_LOG_USER_PROMPTS = "1";
+              OTEL_LOG_ASSISTANT_RESPONSES = "1";
+              OTEL_LOG_TOOL_DETAILS = "1";
+              OTEL_LOG_TOOL_CONTENT = "1";
+
               CLAUDE_CODE_AUTO_COMPACT_WINDOW = "450000";
             };
           };

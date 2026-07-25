@@ -2,6 +2,10 @@
 import ../../lib/mkProfile.nix { inherit lib; } {
   name = "development";
 
+  system = {
+    my.services.otel-collector.enable = lib.mkDefault true;
+  };
+
   home = {
     my.programs.mcp.enable = lib.mkDefault true;
     my.programs.claude-code.enable = lib.mkDefault true;
