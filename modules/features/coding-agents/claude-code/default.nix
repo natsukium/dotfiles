@@ -28,7 +28,7 @@
 
           settings = {
             attribution = {
-              commit = "Assisted-by: Claude Code Opus 4.8";
+              commit = "Assisted-by: Claude Code Opus 5";
               pr = "";
               sessionUrl = false;
             };
