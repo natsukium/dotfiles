@@ -21,8 +21,6 @@ in
     rofi-rbw
     wl-clipboard
     wtype
-    # hash mismatch
-    # inputs.claude-desktop.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 
   programs.wlogout = {

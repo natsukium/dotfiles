@@ -105,11 +105,6 @@
       inputs.nix-darwin.follows = "darwin";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    claude-desktop = {
-      url = "github:k3d3/claude-desktop-linux-flake";
-      inputs.flake-utils.follows = "flake-utils";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     edgepkgs = {
       url = "github:natsukium/edgepkgs";
       inputs.nixpkgs.follows = "nixpkgs";
