@@ -30,6 +30,7 @@
   my.services.grafana.enable = true;
   my.services.prometheus.enable = true;
   my.services.loki.enable = true;
+  my.services.tempo.enable = true;
   my.services.alertmanager.enable = true;
   my.services.blackbox.enable = true;
   my.services.postgres-exporter.enable = true;
