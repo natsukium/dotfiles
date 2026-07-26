@@ -19,6 +19,7 @@
           enable = true;
           enableMcpIntegration = true;
           context = ../common/AGENTS.md;
+          settings.approvals_reviewer = "auto_review";
         };
       };
     };
