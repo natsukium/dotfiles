@@ -36,6 +36,7 @@
                 name = "natsukium";
                 email = "tomoya.otabi@gmail.com";
               };
+              github.user = "natsukium";
               core.editor = "vim";
               color = {
                 status = "auto";

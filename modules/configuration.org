@@ -1646,6 +1646,7 @@ Basic git behavior settings.
 #+begin_src nix
 settings = {
   <<git-user-identity>>
+  <<git-github-user>>
   <<git-editor>>
   <<git-color>>
   <<git-default-branch>>
@@ -1661,6 +1662,20 @@ user = {
   name = "natsukium";
   email = "tomoya.otabi@gmail.com";
 };
+#+end_src
+
+**** GitHub Identity
+
+I read GitHub issues and notifications in Emacs through [[https://github.com/magit/forge][forge]], whose API layer
+=ghub= takes the account name from =github.user= to find the matching
+=~/.authinfo.age= entry. Without it a pull aborts with "Cannot determine
+username" before any request goes out, and the notification list keeps showing
+whatever the last successful fetch stored. The token that goes with it is
+described in the forge section below.
+
+#+NAME: git-github-user
+#+begin_src nix
+github.user = "natsukium";
 #+end_src
 
 **** Editor
