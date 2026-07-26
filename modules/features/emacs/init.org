@@ -334,14 +334,27 @@ expiration is set so the token must be regenerated periodically.
 Required scopes:
 
 - =repo= — issues and pull requests
-- =notifications= — =forge-list-notifications= and notification marking
+- =notifications= — read the notification inbox behind =forge-list-notifications=
 - =user= — resolve the authenticated user's profile
 - =read:org= — enumerate organization repositories and teams
+
+=C-c g= opens the notification list. =forge-list-notifications= renders only what
+the local database already holds, so I pull afterwards rather than before. The
+pull refreshes whichever buffer was current when it started, and running it
+second makes that buffer the list itself.
 
 #+begin_src emacs-lisp
 (use-package forge
   :ensure t
   :after magit)
+
+(defun my/forge-notifications ()
+  "Display GitHub notifications, then pull new ones from the forge."
+  (interactive)
+  (forge-list-notifications)
+  (forge-pull-notifications))
+
+(global-set-key (kbd "C-c g") #'my/forge-notifications)
 #+end_src
 
 *** consult-gh
