@@ -88,6 +88,7 @@
       # instances above, so they need distinct device.
       devices.kilimanjaro-user.id = "YOF7OZK-SCMKTNA-T2GY7NV-DO6C2FG-GCXQITS-MVQMDLS-6JRS6OY-B4QLNQU";
       devices.android.id = "4NKRMZU-E6RYTI2-Y5ZA3ER-BX2RGX6-MGBOSRI-ONAZJGU-BSXU6YC-TEU5SAT";
+      devices.work.id = "VFX2CF2-EE4SQQH-VGENCDS-WBVHL7S-MO3HHCW-6C35PFY-GN3XJWK-3VOIPQY";
       folders.calibre-library = {
         path = "/data/books";
         devices = [ "kilimanjaro" ];
@@ -105,6 +106,7 @@
         devices = [
           "kilimanjaro-user"
           "android"
+          "work"
         ];
         # Peers send file modes that match their local user (typically 0644
         # without group write); applying those locally would lock hermes-agent
