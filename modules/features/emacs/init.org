@@ -777,15 +777,38 @@ Pre-creating the file before the first sync lets that check succeed.
     (write-region "" nil oauth2-auto-plstore)))
 #+end_src
 
-org-gcal stores one plstore entry per calendar ID
-and each one is read on every sync to retrieve the access token,
-so without passphrase caching the user is prompted by pinentry
-multiple times per sync.
-=plstore-cache-passphrase-for-symmetric-encryption=
-caches the passphrase within the Emacs session
-to reduce this to a single prompt after Emacs restart.
+The plstore holding the OAuth tokens is encrypted symmetrically,
+so pinentry pops several times per sync
+unless something caches the passphrase.
+=plstore-cache-passphrase-for-symmetric-encryption= keeps it in an Emacs
+variable for the session, but only under loopback pinentry:
+that is the one mode in which epg runs the passphrase callback plstore
+installs, instead of leaving the prompt to gpg-agent
+and receiving the plaintext alone.
+
+Caching in gpg-agent rather than in Emacs would survive Emacs restarts,
+which loopback does not.
+It also means dropping =no-symkey-cache= from home-manager's
+=programs.gpg= defaults,
+loosening the cache policy of every GPG operation on the machine
+for the sake of one package.
+plstore's own recommendation, public-key encryption via
+=plstore-encrypt-to=, fits even worse:
+my encryption subkey lives on a smartcard,
+so a sync would fail whenever the card is not plugged in.
+
+Loopback keeps the change inside Emacs,
+and although the mode is global to epg,
+plstore is the only epg caller left here
+now that authinfo is decrypted by age.el
+and magit signs through git's own gpg invocation.
+In exchange the passphrase sits in a variable in cleartext
+for as long as Emacs runs,
+and the confirmation prompt is gone,
+so a typo while recreating the plstore silently becomes the new passphrase.
 
 #+begin_src emacs-lisp
+(setq epg-pinentry-mode 'loopback)
 (setq plstore-cache-passphrase-for-symmetric-encryption t)
 #+end_src
 
