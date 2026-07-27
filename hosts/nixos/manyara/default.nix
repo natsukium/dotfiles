@@ -145,6 +145,30 @@
   # files syncthing creates — 0002 preserves group write so both services can coexist
   systemd.services.syncthing.serviceConfig.UMask = "0002";
 
+  # hermes sometimes creates files with an explicit 0600 mode (mkstemp-style
+  # atomic saves ignore its UMask), which hides them from syncthing's
+  # group-based access and silently keeps them out of the sync set. Default
+  # ACLs cannot enforce the invariant — an explicit chmod also rewrites the
+  # ACL mask — so restore group access periodically instead. The find filter
+  # keeps idle runs from touching ctimes, which would churn inotify and
+  # trigger needless syncthing rescans.
+  systemd.services.org-sync-perms = {
+    description = "Restore org-sync group access under the org folder";
+    serviceConfig.Type = "oneshot";
+    script = ''
+      find /var/lib/syncthing/org \
+        \( -type f ! -perm -g+rw -o -type d ! -perm -g+rwx \) \
+        -exec chmod g+rwX {} +
+    '';
+  };
+  systemd.timers.org-sync-perms = {
+    wantedBy = [ "timers.target" ];
+    timerConfig = {
+      OnBootSec = "5m";
+      OnUnitActiveSec = "5m";
+    };
+  };
+
   sops.secrets.syncthing-key = {
     sopsFile = ./syncthing.yaml;
     owner = config.services.syncthing.user;
