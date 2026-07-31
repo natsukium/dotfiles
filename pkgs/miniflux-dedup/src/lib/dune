@@ -1,0 +1,11 @@
+; Tests live in test/ rather than inline, so this library needs no ppx and
+; carries no test framework into the installed artifacts.
+;
+; Private on purpose: nothing outside this project consumes it, and giving it
+; a public_name would install the .cmxa alongside the binary, whose references
+; drag the whole OCaml toolchain into the runtime closure. Kept private it is
+; simply linked into the executable.
+
+(library
+ (name miniflux_dedup)
+ (libraries yojson))
