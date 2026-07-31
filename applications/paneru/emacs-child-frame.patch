@@ -1,0 +1,98 @@
+From 76381761bec9873180489e33f6c610e2b4305d86 Mon Sep 17 00:00:00 2001
+From: natsukium <tomoya.otabi@gmail.com>
+Date: Fri, 31 Jul 2026 12:18:35 +0900
+Subject: [PATCH] fix: exclude Emacs child frames from being tiled
+
+Emacs child frames -- the borderless popups used by completion UIs such as
+corfu, company-box and vertico-posframe -- report as AXWindow/AXFloatingWindow,
+which `is_real` accepts, so paneru tiles them alongside their parent and the
+popup collapses.
+
+Role and subrole cannot separate them from legitimate floating windows such as
+inspector panels, and `kAXParentAttribute` always reports the application
+element regardless of `NSWindow` parentage. The WindowServer-level child-window
+relationship does distinguish them: child frames carry a non-zero CGS parent ID.
+`found_valid_window` already relies on that same signal, so this reuses
+`SLSWindowIteratorGetParentID` on the window-creation path.
+
+Scoping the check to the floating subrole leaves standard windows untouched,
+and macOS keeps child windows attached to their parent, so leaving them
+unmanaged does not strand them on the desktop.
+---
+ src/manager.rs         | 17 +++++++++++++++++
+ src/manager/windows.rs | 24 ++++++++++++++++++++----
+ 2 files changed, 37 insertions(+), 4 deletions(-)
+
+diff --git a/src/manager.rs b/src/manager.rs
+index 0a59f18..a721e0c 100644
+--- a/src/manager.rs
++++ b/src/manager.rs
+@@ -667,6 +667,23 @@ pub fn window_iterator_for_id(window_id: WinID) -> Option<CFRetained<CFType>> {
+     Some(unsafe { CFRetained::from_raw(SLSWindowQueryResultCopyWindows(query.deref().into())) })
+ }
+ 
++/// Returns the WindowServer-level parent window ID, or 0 if this window is top-level.
++///
++/// Reason: `kAXParentAttribute` always reports the application element regardless of
++/// `NSWindow` `parentWindow:` status, so it cannot distinguish Emacs child frames
++/// (used by corfu, company-box, vertico-posframe) from top-level floating windows.
++/// The CGS iterator exposes the actual child-window relationship that yabai relies on
++/// in its `window_parent` check.
++pub fn window_parent_id(window_id: WinID) -> WinID {
++    let Some(iterator) = window_iterator_for_id(window_id) else {
++        return 0;
++    };
++    if !unsafe { SLSWindowIteratorAdvance(&raw const *iterator) } {
++        return 0;
++    }
++    unsafe { SLSWindowIteratorGetParentID(&raw const *iterator) }
++}
++
+ /// Determines if a window is valid based on its parent ID, attributes, and tags.
+ /// This function implements complex logic to filter out irrelevant or invalid windows.
+ ///
+diff --git a/src/manager/windows.rs b/src/manager/windows.rs
+index 220dc03..a78de27 100644
+--- a/src/manager/windows.rs
++++ b/src/manager/windows.rs
+@@ -28,7 +28,7 @@ use super::skylight::{
+ };
+ use crate::config::Config;
+ use crate::errors::{Error, Result};
+-use crate::manager::{Origin, Size, irect_from};
++use crate::manager::{Origin, Size, irect_from, window_parent_id};
+ use crate::platform::{Pid, ProcessSerialNumber, WinID, macos_major_version};
+ use crate::util::{AXUIAttributes, AXUIWrapper, MacResult};
+ 
+@@ -253,9 +253,25 @@ impl WindowOS {
+         let role = self.role().ok();
+         let subrole = self.subrole().ok();
+ 
+-        subrole.as_deref() == Some(kAXStandardWindowSubrole)
+-            || (role.as_deref() == Some(kAXWindowRole)
+-                && subrole.as_deref() == Some(kAXFloatingWindowSubrole))
++        if subrole.as_deref() == Some(kAXStandardWindowSubrole) {
++            return true;
++        }
++        if role.as_deref() != Some(kAXWindowRole)
++            || subrole.as_deref() != Some(kAXFloatingWindowSubrole)
++        {
++            return false;
++        }
++        // Reason: Emacs (and similar apps such as corfu, company-box, vertico-posframe)
++        // reports child frames as `AXWindow`/`AXFloatingWindow`, indistinguishable by
++        // role from legitimate floating windows like inspector panels. The structural
++        // discriminator is the WindowServer-level child-window relationship: child
++        // frames have a non-zero CGS parent ID, while top-level floats do not.
++        // `kAXParentAttribute` cannot be used here because it always reports the app
++        // element regardless of `NSWindow` parentage. Scoping the check to the floating
++        // subrole keeps standard windows unaffected, and macOS automatically keeps
++        // child windows attached to their parent so leaving them unmanaged does not
++        // strand them on the desktop.
++        window_parent_id(self.id) == 0
+     }
+ 
+     fn app_reference(&self) -> Option<CFRetained<AXUIWrapper>> {
+-- 
+2.55.0
+

@@ -1,6 +1,21 @@
 {
+  inputs,
+  pkgs,
+  ...
+}:
+{
   services.paneru = {
     enable = true;
+
+    package =
+      inputs.paneru.packages.${pkgs.stdenv.hostPlatform.system}.default.overrideAttrs
+        (oldAttrs: {
+          # Emacs child frames report as AXWindow/AXFloatingWindow, so paneru tiles
+          # the Corfu popup alongside its parent frame and collapses it. The patch
+          # rejects windows that have a parent at the WindowServer level.
+          patches = (oldAttrs.patches or [ ]) ++ [ ./emacs-child-frame.patch ];
+        });
+
     settings = {
       options = {
         focus_follows_mouse = true;
