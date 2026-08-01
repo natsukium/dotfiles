@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-07-31 13:59+0900\n"
+"POT-Creation-Date: 2026-08-01 11:44+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -6847,11 +6847,18 @@ msgstr ""
 
 #. type: paragraph
 #: overlays/configuration.org:60
+#, fuzzy
+#| msgid ""
+#| "[[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the "
+#| "head of =nixos-unstable-cuda=, so kilimanjaro takes its CUDA packages "
+#| "from =nixpkgs-cuda=. Naming =ollama= and =handy= is enough: "
+#| "=onnxruntime=, =openvino=, =opencv= and =cudnn-frontend= are only "
+#| "reachable through them."
 msgid ""
 "[[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the head "
 "of =nixos-unstable-cuda=, so kilimanjaro takes its CUDA packages from "
-"=nixpkgs-cuda=. Naming =ollama= and =handy= is enough: =onnxruntime=, "
-"=openvino=, =opencv= and =cudnn-frontend= are only reachable through them."
+"=nixpkgs-cuda=. Naming =ollama= and =onnxruntime= is enough: =openvino=, "
+"=opencv= and =cudnn-frontend= are only reachable through them."
 msgstr ""
 "[[https://cache.nixos-cuda.org][cache.nixos-cuda.org]]は=nixos-unstable-cuda="
 "の先端しかカバーしていないため、kilimanjaroはCUDA関連パッケージを=nixpkgs-"
@@ -6888,7 +6895,7 @@ msgid ""
 "      };\n"
 "    in\n"
 "    {\n"
-"      inherit (pkgs) handy ollama;\n"
+"      inherit (pkgs) onnxruntime ollama;\n"
 "    }\n"
 "  );"
 msgstr ""
@@ -6920,24 +6927,25 @@ msgstr ""
 msgid ""
 "temporary-fix = final: prev: {\n"
 "  <<python313-package-set>>\n"
+"  <<handy>>\n"
 "};"
 msgstr ""
 
 #. type: heading ***
-#: overlays/configuration.org:102
+#: overlays/configuration.org:103
 #, no-wrap
 msgid "Python313 package set"
 msgstr "Python313パッケージセット"
 
 #. type: paragraph
-#: overlays/configuration.org:104
+#: overlays/configuration.org:105
 msgid "Override problematic Python packages using =packageOverrides=."
 msgstr ""
 "=packageOverrides= を使用して問題のあるPythonパッケージをオーバーライドしま"
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:106
+#: overlays/configuration.org:107
 msgid ""
 "Python packages in nixpkgs form an interconnected dependency graph. The "
 "=packageOverrides= mechanism ensures that when a package is overridden, all "
@@ -6954,7 +6962,7 @@ msgstr ""
 "バージョンを使い続けてしまいます。"
 
 #. type: paragraph
-#: overlays/configuration.org:112
+#: overlays/configuration.org:113
 msgid ""
 "See [[https://nixos.org/manual/nixpkgs/stable/#overriding-python-packages]"
 "[nixpkgs Python documentation]] for details."
@@ -6963,13 +6971,13 @@ msgstr ""
 "[nixpkgs Pythonドキュメント]]を参照してください。"
 
 #. type: keyword NAME
-#: overlays/configuration.org:114
+#: overlays/configuration.org:115
 #, no-wrap
 msgid "python313-package-set"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:116
+#: overlays/configuration.org:117
 #, no-wrap
 msgid ""
 "python313 = prev.python313.override {\n"
@@ -6981,13 +6989,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:124 overlays/configuration.org:132
+#: overlays/configuration.org:125 overlays/configuration.org:133
 #, no-wrap
 msgid "rapidocr-onnxruntime"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:126
+#: overlays/configuration.org:127
 msgid ""
 "The test suite causes a segmentation fault during execution. The root cause "
 "is still under investigation."
@@ -6996,7 +7004,7 @@ msgstr ""
 "まだ調査中です。"
 
 #. type: paragraph
-#: overlays/configuration.org:129
+#: overlays/configuration.org:130
 msgid ""
 "This package is pulled in as a transitive dependency. Runtime functionality "
 "has been verified to work correctly in actual use, so disabling the test "
@@ -7007,7 +7015,7 @@ msgstr ""
 "回避策です。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:134
+#: overlays/configuration.org:135
 #, no-wrap
 msgid ""
 "rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {\n"
@@ -7016,13 +7024,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:139 overlays/configuration.org:148
+#: overlays/configuration.org:140 overlays/configuration.org:149
 #, no-wrap
 msgid "lxml-html-clean"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:141
+#: overlays/configuration.org:142
 msgid ""
 "Tests fail due to breaking changes in libxml2 2.14, which modified how "
 "certain DOM operations handle whitespace and entity encoding. These changes "
@@ -7035,7 +7043,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:145
+#: overlays/configuration.org:146
 msgid ""
 "Tracked upstream in [[https://github.com/fedora-python/lxml_html_clean/"
 "issues/24][fedora-python/lxml_html_clean#24]].  Remove this override once "
@@ -7046,7 +7054,7 @@ msgstr ""
 "トがlibxml2 2.14互換に更新されたらこのオーバーライドを削除します。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:150
+#: overlays/configuration.org:151
 #, no-wrap
 msgid ""
 "lxml-html-clean = pyprev.lxml-html-clean.overridePythonAttrs (_: {\n"
@@ -7054,14 +7062,53 @@ msgid ""
 "});"
 msgstr ""
 
+#. type: heading **
+#: overlays/configuration.org:156 modules/configuration.org:3088
+#, no-wrap
+msgid "Handy"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:158
+msgid ""
+"For its =custom= provider Handy attached a top-level ~reasoning_effort~ of "
+"~\"none\"~ to every post-processing request, and Google's compatibility "
+"endpoint rejects that with =400 INVALID_ARGUMENT=. Handy pasted the raw "
+"transcript instead of reporting anything, so against my Gemini base URL post-"
+"processing never once ran."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:163
+msgid ""
+"The patch is the upstream fix, which retries without the reasoning fields "
+"after a 400 or 422. It landed after 0.9.4, so this goes away once nixpkgs "
+"ships a release carrying it."
+msgstr ""
+
 #. type: keyword NAME
-#: overlays/configuration.org:155 overlays/configuration.org:161
+#: overlays/configuration.org:167
+#, no-wrap
+msgid "handy"
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:169
+#, no-wrap
+msgid ""
+"handy = prev.handy.overrideAttrs (oldAttrs: {\n"
+"  patches = (oldAttrs.patches or [ ]) ++ [ ./handy-retry-without-reasoning.patch ];\n"
+"});"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:174 overlays/configuration.org:180
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:157
+#: overlays/configuration.org:176
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7074,24 +7121,24 @@ msgstr ""
 "除します。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:163
+#: overlays/configuration.org:182
 #, no-wrap
 msgid "pre-release = final: prev: { };"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:166 overlays/configuration.org:175
+#: overlays/configuration.org:185 overlays/configuration.org:194
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:168
+#: overlays/configuration.org:187
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr "アップストリームへの貢献に適さない回避策です。"
 
 #. type: paragraph
-#: overlays/configuration.org:170
+#: overlays/configuration.org:189
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7104,7 +7151,7 @@ msgstr ""
 "久的に残る想定です。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:177
+#: overlays/configuration.org:196
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7114,13 +7161,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:183 overlays/configuration.org:196
+#: overlays/configuration.org:202 overlays/configuration.org:215
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:185
+#: overlays/configuration.org:204
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7133,7 +7180,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:190
+#: overlays/configuration.org:209
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7146,7 +7193,7 @@ msgstr ""
 "います。"
 
 #. type: paragraph
-#: overlays/configuration.org:194
+#: overlays/configuration.org:213
 msgid ""
 "Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/"
 "gh-dash#316]]."
@@ -7155,7 +7202,7 @@ msgstr ""
 "gh-dash#316]]で報告済みです。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:198
+#: overlays/configuration.org:217
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7169,19 +7216,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: overlays/configuration.org:208
+#: overlays/configuration.org:227
 #, no-wrap
 msgid "mkShim"
 msgstr "mkShim"
 
 #. type: paragraph
-#: overlays/configuration.org:210
+#: overlays/configuration.org:229
 msgid ""
 "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr "macOS Command Line Toolsのスタブ実装を提供するshimユーティリティです。"
 
 #. type: paragraph
-#: overlays/configuration.org:212
+#: overlays/configuration.org:231
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7196,7 +7243,7 @@ msgstr ""
 "制し不要なビルド失敗を防ぎます。"
 
 #. type: paragraph
-#: overlays/configuration.org:217
+#: overlays/configuration.org:236
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
@@ -7205,13 +7252,13 @@ msgstr ""
 "mkShim]]を参照してください。"
 
 #. type: keyword NAME
-#: overlays/configuration.org:219
+#: overlays/configuration.org:238
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:221
+#: overlays/configuration.org:240
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
@@ -13120,12 +13167,6 @@ msgstr "\"./applications/emacs/init.ja.org\""
 #: modules/configuration.org:3086
 #, no-wrap
 msgid "Speech to Text"
-msgstr ""
-
-#. type: heading **
-#: modules/configuration.org:3088
-#, no-wrap
-msgid "Handy"
 msgstr ""
 
 #. type: paragraph

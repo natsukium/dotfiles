@@ -19,7 +19,7 @@
         };
       in
       {
-        inherit (pkgs) handy ollama;
+        inherit (pkgs) onnxruntime ollama;
       }
     );
 
@@ -34,6 +34,9 @@
         });
       };
     };
+    handy = prev.handy.overrideAttrs (oldAttrs: {
+      patches = (oldAttrs.patches or [ ]) ++ [ ./handy-retry-without-reasoning.patch ];
+    });
   };
 
   pre-release = final: prev: { };
