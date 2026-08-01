@@ -96,6 +96,7 @@ existing packages. Remove these overrides once the issues are fixed upstream.
 #+begin_src nix
 temporary-fix = final: prev: {
   <<python313-package-set>>
+  <<handy>>
 };
 #+end_src
 
@@ -149,6 +150,24 @@ Remove this override once the test suite is updated for libxml2 2.14 compatibili
 #+begin_src nix
 lxml-html-clean = pyprev.lxml-html-clean.overridePythonAttrs (_: {
   doCheck = false;
+});
+#+end_src
+
+*** Handy
+
+For its =custom= provider Handy attached a top-level ~reasoning_effort~ of ~"none"~ to
+every post-processing request, and Google's compatibility endpoint rejects that with
+=400 INVALID_ARGUMENT=. Handy pasted the raw transcript instead of reporting anything,
+so against my Gemini base URL post-processing never once ran.
+
+The patch is the upstream fix, which retries without the reasoning fields after a 400
+or 422. It landed after 0.9.4, so this goes away once nixpkgs ships a release carrying
+it.
+
+#+NAME: handy
+#+begin_src nix
+handy = prev.handy.overrideAttrs (oldAttrs: {
+  patches = (oldAttrs.patches or [ ]) ++ [ ./handy-retry-without-reasoning.patch ];
 });
 #+end_src
 
