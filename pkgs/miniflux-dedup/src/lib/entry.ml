@@ -7,7 +7,7 @@
     into one constructor. *)
 type status = Unread | Settled
 
-type t = { id : int; url : string; status : status }
+type t = { id : int; feed_id : int; url : string; status : status }
 
 let status_of_string = function "unread" -> Unread | _ -> Settled
 
@@ -15,6 +15,7 @@ let of_json json =
   let open Yojson.Safe.Util in
   {
     id = json |> member "id" |> to_int;
+    feed_id = json |> member "feed_id" |> to_int;
     url = json |> member "url" |> to_string;
     status = json |> member "status" |> to_string |> status_of_string;
   }
