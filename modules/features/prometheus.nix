@@ -125,9 +125,12 @@
                   {
                     # apfs is excluded because macOS seals its root volume
                     # read-only by design, so the Darwin hosts would report a
-                    # critical fault permanently.
+                    # critical fault permanently. /nix/store goes with it:
+                    # boot.readOnlyNixStore binds it read-only over a writable
+                    # subvolume. A disk that genuinely turns read-only flips the
+                    # whole superblock, so / and /home keep raising the alert.
                     alert = "FilesystemReadOnly";
-                    expr = ''node_filesystem_readonly{fstype!~"tmpfs|ramfs|apfs"} == 1'';
+                    expr = ''node_filesystem_readonly{fstype!~"tmpfs|ramfs|apfs",mountpoint!="/nix/store"} == 1'';
                     for = "5m";
                     labels.severity = "critical";
                     annotations.summary = "{{ $labels.mountpoint }} on {{ $labels.instance }} is read-only";
