@@ -9,7 +9,12 @@
       ...
     }:
     let
-      inherit (lib) mkEnableOption mkIf;
+      inherit (lib)
+        mkEnableOption
+        mkIf
+        mkOption
+        types
+        ;
       cfg = config.my.services.prometheus;
       linux-machines = inputs.self.outputs.nixosConfigurations;
       darwin-machines = inputs.self.outputs.darwinConfigurations;
@@ -24,9 +29,40 @@
         "mikumi"
         "kilimanjaro"
       ];
+
+      nodeTarget =
+        name: value:
+        let
+          inherit (value.config.services.prometheus.exporters.node) listenAddress port;
+        in
+        "${if name == config.networking.hostName then listenAddress else name}:${toString port}";
+
+      nodeMachines = lib.filterAttrs (n: _: builtins.elem n nodeMetricsHosts) (
+        linux-machines // darwin-machines
+      );
+      isAlwaysOn = name: _: builtins.elem name cfg.alwaysOnHosts;
     in
     {
-      options.my.services.prometheus.enable = mkEnableOption "Prometheus metrics server";
+      options.my.services.prometheus = {
+        enable = mkEnableOption "Prometheus metrics server";
+
+        # Hosts expected to answer around the clock, so their silence is a fault
+        # worth paging on. Everything else is a laptop or tarangire, the
+        # on-demand builder kept powered off for its consumption; those going
+        # quiet is routine. Deliberately not derived from my.profiles.server:
+        # that profile describes how a host is built, not whether anyone should
+        # be woken when it disappears. An option rather than a local list
+        # because the comin scrape config labels its targets from the same set.
+        alwaysOnHosts = mkOption {
+          type = types.listOf types.str;
+          default = [
+            "manyara"
+            "serengeti"
+            "mikumi"
+          ];
+          description = "Hosts whose silence should raise a critical alert.";
+        };
+      };
 
       config = mkIf cfg.enable {
         # Alerts on the metrics this server scrapes live next to the scrape
@@ -41,12 +77,12 @@
                 name = "infra";
                 rules = [
                   {
-                    # Scoped to the comin job because comin runs on every host,
-                    # making it the one target whose silence means the host
-                    # itself is gone. always_on excludes the laptops and the
-                    # on-demand builder, which are off far more often than not.
+                    # Scoped to the node job, not comin: comin's exporter can
+                    # die while the machine behind it is healthy, and only the
+                    # node exporter goes quiet exactly when the host does.
+                    # comin having stopped is CominDown instead.
                     alert = "InstanceDown";
-                    expr = ''up{job="comin",always_on="true"} == 0'';
+                    expr = ''up{job="node",always_on="true"} == 0'';
                     for = "5m";
                     labels.severity = "critical";
                     annotations.summary = "{{ $labels.instance }} is unreachable";
@@ -145,19 +181,18 @@
           scrapeConfigs = [
             {
               job_name = "node";
-              # A single group, because listing a host under more than one meant
-              # scraping it twice: every series it produced was stored once per
-              # role label, so anything reading them counted a single fault as
-              # several.
+              # Two groups only because InstanceDown needs to tell the
+              # always-on hosts apart, and they are kept disjoint: listing a
+              # host under both would scrape it twice, storing every series it
+              # produces once per label set, so anything reading them would
+              # count a single fault as several.
               static_configs = [
                 {
-                  targets = lib.mapAttrsToList (
-                    name: value:
-                    let
-                      inherit (value.config.services.prometheus.exporters.node) listenAddress port;
-                    in
-                    "${if name == config.networking.hostName then listenAddress else name}:${toString port}"
-                  ) (lib.filterAttrs (n: _: builtins.elem n nodeMetricsHosts) (linux-machines // darwin-machines));
+                  labels.always_on = "true";
+                  targets = lib.mapAttrsToList nodeTarget (lib.filterAttrs isAlwaysOn nodeMachines);
+                }
+                {
+                  targets = lib.mapAttrsToList nodeTarget (lib.filterAttrs (n: v: !(isAlwaysOn n v)) nodeMachines);
                 }
               ];
             }

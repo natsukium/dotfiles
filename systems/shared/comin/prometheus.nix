@@ -17,17 +17,6 @@ let
   nodeExporterUser = config.services.prometheus.exporters.node.user;
   nodeExporterGroup = config.services.prometheus.exporters.node.group;
 
-  # Hosts expected to answer around the clock, so their silence is a fault worth
-  # paging on. Everything else is a laptop or tarangire, the on-demand builder
-  # kept powered off for its consumption; those going quiet is routine.
-  # Deliberately not derived from my.profiles.server: that profile describes how
-  # a host is built, not whether anyone should be woken when it disappears.
-  alwaysOnHosts = [
-    "manyara"
-    "serengeti"
-    "mikumi"
-  ];
-
   cominTarget =
     name: value:
     let
@@ -37,7 +26,7 @@ let
     "${if name == config.networking.hostName then listen_address' else name}:${toString port}";
 
   machines = linux-machines // darwin-machines;
-  isAlwaysOn = name: _: builtins.elem name alwaysOnHosts;
+  isAlwaysOn = name: _: builtins.elem name config.my.services.prometheus.alwaysOnHosts;
 in
 {
   services.prometheus.scrapeConfigs = [
@@ -63,6 +52,17 @@ in
         {
           name = "comin";
           rules = [
+            {
+              # Not an outage: the host serves everything it served before, it
+              # just stops following main, so this is a warning while
+              # InstanceDown stays critical. 15m because a switch legitimately
+              # takes the exporter down for a few minutes.
+              alert = "CominDown";
+              expr = ''up{job="comin",always_on="true"} == 0'';
+              for = "15m";
+              labels.severity = "warning";
+              annotations.summary = "comin on {{ $labels.instance }} is not answering; the host has stopped following main";
+            }
             {
               alert = "CominDeploymentFailed";
               expr = ''comin_deployment_info{status="failed"} == 1'';
