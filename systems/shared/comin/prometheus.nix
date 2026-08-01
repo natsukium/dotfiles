@@ -57,8 +57,8 @@ in
     }
   ];
 
-  # Alerts on comin's own metrics live next to the scrape config and the
-  # expected-commit metric they join against.
+  # Alerts on comin's own metrics live next to the scrape config and the drift
+  # metric they read.
   services.prometheus.ruleFiles = [
     ((pkgs.formats.yaml { }).generate "comin-rules.yaml" {
       groups = [
@@ -93,6 +93,49 @@ in
               for = "2h";
               labels.severity = "warning";
               annotations.summary = "{{ $labels.host }} is not running the system main HEAD evaluates to";
+            }
+            {
+              # A commit that fails to evaluate or build never reaches a
+              # deployment, so comin_deployment_info keeps reporting the previous
+              # success. 15m so a broken commit I am already fixing stays quiet.
+              alert = "CominEvalFailed";
+              expr = "comin_last_eval_failed == 1";
+              for = "15m";
+              labels.severity = "warning";
+              annotations.summary = "comin cannot evaluate the configuration on {{ $labels.instance }}";
+            }
+            {
+              alert = "CominBuildFailed";
+              expr = "comin_last_build_failed == 1";
+              for = "15m";
+              labels.severity = "warning";
+              annotations.summary = "comin cannot build the configuration on {{ $labels.instance }}";
+            }
+            {
+              alert = "CominFetchFailed";
+              expr = ''comin_last_fetch_failed{always_on="true"} == 1'';
+              for = "1h";
+              labels.severity = "warning";
+              annotations.summary = "comin on {{ $labels.instance }} cannot fetch {{ $labels.remote_name }}";
+            }
+            {
+              # A suspended deployer stops applying commits while comin stays up,
+              # keeps fetching, and every other gauge reads healthy.
+              alert = "CominSuspended";
+              expr = ''comin_is_suspended{always_on="true"} == 1'';
+              for = "15m";
+              labels.severity = "warning";
+              annotations.summary = "comin on {{ $labels.instance }} is suspended and no longer deploying";
+            }
+            {
+              # comin can wedge with its poller alive but never fetching again,
+              # which no other gauge reflects. The window is this wide because the
+              # fetcher also blocks while a new commit waits for a running build.
+              alert = "CominStalled";
+              expr = ''sum by (instance) (increase(comin_fetch_count{always_on="true"}[6h])) == 0'';
+              for = "30m";
+              labels.severity = "warning";
+              annotations.summary = "comin on {{ $labels.instance }} has not fetched for hours";
             }
             {
               # 7d because a pending reboot is routine after a kernel update;
