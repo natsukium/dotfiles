@@ -1,6 +1,23 @@
 {
   "annotations": {
-    "list": []
+    "list": [
+      {
+        "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+        "enable": true,
+        "hide": false,
+        "iconColor": "light-blue",
+        "name": "Deployments",
+        "target": {
+          "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+          "editorMode": "code",
+          "expr": "label_replace(\n  label_replace(\n    (\n      comin_deployment_info{status=\"done\"}\n      unless comin_deployment_info{status=\"done\"} offset 1m\n    )\n    and on(instance) (comin_deployment_info{status=\"done\"} offset 10m),\n    \"instance\", \"$1\", \"instance\", \"([^:]+).*\"\n  ),\n  \"instance\", \"manyara\", \"instance\", \"localhost\"\n)",
+          "refId": "Deployments"
+        },
+        "tagKeys": "instance",
+        "textFormat": "{{instance}} {{commit_id}}",
+        "titleFormat": "deployed"
+      }
+    ]
   },
   "editable": false,
   "graphTooltip": 1,

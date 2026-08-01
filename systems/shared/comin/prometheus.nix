@@ -202,7 +202,7 @@ in
                 git clone --quiet ${dotfilesUrl} "$repo"
               fi
               git -C "$repo" fetch --quiet origin
-              mkdir -p "$STATE_DIRECTORY/eval"
+              mkdir -p "$STATE_DIRECTORY/eval" "$STATE_DIRECTORY/reported"
 
               # A (host, commit) pair always evaluates to the same path.
               eval_out_path() {
@@ -216,6 +216,33 @@ in
                   mv "$cache.tmp" "$cache"
                 fi
                 cat "$cache"
+              }
+
+              # The gauge says a host is behind but not what by, and answering
+              # that from the dashboard would mean commit ids and store paths as
+              # metric labels. A log line carries free text at no such cost. The
+              # timer refires every five minutes and drift lasts days, so each
+              # (deployed, main) pair is reported once.
+              explain_drift() {
+                local host=$1 deployed=$2 expected=$3 actual=$4
+                local marker=$STATE_DIRECTORY/reported/$host
+
+                if [ "$(cat "$marker" 2>/dev/null || true)" = "$deployed $main_commit" ]; then
+                  return 0
+                fi
+                printf '%s %s' "$deployed" "$main_commit" >"$marker"
+
+                echo "drift $host: running $deployed, main is $main_commit"
+                git -C "$repo" log --oneline --no-decorate "$deployed..$main_commit" 2>/dev/null |
+                  awk -v h="$host" '{ print "drift " h ": missing " $0 }' || true
+
+                # diff-closures reads both closures from the local store, and
+                # another host's system is only here when manyara happened to
+                # build it, so the commit list above is the part always present.
+                if [ -n "$expected" ] && [ -e "$expected" ] && [ -e "$actual" ]; then
+                  nix --extra-experimental-features 'nix-command' store diff-closures "$actual" "$expected" |
+                    awk -v h="$host" 'NF { print "drift " h ": " $0 }' || true
+                fi
               }
 
               # The temp file deliberately does not end in .prom so the textfile
@@ -239,6 +266,11 @@ in
                   }')
                 [ -n "$deployed" ] || continue
 
+                # Both stay empty on the rebase path below, where there is no
+                # pair of systems to compare; explain_drift reports what it has.
+                expected=""
+                actual=""
+
                 if [ "$deployed" = "$main_commit" ]; then
                   drift=0
                 elif ! git -C "$repo" merge-base --is-ancestor "$deployed" refs/remotes/origin/main; then
@@ -257,6 +289,10 @@ in
                 # this against the comin job, whose instance label it cannot share.
                 printf '${driftMetric}{host="%s",target="%s",always_on="%s"} %s\n' \
                   "$host" "$target" "$always_on" "$drift" >>"$tmp"
+
+                if [ "$drift" = 1 ]; then
+                  explain_drift "$host" "$deployed" "$expected" "$actual"
+                fi
               done <<'SPECS'
               ${lib.concatStringsSep "\n" hostSpecs}
               SPECS
@@ -278,4 +314,21 @@ in
       OnUnitActiveSec = "5m";
     };
   };
+
+  # Its own job so the explanations stay out of the comin log panel, which reads
+  # one line per host rather than one per missing commit. Alloy parses all of
+  # /etc/alloy as a single graph, so the sink from ./alloy.nix is reachable here;
+  # a second source rather than another matcher because loki.source.journal ANDs
+  # its matches.
+  my.services.alloy.configs.comin-drift = ''
+    loki.source.journal "comin_drift" {
+      forward_to = [loki.relabel.comin.receiver]
+      matches    = "_SYSTEMD_UNIT=comin-drift.service"
+      labels     = {
+        job  = "comin-drift",
+        host = "${config.networking.hostName}",
+        os   = "linux",
+      }
+    }
+  '';
 }
