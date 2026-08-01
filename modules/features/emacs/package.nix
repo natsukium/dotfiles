@@ -3,6 +3,7 @@
   age,
   beancount,
   beancount-language-server,
+  difftastic,
   emacs-pgtk,
   emacs-plus,
   emacsWithPackagesFromUsePackage,
@@ -45,6 +46,7 @@ emacsWithPackagesFromUsePackage {
     age
     beancount
     beancount-language-server
+    difftastic
     gettext
     nixd
     nixfmt

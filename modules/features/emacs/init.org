@@ -298,6 +298,22 @@ The built-in savehist package keeps a record of user inputs and stores them acro
   (add-hook 'magit-post-refresh-hook 'diff-hl-magit-post-refresh))
 #+end_src
 
+*** difftastic.el
+
+I already use [[*Difftastic][difftastic]] for git outside Emacs, and
+[[https://github.com/pkryger/difftastic.el][difftastic.el]] brings the same
+structural diff to magit.
+
+=difftastic-bindings-mode= adds =M-d= and =M-c= to the =magit-diff= transient,
+so magit's own diff stays the default and difftastic is one key away.
+
+#+begin_src emacs-lisp
+(use-package difftastic
+  :ensure t
+  :init
+  (difftastic-bindings-mode))
+#+end_src
+
 *** forge
 
 [[https://github.com/magit/forge][Forge]] extends Magit to work with GitHub, GitLab, and other forges
