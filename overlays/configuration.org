@@ -58,8 +58,8 @@ stable = final: prev: {
 ** cuda
 
 [[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the head of =nixos-unstable-cuda=, so kilimanjaro takes
-its CUDA packages from =nixpkgs-cuda=. Naming =ollama= and =handy= is enough:
-=onnxruntime=, =openvino=, =opencv= and =cudnn-frontend= are only reachable through them.
+its CUDA packages from =nixpkgs-cuda=. Naming =ollama= and =onnxruntime= is enough:
+=openvino=, =opencv= and =cudnn-frontend= are only reachable through them.
 
 The package set is imported plain because the CUDA Hydra builds plain nixpkgs, and a local
 overlay reaching into that closure would move the store paths off the cache. The guard
@@ -80,7 +80,7 @@ cuda =
       };
     in
     {
-      inherit (pkgs) handy ollama;
+      inherit (pkgs) onnxruntime ollama;
     }
   );
 #+end_src

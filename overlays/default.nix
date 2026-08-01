@@ -19,7 +19,7 @@
         };
       in
       {
-        inherit (pkgs) handy ollama;
+        inherit (pkgs) onnxruntime ollama;
       }
     );
 
