@@ -95,7 +95,7 @@ in
     enable = true;
     settings = {
       model.provider = "openai-codex";
-      model.default = "gpt-5.4-mini";
+      model.default = "gpt-5.6-terra";
       web.search_backend = "searxng";
     };
     addToSystemPackages = true;
