@@ -37,6 +37,258 @@
   "weekStart": "",
   "panels": [
     {
+      "id": 20,
+      "title": "Cache over time",
+      "type": "row",
+      "collapsed": false,
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 1
+      },
+      "panels": []
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 21,
+      "title": "Objects",
+      "type": "timeseries",
+      "description": "Drops are GC, climbs are uploads.",
+      "gridPos": {
+        "x": 0,
+        "y": 5,
+        "w": 8,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisColorMode": "text",
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "min", "max"],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "niks3_cache_objects",
+          "range": true,
+          "instant": false,
+          "refId": "A",
+          "legendFormat": "Objects"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 22,
+      "title": "Logical size",
+      "type": "timeseries",
+      "gridPos": {
+        "x": 8,
+        "y": 5,
+        "w": 8,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisColorMode": "text",
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "min", "max"],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "niks3_cache_logical_bytes",
+          "range": true,
+          "instant": false,
+          "refId": "A",
+          "legendFormat": "Logical size"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 23,
+      "title": "Pending closures",
+      "type": "timeseries",
+      "description": "In-flight uploads not yet committed. A sustained high value means uploads are stuck.",
+      "gridPos": {
+        "x": 16,
+        "y": 5,
+        "w": 8,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "drawStyle": "line",
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "gradientMode": "none",
+            "spanNulls": false,
+            "showPoints": "never",
+            "pointSize": 5,
+            "stacking": {
+              "mode": "none",
+              "group": "A"
+            },
+            "axisPlacement": "auto",
+            "axisColorMode": "text",
+            "scaleDistribution": {
+              "type": "linear"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "min", "max"],
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "niks3_pending_closures",
+          "range": true,
+          "instant": false,
+          "refId": "A",
+          "legendFormat": "Pending closures"
+        }
+      ]
+    },
+    {
       "datasource": {
         "type": "prometheus",
         "uid": "PBFA97CFB590B2093"
@@ -284,7 +536,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 4,
+        "y": 13,
         "w": 8,
         "h": 8
       },
@@ -363,7 +615,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 8,
-        "y": 4,
+        "y": 13,
         "w": 8,
         "h": 8
       },
@@ -443,7 +695,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 16,
-        "y": 4,
+        "y": 13,
         "w": 8,
         "h": 8
       },
@@ -546,7 +798,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 12,
+        "y": 21,
         "w": 8,
         "h": 8
       },
@@ -625,7 +877,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 8,
-        "y": 12,
+        "y": 21,
         "w": 8,
         "h": 8
       },
@@ -717,7 +969,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 16,
-        "y": 12,
+        "y": 21,
         "w": 8,
         "h": 8
       },
@@ -796,7 +1048,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 20,
+        "y": 29,
         "w": 12,
         "h": 8
       },
@@ -875,7 +1127,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 12,
-        "y": 20,
+        "y": 29,
         "w": 12,
         "h": 8
       },
@@ -951,7 +1203,7 @@
       "collapsed": false,
       "gridPos": {
         "x": 0,
-        "y": 28,
+        "y": 37,
         "w": 24,
         "h": 1
       },
@@ -967,7 +1219,7 @@
       "type": "stat",
       "gridPos": {
         "x": 0,
-        "y": 29,
+        "y": 38,
         "w": 6,
         "h": 4
       },
@@ -1027,7 +1279,7 @@
       "type": "stat",
       "gridPos": {
         "x": 6,
-        "y": 29,
+        "y": 38,
         "w": 6,
         "h": 4
       },
@@ -1087,7 +1339,7 @@
       "type": "stat",
       "gridPos": {
         "x": 12,
-        "y": 29,
+        "y": 38,
         "w": 6,
         "h": 4
       },
@@ -1147,7 +1399,7 @@
       "type": "stat",
       "gridPos": {
         "x": 18,
-        "y": 29,
+        "y": 38,
         "w": 6,
         "h": 4
       },
@@ -1207,7 +1459,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 0,
-        "y": 33,
+        "y": 42,
         "w": 12,
         "h": 8
       },
@@ -1298,7 +1550,7 @@
       "type": "timeseries",
       "gridPos": {
         "x": 12,
-        "y": 33,
+        "y": 42,
         "w": 12,
         "h": 8
       },
