@@ -135,15 +135,6 @@
       url = "github:natsukium/mcp-servers-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    niri-flake = {
-      url = "github:sodiboo/niri-flake";
-      inputs.niri-stable.follows = "";
-      inputs.niri-unstable.follows = "";
-      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.xwayland-satellite-stable.follows = "";
-      inputs.xwayland-satellite-unstable.follows = "";
-    };
     org-clickup = {
       url = "git+https://git.natsukium.com/natsukium/org-clickup";
       flake = false;
