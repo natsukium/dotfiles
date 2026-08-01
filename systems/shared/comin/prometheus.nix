@@ -81,9 +81,11 @@ in
               annotations.summary = "{{ $labels.instance }} is not on main HEAD (deployed {{ $labels.commit_id }})";
             }
             {
+              # 7d because a pending reboot is routine after a kernel update;
+              # only a deferred one is worth a message.
               alert = "CominRebootRequired";
-              expr = ''comin_host_info{need_to_reboot="1"} == 1'';
-              for = "15m";
+              expr = "comin_need_to_reboot == 1";
+              for = "7d";
               labels.severity = "warning";
               annotations.summary = "{{ $labels.instance }} needs a reboot to activate its latest generation";
             }
