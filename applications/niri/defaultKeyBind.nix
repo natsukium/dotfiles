@@ -1,6 +1,9 @@
 {
-  # Neither niri nor the home-manager module ships niri's default binds, so they
-  # are vendored here from upstream's default-config.kdl.
+  # The home-manager module ships no default binds, so I transcribe the `binds`
+  # block of upstream's default-config.kdl here (niri 26.4). My own binds live in
+  # the override in ./default.nix, which keeps the next refresh a diff against
+  # upstream rather than a merge.
+  #
   # Keys consist of modifiers separated by + signs, followed by an XKB key name
   # in the end. To find an XKB name for a particular key, you may use a program
   # like wev.
@@ -16,54 +19,104 @@
   "Mod+Shift+Slash".show-hotkey-overlay = { };
 
   # Suggested binds for running programs: terminal, app launcher, screen locker.
-  "Mod+T".spawn = "alacritty";
-  "Mod+D".spawn = "fuzzel";
-  "Super+Alt+L".spawn = "swaylock";
+  "Mod+T" = {
+    _props.hotkey-overlay-title = "Open a Terminal: alacritty";
+    spawn = "alacritty";
+  };
+  "Mod+D" = {
+    _props.hotkey-overlay-title = "Run an Application: fuzzel";
+    spawn = "fuzzel";
+  };
+  "Super+Alt+L" = {
+    _props.hotkey-overlay-title = "Lock the Screen: swaylock";
+    spawn = "swaylock";
+  };
 
-  # You can also use a shell. Do this if you need pipes, multiple commands, etc.
-  # Note: the entire command goes as a single argument in the end.
-  # Mod+T { spawn "bash" "-c" "notify-send hello && exec alacritty"; }
+  # Use spawn-sh to run a shell command. Do this if you need pipes, multiple commands, etc.
+  # Note: the entire command goes as a single argument. It's passed verbatim to `sh -c`.
+  # For example, this is a standard bind to toggle the screen reader (orca).
+  "Super+Alt+S" = {
+    _props = {
+      allow-when-locked = true;
+      hotkey-overlay-title = null;
+    };
+    spawn-sh = "pkill orca || exec orca";
+  };
 
   # Example volume keys mappings for PipeWire & WirePlumber.
   # The allow-when-locked=true property makes them work even when the session is locked.
+  # Using spawn-sh allows to pass multiple arguments together with the command.
+  # "-l 1.0" limits the volume to 100%.
   "XF86AudioRaiseVolume" = {
     _props.allow-when-locked = true;
-    spawn = [
-      "wpctl"
-      "set-volume"
-      "@DEFAULT_AUDIO_SINK@"
-      "0.1+"
-    ];
+    spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1+ -l 1.0";
   };
   "XF86AudioLowerVolume" = {
     _props.allow-when-locked = true;
-    spawn = [
-      "wpctl"
-      "set-volume"
-      "@DEFAULT_AUDIO_SINK@"
-      "0.1-"
-    ];
+    spawn-sh = "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.1-";
   };
   "XF86AudioMute" = {
     _props.allow-when-locked = true;
-    spawn = [
-      "wpctl"
-      "set-mute"
-      "@DEFAULT_AUDIO_SINK@"
-      "toggle"
-    ];
+    spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
   };
   "XF86AudioMicMute" = {
     _props.allow-when-locked = true;
+    spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+  };
+
+  # Example media keys mapping using playerctl.
+  # This will work with any MPRIS-enabled media player.
+  "XF86AudioPlay" = {
+    _props.allow-when-locked = true;
+    spawn-sh = "playerctl play-pause";
+  };
+  "XF86AudioStop" = {
+    _props.allow-when-locked = true;
+    spawn-sh = "playerctl stop";
+  };
+  "XF86AudioPrev" = {
+    _props.allow-when-locked = true;
+    spawn-sh = "playerctl previous";
+  };
+  "XF86AudioNext" = {
+    _props.allow-when-locked = true;
+    spawn-sh = "playerctl next";
+  };
+
+  # Example brightness key mappings for brightnessctl.
+  # You can use regular spawn with multiple arguments too (to avoid going through "sh"),
+  # but you need to manually put each argument in separate "" quotes.
+  "XF86MonBrightnessUp" = {
+    _props.allow-when-locked = true;
     spawn = [
-      "wpctl"
-      "set-mute"
-      "@DEFAULT_AUDIO_SOURCE@"
-      "toggle"
+      "brightnessctl"
+      "--class=backlight"
+      "set"
+      "+10%"
+    ];
+  };
+  "XF86MonBrightnessDown" = {
+    _props.allow-when-locked = true;
+    spawn = [
+      "brightnessctl"
+      "--class=backlight"
+      "set"
+      "10%-"
     ];
   };
 
-  "Mod+Q".close-window = { };
+  # Open/close the Overview: a zoomed-out view of workspaces and windows.
+  # You can also move the mouse into the top-left hot corner,
+  # or do a four-finger swipe up on a touchpad.
+  "Mod+O" = {
+    _props.repeat = false;
+    toggle-overview = { };
+  };
+
+  "Mod+Q" = {
+    _props.repeat = false;
+    close-window = { };
+  };
 
   "Mod+Left".focus-column-left = { };
   "Mod+Down".focus-window-down = { };
@@ -180,8 +233,8 @@
   # These binds are also affected by touchpad's natural-scroll, so these
   # example binds are "inverted", since we have natural-scroll enabled for
   # touchpads by default.
-  # Mod+TouchpadScrollDown { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02+"; }
-  # Mod+TouchpadScrollUp   { spawn "wpctl" "set-volume" "@DEFAULT_AUDIO_SINK@" "0.02-"; }
+  # Mod+TouchpadScrollDown { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.02+"; }
+  # Mod+TouchpadScrollUp   { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 0.02-"; }
 
   # You can refer to workspaces by index. However, keep in mind that
   # niri is a dynamic workspace system, so these commands are kind of
@@ -216,18 +269,42 @@
   # Switches focus between the current and the previous workspace.
   # Mod+Tab { focus-workspace-previous; }
 
+  # The following binds move the focused window in and out of a column.
+  # If the window is alone, they will consume it into the nearby column to the side.
+  # If the window is already in a column, they will expel it out.
+  "Mod+BracketLeft".consume-or-expel-window-left = { };
+  "Mod+BracketRight".consume-or-expel-window-right = { };
+
+  # Consume one window from the right to the bottom of the focused column.
   "Mod+Comma".consume-window-into-column = { };
+  # Expel the bottom window from the focused column to the right.
   "Mod+Period".expel-window-from-column = { };
 
-  # There are also commands that consume or expel a single window to the side.
-  # Mod+BracketLeft  { consume-or-expel-window-left; }
-  # Mod+BracketRight { consume-or-expel-window-right; }
-
+  # Cycle through widths set in preset-column-widths.
   "Mod+R".switch-preset-column-width = { };
-  "Mod+Shift+R".reset-window-height = { };
+  # Cycling through the presets in reverse order is also possible.
+  "Mod+Shift+R".switch-preset-column-width-back = { };
+
+  "Mod+Ctrl+Shift+R".switch-preset-window-height = { };
+  "Mod+Ctrl+R".reset-window-height = { };
+
   "Mod+F".maximize-column = { };
   "Mod+Shift+F".fullscreen-window = { };
+
+  # While maximize-column leaves gaps and borders around the window,
+  # maximize-window-to-edges doesn't: the window expands to the edges of the screen.
+  # This bind corresponds to normal window maximizing,
+  # e.g. by double-clicking on the titlebar.
+  "Mod+M".maximize-window-to-edges = { };
+
+  # Expand the focused column to space not taken up by other fully visible columns.
+  # Makes the column "fill the rest of the space".
+  "Mod+Ctrl+F".expand-column-to-available-width = { };
+
   "Mod+C".center-column = { };
+
+  # Center all fully visible columns on screen.
+  "Mod+Ctrl+C".center-visible-columns = { };
 
   # Finer width adjustments.
   # This command can also:
@@ -244,6 +321,15 @@
   "Mod+Shift+Minus".set-window-height = "-10%";
   "Mod+Shift+Equal".set-window-height = "+10%";
 
+  # Move the focused window between the floating and the tiling layout.
+  "Mod+V".toggle-window-floating = { };
+  "Mod+Shift+V".switch-focus-between-floating-and-tiling = { };
+
+  # Toggle tabbed column display mode.
+  # Windows in this column will appear as vertical tabs,
+  # rather than stacked on top of each other.
+  "Mod+W".toggle-column-tabbed-display = { };
+
   # Actions to switch layouts.
   # Note: if you uncomment these, make sure you do NOT have
   # a matching layout switch hotkey configured in xkb options above.
@@ -255,6 +341,23 @@
   "Print".screenshot = { };
   "Ctrl+Print".screenshot-screen = { };
   "Alt+Print".screenshot-window = { };
+
+  # Applications such as remote-desktop clients and software KVM switches may
+  # request that niri stops processing the keyboard shortcuts defined here
+  # so they may, for example, forward the key presses as-is to a remote machine.
+  # It's a good idea to bind an escape hatch to toggle the inhibitor,
+  # so a buggy application can't hold your session hostage.
+  #
+  # The allow-inhibiting=false property can be applied to other binds as well,
+  # which ensures niri always processes them, even when an inhibitor is active.
+  "Mod+Escape" = {
+    _props.allow-inhibiting = false;
+    toggle-keyboard-shortcuts-inhibit = { };
+  };
+
+  # The quit action will show a confirmation dialog to avoid accidental exits.
+  "Mod+Shift+E".quit = { };
+  "Ctrl+Alt+Delete".quit = { };
 
   # Powers off the monitors. To turn them back on, do any input like
   # moving the mouse or pressing any other key.

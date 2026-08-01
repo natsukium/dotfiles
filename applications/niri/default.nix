@@ -24,10 +24,11 @@ in
       binds = defaultKeyBind // {
         "Mod+Return".spawn = terminal;
         "Mod+D".spawn = launcher;
-        # mod shift space floating # not support yet https://github.com/YaLTeR/niri/issues/122
 
         # niri does not deliver Handy's own global hotkey, so drive it via signals.
         # Match by "bin/handy" because the Nix wrapper renames the process to .handy-wrapped.
+        # I keep these on spawn rather than spawn-sh, which would put the pattern
+        # on the wrapper shell's own command line for pkill -f to match.
         "Mod+Space".spawn = [
           "pkill"
           "-USR2"
@@ -40,11 +41,7 @@ in
           "-f"
           "bin/handy"
         ];
-        "Mod+T".spawn = [
-          "sh"
-          "-c"
-          "rbw unlock && rofi-rbw -t password"
-        ];
+        "Mod+T".spawn-sh = "rbw unlock && rofi-rbw -t password";
         # The quit action will show a confirmation dialog to avoid accidental exits.
         "Mod+Shift+E" = if config.programs.wlogout.enable then { spawn = "wlogout"; } else { quit = { }; };
       };
