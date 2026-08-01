@@ -45,7 +45,7 @@ in
     preventSleepOnCharge = true;
   };
 
-  my.services.newsyslog.enable = true;
+  system.newsyslog.enable = true;
 
   system.startup.chime = false;
 

@@ -26,7 +26,7 @@ let
   alloyConfig =
     if pkgs.stdenv.hostPlatform.isDarwin then
       # Tail only the live file. Rotated archives are gzipped (`flags = [ "Z" ]`
-      # in my.services.newsyslog), and loki.source.file does NOT decompress
+      # in system.newsyslog), and loki.source.file does NOT decompress
       # transparently — it would forward gzip bytes verbatim and pollute Loki
       # with garbled lines. We do not need to read archives anyway: Alloy uses
       # fsevents to follow rename events and reads each rotated file to EOF

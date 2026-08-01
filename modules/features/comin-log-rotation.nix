@@ -11,11 +11,14 @@
     in
     {
       config = lib.mkIf config.services.comin.enable {
-        my.services.newsyslog.settings.${cominLog} = {
-          count = 10;
-          size = 1000;
-          flags = [ "Z" ];
-        };
+        system.newsyslog.files.comin = [
+          {
+            logfilename = cominLog;
+            count = 10;
+            size = "1000";
+            flags = [ "Z" ];
+          }
+        ];
 
         # macOS newsyslog has no postcmd / arbitrary-command-after-rotate facility
         # (verified against the newsyslog(8) man page on Sonoma+); only signal
