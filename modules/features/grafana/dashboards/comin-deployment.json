@@ -280,7 +280,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count(comin_host_info{need_to_reboot=\"1\"}) or vector(0)",
+          "expr": "count(comin_need_to_reboot == 1) or vector(0)",
           "instant": true,
           "refId": "A"
         }
@@ -483,7 +483,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "comin_host_info",
+          "expr": "comin_need_to_reboot",
           "format": "table",
           "instant": true,
           "refId": "Reboot"
@@ -493,7 +493,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "count by (instance) (comin_deployment_info unless on(commit_id) comin_expected_commit_info)",
+          "expr": "label_replace(comin_system_drift, \"instance\", \"$1\", \"target\", \"(.*)\")",
           "format": "table",
           "instant": true,
           "refId": "Drift"
@@ -512,7 +512,7 @@
           "id": "filterFieldsByName",
           "options": {
             "include": {
-              "pattern": "^(instance|status|commit_id|need_to_reboot|Value #Drift)$"
+              "pattern": "^(instance|status|commit_id|Value #Reboot|Value #Drift)$"
             }
           }
         },
@@ -521,16 +521,16 @@
           "options": {
             "indexByName": {
               "Value #Drift": 4,
+              "Value #Reboot": 3,
               "commit_id": 2,
               "instance": 0,
-              "need_to_reboot": 3,
               "status": 1
             },
             "renameByName": {
               "Value #Drift": "Drift",
+              "Value #Reboot": "Reboot",
               "commit_id": "Commit",
               "instance": "Host",
-              "need_to_reboot": "Reboot",
               "status": "Status"
             }
           }
@@ -895,7 +895,7 @@
             "type": "prometheus",
             "uid": "PBFA97CFB590B2093"
           },
-          "expr": "(count(comin_deployment_info unless on(commit_id) comin_expected_commit_info) or vector(0)) and on() (count(comin_expected_commit_info) > 0)",
+          "expr": "sum(comin_system_drift) or vector(0)",
           "instant": true,
           "refId": "A"
         }

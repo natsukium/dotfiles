@@ -10,7 +10,9 @@ let
   darwin-machines = inputs.self.outputs.darwinConfigurations;
 
   textfileDir = "/var/lib/node-exporter-textfile";
+  textfileName = "comin-drift";
   expectedCommitMetric = "comin_expected_commit_info";
+  driftMetric = "comin_system_drift";
 
   dotfilesUrl = "https://github.com/natsukium/dotfiles";
 
@@ -27,6 +29,17 @@ let
 
   machines = linux-machines // darwin-machines;
   isAlwaysOn = name: _: builtins.elem name config.my.services.prometheus.alwaysOnHosts;
+
+  # One line per host, read by the drift checker below.
+  hostSpecs = lib.mapAttrsToList (
+    name: value:
+    lib.concatStringsSep " " [
+      name
+      (if linux-machines ? ${name} then "nixosConfigurations" else "darwinConfigurations")
+      (cominTarget name value)
+      (if isAlwaysOn name value then "true" else "false")
+    ]
+  ) machines;
 in
 {
   services.prometheus.scrapeConfigs = [
@@ -71,14 +84,15 @@ in
               annotations.summary = "comin deployment failed on {{ $labels.instance }} (commit {{ $labels.commit_id }})";
             }
             {
-              # comin marks the last deploy done even when newer commits exist on
-              # origin, so a lagging host looks healthy; joining against the
-              # main-HEAD textfile metric surfaces the drift.
-              alert = "CominDeploymentDrift";
-              expr = ''(comin_deployment_info{status="done"} unless on(commit_id) comin_expected_commit_info) and on() (count(comin_expected_commit_info) > 0)'';
-              for = "30m";
+              # Always-on hosts only: a laptop asleep during a push is behind by
+              # definition, and saying so every time it wakes was most of the noise
+              # this alert used to make. 2h because a slow rebuild is not a fault
+              # while the drift worth knowing about lasts days.
+              alert = "CominSystemDrift";
+              expr = ''${driftMetric}{always_on="true"} == 1'';
+              for = "2h";
               labels.severity = "warning";
-              annotations.summary = "{{ $labels.instance }} is not on main HEAD (deployed {{ $labels.commit_id }})";
+              annotations.summary = "{{ $labels.host }} is not running the system main HEAD evaluates to";
             }
             {
               # 7d because a pending reboot is routine after a kernel update;
@@ -101,56 +115,124 @@ in
 
   systemd.tmpfiles.rules = [
     "d ${textfileDir} 0700 ${nodeExporterUser} ${nodeExporterGroup} -"
+    # Folded into ${textfileName}.prom; left behind it would serve its last value forever.
+    "r ${textfileDir}/${expectedCommitMetric}.prom"
   ];
 
-  systemd.services.comin-expected-commit = {
-    description = "Publish dotfiles main HEAD as a Prometheus textfile metric";
+  systemd.services.comin-drift = {
+    description = "Publish per-host comin drift as a Prometheus textfile metric";
     serviceConfig = {
       Type = "oneshot";
       User = nodeExporterUser;
       Group = nodeExporterGroup;
+      StateDirectory = "comin-drift";
+      # nix wants a writable home for its evaluation and tarball caches.
+      Environment = [ "HOME=%S/comin-drift" ];
+      # Eight evaluations do not fit in the 90s a oneshot gets by default.
+      TimeoutStartSec = "30m";
       ExecStart =
         let
-          # comin marks the last successful deployment as status=done regardless of
-          # whether newer commits exist on origin, so a silently lagging host is
-          # indistinguishable from a healthy one. Polling the remote main HEAD into a
-          # textfile metric lets the dashboard join comin_deployment_info against the
-          # expected value, surfacing drift directly.
-          publishExpectedCommit = pkgs.writeShellApplication {
-            name = "comin-publish-expected-commit";
+          publishDrift = pkgs.writeShellApplication {
+            name = "comin-publish-drift";
             runtimeInputs = [
-              pkgs.git
+              config.nix.package
               pkgs.coreutils
+              pkgs.curl
+              pkgs.findutils
+              pkgs.gawk
+              pkgs.git
             ];
+            # comin deploys a store path, not a commit: it skips any commit whose
+            # closure it already runs and keeps reporting the older one that last
+            # changed the host, so comparing commit ids called every host a commit
+            # did not touch drifting. Evaluation is host-independent, so manyara
+            # can answer for the whole fleet and no other machine has to publish.
             text = ''
-              sha=$(git ls-remote ${dotfilesUrl} refs/heads/main | cut -f1)
-              if [ -z "$sha" ]; then
+              main_commit=$(git ls-remote ${dotfilesUrl} refs/heads/main | cut -f1)
+              if [ -z "$main_commit" ]; then
                 echo "git ls-remote returned no SHA for refs/heads/main" >&2
                 exit 1
               fi
 
+              repo=$STATE_DIRECTORY/repository
+              if [ ! -d "$repo/.git" ]; then
+                git clone --quiet ${dotfilesUrl} "$repo"
+              fi
+              git -C "$repo" fetch --quiet origin
+              mkdir -p "$STATE_DIRECTORY/eval"
+
+              # A (host, commit) pair always evaluates to the same path.
+              eval_out_path() {
+                local cache
+                cache=$STATE_DIRECTORY/eval/$2.$1.$3
+                if [ ! -s "$cache" ]; then
+                  # stdin is the host list the caller is looping over.
+                  nix --extra-experimental-features 'nix-command flakes' --accept-flake-config eval --raw \
+                    "git+file://$repo?rev=$3#$2.\"$1\".config.system.build.toplevel.outPath" \
+                    </dev/null >"$cache.tmp" || return 1
+                  mv "$cache.tmp" "$cache"
+                fi
+                cat "$cache"
+              }
+
               # The temp file deliberately does not end in .prom so the textfile
               # collector skips it during the brief window before the rename.
-              tmp=$(mktemp ${textfileDir}/${expectedCommitMetric}.XXXXXX.tmp)
+              tmp=$(mktemp ${textfileDir}/${textfileName}.XXXXXX.tmp)
               {
                 printf '# HELP ${expectedCommitMetric} Latest commit on the configured branch, polled by systemd timer.\n'
                 printf '# TYPE ${expectedCommitMetric} gauge\n'
-                printf '${expectedCommitMetric}{branch="main",commit_id="%s"} 1\n' "$sha"
-              } > "$tmp"
-              mv "$tmp" ${textfileDir}/${expectedCommitMetric}.prom
+                printf '${expectedCommitMetric}{branch="main",commit_id="%s"} 1\n' "$main_commit"
+                printf '# HELP ${driftMetric} Whether the host runs a system other than the one main HEAD evaluates to.\n'
+                printf '# TYPE ${driftMetric} gauge\n'
+              } >"$tmp"
+
+              while read -r host attr target always_on; do
+                # Unreachable or last-deployment-failed hosts belong to CominDown
+                # and CominDeploymentFailed; they get no drift series at all.
+                metrics=$(curl --silent --fail --max-time 5 "http://$target/metrics") || continue
+                deployed=$(printf '%s\n' "$metrics" | awk -F'"' '
+                  /^comin_deployment_info\{/ && /status="done"/ {
+                    for (i = 1; i < NF; i++) if ($i ~ /commit_id=$/) { print $(i + 1); exit }
+                  }')
+                [ -n "$deployed" ] || continue
+
+                if [ "$deployed" = "$main_commit" ]; then
+                  drift=0
+                elif ! git -C "$repo" merge-base --is-ancestor "$deployed" refs/remotes/origin/main; then
+                  # comin refuses a branch that no longer contains what it deployed,
+                  # and only says so in a debug log, so a rebased main strands the
+                  # host with every gauge still reading healthy.
+                  drift=1
+                else
+                  expected=$(eval_out_path "$host" "$attr" "$main_commit") || continue
+                  actual=$(eval_out_path "$host" "$attr" "$deployed") || continue
+                  drift=0
+                  [ "$expected" = "$actual" ] || drift=1
+                fi
+
+                # target duplicates the scrape address so the dashboard can join
+                # this against the comin job, whose instance label it cannot share.
+                printf '${driftMetric}{host="%s",target="%s",always_on="%s"} %s\n' \
+                  "$host" "$target" "$always_on" "$drift" >>"$tmp"
+              done <<'SPECS'
+              ${lib.concatStringsSep "\n" hostSpecs}
+              SPECS
+
+              mv "$tmp" ${textfileDir}/${textfileName}.prom
+              find "$STATE_DIRECTORY/eval" -type f -mtime +30 -delete
             '';
           };
         in
-        lib.getExe publishExpectedCommit;
+        lib.getExe publishDrift;
     };
   };
 
-  systemd.timers.comin-expected-commit = {
-    description = "Refresh dotfiles main HEAD metric for drift detection";
+  systemd.timers.comin-drift = {
+    description = "Refresh per-host comin drift metrics";
     wantedBy = [ "timers.target" ];
     timerConfig = {
-      OnBootSec = "1m";
-      OnUnitActiveSec = "1m";
+      OnBootSec = "5m";
+      OnUnitActiveSec = "5m";
     };
   };
 }
