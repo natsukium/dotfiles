@@ -74,8 +74,14 @@
                     annotations.summary = ''{{ $labels.device }} on {{ $labels.instance }} below 15% free ({{ printf "%.1f" $value }}%)'';
                   }
                   {
+                    # Unlike the 15% rule this one watches /boot as well.
+                    # manyara's ESP is 128MiB and normally sits at 15% free, so
+                    # warning there would fire permanently, but 5% is the point
+                    # where a kernel no longer fits and comin's deploys start
+                    # failing at the bootloader step — which is how a full ESP
+                    # went unnoticed for a week.
                     alert = "FilesystemSpaceCritical";
-                    expr = ''max by (instance, device, fstype) (100 * node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay",mountpoint!~"/boot.*"} / node_filesystem_size_bytes{fstype!~"tmpfs|ramfs|overlay",mountpoint!~"/boot.*"}) < 5'';
+                    expr = ''max by (instance, device, fstype) (100 * node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|ramfs|overlay"}) < 5'';
                     for = "10m";
                     labels.severity = "critical";
                     annotations.summary = ''{{ $labels.device }} on {{ $labels.instance }} below 5% free ({{ printf "%.1f" $value }}%)'';
