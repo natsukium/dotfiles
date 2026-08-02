@@ -7,6 +7,7 @@
   emacs-pgtk,
   emacs-plus,
   emacsWithPackagesFromUsePackage,
+  fetchFromGitHub,
   gettext,
   nixd,
   nixfmt,
@@ -31,6 +32,26 @@ emacsWithPackagesFromUsePackage {
     epkgs:
     epkgs
     // {
+      lean4-mode = epkgs.melpaBuild rec {
+        pname = "lean4-mode";
+        ename = "lean4-mode";
+        version = "1.1.2";
+        commit = "76895d8939111654a472cfc617cfd43fbf5f1eb6";
+        # lean4-input reads data/abbreviations.json from next to its own .el
+        files = ''("*.el" "data")'';
+        src = fetchFromGitHub {
+          owner = "leanprover-community";
+          repo = "lean4-mode";
+          tag = version;
+          hash = "sha256-DLgdxd0m3SmJ9heJ/pe5k8bZCfvWdaKAF0BDYEkwlMQ=";
+        };
+        packageRequires = with epkgs; [
+          compat
+          dash
+          lsp-mode
+          magit-section
+        ];
+      };
       org-clickup = epkgs.melpaBuild {
         pname = "org-clickup";
         ename = "org-clickup";

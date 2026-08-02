@@ -497,6 +497,44 @@ so =.bean= is added explicitly here for the common short extension.
   :ensure t)
 #+end_src
 
+** Lean
+
+[[https://github.com/leanprover-community/lean4-mode][lean4-mode]] is the major mode for Lean 4.
+It talks to the Lean server through lsp-mode,
+the client the rest of this configuration already uses,
+and adds the =*Lean Goals*= buffer (=C-c C-i=)
+showing the proof state at point,
+together with an input method that turns sequences like =\to= into the
+corresponding Unicode notation.
+
+The package is not on MELPA,
+so it is pinned by revision in the Emacs package definition
+instead of being declared as a flake input;
+a single Emacs package does not earn a place in the flake's input list.
+
+=lean4-mode-hook= defaults to plain =lsp=,
+which starts a server the moment a =.lean= file is opened,
+including files opened in the background.
+Assigning the hook before the package loads replaces that with =lsp-deferred=,
+matching the other languages here;
+=defcustom= leaves an already-set variable alone,
+so the assignment survives the package's own definition.
+
+#+begin_src emacs-lisp
+(use-package lean4-mode
+  :ensure t
+  :commands lean4-mode
+  :init
+  (setq lean4-mode-hook (list #'lsp-deferred)))
+#+end_src
+
+Nothing here provides =lean= or =lake=.
+Lean projects pin their toolchain in a =lean-toolchain= file,
+and mathlib in particular expects that exact version,
+so a toolchain bundled into the Emacs wrapper would be the wrong one most of the time.
+Each project's devShell supplies it instead,
+and envrc carries that =PATH= into the buffer where lean4-mode looks for it.
+
 ** Markdown
 
 https://github.com/jrblevin/markdown-mode
