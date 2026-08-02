@@ -743,6 +743,25 @@ to prevent lines from becoming unnecessarily long.
 (setq org-agenda-files '("~/dropbox/org"))
 #+end_src
 
+** org-habit
+
+Some of my todos are things I want to keep doing rather than finish once.
+=org-habit= draws a consistency graph next to those entries in the agenda,
+so a repeating task shows whether I actually kept it up
+instead of only when it is next due.
+Marking an entry as a habit is described in
+[[https://orgmode.org/manual/Tracking-your-habits.html][Tracking your habits]].
+
+Org ships the module but does not load it by default.
+I require the feature after Org loads rather than adding it to =org-modules=,
+because that option is read once while Org starts up
+and is easy to set too late.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org
+  (require 'org-habit))
+#+end_src
+
 ** org-gcal
 
 [[https://github.com/kidd/org-gcal.el][org-gcal]] provides bidirectional sync between Google Calendar and Org files
