@@ -2648,6 +2648,69 @@ so it survives re-plugging and would apply to a replacement unit.
 }
 #+end_src
 
+* Authentication
+
+** Ente Auth
+
+[[https://ente.io/auth/][Ente Auth]] holds my TOTP secrets and syncs them with end-to-end
+encryption between Android and every machine here, so a lost phone is an
+inconvenience rather than a lockout. Client and server are both open source, so
+I can read what happens to the secrets and self-host the backend later without
+re-enrolling anything.
+
+Before this I used Google Authenticator and then Microsoft Authenticator, out
+of inertia more than choice. Neither could hand its secrets to a new device at
+the time, so replacing a phone meant re-enrolling every account by hand.
+
+A password manager would solve the sync problem too (Bitwarden sells TOTP on a
+paid plan, and a self-hosted Vaultwarden gives it away), but I keep the two
+apart deliberately. Storing the codes in the vault means anyone who gets into
+the vault has already cleared the second factor, which leaves me with one
+factor wearing two hats.
+
+nixpkgs builds =ente-auth= for Linux only. The app is written in Flutter, and the
+Flutter tooling in nixpkgs can only produce Linux desktop bundles; a macOS bundle
+requires Xcode, which a sandboxed Nix build cannot use. So darwin installs the
+upstream cask through brew-nix instead.
+
+#+begin_src nix :tangle features/ente-auth.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/ente-auth.nix
+{ ... }:
+{
+  flake.modules.homeManager.ente-auth =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.programs.ente-auth;
+    in
+    {
+      options.my.programs.ente-auth = {
+        enable = lib.mkEnableOption "Ente Auth";
+        package = lib.mkOption {
+          type = lib.types.package;
+          # nixpkgs marks ente-auth as Linux-only, so darwin falls back to the
+          # upstream cask exposed by the brew-nix overlay.
+          default = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.brewCasks.ente-auth else pkgs.ente-auth;
+          defaultText = lib.literalExpression "pkgs.ente-auth";
+          description = "The Ente Auth package to install.";
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
+        home.packages = [ cfg.package ];
+      };
+    };
+}
+#+end_src
+
 * Browser
 
 ** Zen Browser

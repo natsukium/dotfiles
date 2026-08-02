@@ -18,7 +18,6 @@ in
   ];
 
   home.packages = with pkgs; [
-    ente-auth
     rofi-rbw
     wl-clipboard
     wtype
