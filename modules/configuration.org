@@ -3081,6 +3081,8 @@ in
           client.enable = true;
         };
 
+        <<emacs-daemon-path>>
+
         xdg.configFile."emacs/init.el".source = tangleEl pkgs ./init.org;
         xdg.configFile."emacs/early-init.el".source = tangleEl pkgs ./early-init.org;
         home.file.".authinfo.age".source = ./authinfo.age;
@@ -3156,6 +3158,32 @@ emacsWithPackagesFromUsePackage {
     terraform-ls
   ];
 }
+#+end_src
+
+*** Daemon PATH
+
+launchd hands its agents only the system =PATH=, and =init.org= repairs
+=PATH= with =exec-path-from-shell= only when =window-system= is non-nil,
+which a daemon start never satisfies. So the daemon came up with no Nix
+profile in sight, died during package initialization, and =KeepAlive=
+restarted it every ten seconds — each start reaching =/usr/bin/gcc= for
+native compilation, which on a machine without Xcode is the stub that
+opens the Command Line Tools installer. I hand the agent a =PATH= of its
+own.
+
+#+NAME: emacs-daemon-path
+#+begin_src nix
+launchd.agents = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+  emacs.config.EnvironmentVariables.PATH = lib.concatStringsSep ":" [
+    "${config.home.profileDirectory}/bin"
+    "/run/current-system/sw/bin"
+    "/nix/var/nix/profiles/default/bin"
+    "/usr/bin"
+    "/bin"
+    "/usr/sbin"
+    "/sbin"
+  ];
+};
 #+end_src
 
 *** early-init.org

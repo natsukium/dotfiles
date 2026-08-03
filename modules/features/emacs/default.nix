@@ -70,6 +70,18 @@ in
           client.enable = true;
         };
 
+        launchd.agents = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
+          emacs.config.EnvironmentVariables.PATH = lib.concatStringsSep ":" [
+            "${config.home.profileDirectory}/bin"
+            "/run/current-system/sw/bin"
+            "/nix/var/nix/profiles/default/bin"
+            "/usr/bin"
+            "/bin"
+            "/usr/sbin"
+            "/sbin"
+          ];
+        };
+
         xdg.configFile."emacs/init.el".source = tangleEl pkgs ./init.org;
         xdg.configFile."emacs/early-init.el".source = tangleEl pkgs ./early-init.org;
         home.file.".authinfo.age".source = ./authinfo.age;
