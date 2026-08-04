@@ -20,6 +20,11 @@
           configDir = "${config.xdg.configHome}/pi/agent";
           context = ../common/AGENTS.md;
         };
+
+        # Reuse repo-local Claude skills in pi instead of maintaining parallel
+        # .agents/skills copies.
+        home.file."${config.programs.pi-coding-agent.configDir}/extensions/claude-project-skills.ts".source =
+          ./extensions/claude-project-skills.ts;
       };
     };
 }
