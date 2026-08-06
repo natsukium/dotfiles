@@ -9,6 +9,8 @@
   spoor,
 }:
 let
+  opener = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
+
   # Wraps list/switch in an fzf picker: the built-in
   # switch_{next,previous}_session only steps in daemon order, so
   # jumping to a known session otherwise means retyping a 32-hex id.
@@ -130,11 +132,19 @@ let
   };
 
   # kitty-style URL hints for the plain-text URLs felis won't make
-  # clickable (only OSC 8 links are). spoor reads the visible region
-  # from the temp-file path in the last argv slot, keeping stdin free
-  # for its /dev/tty overlay; `--action open` hands the pick to the
-  # platform opener. Open-only: the transient pipe session sees only
-  # its own FELIS_SESSION_ID, not the originating window's, so a pick
+  # clickable (only OSC 8 links are), plus the file names a coding
+  # agent prints for what it just wrote, whose OSC 8 link the plain
+  # region has already dropped. Only .html and .pdf: every further
+  # extension is one more label competing for the short keys, and the
+  # rest of a screen's dotted words open in Neovim anyway. spoor reads
+  # the visible region from the temp-file path in the last argv slot,
+  # keeping stdin free for its /dev/tty overlay.
+  # The pick comes back on stdout rather than through `--action open`
+  # because a ~-relative name needs a shell to expand it, and the
+  # opener would receive it as a literal argument. A relative name
+  # resolves against the focused session's OSC 7 cwd, which felis
+  # gives the transient session. Open-only: that session sees only its
+  # own FELIS_SESSION_ID, not the originating window's, so a pick
   # can't be routed back to the prompt.
   felis-hints = pkgs.writeShellApplication {
     name = "felis-hints";
@@ -143,7 +153,18 @@ let
     ]
     ++ lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.xdg-utils;
     text = ''
-      exec spoor --preset url --action open "''${1:?no region file}"
+      picked=$(spoor \
+        --preset url \
+        --regex '[\w.~/@+-]+\.(?i:html?|pdf)\b' \
+        "''${1:?no region file}") || exit 0
+      [ -n "$picked" ] || exit 0
+      # The tilde here is the literal character a display path carries,
+      # which is what SC2088 assumes is a mistake.
+      # shellcheck disable=SC2088
+      case $picked in
+        "~/"*) picked=$HOME/''${picked#"~/"} ;;
+      esac
+      exec ${opener} "$picked"
     '';
   };
 
