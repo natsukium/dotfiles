@@ -201,6 +201,8 @@ in
                 command = [ "${felis-nix-log}/bin/felis-nix-log" ];
               };
             };
+
+            mouse.wheel_scroll_multiplier = 5;
           };
         };
       };
