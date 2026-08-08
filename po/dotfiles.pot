@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-08-03 17:48+0900\n"
+"POT-Creation-Date: 2026-08-08 12:00+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -405,7 +405,7 @@ msgstr ""
 #: configuration.org:70 modules/features/emacs/init.org:651
 #: modules/configuration.org:80 modules/configuration.org:452
 #: modules/configuration.org:599 modules/configuration.org:2330
-#: modules/configuration.org:3888
+#: modules/configuration.org:3909
 #, no-wrap
 msgid "Configuration"
 msgstr ""
@@ -3943,7 +3943,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:93 modules/configuration.org:3845
+#: modules/features/emacs/init.org:93 modules/configuration.org:3866
 #, no-wrap
 msgid "Darwin"
 msgstr ""
@@ -7081,7 +7081,7 @@ msgstr ""
 
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:357
-#: modules/configuration.org:558 modules/configuration.org:3875
+#: modules/configuration.org:558 modules/configuration.org:3896
 #, no-wrap
 msgid "Options"
 msgstr ""
@@ -13369,35 +13369,43 @@ msgid ""
 "  spoor,\n"
 "}:\n"
 "let\n"
-"  felis-switch = pkgs.writeShellApplication {\n"
-"    name = \"felis-switch\";\n"
-"    runtimeInputs = [\n"
-"      package\n"
-"      pkgs.fzf\n"
-"      pkgs.gawk\n"
-"    ];\n"
-"    text = ''\n"
-"      list=$(felis sessions list)\n"
-"      if [ -z \"$list\" ] || [ \"$list\" = \"no sessions\" ]; then\n"
-"        echo \"no sessions\" >&2\n"
-"        exit 0\n"
-"      fi"
+"  opener = if pkgs.stdenv.hostPlatform.isDarwin then \"open\" else "
+"\"xdg-open\";"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:3673
+#, no-wrap
+msgid ""
+"felis-switch = pkgs.writeShellApplication {\n"
+"  name = \"felis-switch\";\n"
+"  runtimeInputs = [\n"
+"    package\n"
+"    pkgs.fzf\n"
+"    pkgs.gawk\n"
+"  ];\n"
+"  text = ''\n"
+"    list=$(felis sessions list)\n"
+"    if [ -z \"$list\" ] || [ \"$list\" = \"no sessions\" ]; then\n"
+"      echo \"no sessions\" >&2\n"
+"      exit 0\n"
+"    fi"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3689
+#: modules/configuration.org:3691
 #, no-wrap
 msgid "awk -v self=\"''${FELIS_SESSION_ID:-}\" '$1 != self' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3690 modules/configuration.org:3720
+#: modules/configuration.org:3692 modules/configuration.org:3722
 #, no-wrap
 msgid "fzf --ansi \\"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3687
+#: modules/configuration.org:3689
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -13410,7 +13418,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3696
+#: modules/configuration.org:3698
 #, no-wrap
 msgid ""
 "    id=''${selection%% *}\n"
@@ -13420,7 +13428,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3704
+#: modules/configuration.org:3706
 #, no-wrap
 msgid ""
 "felis-kill = pkgs.writeShellApplication {\n"
@@ -13439,7 +13447,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3718
+#: modules/configuration.org:3720
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -13453,19 +13461,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3728 modules/configuration.org:3749
+#: modules/configuration.org:3730 modules/configuration.org:3751
 #, no-wrap
 msgid "awk 'NF {print $1}' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3729 modules/configuration.org:3750
+#: modules/configuration.org:3731 modules/configuration.org:3752
 #, no-wrap
 msgid "while read -r id; do"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3727
+#: modules/configuration.org:3729
 #, no-wrap
 msgid ""
 "    printf '%s\\n' \"$selection\" \\\n"
@@ -13476,13 +13484,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3752
+#: modules/configuration.org:3754
 #, no-wrap
 msgid "awk -v id=\"$id\" 'NF {print id\"\\t\"$0}'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3739
+#: modules/configuration.org:3741
 #, no-wrap
 msgid ""
 "felis-grep = pkgs.writeShellApplication {\n"
@@ -13505,13 +13513,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3762
+#: modules/configuration.org:3764
 #, no-wrap
 msgid "fzf --delimiter='\\t' --with-nth=2.. --prompt='grep scrollback> '"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3760
+#: modules/configuration.org:3762
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -13520,7 +13528,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3765
+#: modules/configuration.org:3767
 #, no-wrap
 msgid ""
 "    id=$(printf '%s' \"$selection\" | awk -F'\\t' '{print $1; exit}')\n"
@@ -13530,7 +13538,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3775
+#: modules/configuration.org:3777
 #, no-wrap
 msgid ""
 "felis-scrollback = pkgs.writeShellApplication {\n"
@@ -13546,7 +13554,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3793
+#: modules/configuration.org:3803
 #, no-wrap
 msgid ""
 "felis-hints = pkgs.writeShellApplication {\n"
@@ -13556,25 +13564,33 @@ msgid ""
 "  ]\n"
 "  ++ lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.xdg-utils;\n"
 "  text = ''\n"
-"    exec spoor --preset url --action open \"''${1:?no region file}\"\n"
+"    picked=$(spoor \\\n"
+"      --preset url \\\n"
+"      --regex '[\\w.~/@+-]+\\.(?i:html?|pdf)\\b' \\\n"
+"      \"''${1:?no region file}\") || exit 0\n"
+"    [ -n \"$picked\" ] || exit 0\n"
+"    case $picked in\n"
+"      \"~/\"*) picked=$HOME/''${picked#\"~/\"} ;;\n"
+"    esac\n"
+"    exec ${opener} \"$picked\"\n"
 "  '';\n"
 "};"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3821
+#: modules/configuration.org:3842
 #, no-wrap
 msgid "sed 's/^nix log //' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3822
+#: modules/configuration.org:3843
 #, no-wrap
 msgid "awk '!seen[$0]++'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3809
+#: modules/configuration.org:3830
 #, no-wrap
 msgid ""
 "  felis-nix-log = pkgs.writeShellApplication {\n"
@@ -13614,13 +13630,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3847
+#: modules/configuration.org:3868
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3849
+#: modules/configuration.org:3870
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -13630,7 +13646,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3860
+#: modules/configuration.org:3881
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -13645,7 +13661,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3870
+#: modules/configuration.org:3891
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -13654,13 +13670,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3877
+#: modules/configuration.org:3898
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3879
+#: modules/configuration.org:3900
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -13674,7 +13690,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3890
+#: modules/configuration.org:3911
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -13684,13 +13700,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3895
+#: modules/configuration.org:3916
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3897
+#: modules/configuration.org:3918
 #, no-wrap
 msgid ""
 "config = {\n"
