@@ -8,6 +8,7 @@
   },
   automerge: true,
   automergeStrategy: "rebase",
+  prHourlyLimit: 0,
   nix: {
     enabled: true,
   },
@@ -16,6 +17,12 @@
       matchDatasources: ["docker"],
       groupName: "docker images",
       extends: ["schedule:weekly"],
+    },
+    // The component's manifest pins the library exactly, so whichever half
+    // arrives alone fails the manifest check.
+    {
+      matchDepNames: ["Jezza34000/homeassistant_petkit", "Jezza34000/py-petkit-api"],
+      groupName: "petkit",
     },
   ],
   // Nix expressions that pin a source by hand are invisible to every stock
