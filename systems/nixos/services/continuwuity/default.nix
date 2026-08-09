@@ -33,6 +33,24 @@
   systemd.services.continuwuity.serviceConfig.EnvironmentFile =
     config.sops.templates."continuwuity.env".path;
 
+  # Upstream documents two ways to back this up. The online one drives RocksDB's
+  # backup engine, but it is reachable only as `!admin server backup-database`
+  # from the admin room or at startup through admin_execute, so nothing a timer
+  # runs can ask for it, and restoring one means renaming every .sst file by
+  # hand and merging two directories. The other is the offline procedure
+  # (halt, copy database_path, restore it as it stands), which is what this
+  # does. Media sits in media/ under the same directory, so one copy covers it.
+  # The cleanup hook runs as ExecStopPost, so the homeserver comes back even
+  # when restic fails.
+  my.services.restic.backups.continuwuity = {
+    # DynamicUser puts the real tree under /var/lib/private and leaves
+    # /var/lib/continuwuity as a symlink to it, which restic would archive as a
+    # symlink and nothing more.
+    paths = [ "/var/lib/private/continuwuity" ];
+    prepare = "${config.systemd.package}/bin/systemctl stop continuwuity.service";
+    cleanup = "${config.systemd.package}/bin/systemctl start continuwuity.service";
+  };
+
   my.services.cloudflared-tunnel.ingress."matrix.natsukium.com".service =
     "http://localhost:${toString (lib.head config.services.matrix-continuwuity.settings.global.port)}";
 
