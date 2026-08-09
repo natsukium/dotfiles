@@ -13,13 +13,13 @@ buildHomeAssistantComponent rec {
   owner = "Jezza34000";
   domain = "petkit";
   # renovate: datasource=github-releases depName=Jezza34000/homeassistant_petkit
-  version = "1.25.0";
+  version = "1.27.0";
 
   src = fetchFromGitHub {
     inherit owner;
     repo = "homeassistant_petkit";
     tag = version;
-    hash = "sha256-1YFE2s4MV37PNRdDg35zWgfNxdNny82pdheHa87Xsus=";
+    hash = "sha256-pK3/JwtQSq91TlO4W0GoUq5i/1VsDuH0K6S3KYfyARI=";
   };
 
   dependencies = [
