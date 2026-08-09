@@ -115,6 +115,11 @@ resource "cloudflare_r2_bucket" "nix_cache_niks3" {
   name       = "nix-cache-niks3"
 }
 
+resource "cloudflare_r2_bucket" "restic_backup" {
+  account_id = local.cloudflare_account_id
+  name       = "restic-backup"
+}
+
 # Public read path: clients pull straight from R2 (CDN-cached), bypassing the
 # tunnel. Cloudflare manages this DNS record itself, hence not in local.records.
 resource "cloudflare_r2_custom_domain" "nix_cache_niks3" {
