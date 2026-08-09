@@ -13,6 +13,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "pypetkitapi";
+  # renovate: datasource=github-releases depName=Jezza34000/py-petkit-api
   version = "1.26.1";
   pyproject = true;
 

@@ -18,4 +18,25 @@
       extends: ["schedule:weekly"],
     },
   ],
+  // Nix expressions that pin a source by hand are invisible to every stock
+  // manager, so I annotate the version string with what the file cannot
+  // express: where the source lives and how its tags are shaped.
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: ["/\\.nix$/"],
+      matchStrings: [
+        '# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)(?: extractVersion=(?<extractVersion>\\S+))?\\s+version = "(?<currentValue>[^"]+)"',
+      ],
+    },
+  ],
+  // Bumping the version alone leaves the hash beside it stale, and the pull
+  // request would never build. update-nix-hash refetches the source and
+  // rewrites it; it only exists on my self-hosted runner, which is why I moved
+  // this repository off the hosted app.
+  postUpgradeTasks: {
+    commands: ["update-nix-hash {{{packageFile}}}"],
+    fileFilters: ["**/*.nix"],
+    executionMode: "update",
+  },
 }

@@ -52,6 +52,10 @@
         # Commits go through the API, so GitHub signs them and attributes them
         # to the App instead of to an unverified local git author.
         platformCommit = "enabled";
+        # postUpgradeTasks runs nothing unless the command matches; I allow only
+        # update-nix-hash so a repository config cannot turn a dependency bump
+        # into arbitrary code execution on this host.
+        allowedCommands = [ "^update-nix-hash .+$" ];
       };
     };
 

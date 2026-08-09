@@ -7,6 +7,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "sdp-transform";
+  # renovate: datasource=github-releases depName=skymaze/sdp-transform extractVersion=^v(?<version>.+)$
   version = "1.1.0";
   pyproject = true;
 

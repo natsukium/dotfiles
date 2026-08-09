@@ -12,6 +12,7 @@
 buildHomeAssistantComponent rec {
   owner = "Jezza34000";
   domain = "petkit";
+  # renovate: datasource=github-releases depName=Jezza34000/homeassistant_petkit
   version = "1.25.0";
 
   src = fetchFromGitHub {

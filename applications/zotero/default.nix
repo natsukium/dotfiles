@@ -21,11 +21,15 @@ let
 
   profilesPath = if stdenv.hostPlatform.isDarwin then "${configPath}/Profiles" else configPath;
 
-  better-bibtex-version = "7.0.38";
-  better-bibtex = pkgs.fetchurl {
-    url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v${better-bibtex-version}/zotero-better-bibtex-${better-bibtex-version}.xpi";
-    hash = "sha256-tdjRFMmnrst6JTNP5yCuDLX2pDIS9olAKEnyHp8m8WE=";
-  };
+  better-bibtex =
+    let
+      # renovate: datasource=github-releases depName=retorquere/zotero-better-bibtex extractVersion=^v(?<version>.+)$
+      version = "7.0.38";
+    in
+    pkgs.fetchurl {
+      url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v${version}/zotero-better-bibtex-${version}.xpi";
+      hash = "sha256-tdjRFMmnrst6JTNP5yCuDLX2pDIS9olAKEnyHp8m8WE=";
+    };
   user-js = ''
     user_pref("extensions.autoDisableScopes", 0);
   '';
