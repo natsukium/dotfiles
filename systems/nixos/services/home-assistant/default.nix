@@ -30,6 +30,9 @@ in
         unit_system = "metric";
       };
       prometheus = { };
+      recorder.purge_keep_days = 14;
+      history = { };
+      logbook = { };
       http = {
         use_x_forwarded_for = true;
         trusted_proxies = [
