@@ -57,6 +57,12 @@
         else
           json.generate "renovate-${name}-config.json" settings;
 
+      # Renovate can bump a hardcoded `version` in a Nix expression, but the
+      # `hash` beside it only follows from fetching the source. This is what a
+      # repository's postUpgradeTasks calls to close that gap, so I put it on
+      # the path of every instance rather than opting in per repository.
+      updateNixHash = pkgs.callPackage ./update-nix-hash.nix { };
+
       mkService =
         name: instance:
         nameValuePair "renovate-${name}" {
@@ -69,6 +75,7 @@
           path = [
             config.systemd.package
             pkgs.git
+            updateNixHash
           ]
           ++ optional (instance.githubApp != null) pkgs.gh-token
           ++ instance.runtimePackages;
@@ -88,7 +95,9 @@
             CacheDirectory = "renovate-${name}";
             StateDirectory = "renovate-${name}";
 
-            # Hardening, as in nixpkgs' services.renovate.
+            # Hardening copied from nixpkgs' services.renovate; I keep AF_UNIX
+            # open because update-nix-hash prefetches through the Nix daemon
+            # socket.
             CapabilityBoundingSet = [ "" ];
             DeviceAllow = [ "" ];
             LockPersonality = true;
