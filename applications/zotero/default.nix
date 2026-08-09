@@ -24,11 +24,11 @@ let
   better-bibtex =
     let
       # renovate: datasource=github-releases depName=retorquere/zotero-better-bibtex extractVersion=^v(?<version>.+)$
-      version = "7.0.76";
+      version = "9.0.55";
     in
     pkgs.fetchurl {
       url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v${version}/zotero-better-bibtex-${version}.xpi";
-      hash = "sha256-4MWwqSoOWPGiuLiZA6BfS24ScDdYhDto+jNF9l0C7kw=";
+      hash = "sha256-LZFOuxdMLFkOz/dBppA/GXkGW0J0DzAdk47Cy2wD5NY=";
     };
   user-js = ''
     user_pref("extensions.autoDisableScopes", 0);
