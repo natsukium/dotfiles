@@ -57,7 +57,7 @@
       "id": 21,
       "title": "Objects",
       "type": "timeseries",
-      "description": "Drops are GC, climbs are uploads.",
+      "description": "Drops are GC, climbs are uploads. R2 counting more objects than niks3 does is GC having left some behind.",
       "gridPos": {
         "x": 0,
         "y": 5,
@@ -126,6 +126,18 @@
           "instant": false,
           "refId": "A",
           "legendFormat": "Objects"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "cloudflare_r2_bucket_objects{bucket=\"nix-cache-niks3\"}",
+          "range": true,
+          "instant": false,
+          "refId": "B",
+          "legendFormat": "R2 objects"
         }
       ]
     },
@@ -135,8 +147,9 @@
         "uid": "PBFA97CFB590B2093"
       },
       "id": 22,
-      "title": "Logical size",
+      "title": "Size",
       "type": "timeseries",
+      "description": "What niks3 records against what R2 bills for. R2 stores the compressed NARs, so it sits below the logical size; the gap is the compression ratio, and the two drifting apart is objects the cache no longer knows about.",
       "gridPos": {
         "x": 8,
         "y": 5,
@@ -205,6 +218,18 @@
           "instant": false,
           "refId": "A",
           "legendFormat": "Logical size"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "cloudflare_r2_bucket_payload_bytes{bucket=\"nix-cache-niks3\"} + cloudflare_r2_bucket_metadata_bytes{bucket=\"nix-cache-niks3\"}",
+          "range": true,
+          "instant": false,
+          "refId": "B",
+          "legendFormat": "R2 stored"
         }
       ]
     },

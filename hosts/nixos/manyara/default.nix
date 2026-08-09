@@ -35,6 +35,7 @@
   my.services.alertmanager.enable = true;
   my.services.blackbox.enable = true;
   my.services.postgres-exporter.enable = true;
+  my.services.cloudflare-r2-exporter.enable = true;
   my.services.restic.enable = true;
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;
