@@ -17,6 +17,7 @@
     ../../../systems/nixos/services/home-assistant
     ../../../systems/nixos/services/miniflux
     ../../../systems/nixos/services/niks3
+    ../../../systems/nixos/services/renovate
     ../../../systems/nixos/services/searxng
     ./hardware-configuration.nix
     inputs.simple-wol-manager.nixosModules.default
