@@ -9,7 +9,7 @@ let
   linux-machines = inputs.self.outputs.nixosConfigurations;
   darwin-machines = inputs.self.outputs.darwinConfigurations;
 
-  textfileDir = "/var/lib/node-exporter-textfile";
+  textfileDir = config.my.services.node-exporter-textfile.directory;
   textfileName = "comin-drift";
   expectedCommitMetric = "comin_expected_commit_info";
   driftMetric = "comin_system_drift";
@@ -152,12 +152,9 @@ in
     })
   ];
 
-  services.prometheus.exporters.node.extraFlags = [
-    "--collector.textfile.directory=${textfileDir}"
-  ];
+  my.services.node-exporter-textfile.enable = true;
 
   systemd.tmpfiles.rules = [
-    "d ${textfileDir} 0700 ${nodeExporterUser} ${nodeExporterGroup} -"
     # Folded into ${textfileName}.prom; left behind it would serve its last value forever.
     "r ${textfileDir}/${expectedCommitMetric}.prom"
   ];
