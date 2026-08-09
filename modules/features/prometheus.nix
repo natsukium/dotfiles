@@ -136,6 +136,19 @@
                     annotations.summary = "{{ $labels.mountpoint }} on {{ $labels.instance }} is read-only";
                   }
                   {
+                    # A backup that quietly stops running looks exactly like one that
+                    # works: SystemdUnitFailed only catches the runs that start and
+                    # then fail, and the timer's last trigger is the one signal the
+                    # node exporter offers for the runs that never start at all.
+                    # Timers that have not fired since boot report zero, so those are
+                    # filtered out rather than alerting on every fresh deploy.
+                    alert = "BackupStale";
+                    expr = ''time() - node_systemd_timer_last_trigger_seconds{name=~"restic-backups-.*"} > 172800 and node_systemd_timer_last_trigger_seconds > 0'';
+                    for = "1h";
+                    labels.severity = "warning";
+                    annotations.summary = "{{ $labels.name }} has not run in two days on {{ $labels.instance }}";
+                  }
+                  {
                     alert = "OOMKillDetected";
                     expr = "increase(node_vmstat_oom_kill[10m]) > 0";
                     labels.severity = "warning";
