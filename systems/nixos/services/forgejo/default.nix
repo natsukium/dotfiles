@@ -29,6 +29,12 @@
       --username natsukium \
       --email "tomoya.otabi@gmail.com" \
       --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})" || true
+
+    ${lib.getExe config.services.forgejo.package} admin user create \
+      --username renovate \
+      --email "renovate@natsukium.com" \
+      --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-renovate-password.path})" \
+      --must-change-password=false || true
   '';
 
   # The repositories under stateDir are only half the instance: issues, pull
@@ -59,6 +65,11 @@
     };
 
   sops.secrets.forgejo-admin-password = {
+    sopsFile = ./secrets.yaml;
+    owner = "forgejo";
+  };
+
+  sops.secrets.forgejo-renovate-password = {
     sopsFile = ./secrets.yaml;
     owner = "forgejo";
   };
