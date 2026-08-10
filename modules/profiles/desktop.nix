@@ -12,6 +12,7 @@ import ../../lib/mkProfile.nix { inherit lib; } {
   home = {
     my.programs.ente-auth.enable = lib.mkDefault true;
     my.programs.zen-browser.enable = lib.mkDefault true;
+    my.programs.firefox.enable = lib.mkDefault true;
     my.programs.handy.enable = lib.mkDefault true;
   };
 }

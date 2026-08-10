@@ -2713,65 +2713,232 @@ upstream cask through brew-nix instead.
 
 * Browser
 
-** Zen Browser
+Compared with Chromium, Firefox lets me declare far more of its configuration
+(search engines and extensions, to name two), and that plays straight into
+home-manager: every machine gets the same browser from the same expression, with no
+sync service involved. That is why I stay on the Firefox side of the fence. I also
+simply want to run Gecko rather than yet another Blink browser.
 
-[[https://zen-browser.app/][Zen Browser]] is a Firefox-based browser with a focus on privacy and customization.
-Firefox derivatives were preferred over Chromium-based browsers because Firefox's extension
-ecosystem and =about:config= provide deeper control over browser behavior, and the Nix
-ecosystem has mature tooling for managing Firefox profiles declaratively via home-manager.
+For about a year and a half that Firefox was [[https://zen-browser.app/][Zen Browser]], a fork with better
+UI/UX, though I always had some reservations about it. While I was using it,
+stock Firefox kept shipping, and eventually almost everything I wanted landed
+upstream:
 
-Zen Browser was chosen over vanilla Firefox for its improved UI/UX while retaining full
-Firefox compatibility — extensions, search engines, and profile settings work identically.
+1. Vertical tabs ([[https://www.firefox.com/en-US/firefox/136.0/releasenotes/][Firefox 136]]). I keep a hundred tabs open at all times, so a
+   horizontal tab strip is out of the question.
+2. Configurable keyboard shortcuts ([[https://www.firefox.com/en-US/firefox/147.0/releasenotes/][Firefox 147]]). Firefox finally lets me rebind
+   them.
+3. Split view ([[https://www.firefox.com/en-US/firefox/149.0/releasenotes/][Firefox 149]]). Not an everyday feature, but comparing two pages
+   side by side comes up more often than I expected.
 
-#+begin_src nix :tangle features/zen-browser.nix :exports none
+What I liked about Zen beyond that turned out to need nothing more than CSS:
+
+1. [[https://docs.zen-browser.app/user-manual/compact-mode][Compact mode]]. A browser, like almost every program, has no need for bars;
+   Zen hides the toolbar and sidebar by default.
+2. [[https://docs.zen-browser.app/user-manual/urlbar][Floating URL bar]]. Zen's URL bar searches like any other, but the input
+   floats in the middle of the window. URL bars are normally pinned to the top or
+   bottom edge, so one of the most heavily used components demands the longest eye
+   movement. And as compact mode shows, I don't want a bar there in the first
+   place.
+
+Neither needs a fork; a =userChrome.css= theme is enough. With [[https://github.com/reizumii/parfait][parfait]] I get
+everything I wanted from Zen on stock Firefox, and it is far from the only such
+theme; [[https://github.com/greeeen-dev/natsumi-browser][natsumi-browser]] was the first one I came across.
+
+With the UI gap closed, what remains are my reservations: Zen's stability, its
+prospects as a project, and how well it is maintained in nixpkgs. So I switched to
+Firefox. Both browsers stay installed for now, sharing one set of search engines
+and extensions.
+
+#+begin_src nix :tangle features/firefox/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/zen-browser.nix
+#+begin_src nix :tangle features/firefox/default.nix
 { ... }:
+let
+  sharedSearch = import ./search.nix;
+  sharedExtensions = import ./extensions.nix;
+in
 {
-  flake.modules.homeManager."zen-browser" =
-    {
-      inputs,
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      cfg = config.my.programs.zen-browser;
-    in
-    {
-      imports = [ inputs.zen-browser.homeModules.beta ];
+  <<firefox-module>>
 
-      options.my.programs.zen-browser = {
-        enable = lib.mkEnableOption "Zen Browser";
-      };
+  <<zen-browser-module>>
+}
+#+end_src
 
-      config = lib.mkIf cfg.enable {
-        programs.zen-browser = {
-          enable = true;
-          profiles.natsukium = {
-            <<zen-browser-settings>>
+** Firefox
 
-            <<zen-browser-search>>
+Stock Firefox is dressed in parfait, a chrome theme written entirely in
+=userChrome.css= (no extension, no =userChrome.js= loader), so it lives inside the
+profile home-manager already writes.
 
-            <<zen-browser-extensions>>
-          };
+#+NAME: firefox-parfait-source
+#+begin_src nix
+# renovate: datasource=github-releases depName=reizumii/parfait extractVersion=^v(?<version>.+)$
+version = "0.19";
+parfait = pkgs.fetchFromGitHub {
+  owner = "reizumii";
+  repo = "parfait";
+  tag = "v${version}";
+  hash = "sha256-6r4jQoqleNTLIA1G5N1dlVMWQe/kxTi6miLkuQxCDu4=";
+};
+#+end_src
+
+On Linux, home-manager still defaults the profile directory to =~/.mozilla/firefox= for
+=home.stateVersion= below 26.05 and warns on every evaluation until the choice is made
+explicit.
+
+#+NAME: firefox-module
+#+begin_src nix
+flake.modules.homeManager.firefox =
+  {
+    config,
+    lib,
+    pkgs,
+    ...
+  }:
+  let
+    cfg = config.my.programs.firefox;
+    <<firefox-parfait-source>>
+  in
+  {
+    options.my.programs.firefox = {
+      enable = lib.mkEnableOption "Firefox";
+    };
+
+    config = lib.mkIf cfg.enable {
+      programs.firefox = {
+        enable = true;
+        configPath = lib.mkIf pkgs.stdenv.hostPlatform.isLinux "${config.xdg.configHome}/mozilla/firefox";
+        profiles.natsukium = {
+          search = sharedSearch { inherit pkgs; };
+          extensions = sharedExtensions { inherit pkgs; };
+
+          <<firefox-settings>>
         };
       };
+
+      <<firefox-parfait-tree>>
     };
-}
+  };
 #+end_src
 
 *** Settings
 
-Auto-install extensions without user prompts. By default, Firefox shows a confirmation dialog
-for each extension installed via the profile. Setting =extensions.autoDisableScopes= to 0
-disables this behavior, which is necessary for fully declarative extension management —
-otherwise the first launch after a profile rebuild would require manual approval for every
-extension.
+=extensions.autoDisableScopes= is 0 in both profiles: by default Firefox asks for
+confirmation of each extension the profile installs, so the first launch after a
+rebuild would mean approving every one by hand.
+
+parfait ships its defaults in a =user.js= that its install instructions tell you to copy
+into the profile. home-manager generates =user.js= itself from =settings=, so those
+defaults are transcribed here: an unset preference does not match any =-moz-pref()= query,
+and dropping the list would leave the theme running on whatever the stylesheets fall back
+to rather than on what its author intended.
+
+Four values depart from that baseline. =sidebar.verticalTabs= and =sidebar.visibility= are
+Firefox's own preferences, and the =hide-sidebar= value is what puts parfait into its
+floating layout: the navigation bar slides off screen and the sidebar hovers over the
+page, which is the compact mode I came here for. =parfait.blur.enabled= adds the backdrop
+filter behind the floating address bar. =parfait.urlbar.search-mode.glow= is off: I do not
+want an animation firing every time the search mode changes.
+
+#+NAME: firefox-settings
+#+begin_src nix
+settings = {
+  "extensions.autoDisableScopes" = 0;
+
+  # parfait reads its own stylesheets from the profile, and paints icons through
+  # context-fill, which is gated behind the second preference.
+  "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
+  "svg.context-properties.content.enabled" = true;
+
+  "sidebar.verticalTabs" = true;
+  "sidebar.visibility" = "hide-sidebar";
+
+  "parfait.animations.enabled" = true;
+  "parfait.blur.enabled" = true;
+  "parfait.theme.roundness.preset" = 0;
+  "parfait.window.borderless" = false;
+  "parfait.bg.accent-color" = false;
+  "parfait.bg.contrast" = 2;
+  "parfait.bg.gradient" = false;
+  "parfait.bg.opacity" = 4;
+  "parfait.bg.transparent" = false;
+  "parfait.tabs.groups.color" = false;
+  "parfait.sidebar.width.preset" = 2;
+  "parfait.toolbar.sidebar-gutter" = true;
+  "parfait.toolbar.unified-sidebar" = true;
+  "parfait.traffic-lights.enabled" = false;
+  "parfait.traffic-lights.mono" = false;
+  "parfait.urlbar.url.center" = false;
+  "parfait.urlbar.results.compact" = false;
+  "parfait.urlbar.search-mode.glow" = false;
+  "parfait.new-tab.logo" = 1;
+  "parfait.new-tab.bg.pattern" = false;
+};
+#+end_src
+
+*** Theme files
+
+parfait's repository is already shaped like a profile's =chrome/= directory, so the
+whole tree is linked in as-is. =profilesPath= is an internal option, but it is the
+only thing that knows where the profile directory lands, and that differs between
+darwin and Linux.
+
+#+NAME: firefox-parfait-tree
+#+begin_src nix
+home.file."${config.programs.firefox.profilesPath}/natsukium/chrome".source = parfait;
+#+end_src
+
+** Zen Browser
+
+Zen ships its own home-manager module in its flake, so mine only imports it and
+fills in the shared profile pieces.
+
+It never got along with Nix on darwin: with home-manager managing its profiles,
+launch kept ending in an error loop at the profile chooser, and the app bundle's
+code signature makes it hard to build in the Nix sandbox.
+
+#+NAME: zen-browser-module
+#+begin_src nix
+flake.modules.homeManager."zen-browser" =
+  {
+    inputs,
+    config,
+    lib,
+    pkgs,
+    ...
+  }:
+  let
+    cfg = config.my.programs.zen-browser;
+  in
+  {
+    imports = [ inputs.zen-browser.homeModules.beta ];
+
+    options.my.programs.zen-browser = {
+      enable = lib.mkEnableOption "Zen Browser";
+    };
+
+    config = lib.mkIf cfg.enable {
+      programs.zen-browser = {
+        enable = true;
+        profiles.natsukium = {
+          search = sharedSearch { inherit pkgs; };
+          extensions = sharedExtensions { inherit pkgs; };
+
+          <<zen-browser-settings>>
+        };
+      };
+    };
+  };
+#+end_src
+
+*** Settings
+
+Only =extensions.autoDisableScopes= again, for the same reason as in the Firefox
+profile.
 
 #+NAME: zen-browser-settings
 #+begin_src nix
@@ -2780,38 +2947,44 @@ settings = {
 };
 #+end_src
 
-*** Search Engines
+** Search Engines
 
-Custom search engines for quick access to development-related package registries and
-documentation. Each engine is assigned a short alias (e.g., =@np=) for use in the address bar,
-avoiding the need to navigate to each site manually.
+Custom search engines for the package registries and documentation I search daily;
+a short alias in the address bar (=@np= and friends) beats navigating to each site
+first. Both browser profiles take this file, so an alias means the same thing
+whichever one is open.
 
-#+NAME: zen-browser-search
-#+begin_src nix
-search = {
-  force = true;
-  engines = {
-    <<zen-browser-search-engine-nix-packages>>
-
-    <<zen-browser-search-engine-nixos-wiki>>
-
-    <<zen-browser-search-engine-noogle>>
-
-    <<zen-browser-search-engine-crates-io>>
-
-    <<zen-browser-search-engine-npm>>
-
-    <<zen-browser-search-engine-pypi>>
-  };
-};
+#+begin_src nix :tangle features/firefox/search.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
 #+end_src
 
-**** Nix Packages
+#+begin_src nix :tangle features/firefox/search.nix
+{ pkgs }:
+{
+  force = true;
+  engines = {
+    <<browser-search-engine-nix-packages>>
 
-Search the official NixOS/nixpkgs repository. Uses =nixos-icons= from nixpkgs for the icon
-to avoid depending on an external URL that could change or become unavailable.
+    <<browser-search-engine-nixos-wiki>>
 
-#+NAME: zen-browser-search-engine-nix-packages
+    <<browser-search-engine-noogle>>
+
+    <<browser-search-engine-crates-io>>
+
+    <<browser-search-engine-npm>>
+
+    <<browser-search-engine-pypi>>
+  };
+}
+#+end_src
+
+*** Nix Packages
+
+The icon comes from =nixos-icons= in nixpkgs rather than an external URL that could
+move or vanish.
+
+#+NAME: browser-search-engine-nix-packages
 #+begin_src nix
 nix-packages = {
   name = "Nix Packages";
@@ -2836,11 +3009,9 @@ nix-packages = {
 };
 #+end_src
 
-**** NixOS Wiki
+*** NixOS Wiki
 
-Search the NixOS community wiki for configuration examples and troubleshooting guides.
-
-#+NAME: zen-browser-search-engine-nixos-wiki
+#+NAME: browser-search-engine-nixos-wiki
 #+begin_src nix
 nixos-wiki = {
   name = "NixOS Wiki";
@@ -2850,12 +3021,11 @@ nixos-wiki = {
 };
 #+end_src
 
-**** noogle
+*** noogle
 
-[[https://noogle.dev/][noogle]] is a Nix function search engine — the equivalent of Hoogle for Haskell.
-Useful for discovering library functions by type signature or name when writing Nix expressions.
+[[https://noogle.dev/][noogle]] is a Nix function search engine, the equivalent of Hoogle for Haskell.
 
-#+NAME: zen-browser-search-engine-noogle
+#+NAME: browser-search-engine-noogle
 #+begin_src nix
 noogle = {
   name = "noogle";
@@ -2865,11 +3035,9 @@ noogle = {
 };
 #+end_src
 
-**** crates.io
+*** crates.io
 
-Search the Rust package registry for crate discovery and version information.
-
-#+NAME: zen-browser-search-engine-crates-io
+#+NAME: browser-search-engine-crates-io
 #+begin_src nix
 crates-io = {
   name = "crates.io";
@@ -2879,11 +3047,9 @@ crates-io = {
 };
 #+end_src
 
-**** npm
+*** npm
 
-Search the npm registry for JavaScript/TypeScript package discovery.
-
-#+NAME: zen-browser-search-engine-npm
+#+NAME: browser-search-engine-npm
 #+begin_src nix
 npm = {
   name = "npm";
@@ -2893,11 +3059,9 @@ npm = {
 };
 #+end_src
 
-**** PyPI
+*** PyPI
 
-Search the Python Package Index for Python package discovery.
-
-#+NAME: zen-browser-search-engine-pypi
+#+NAME: browser-search-engine-pypi
 #+begin_src nix
 pypi = {
   name = "PyPI";
@@ -2907,15 +3071,20 @@ pypi = {
 };
 #+end_src
 
-*** Extensions
+** Extensions
 
-Browser extensions managed declaratively. Extensions are sourced from two overlay-provided
-sets: =firefox-addons= (from the NUR firefox-addons repository) and =my-firefox-addons=
-(custom additions not available upstream).
+Both profiles take the same extension list. The packages come from two overlay
+sets: =firefox-addons= repackages the NUR firefox-addons repository, and
+=my-firefox-addons= carries the ones upstream does not have.
 
-#+NAME: zen-browser-extensions
-#+begin_src nix
-extensions = {
+#+begin_src nix :tangle features/firefox/extensions.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/firefox/extensions.nix
+{ pkgs }:
+{
   packages =
     (with pkgs.firefox-addons; [
       bitwarden
@@ -2933,7 +3102,7 @@ extensions = {
       calilay
       kiseppe-price-chart-kindle
     ]);
-};
+}
 #+end_src
 
 * Editor
