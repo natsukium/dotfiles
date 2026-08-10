@@ -36,6 +36,10 @@
                 enable = true;
                 priority = 10;
               };
+              ruff = {
+                enable = true;
+                priority = 10;
+              };
               shellcheck = {
                 enable = true;
                 priority = 10;

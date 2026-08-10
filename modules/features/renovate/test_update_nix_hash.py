@@ -1,7 +1,6 @@
 """Tests for update_nix_hash, using the shapes this repository actually pins."""
 
 import pytest
-
 from update_nix_hash import Unsupported, rewrite, source, update
 
 # A home-assistant component: the fetcher inherits `owner` from the derivation,
@@ -85,8 +84,10 @@ def test_prefixed_tag_is_interpolated():
 
 def test_plain_url_resolves_every_interpolation_and_is_not_unpacked():
     assert source(PLAIN_URL) == (
-        "https://github.com/retorquere/zotero-better-bibtex/releases/download/"
-        "v9.0.55/zotero-better-bibtex-9.0.55.xpi",
+        (
+            "https://github.com/retorquere/zotero-better-bibtex/releases/download/"
+            "v9.0.55/zotero-better-bibtex-9.0.55.xpi"
+        ),
         False,
     )
 
@@ -133,7 +134,5 @@ def test_update_writes_the_fetched_hash(tmp_path):
 
     update(path, fetch=fake_prefetch)
 
-    assert fetched == [
-        ("https://github.com/skymaze/sdp-transform/archive/v1.2.0.tar.gz", True)
-    ]
+    assert fetched == [("https://github.com/skymaze/sdp-transform/archive/v1.2.0.tar.gz", True)]
     assert 'hash = "sha256-refetched=";' in path.read_text()
