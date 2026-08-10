@@ -73,6 +73,7 @@
           startAt = optional (instance.schedule != null) instance.schedule;
 
           path = [
+            config.nix.package
             config.systemd.package
             pkgs.git
             updateNixHash
