@@ -59,7 +59,10 @@ in
       github = {
         issuer = "https://token.actions.githubusercontent.com";
         audience = "https://${serverDomain}";
-        boundClaims.repository = [ "natsukium/dotfiles" ];
+        boundClaims.repository = [
+          "natsukium/dotfiles"
+          "natsukium/sprout"
+        ];
       };
       forgejo = {
         issuer = "https://git.natsukium.com/api/actions";
