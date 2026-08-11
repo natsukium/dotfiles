@@ -20,7 +20,10 @@ let
   };
 in
 {
-  imports = [ ./metrics.nix ];
+  imports = [
+    ./metrics.nix
+    ./port.nix
+  ];
 
   services.home-assistant = {
     enable = true;
@@ -42,6 +45,13 @@ in
       recorder.purge_keep_days = 14;
       history = { };
       logbook = { };
+      # 2026.8 imports an existing http: block into Home Assistant's own storage
+      # on the first start after the upgrade, then records the migration as done
+      # and ignores YAML from there on. I keep the block through that one start
+      # rather than dropping it in the same deploy, which would leave nothing to
+      # import and silently stop Caddy's X-Forwarded-For from being trusted.
+      # Delete it once manyara has run 2026.8: past that start it does nothing
+      # but raise a repair issue that upstream flags as breaking in 2027.2.
       http = {
         use_x_forwarded_for = true;
         trusted_proxies = [
@@ -53,7 +63,7 @@ in
   };
 
   services.caddy.virtualHosts."http://ha.home.natsukium.com".extraConfig = ''
-    reverse_proxy localhost:${toString config.services.home-assistant.config.http.server_port}
+    reverse_proxy localhost:${toString config.my.services.home-assistant.port}
   '';
 
   # I snapshot the configuration directory rather than the backup integration,
