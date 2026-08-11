@@ -49,6 +49,9 @@ in
               "sidebar.verticalTabs" = true;
               "sidebar.visibility" = "hide-sidebar";
 
+              "browser.translations.automaticallyPopup" = false;
+              "layout.spellcheckDefault" = 0;
+
               "parfait.animations.enabled" = true;
               "parfait.blur.enabled" = true;
               "parfait.theme.roundness.preset" = 0;
@@ -104,6 +107,9 @@ in
 
             settings = {
               "extensions.autoDisableScopes" = 0;
+
+              "browser.translations.automaticallyPopup" = false;
+              "layout.spellcheckDefault" = 0;
             };
           };
         };
