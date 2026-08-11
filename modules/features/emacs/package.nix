@@ -10,7 +10,6 @@
   gettext,
   nixd,
   nixfmt,
-  notmuch,
   terraform-ls,
   yaml-language-server,
   defaultInitFile,
@@ -42,7 +41,6 @@ emacsWithPackagesFromUsePackage {
     };
   extraEmacsPackages = epkgs: [
     epkgs.treesit-grammars.with-all-grammars
-    notmuch.emacs
     age
     beancount
     beancount-language-server
