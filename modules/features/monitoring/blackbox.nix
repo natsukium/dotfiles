@@ -13,14 +13,14 @@
 
       blackboxPort = 9115;
 
-      # Probe each service on its loopback port so a hung-but-running daemon
-      # (which the systemd unit alert would miss) still trips ServiceProbeFailed.
-      # Ports are read from each service's own config so the list cannot drift.
-      # Keyed by service name, which becomes the instance label below: a failing
-      # probe should name the service, not a port number nobody memorises.
+      # A hung-but-running daemon passes the systemd unit alert, so probe HTTP
+      # instead. Ports come from each service's own config so the list cannot
+      # drift; the attr name becomes the instance label so a failing probe
+      # names the service, not a port number.
       probeTargets = {
         grafana = "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}/api/health";
-        prometheus = "http://127.0.0.1:${toString config.services.prometheus.port}/-/healthy";
+        victoriametrics = "http://127.0.0.1:${toString config.my.services.victoriametrics.port}/-/healthy";
+        vmalert = "http://127.0.0.1:${toString config.my.services.victoriametrics.vmalertPort}/-/healthy";
         loki = "http://127.0.0.1:${toString config.services.loki.configuration.server.http_listen_port}/ready";
         forgejo = "http://127.0.0.1:${toString config.services.forgejo.settings.server.HTTP_PORT}/";
         miniflux = "http://127.0.0.1:${config.services.miniflux.config.PORT}/healthcheck";
@@ -43,7 +43,7 @@
               timeout = "5s";
               http = {
                 # Login redirects and auth challenges still prove the service
-                # answers HTTP, which is the liveness signal we want.
+                # answers HTTP, which is all a liveness probe needs.
                 valid_status_codes = [
                   200
                   204
@@ -59,7 +59,7 @@
           };
         };
 
-        services.prometheus.scrapeConfigs = [
+        services.victoriametrics.prometheusConfig.scrape_configs = [
           {
             job_name = "blackbox";
             metrics_path = "/probe";
@@ -68,9 +68,8 @@
               labels.instance = name;
               targets = [ url ];
             }) probeTargets;
-            # An instance set here survives relabelling, so the probed URL only
-            # has to reach __param_target before __address__ is redirected at
-            # the exporter. The URL stays visible on the Prometheus targets page.
+            # The static instance label survives relabelling; the URL moves to
+            # __param_target and __address__ is pointed at the exporter.
             relabel_configs = [
               {
                 source_labels = [ "__address__" ];
@@ -84,23 +83,19 @@
           }
         ];
 
-        services.prometheus.ruleFiles = [
-          ((pkgs.formats.yaml { }).generate "blackbox-rules.yaml" {
-            groups = [
+        services.vmalert.instances.main.rules.groups = [
+          {
+            name = "blackbox";
+            rules = [
               {
-                name = "blackbox";
-                rules = [
-                  {
-                    alert = "ServiceProbeFailed";
-                    expr = "probe_success == 0";
-                    for = "5m";
-                    labels.severity = "warning";
-                    annotations.summary = "HTTP probe failed for {{ $labels.instance }}";
-                  }
-                ];
+                alert = "ServiceProbeFailed";
+                expr = "probe_success == 0";
+                for = "5m";
+                labels.severity = "warning";
+                annotations.summary = "HTTP probe failed for {{ $labels.instance }}";
               }
             ];
-          })
+          }
         ];
       };
     };

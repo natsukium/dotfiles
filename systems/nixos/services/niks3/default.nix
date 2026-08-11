@@ -76,7 +76,7 @@ in
     service = "http://localhost:${niks3Port}";
   };
 
-  services.prometheus.scrapeConfigs = [
+  services.victoriametrics.prometheusConfig.scrape_configs = [
     {
       job_name = "niks3";
       static_configs = [ { targets = [ "127.0.0.1:${niks3Port}" ]; } ];

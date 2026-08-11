@@ -6,8 +6,8 @@
       inherit (lib) mkEnableOption mkIf;
       cfg = config.my.services.alertmanager;
 
-      # matrix-alertmanager relays Alertmanager webhooks; Prometheus and the
-      # relay both reach Alertmanager over loopback, so nothing opens a port.
+      # matrix-alertmanager relays Alertmanager webhooks to Matrix; everything
+      # stays on loopback, so nothing opens a port.
       relayPort = 9088;
     in
     {
@@ -29,10 +29,8 @@
               ];
               group_wait = "30s";
               group_interval = "5m";
-              # A still-firing alert re-notifies at most once a day to avoid a
-              # room flooded by a long-running condition. Severity labels are in
-              # place (critical/warning), so this can later split into a child
-              # route that re-notifies critical more often.
+              # Re-notify a still-firing alert at most once a day so a
+              # long-running condition does not flood the room.
               repeat_interval = "24h";
             };
             receivers = [
@@ -51,12 +49,11 @@
           };
         };
 
-        services.prometheus.alertmanagers = [
-          {
-            static_configs = [
-              { targets = [ "127.0.0.1:${toString config.services.prometheus.alertmanager.port}" ]; }
-            ];
-          }
+        # Alertmanager lives under services.prometheus only because that is
+        # where nixpkgs files it; the unit needs no Prometheus server. vmalert
+        # evaluates the rules, so vmalert gets the delivery address.
+        services.vmalert.instances.main.settings."notifier.url" = [
+          "http://127.0.0.1:${toString config.services.prometheus.alertmanager.port}"
         ];
 
         services.matrix-alertmanager = {

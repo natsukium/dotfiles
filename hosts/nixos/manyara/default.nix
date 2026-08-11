@@ -6,7 +6,7 @@
 }:
 {
   imports = [
-    ../../../systems/shared/comin/prometheus.nix
+    ../../../systems/shared/comin/metrics.nix
     ../../../systems/nixos/common.nix
     ../../../systems/nixos/services/adguardhome
     ../../../systems/nixos/services/atuin
@@ -29,7 +29,7 @@
   my.profiles.server.enable = true;
 
   my.services.grafana.enable = true;
-  my.services.prometheus.enable = true;
+  my.services.victoriametrics.enable = true;
   my.services.loki.enable = true;
   my.services.tempo.enable = true;
   my.services.alertmanager.enable = true;

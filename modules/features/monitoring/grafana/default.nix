@@ -29,17 +29,32 @@
           };
           provision = {
             enable = true;
-            datasources.settings.datasources = [
+            # Provisioning matches by name, so a rename is an insert that
+            # collides on the uid the old row still holds; the old name has to
+            # be retired in the same pass.
+            datasources.settings.deleteDatasources = [
               {
                 name = "Prometheus";
+                orgId = 1;
+              }
+            ];
+            datasources.settings.datasources = [
+              {
+                name = "VictoriaMetrics";
+                # VictoriaMetrics answers the Prometheus query API, so the
+                # stock Prometheus datasource drives it and the type recorded
+                # in every dashboard panel stays valid.
                 type = "prometheus";
-                # Every dashboard under ./dashboards refers to this datasource by
-                # uid, and until now the uid was whatever Grafana minted on first
-                # provisioning. Pinning the value it already holds makes the
-                # dependency explicit, so replacing the datasource later cannot
-                # silently blank every panel.
+                # The uid Grafana originally minted; every dashboard under
+                # ./dashboards refers to it, so changing it would orphan every
+                # panel.
                 uid = "PBFA97CFB590B2093";
-                url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
+                url = "http://127.0.0.1:${toString config.my.services.victoriametrics.port}/prometheus";
+                isDefault = true;
+                # $__rate_interval is derived from this. Left unset Grafana
+                # assumes 15s and computes rate windows shorter than the 1m
+                # scrape, which reads as gaps in every rate panel.
+                jsonData.timeInterval = "1m";
               }
               {
                 name = "Loki";
@@ -102,11 +117,9 @@
         services.grafana.settings.rendering.callback_url =
           lib.mkForce "http://127.0.0.1:${toString config.services.grafana.settings.server.http_port}/";
 
-        # Grafana refuses to start in production mode while renderer_token is
-        # still the default, and provisionGrafana does not set one. The token is
-        # generated here rather than kept in sops because it never leaves the
-        # host: it authenticates one loopback caller to another, and no other
-        # machine can use it.
+        # Grafana refuses production mode while renderer_token is the default,
+        # and provisionGrafana sets none. Generated on the host rather than in
+        # sops because it only authenticates one loopback caller to another.
         services.grafana.settings.rendering.renderer_token = "$__file{${tokenFile}}";
         systemd.services.grafana-image-renderer.serviceConfig.EnvironmentFile = tokenEnvFile;
 

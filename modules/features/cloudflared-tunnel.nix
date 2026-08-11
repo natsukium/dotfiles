@@ -67,7 +67,7 @@
         systemd.services."cloudflared-tunnel-${cfg.id}".environment.TUNNEL_METRICS =
           "127.0.0.1:${toString metricsPort}";
 
-        services.prometheus.scrapeConfigs = [
+        services.victoriametrics.prometheusConfig.scrape_configs = [
           {
             job_name = "cloudflared";
             static_configs = [ { targets = [ "127.0.0.1:${toString metricsPort}" ]; } ];

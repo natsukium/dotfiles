@@ -14,15 +14,13 @@
       config = mkIf cfg.enable {
         services.prometheus.exporters.postgres = {
           enable = true;
-          # Run as the postgres system user so peer auth on the local socket
-          # logs in as the superuser role. This reaches every database in the
-          # cluster (pg_stat_database is cluster-wide) without provisioning a
-          # monitoring role or storing a password: the default dataSourceName
-          # already points at the /run/postgresql socket as user=postgres.
+          # Peer auth as the postgres user reaches every database in the
+          # cluster without a monitoring role or a stored password; the
+          # default dataSourceName already uses the local socket.
           runAsLocalSuperUser = true;
         };
 
-        services.prometheus.scrapeConfigs = [
+        services.victoriametrics.prometheusConfig.scrape_configs = [
           {
             job_name = "postgres";
             static_configs = [ { targets = [ "127.0.0.1:${toString exporter.port}" ]; } ];

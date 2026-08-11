@@ -57,35 +57,28 @@
           };
         };
 
-        services.prometheus.ruleFiles = [
-          ((pkgs.formats.yaml { }).generate "cloudflare-r2-rules.yaml" {
-            groups = [
+        services.vmalert.instances.main.rules.groups = [
+          {
+            name = "cloudflare-r2";
+            rules = [
               {
-                name = "cloudflare-r2";
-                rules = [
-                  {
-                    # Every panel on the R2 dashboard is a gauge the timer refreshes,
-                    # so a failing timer leaves the last values on screen and nothing
-                    # else says they stopped moving. An hour is twelve missed runs:
-                    # past any transient API failure, well short of a wrong number
-                    # being believed for a day.
-                    alert = "CloudflareR2MetricsStale";
-                    # The collector labels each file with its full path, not its
-                    # name.
-                    expr = ''time() - node_textfile_mtime_seconds{file="${textfileDir}/${textfileName}.prom"} > 3600'';
-                    for = "15m";
-                    labels.severity = "warning";
-                    annotations.summary = "Cloudflare R2 usage metrics have not refreshed on {{ $labels.instance }}";
-                  }
-                ];
+                # These are gauges the timer refreshes; when it fails the last
+                # values just stay on screen. An hour is twelve missed runs,
+                # past any transient API failure.
+                alert = "CloudflareR2MetricsStale";
+                # The collector labels each file with its full path, not its
+                # name.
+                expr = ''time() - node_textfile_mtime_seconds{file="${textfileDir}/${textfileName}.prom"} > 3600'';
+                for = "15m";
+                labels.severity = "warning";
+                annotations.summary = "Cloudflare R2 usage metrics have not refreshed on {{ $labels.instance }}";
               }
             ];
-          })
+          }
         ];
 
-        # Created by hand under Manage Account > API Tokens as an account-owned
-        # token, so it outlives any one member: a custom token carrying Account
-        # Analytics: Read on the account above and nothing else.
+        # A hand-made custom token (Manage Account > API Tokens) carrying only
+        # Account Analytics: Read; account-owned so it outlives any one member.
         sops.secrets.cloudflare-analytics-token = {
           sopsFile = ./secrets.yaml;
         };

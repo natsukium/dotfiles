@@ -20,7 +20,7 @@ let
   };
 in
 {
-  imports = [ ./prometheus.nix ];
+  imports = [ ./metrics.nix ];
 
   services.home-assistant = {
     enable = true;

@@ -1,11 +1,9 @@
 { lib, ... }:
 let
-  # Receives OTLP from Claude Code on localhost and fans the three signals out
-  # to the central manyara stack: metrics via remote_write to Prometheus, logs
-  # to Loki's native OTLP endpoint, and traces via OTLP to Tempo. Claude Code
-  # sessions are too short-lived to scrape, so metrics have to be pushed like
-  # the logs already are. Same body for nixos and darwin: it only appends an
-  # alloy config snippet, and Alloy runs on both platforms via my.services.alloy.
+  # Receives OTLP from Claude Code on localhost and fans it out to manyara:
+  # remote_write to VictoriaMetrics, OTLP to Loki and Tempo. Sessions are too
+  # short-lived to scrape, so metrics are pushed like the logs. One body for
+  # both platforms since Alloy runs on both via my.services.alloy.
   module =
     { config, inputs, ... }:
     let
@@ -16,10 +14,9 @@ let
       # Full tailnet FQDN, matching systems/shared/comin/alloy.nix: the short
       # name resolves inconsistently across Linux and macOS resolvers.
       host = "manyara.tail4108.ts.net";
-      prometheusEndpoint = "http://${host}:${toString manyara.services.prometheus.port}/api/v1/write";
-      # Loki's native OTLP ingest path. It promotes the service.name resource
-      # attribute to a service_name label by default, so events are queryable as
-      # {service_name="claude-code"} without hint plumbing on the Alloy side.
+      metricsEndpoint = "http://${host}:${toString manyara.my.services.victoriametrics.port}/api/v1/write";
+      # Loki's OTLP ingest promotes service.name to a service_name label by
+      # default, so events are queryable without hint plumbing.
       lokiEndpoint = "http://${host}:${toString manyara.services.loki.configuration.server.http_listen_port}/otlp";
       # Standard OTLP/gRPC port, matching the receiver in ./tempo.nix.
       tempoEndpoint = "${host}:4317";
@@ -53,6 +50,8 @@ let
             forward_to          = [prometheus.remote_write.manyara.receiver]
           }
 
+          // Alloy names this component after the protocol, not the server;
+          // VictoriaMetrics accepts remote_write on the same path.
           prometheus.remote_write "manyara" {
             // Claude Code metrics carry no host identity of their own; tag them
             // here so the fleet's sessions are distinguishable in Grafana.
@@ -61,7 +60,7 @@ let
             }
 
             endpoint {
-              url = "${prometheusEndpoint}"
+              url = "${metricsEndpoint}"
             }
           }
 

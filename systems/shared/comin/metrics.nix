@@ -28,7 +28,7 @@ let
     "${if name == config.networking.hostName then listen_address' else name}:${toString port}";
 
   machines = linux-machines // darwin-machines;
-  isAlwaysOn = name: _: builtins.elem name config.my.services.prometheus.alwaysOnHosts;
+  isAlwaysOn = name: _: builtins.elem name config.my.services.victoriametrics.alwaysOnHosts;
 
   # One line per host, read by the drift checker below.
   hostSpecs = lib.mapAttrsToList (
@@ -42,7 +42,7 @@ let
   ) machines;
 in
 {
-  services.prometheus.scrapeConfigs = [
+  services.victoriametrics.prometheusConfig.scrape_configs = [
     {
       job_name = "comin";
       static_configs = [
@@ -59,97 +59,93 @@ in
 
   # Alerts on comin's own metrics live next to the scrape config and the drift
   # metric they read.
-  services.prometheus.ruleFiles = [
-    ((pkgs.formats.yaml { }).generate "comin-rules.yaml" {
-      groups = [
+  services.vmalert.instances.main.rules.groups = [
+    {
+      name = "comin";
+      rules = [
         {
-          name = "comin";
-          rules = [
-            {
-              # Not an outage: the host serves everything it served before, it
-              # just stops following main, so this is a warning while
-              # InstanceDown stays critical. 15m because a switch legitimately
-              # takes the exporter down for a few minutes.
-              alert = "CominDown";
-              expr = ''up{job="comin",always_on="true"} == 0'';
-              for = "15m";
-              labels.severity = "warning";
-              annotations.summary = "comin on {{ $labels.instance }} is not answering; the host has stopped following main";
-            }
-            {
-              alert = "CominDeploymentFailed";
-              expr = ''comin_deployment_info{status="failed"} == 1'';
-              for = "5m";
-              labels.severity = "warning";
-              annotations.summary = "comin deployment failed on {{ $labels.instance }} (commit {{ $labels.commit_id }})";
-            }
-            {
-              # Always-on hosts only: a laptop asleep during a push is behind by
-              # definition, and saying so every time it wakes was most of the noise
-              # this alert used to make. 2h because a slow rebuild is not a fault
-              # while the drift worth knowing about lasts days.
-              alert = "CominSystemDrift";
-              expr = ''${driftMetric}{always_on="true"} == 1'';
-              for = "2h";
-              labels.severity = "warning";
-              annotations.summary = "{{ $labels.host }} is not running the system main HEAD evaluates to";
-            }
-            {
-              # A commit that fails to evaluate or build never reaches a
-              # deployment, so comin_deployment_info keeps reporting the previous
-              # success. 15m so a broken commit I am already fixing stays quiet.
-              alert = "CominEvalFailed";
-              expr = "comin_last_eval_failed == 1";
-              for = "15m";
-              labels.severity = "warning";
-              annotations.summary = "comin cannot evaluate the configuration on {{ $labels.instance }}";
-            }
-            {
-              alert = "CominBuildFailed";
-              expr = "comin_last_build_failed == 1";
-              for = "15m";
-              labels.severity = "warning";
-              annotations.summary = "comin cannot build the configuration on {{ $labels.instance }}";
-            }
-            {
-              alert = "CominFetchFailed";
-              expr = ''comin_last_fetch_failed{always_on="true"} == 1'';
-              for = "1h";
-              labels.severity = "warning";
-              annotations.summary = "comin on {{ $labels.instance }} cannot fetch {{ $labels.remote_name }}";
-            }
-            {
-              # A suspended deployer stops applying commits while comin stays up,
-              # keeps fetching, and every other gauge reads healthy.
-              alert = "CominSuspended";
-              expr = ''comin_is_suspended{always_on="true"} == 1'';
-              for = "15m";
-              labels.severity = "warning";
-              annotations.summary = "comin on {{ $labels.instance }} is suspended and no longer deploying";
-            }
-            {
-              # comin can wedge with its poller alive but never fetching again,
-              # which no other gauge reflects. The window is this wide because the
-              # fetcher also blocks while a new commit waits for a running build.
-              alert = "CominStalled";
-              expr = ''sum by (instance) (increase(comin_fetch_count{always_on="true"}[6h])) == 0'';
-              for = "30m";
-              labels.severity = "warning";
-              annotations.summary = "comin on {{ $labels.instance }} has not fetched for hours";
-            }
-            {
-              # 7d because a pending reboot is routine after a kernel update;
-              # only a deferred one is worth a message.
-              alert = "CominRebootRequired";
-              expr = "comin_need_to_reboot == 1";
-              for = "7d";
-              labels.severity = "warning";
-              annotations.summary = "{{ $labels.instance }} needs a reboot to activate its latest generation";
-            }
-          ];
+          # Not an outage: the host serves everything it served before, it
+          # just stops following main, so this is a warning while
+          # InstanceDown stays critical. 15m because a switch legitimately
+          # takes the exporter down for a few minutes.
+          alert = "CominDown";
+          expr = ''up{job="comin",always_on="true"} == 0'';
+          for = "15m";
+          labels.severity = "warning";
+          annotations.summary = "comin on {{ $labels.instance }} is not answering; the host has stopped following main";
+        }
+        {
+          alert = "CominDeploymentFailed";
+          expr = ''comin_deployment_info{status="failed"} == 1'';
+          for = "5m";
+          labels.severity = "warning";
+          annotations.summary = "comin deployment failed on {{ $labels.instance }} (commit {{ $labels.commit_id }})";
+        }
+        {
+          # Always-on hosts only: a laptop asleep during a push is behind by
+          # definition, and saying so every time it wakes was most of the noise
+          # this alert used to make. 2h because a slow rebuild is not a fault
+          # while the drift worth knowing about lasts days.
+          alert = "CominSystemDrift";
+          expr = ''${driftMetric}{always_on="true"} == 1'';
+          for = "2h";
+          labels.severity = "warning";
+          annotations.summary = "{{ $labels.host }} is not running the system main HEAD evaluates to";
+        }
+        {
+          # A commit that fails to evaluate or build never reaches a
+          # deployment, so comin_deployment_info keeps reporting the previous
+          # success. 15m so a broken commit I am already fixing stays quiet.
+          alert = "CominEvalFailed";
+          expr = "comin_last_eval_failed == 1";
+          for = "15m";
+          labels.severity = "warning";
+          annotations.summary = "comin cannot evaluate the configuration on {{ $labels.instance }}";
+        }
+        {
+          alert = "CominBuildFailed";
+          expr = "comin_last_build_failed == 1";
+          for = "15m";
+          labels.severity = "warning";
+          annotations.summary = "comin cannot build the configuration on {{ $labels.instance }}";
+        }
+        {
+          alert = "CominFetchFailed";
+          expr = ''comin_last_fetch_failed{always_on="true"} == 1'';
+          for = "1h";
+          labels.severity = "warning";
+          annotations.summary = "comin on {{ $labels.instance }} cannot fetch {{ $labels.remote_name }}";
+        }
+        {
+          # A suspended deployer stops applying commits while comin stays up,
+          # keeps fetching, and every other gauge reads healthy.
+          alert = "CominSuspended";
+          expr = ''comin_is_suspended{always_on="true"} == 1'';
+          for = "15m";
+          labels.severity = "warning";
+          annotations.summary = "comin on {{ $labels.instance }} is suspended and no longer deploying";
+        }
+        {
+          # comin can wedge with its poller alive but never fetching again,
+          # which no other gauge reflects. The window is this wide because the
+          # fetcher also blocks while a new commit waits for a running build.
+          alert = "CominStalled";
+          expr = ''sum by (instance) (increase(comin_fetch_count{always_on="true"}[6h])) == 0'';
+          for = "30m";
+          labels.severity = "warning";
+          annotations.summary = "comin on {{ $labels.instance }} has not fetched for hours";
+        }
+        {
+          # 7d because a pending reboot is routine after a kernel update;
+          # only a deferred one is worth a message.
+          alert = "CominRebootRequired";
+          expr = "comin_need_to_reboot == 1";
+          for = "7d";
+          labels.severity = "warning";
+          annotations.summary = "{{ $labels.instance }} needs a reboot to activate its latest generation";
         }
       ];
-    })
+    }
   ];
 
   my.services.node-exporter-textfile.enable = true;
