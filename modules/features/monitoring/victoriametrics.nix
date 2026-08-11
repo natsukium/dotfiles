@@ -24,6 +24,10 @@
       vmalertUrl = "http://${vmalertAddress}";
       vmUrl = "http://127.0.0.1:${toString cfg.port}";
 
+      # The backup below deletes every snapshot around its run, so this
+      # directory holds exactly one while restic reads it.
+      snapshotDir = "/var/lib/${config.services.victoriametrics.stateDir}/snapshots";
+
       # Not derived from exporter enablement: every host enables it, and
       # scraping the mostly-off laptops would only record failures.
       nodeMetricsHosts = [
@@ -297,6 +301,24 @@
         # Alloy on the other hosts pushes the Claude Code metrics here over
         # remote_write; ephemeral CLI sessions cannot be scraped.
         networking.firewall.allowedTCPPorts = [ cfg.port ];
+
+        # Losing this host would cost years of house history, and the archive
+        # is single-digit gigabytes. The database rewrites its files as it
+        # merges parts, so restic cannot read the live directory; a snapshot
+        # freezes one view as hardlinks, costing directory entries and nothing
+        # else.
+        my.services.restic.backups.victoriametrics = {
+          paths = [ snapshotDir ];
+          prepare = ''
+            # Clearing first handles a run killed between prepare and cleanup,
+            # and means this never has to learn the generated snapshot name.
+            ${lib.getExe pkgs.curl} -fsS -XPOST ${vmUrl}/snapshot/delete_all >/dev/null
+            ${lib.getExe pkgs.curl} -fsS -XPOST ${vmUrl}/snapshot/create >/dev/null
+          '';
+          cleanup = ''
+            ${lib.getExe pkgs.curl} -fsS -XPOST ${vmUrl}/snapshot/delete_all >/dev/null
+          '';
+        };
 
         # system.checks rather than extraDependencies: these only have to build,
         # and nothing they produce belongs in the running system's closure.
