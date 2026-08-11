@@ -21,7 +21,7 @@ let
       # attribute to a service_name label by default, so events are queryable as
       # {service_name="claude-code"} without hint plumbing on the Alloy side.
       lokiEndpoint = "http://${host}:${toString manyara.services.loki.configuration.server.http_listen_port}/otlp";
-      # Standard OTLP/gRPC port, matching the receiver in modules/features/tempo.nix.
+      # Standard OTLP/gRPC port, matching the receiver in ./tempo.nix.
       tempoEndpoint = "${host}:4317";
     in
     {
