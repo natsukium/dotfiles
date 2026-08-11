@@ -33,6 +33,12 @@
               {
                 name = "Prometheus";
                 type = "prometheus";
+                # Every dashboard under ./dashboards refers to this datasource by
+                # uid, and until now the uid was whatever Grafana minted on first
+                # provisioning. Pinning the value it already holds makes the
+                # dependency explicit, so replacing the datasource later cannot
+                # silently blank every panel.
+                uid = "PBFA97CFB590B2093";
                 url = "http://${config.services.prometheus.listenAddress}:${toString config.services.prometheus.port}";
               }
               {

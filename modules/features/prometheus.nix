@@ -193,7 +193,13 @@
           enable = true;
           # The remote-write receiver is off by default; without it the fleet's
           # Alloy has nowhere to push the OTLP-sourced Claude Code metrics.
-          extraFlags = [ "--web.enable-remote-write-receiver" ];
+          extraFlags = [
+            "--web.enable-remote-write-receiver"
+            # Temporary, for the VictoriaMetrics migration: the snapshot endpoint
+            # is the only supported way to hand this TSDB to vmctl, and it lives
+            # behind the admin API. Goes away with the rest of this module.
+            "--web.enable-admin-api"
+          ];
           scrapeConfigs = [
             {
               job_name = "node";
