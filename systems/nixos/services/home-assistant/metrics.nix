@@ -21,7 +21,7 @@ in
       job_name = "home-assistant";
       metrics_path = "/api/prometheus";
       static_configs = [
-        { targets = [ "127.0.0.1:${toString config.services.home-assistant.config.http.server_port}" ]; }
+        { targets = [ "127.0.0.1:${toString config.my.services.home-assistant.port}" ]; }
       ];
       bearer_token_file = tokenFile;
     }
