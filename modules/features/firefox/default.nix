@@ -51,6 +51,7 @@ in
 
               "browser.translations.automaticallyPopup" = false;
               "layout.spellcheckDefault" = 0;
+              "signon.rememberSignons" = false;
 
               "parfait.animations.enabled" = true;
               "parfait.blur.enabled" = true;
@@ -110,6 +111,7 @@ in
 
               "browser.translations.automaticallyPopup" = false;
               "layout.spellcheckDefault" = 0;
+              "signon.rememberSignons" = false;
             };
           };
         };

@@ -2831,6 +2831,8 @@ flake.modules.homeManager.firefox =
 confirmation of each extension the profile installs, so the first launch after a
 rebuild would mean approving every one by hand.
 
+I keep my passwords in Bitwarden, so I turn off =signon.rememberSignons=.
+
 parfait ships its defaults in a =user.js= that its install instructions tell you to copy
 into the profile. home-manager generates =user.js= itself from =settings=, so those
 defaults are transcribed here: an unset preference does not match any =-moz-pref()= query,
@@ -2859,6 +2861,7 @@ settings = {
 
   "browser.translations.automaticallyPopup" = false;
   "layout.spellcheckDefault" = 0;
+  "signon.rememberSignons" = false;
 
   "parfait.animations.enabled" = true;
   "parfait.blur.enabled" = true;
@@ -2940,7 +2943,7 @@ flake.modules.homeManager."zen-browser" =
 
 *** Settings
 
-Zen is a Firefox fork, so the three preferences that are not about parfait carry over
+Zen is a Firefox fork, so the preferences that are not about parfait carry over
 unchanged, for the reasons given in the Firefox profile.
 
 #+NAME: zen-browser-settings
@@ -2950,6 +2953,7 @@ settings = {
 
   "browser.translations.automaticallyPopup" = false;
   "layout.spellcheckDefault" = 0;
+  "signon.rememberSignons" = false;
 };
 #+end_src
 
