@@ -24,9 +24,8 @@
       vmalertUrl = "http://${vmalertAddress}";
       vmUrl = "http://127.0.0.1:${toString cfg.port}";
 
-      # The backup below deletes every snapshot around its run, so this
-      # directory holds exactly one while restic reads it.
-      snapshotDir = "/var/lib/${config.services.victoriametrics.stateDir}/snapshots";
+      storageDataPath = "/var/lib/${config.services.victoriametrics.stateDir}";
+      backupStage = "/var/backup/victoriametrics";
 
       # Not derived from exporter enablement: every host enables it, and
       # scraping the mostly-off laptops would only record failures.
@@ -302,21 +301,20 @@
         # remote_write; ephemeral CLI sessions cannot be scraped.
         networking.firewall.allowedTCPPorts = [ cfg.port ];
 
-        # Losing this host would cost years of house history, and the archive
-        # is single-digit gigabytes. The database rewrites its files as it
-        # merges parts, so restic cannot read the live directory; a snapshot
-        # freezes one view as hardlinks, costing directory entries and nothing
-        # else.
         my.services.restic.backups.victoriametrics = {
-          paths = [ snapshotDir ];
+          paths = [ backupStage ];
           prepare = ''
-            # Clearing first handles a run killed between prepare and cleanup,
-            # and means this never has to learn the generated snapshot name.
-            ${lib.getExe pkgs.curl} -fsS -XPOST ${vmUrl}/snapshot/delete_all >/dev/null
-            ${lib.getExe pkgs.curl} -fsS -XPOST ${vmUrl}/snapshot/create >/dev/null
-          '';
-          cleanup = ''
-            ${lib.getExe pkgs.curl} -fsS -XPOST ${vmUrl}/snapshot/delete_all >/dev/null
+            ${pkgs.coreutils}/bin/install -d -m 0700 ${backupStage}
+            ${lib.getExe' config.services.victoriametrics.package "vmbackup"} \
+              -storageDataPath=${storageDataPath} \
+              -snapshot.createURL=${vmUrl}/snapshot/create \
+              -dst=fs://${backupStage}
+
+            # An archive far smaller than the database it claims to hold is the
+            # failure mode above, and it is invisible from restic's exit code.
+            live=$(${pkgs.coreutils}/bin/du -sb ${storageDataPath}/data | ${pkgs.coreutils}/bin/cut -f1)
+            staged=$(${pkgs.coreutils}/bin/du -sb ${backupStage} | ${pkgs.coreutils}/bin/cut -f1)
+            test "$staged" -ge $(( live / 2 ))
           '';
         };
 
