@@ -812,6 +812,14 @@ with "Make changes to events" permission.
           ("tomoya.otabi@attm.co.jp" . ,(concat org-root "gcal-work.org")))))
 #+end_src
 
+I have no use for cancelled events, so I let org-gcal drop their headlines
+without asking.
+
+#+begin_src emacs-lisp
+(with-eval-after-load 'org-gcal
+  (setq org-gcal-remove-api-cancelled-events t))
+#+end_src
+
 The empty-file pre-creation works around
 [[https://github.com/telotortium/emacs-oauth2-auto/issues/6][emacs-oauth2-auto issue #6]]:
 when =~/.config/emacs/= contains symlinks (here from home-manager
