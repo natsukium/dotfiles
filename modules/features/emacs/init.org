@@ -990,6 +990,103 @@ machine rss.home.natsukium.com login natsukium password <fever-password>"
   (elfeed-protocol-enable))
 #+end_src
 
+** Catching up in one keystroke
+
+A Fever update asks for a fixed window of article ids past the last one it saw,
+so a single fetch never brings in more than =elfeed-protocol-fever-maxsize=
+entries. I read feeds on several machines and follow daily news through them,
+so whichever machine I open first has usually fallen days behind, with a
+backlog of hundreds of articles. Catching up used to mean pressing =G= over
+and over until nothing new arrived, so =my/elfeed-update-until-done= does the
+repeating for me, chaining fetches until the server returns nothing.
+
+#+begin_src emacs-lisp
+(defvar my/elfeed-update-max-rounds 20
+  "Maximum number of fetch rounds `my/elfeed-update-until-done' will run.")
+
+(defvar my/elfeed--update-rounds (make-hash-table :test #'equal)
+  "Remaining rounds per protocol feed url while a catch-up run is in flight.")
+
+(defun my/elfeed-update-until-done ()
+  "Fetch every protocol feed repeatedly until the server has nothing new."
+  (interactive)
+  (dolist (feed-url (elfeed-protocol-feed-list))
+    (my/elfeed--update-round feed-url my/elfeed-update-max-rounds)))
+
+(defun my/elfeed--update-round (feed-url rounds)
+  "Fetch one batch from FEED-URL with ROUNDS fetches left in the budget."
+  (let ((update-func (elfeed-protocol-update-func
+                      (elfeed-protocol-type feed-url))))
+    (puthash feed-url rounds my/elfeed--update-rounds)
+    (funcall update-func (elfeed-protocol-url feed-url)
+             (lambda (entries)
+               (my/elfeed--update-continue feed-url entries)))))
+
+(defun my/elfeed--update-continue (feed-url entries)
+  "Decide whether to fetch FEED-URL again after a round returned ENTRIES."
+  ;; The initial sync splits its request into several batches and runs the
+  ;; callback once per batch.  Clearing the budget before deciding makes the
+  ;; later callbacks no-ops instead of forking the chain.
+  (when-let* ((rounds (gethash feed-url my/elfeed--update-rounds)))
+    (remhash feed-url my/elfeed--update-rounds)
+    ;; Each feed's chain ends asynchronously in one of the first two branches,
+    ;; so there is no single "all feeds done" point where expiry could run
+    ;; once.  Running it per finished chain is redundant but idempotent.
+    (cond
+     ((null entries)
+      (message "elfeed: %s is up to date" feed-url)
+      (my/elfeed-expire-entries))
+     ((<= rounds 1)
+      (message "elfeed: %s still had entries after %d rounds"
+               feed-url my/elfeed-update-max-rounds)
+      (my/elfeed-expire-entries))
+     (t
+      (message "elfeed: fetched %d entries from %s" (length entries) feed-url)
+      ;; The pause is not politeness toward Miniflux; it moves the next
+      ;; request out of the curl process filter that delivered this response.
+      (run-at-time 1 nil #'my/elfeed--update-round feed-url (1- rounds))))))
+
+(with-eval-after-load 'elfeed-search
+  (keymap-set elfeed-search-mode-map "G" #'my/elfeed-update-until-done))
+#+end_src
+
+** Expiring news
+
+News articles arrive in volume and are worth reading the week they appear and
+never again, so keeping them around only bloats the local database. Entries
+tagged =news= are deleted once they are older than a month, at the end of
+every catch-up run.
+
+#+begin_src emacs-lisp
+(defvar my/elfeed-expire-tag 'news
+  "Tag whose entries `my/elfeed-expire-entries' retires.")
+
+(defvar my/elfeed-expire-age "1 month"
+  "Age past which entries tagged `my/elfeed-expire-tag' are removed.")
+
+(defun my/elfeed-expire-entries ()
+  "Remove aged out entries tagged `my/elfeed-expire-tag' from the database."
+  (interactive)
+  (let ((threshold (- (float-time) (elfeed-time-duration my/elfeed-expire-age)))
+        (expired ()))
+    ;; Collect before deleting; `elfeed-db-visit' walks the same tree the
+    ;; deletion mutates.
+    (with-elfeed-db-visit (entry)
+      (when (and (elfeed-tagged-p my/elfeed-expire-tag entry)
+                 (< (elfeed-entry-date entry) threshold))
+        (push entry expired)))
+    (when expired
+      ;; Untag before deleting so elfeed-protocol pushes the read state to
+      ;; Miniflux; an entry deleted while still unread would leave the server
+      ;; counting an article that no longer exists locally.
+      (elfeed-untag expired 'unread)
+      (elfeed-db-delete expired)
+      (when (get-buffer "*elfeed-search*")
+        (elfeed-search-update :force))
+      (message "elfeed: expired %d %s entries"
+               (length expired) my/elfeed-expire-tag))))
+#+end_src
+
 * mail
 
 [[https://notmuchmail.org/][notmuch]] is a tag-based email indexer and searcher.

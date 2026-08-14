@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-08-13 12:39+0900\n"
+"POT-Creation-Date: 2026-08-14 18:13+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -5801,14 +5801,182 @@ msgid ""
 "  (elfeed-protocol-enable))"
 msgstr ""
 
-#. type: heading *
+#. type: heading **
 #: modules/features/emacs/init.org:993
+#, no-wrap
+msgid "Catching up in one keystroke"
+msgstr ""
+
+#. type: paragraph
+#: modules/features/emacs/init.org:995
+msgid ""
+"A Fever update asks for a fixed window of article ids past the last one it "
+"saw, so a single fetch never brings in more than "
+"=elfeed-protocol-fever-maxsize= entries. I read feeds on several machines "
+"and follow daily news through them, so whichever machine I open first has "
+"usually fallen days behind, with a backlog of hundreds of articles. Catching "
+"up used to mean pressing =G= over and over until nothing new arrived, so "
+"=my/elfeed-update-until-done= does the repeating for me, chaining fetches "
+"until the server returns nothing."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1004
+#, no-wrap
+msgid ""
+"(defvar my/elfeed-update-max-rounds 20\n"
+"  \"Maximum number of fetch rounds `my/elfeed-update-until-done' will "
+"run.\")"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1007
+#, no-wrap
+msgid ""
+"(defvar my/elfeed--update-rounds (make-hash-table :test #'equal)\n"
+"  \"Remaining rounds per protocol feed url while a catch-up run is in "
+"flight.\")"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1010
+#, no-wrap
+msgid ""
+"(defun my/elfeed-update-until-done ()\n"
+"  \"Fetch every protocol feed repeatedly until the server has nothing "
+"new.\"\n"
+"  (interactive)\n"
+"  (dolist (feed-url (elfeed-protocol-feed-list))\n"
+"    (my/elfeed--update-round feed-url my/elfeed-update-max-rounds)))"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1016
+#, no-wrap
+msgid ""
+"(defun my/elfeed--update-round (feed-url rounds)\n"
+"  \"Fetch one batch from FEED-URL with ROUNDS fetches left in the "
+"budget.\"\n"
+"  (let ((update-func (elfeed-protocol-update-func\n"
+"                      (elfeed-protocol-type feed-url))))\n"
+"    (puthash feed-url rounds my/elfeed--update-rounds)\n"
+"    (funcall update-func (elfeed-protocol-url feed-url)\n"
+"             (lambda (entries)\n"
+"               (my/elfeed--update-continue feed-url entries)))))"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1025
+#, no-wrap
+msgid ""
+"(defun my/elfeed--update-continue (feed-url entries)\n"
+"  \"Decide whether to fetch FEED-URL again after a round returned "
+"ENTRIES.\"\n"
+"  ;; The initial sync splits its request into several batches and runs the\n"
+"  ;; callback once per batch.  Clearing the budget before deciding makes "
+"the\n"
+"  ;; later callbacks no-ops instead of forking the chain.\n"
+"  (when-let* ((rounds (gethash feed-url my/elfeed--update-rounds)))\n"
+"    (remhash feed-url my/elfeed--update-rounds)\n"
+"    ;; Each feed's chain ends asynchronously in one of the first two "
+"branches,\n"
+"    ;; so there is no single \"all feeds done\" point where expiry could "
+"run\n"
+"    ;; once.  Running it per finished chain is redundant but idempotent.\n"
+"    (cond\n"
+"     ((null entries)\n"
+"      (message \"elfeed: %s is up to date\" feed-url)\n"
+"      (my/elfeed-expire-entries))\n"
+"     ((<= rounds 1)\n"
+"      (message \"elfeed: %s still had entries after %d rounds\"\n"
+"               feed-url my/elfeed-update-max-rounds)\n"
+"      (my/elfeed-expire-entries))\n"
+"     (t\n"
+"      (message \"elfeed: fetched %d entries from %s\" (length entries) "
+"feed-url)\n"
+"      ;; The pause is not politeness toward Miniflux; it moves the next\n"
+"      ;; request out of the curl process filter that delivered this "
+"response.\n"
+"      (run-at-time 1 nil #'my/elfeed--update-round feed-url (1- rounds))))))"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1049
+#, no-wrap
+msgid ""
+"(with-eval-after-load 'elfeed-search\n"
+"  (keymap-set elfeed-search-mode-map \"G\" #'my/elfeed-update-until-done))"
+msgstr ""
+
+#. type: heading **
+#: modules/features/emacs/init.org:1053
+#, no-wrap
+msgid "Expiring news"
+msgstr ""
+
+#. type: paragraph
+#: modules/features/emacs/init.org:1055
+msgid ""
+"News articles arrive in volume and are worth reading the week they appear "
+"and never again, so keeping them around only bloats the local "
+"database. Entries tagged =news= are deleted once they are older than a "
+"month, at the end of every catch-up run."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1061
+#, no-wrap
+msgid ""
+"(defvar my/elfeed-expire-tag 'news\n"
+"  \"Tag whose entries `my/elfeed-expire-entries' retires.\")"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1064
+#, no-wrap
+msgid ""
+"(defvar my/elfeed-expire-age \"1 month\"\n"
+"  \"Age past which entries tagged `my/elfeed-expire-tag' are removed.\")"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/emacs/init.org:1067
+#, no-wrap
+msgid ""
+"(defun my/elfeed-expire-entries ()\n"
+"  \"Remove aged out entries tagged `my/elfeed-expire-tag' from the "
+"database.\"\n"
+"  (interactive)\n"
+"  (let ((threshold (- (float-time) (elfeed-time-duration "
+"my/elfeed-expire-age)))\n"
+"        (expired ()))\n"
+"    ;; Collect before deleting; `elfeed-db-visit' walks the same tree the\n"
+"    ;; deletion mutates.\n"
+"    (with-elfeed-db-visit (entry)\n"
+"      (when (and (elfeed-tagged-p my/elfeed-expire-tag entry)\n"
+"                 (< (elfeed-entry-date entry) threshold))\n"
+"        (push entry expired)))\n"
+"    (when expired\n"
+"      ;; Untag before deleting so elfeed-protocol pushes the read state to\n"
+"      ;; Miniflux; an entry deleted while still unread would leave the "
+"server\n"
+"      ;; counting an article that no longer exists locally.\n"
+"      (elfeed-untag expired 'unread)\n"
+"      (elfeed-db-delete expired)\n"
+"      (when (get-buffer \"*elfeed-search*\")\n"
+"        (elfeed-search-update :force))\n"
+"      (message \"elfeed: expired %d %s entries\"\n"
+"               (length expired) my/elfeed-expire-tag))))"
+msgstr ""
+
+#. type: heading *
+#: modules/features/emacs/init.org:1090
 #, no-wrap
 msgid "mail"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:995
+#: modules/features/emacs/init.org:1092
 msgid ""
 "[[https://notmuchmail.org/][notmuch]] is a tag-based email indexer and "
 "searcher.  [[https://notmuchmail.org/notmuch-emacs/][notmuch.el]] provides "
@@ -5817,7 +5985,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:999
+#: modules/features/emacs/init.org:1096
 msgid ""
 "notmuch was chosen over mu4e because the notmuch indexer is already "
 "configured for all email accounts.  Adding notmuch.el only requires the "
@@ -5825,7 +5993,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1004
+#: modules/features/emacs/init.org:1101
 msgid ""
 "notmuch has no built-in delete operation; it manages metadata (tags)  rather "
 "than maildir folder placement.  Pressing =d= tags the message with "
@@ -5838,7 +6006,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1014
+#: modules/features/emacs/init.org:1111
 msgid ""
 "=shr-use-colors= is disabled so sender HTML colors don't clash with the dark "
 "theme. Inline CID images ship with the mail and are enabled, but "
@@ -5849,7 +6017,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1021
+#: modules/features/emacs/init.org:1118
 msgid ""
 "=notmuch-show-part-button-default-action= defaults to saving an attachment "
 "to disk; I switch it to =notmuch-show-view-part= so the part opens with its "
@@ -5858,7 +6026,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1027
+#: modules/features/emacs/init.org:1124
 #, no-wrap
 msgid ""
 "(use-package notmuch\n"
@@ -5911,7 +6079,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1070
+#: modules/features/emacs/init.org:1167
 msgid ""
 "[[https://orgmode.org/manual/Protocols.html][ol-notmuch]] integrates notmuch "
 "with Org mode's link system.  Calling =org-store-link= (=C-c l=) in a "
@@ -5920,7 +6088,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1076
+#: modules/features/emacs/init.org:1173
 #, no-wrap
 msgid ""
 "(use-package ol-notmuch\n"
@@ -5929,19 +6097,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:1081
+#: modules/features/emacs/init.org:1178
 #, no-wrap
 msgid "terminal"
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1082
+#: modules/features/emacs/init.org:1179
 #, no-wrap
 msgid "vterm"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1084
+#: modules/features/emacs/init.org:1181
 msgid ""
 "[[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] is a "
 "fully-fledged terminal emulator based on libvterm.  It provides better "
@@ -5950,7 +6118,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1089
+#: modules/features/emacs/init.org:1186
 #, no-wrap
 msgid ""
 "(use-package vterm\n"
@@ -5958,13 +6126,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:1093
+#: modules/features/emacs/init.org:1190
 #, no-wrap
 msgid "encryption"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1095
+#: modules/features/emacs/init.org:1192
 msgid ""
 "[[https://github.com/anticomputer/age.el][age.el]] provides transparent "
 "encryption and decryption of =.age= files in Emacs using the "
@@ -5972,14 +6140,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1098
+#: modules/features/emacs/init.org:1195
 msgid ""
 "Using SSH keys as identity/recipient so that no separate age keypair is "
 "needed."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1102
+#: modules/features/emacs/init.org:1199
 #, no-wrap
 msgid ""
 "(use-package age\n"
@@ -5993,33 +6161,33 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:1112
+#: modules/features/emacs/init.org:1209
 #, no-wrap
 msgid "AI"
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1114
+#: modules/features/emacs/init.org:1211
 #, no-wrap
 msgid "gptel"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1116
+#: modules/features/emacs/init.org:1213
 msgid ""
 "[[https://github.com/karthink/gptel][gptel]] turns any buffer into a chat "
 "with an LLM backend."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1119
+#: modules/features/emacs/init.org:1216
 msgid ""
 "Authenticate once with =gptel-openai-oauth-login= (ChatGPT device flow); the "
 "token is cached under =.cache/gptel-openai/= in =user-emacs-directory=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1123
+#: modules/features/emacs/init.org:1220
 #, no-wrap
 msgid ""
 "(use-package gptel\n"
@@ -6030,19 +6198,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:1130
+#: modules/features/emacs/init.org:1227
 #, no-wrap
 msgid "misc"
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1131
+#: modules/features/emacs/init.org:1228
 #, no-wrap
 msgid "vundo"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1133
+#: modules/features/emacs/init.org:1230
 #, no-wrap
 msgid ""
 "(use-package vundo\n"
@@ -6053,13 +6221,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1140
+#: modules/features/emacs/init.org:1237
 #, no-wrap
 msgid "consult"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1142
+#: modules/features/emacs/init.org:1239
 #, no-wrap
 msgid ""
 ";; Example configuration for Consult\n"
@@ -6138,7 +6306,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1199
+#: modules/features/emacs/init.org:1296
 #, no-wrap
 msgid ""
 ";; The :init configuration is always executed (Not lazy)\n"
@@ -6146,7 +6314,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1202
+#: modules/features/emacs/init.org:1299
 #, no-wrap
 msgid ""
 ";; Tweak the register preview for `consult-register-load',\n"
@@ -6159,7 +6327,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1209
+#: modules/features/emacs/init.org:1306
 #, no-wrap
 msgid ""
 ";; Use Consult to select xref locations with preview\n"
@@ -6168,7 +6336,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1213
+#: modules/features/emacs/init.org:1310
 #, no-wrap
 msgid ""
 ";; Configure other variables and modes in the :config section,\n"
@@ -6177,7 +6345,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1217
+#: modules/features/emacs/init.org:1314
 #, no-wrap
 msgid ""
 ";; Optionally configure preview. The default value\n"
@@ -6199,7 +6367,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1233
+#: modules/features/emacs/init.org:1330
 #, no-wrap
 msgid ""
 ";; Optionally configure the narrowing key.\n"
@@ -6208,7 +6376,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1237
+#: modules/features/emacs/init.org:1334
 #, no-wrap
 msgid ""
 "  ;; Optionally make narrowing help available in the minibuffer.\n"
@@ -6220,7 +6388,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1244
+#: modules/features/emacs/init.org:1341
 #, no-wrap
 msgid ""
 ";; Consult users will also want the embark-consult package.\n"
@@ -6229,13 +6397,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1249
+#: modules/features/emacs/init.org:1346
 #, no-wrap
 msgid "compilation"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1251
+#: modules/features/emacs/init.org:1348
 msgid ""
 "The compilation buffer does not inherit from comint-mode, so ANSI escape "
 "sequences are displayed as raw text by default.  Adding "
@@ -6244,19 +6412,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1257
+#: modules/features/emacs/init.org:1354
 #, no-wrap
 msgid "(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)"
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1260
+#: modules/features/emacs/init.org:1357
 #, no-wrap
 msgid "copy-region-reference"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1262
+#: modules/features/emacs/init.org:1359
 msgid ""
 "Copy the absolute path and line range of the selected region in "
 "=file:start-end= format (e.g. =/path/to/file.el:10-20=).  Pasting the result "
@@ -6265,7 +6433,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1268
+#: modules/features/emacs/init.org:1365
 #, no-wrap
 msgid ""
 "(defun my/copy-region-reference (start end)\n"
@@ -6282,37 +6450,37 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1279
+#: modules/features/emacs/init.org:1376
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c r\") #'my/copy-region-reference)"
 msgstr ""
 
 #. type: heading **
-#: modules/features/emacs/init.org:1282
+#: modules/features/emacs/init.org:1379
 #, no-wrap
 msgid "Others"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1284
+#: modules/features/emacs/init.org:1381
 #, no-wrap
 msgid "(which-key-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1286
+#: modules/features/emacs/init.org:1383
 #, no-wrap
 msgid "(setq-default indent-tabs-mode nil)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1288
+#: modules/features/emacs/init.org:1385
 #, no-wrap
 msgid "(require 'org-tempo)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1290
+#: modules/features/emacs/init.org:1387
 #, no-wrap
 msgid ""
 "(org-babel-do-load-languages\n"
@@ -6321,31 +6489,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1294
+#: modules/features/emacs/init.org:1391
 #, no-wrap
 msgid "(setq org-src-preserve-indentation t)"
 msgstr ""
 
 #. type: heading ***
-#: modules/features/emacs/init.org:1297
+#: modules/features/emacs/init.org:1394
 #, no-wrap
 msgid "project.el"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1299
+#: modules/features/emacs/init.org:1396
 msgid ""
 "Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) "
 "as projects."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1301
+#: modules/features/emacs/init.org:1398
 msgid "Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1304
+#: modules/features/emacs/init.org:1401
 #, no-wrap
 msgid ""
 "(defun my/sync-project-list ()\n"
@@ -6361,7 +6529,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1314
+#: modules/features/emacs/init.org:1411
 #, no-wrap
 msgid ""
 ";; 3. Build file contents in a temporary buffer\n"
@@ -6374,7 +6542,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1322
+#: modules/features/emacs/init.org:1419
 #, no-wrap
 msgid ""
 ";; 4. Write the built contents to file\n"
@@ -6382,20 +6550,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1325
+#: modules/features/emacs/init.org:1422
 #, no-wrap
 msgid "(my/sync-project-list)"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1328
+#: modules/features/emacs/init.org:1425
 msgid ""
 "Sort the project list by modification time, placing recently updated "
 "projects first."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/emacs/init.org:1330
+#: modules/features/emacs/init.org:1427
 msgid ""
 "Using advice instead of sorting in =my/sync-project-list= ensures that "
 "projects are sorted by their current mtime at selection time, not at file "
@@ -6404,7 +6572,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1335
+#: modules/features/emacs/init.org:1432
 #, no-wrap
 msgid ""
 "(defun my/sort-projects-by-mtime (projects)\n"
@@ -6419,7 +6587,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/emacs/init.org:1345
+#: modules/features/emacs/init.org:1442
 #, no-wrap
 msgid "(advice-add 'project-known-project-roots :filter-return"
 msgstr ""
