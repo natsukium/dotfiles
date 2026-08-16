@@ -691,6 +691,44 @@ typically on desktop systems that suspend/resume.
 })
 #+end_src
 
+** SSH Client
+
+Home-manager owns =~/.ssh/config= so that the handful of hosts I reach by a name that
+is not their real address stay in the repository rather than in a file I edit by
+hand. It still ships a set of legacy defaults behind =enableDefaultConfig= and warns
+whenever they are left on, so this module turns them off and writes only what the
+sections below ask for.
+
+=ConnectTimeout 5= is the one thing that applies to every host. The default lets ssh
+sit on an unreachable machine for over two minutes, which is long enough that a
+laptop that has wandered off the tailnet reads as a hang rather than a failure. The
+per-host blocks come from the feature that needs them; [[*Git][Git]] contributes the route to
+my forge.
+
+#+begin_src nix :tangle features/ssh.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/ssh.nix
+{ ... }:
+{
+  flake.modules.homeManager.ssh =
+    { config, lib, ... }:
+    {
+      options.my.programs.ssh.enable = lib.mkEnableOption "ssh client";
+
+      config = lib.mkIf config.my.programs.ssh.enable {
+        programs.ssh = {
+          enable = true;
+          enableDefaultConfig = false;
+          settings."*".ConnectTimeout = 5;
+        };
+      };
+    };
+}
+#+end_src
+
 * File Synchronization
 
 ** org-sync
@@ -1630,6 +1668,8 @@ scalar has no meaning without the git module it extends.
           <<git-lazygit>>
 
           <<git-fish-abbreviations>>
+
+          <<git-ssh>>
         })
 
         <<git-scalar-config>>
@@ -2115,6 +2155,34 @@ gstp = "git stash pop";
 #+begin_src nix
 gsw = "git switch";
 gswc = "git switch -c";
+#+end_src
+
+*** Forge Route
+
+=git.natsukium.com= resolves publicly to the cloudflared tunnel, which carries HTTP
+only, so ssh has to be aimed somewhere else. The tailnet name reaches manyara from
+anywhere I am signed into tailscale and never changes, whereas the LAN address I
+pointed at before comes from DHCP and has already drifted once, turning a push into
+"No route to host" until I noticed and edited the file by hand. Port 2022 is a
+second sshd port on that host: tailscale runs with =--ssh=, so on the tailnet
+tailscaled answers 22 itself and hands out a plain shell as =forgejo=, never letting
+sshd apply the ~command="forgejo serv"~ restriction that git depends on.
+
+Both belong here rather than in Forgejo's own settings. Forgejo renders a clone URL
+from =SSH_DOMAIN= and =SSH_PORT=, and any port other than 22 turns the short
+~forgejo@host:owner/repo.git~ form into a full ~ssh://host:2022/~ URI that I would
+then paste into every remote. The tailnet name and the port are properties of how I
+get there, not of the forge, so the web UI keeps advertising the plain address and
+this block redirects it.
+
+The block lands in =~/.ssh/config= through the [[*SSH Client][SSH Client]] module, which owns the file.
+
+#+NAME: git-ssh
+#+begin_src nix
+programs.ssh.settings."git.natsukium.com" = {
+  HostName = "manyara.tail4108.ts.net";
+  Port = 2022;
+};
 #+end_src
 
 * Continuous Integration

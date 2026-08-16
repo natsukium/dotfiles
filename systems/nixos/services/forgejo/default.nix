@@ -5,6 +5,17 @@
   ...
 }:
 {
+  # Tailscale runs with --ssh, so on the tailnet tailscaled answers port 22
+  # itself and hands out a plain shell as `forgejo`, bypassing the
+  # command="forgejo serv" restriction in its authorized_keys. A second sshd
+  # port escapes that interception, which only covers 22, without giving up
+  # Tailscale SSH for admin logins. 2222 is taken by the hermes-agent guest.
+  # SSH_PORT stays at its default 22: forgejo only uses it to render clone
+  # URLs, and anything other than 22 turns them into ssh://host:port/ URIs.
+  # Port 2022 belongs to the tailnet route alone, so it lives in the client
+  # ssh config instead of every URL the web UI hands out.
+  services.openssh.ports = [ 2022 ];
+
   services.forgejo = {
     enable = true;
     package = pkgs.forgejo;
@@ -13,7 +24,6 @@
       service.DISABLE_REGISTRATION = true;
       server = {
         HTTP_PORT = 3010;
-        SSH_PORT = lib.head config.services.openssh.ports;
         DOMAIN = "git.natsukium.com";
         ROOT_URL = "https://git.natsukium.com/";
       };

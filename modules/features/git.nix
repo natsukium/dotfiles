@@ -119,6 +119,11 @@
             gsw = "git switch";
             gswc = "git switch -c";
           };
+
+          programs.ssh.settings."git.natsukium.com" = {
+            HostName = "manyara.tail4108.ts.net";
+            Port = 2022;
+          };
         })
 
         (lib.mkIf scalarCfg.enable {
