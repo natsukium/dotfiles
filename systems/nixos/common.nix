@@ -48,6 +48,10 @@ in
 
   services.openssh = {
     enable = true;
+    # Spelled out even though it is the module default: `ports` is a list
+    # option, so a service that needs its own sshd port appends to it, and a
+    # bare default would be replaced rather than extended.
+    ports = [ 22 ];
     settings.PasswordAuthentication = false;
     hostKeys = [
       {

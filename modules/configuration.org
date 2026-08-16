@@ -2149,7 +2149,9 @@ gswc = "git switch -c";
 
 ** Forgejo
 
-I self-host [[https://forgejo.org/][Forgejo]] on manyara as my personal forge at =git.natsukium.com=.
+I self-host [[https://forgejo.org/][Forgejo]] on manyara as my personal forge at =git.natsukium.com=. This
+feature carries the NixOS module that runs the instance and the home-manager
+module that routes git's ssh traffic to it.
 
 #+begin_src nix :tangle features/forgejo/default.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -2160,6 +2162,8 @@ I self-host [[https://forgejo.org/][Forgejo]] on manyara as my personal forge at
 { ... }:
 {
   <<forgejo-instance>>
+
+  <<forgejo-client>>
 }
 #+end_src
 
@@ -2193,7 +2197,6 @@ flake.modules.nixos.forgejo =
           service.DISABLE_REGISTRATION = true;
           server = {
             HTTP_PORT = 3010;
-            SSH_PORT = lib.head config.services.openssh.ports;
             DOMAIN = "git.natsukium.com";
             ROOT_URL = "https://git.natsukium.com/";
           };
@@ -2235,9 +2238,26 @@ flake.modules.nixos.forgejo =
           service = "http://${toString HTTP_ADDR}:${toString HTTP_PORT}";
         };
 
+      <<forgejo-ssh-port>>
+
       <<forgejo-backup>>
     };
   };
+#+end_src
+
+**** SSH Port
+
+Tailscale runs with [[*Service Settings][=--ssh=]], so on the tailnet tailscaled answers port 22 itself
+and hands out a plain shell as =forgejo=. That bypasses the ~command="forgejo serv"~
+restriction git depends on, so sshd moves to 2022.
+=SSH_PORT= is pinned to 22 anyway: forgejo only uses it to
+render clone URLs, and any other value turns them into full ~ssh://~ URIs. The
+[[*Client Route][client route]] carries the real port.
+
+#+NAME: forgejo-ssh-port
+#+begin_src nix
+services.openssh.ports = [ 2022 ];
+services.forgejo.settings.server.SSH_PORT = 22;
 #+end_src
 
 **** Backup
@@ -2260,6 +2280,29 @@ my.services.restic.backups.forgejo.paths = [
   config.services.forgejo.stateDir
   "${config.services.postgresqlBackup.location}/${config.services.forgejo.database.name}.sql.gz"
 ];
+#+end_src
+
+*** Client Route
+
+=git.natsukium.com= resolves publicly to the cloudflared tunnel, which carries
+HTTP only, so ssh needs another path. Every machine of mine reaches manyara over
+tailscale, so this block points the public name at the tailnet one. It lands in
+=~/.ssh/config= through the [[*SSH Client][SSH Client]] module, which owns the file.
+
+#+NAME: forgejo-client
+#+begin_src nix
+flake.modules.homeManager.forgejo =
+  { config, lib, ... }:
+  {
+    options.my.programs.forgejo.enable = lib.mkEnableOption "the ssh route to my forge";
+
+    config = lib.mkIf config.my.programs.forgejo.enable {
+      programs.ssh.settings."git.natsukium.com" = {
+        HostName = "manyara.tail4108.ts.net";
+        Port = 2022;
+      };
+    };
+  };
 #+end_src
 
 * Continuous Integration

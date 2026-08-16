@@ -25,7 +25,6 @@
             service.DISABLE_REGISTRATION = true;
             server = {
               HTTP_PORT = 3010;
-              SSH_PORT = lib.head config.services.openssh.ports;
               DOMAIN = "git.natsukium.com";
               ROOT_URL = "https://git.natsukium.com/";
             };
@@ -67,6 +66,9 @@
             service = "http://${toString HTTP_ADDR}:${toString HTTP_PORT}";
           };
 
+        services.openssh.ports = [ 2022 ];
+        services.forgejo.settings.server.SSH_PORT = 22;
+
         services.postgresqlBackup = {
           enable = true;
           databases = [ config.services.forgejo.database.name ];
@@ -76,6 +78,19 @@
           config.services.forgejo.stateDir
           "${config.services.postgresqlBackup.location}/${config.services.forgejo.database.name}.sql.gz"
         ];
+      };
+    };
+
+  flake.modules.homeManager.forgejo =
+    { config, lib, ... }:
+    {
+      options.my.programs.forgejo.enable = lib.mkEnableOption "the ssh route to my forge";
+
+      config = lib.mkIf config.my.programs.forgejo.enable {
+        programs.ssh.settings."git.natsukium.com" = {
+          HostName = "manyara.tail4108.ts.net";
+          Port = 2022;
+        };
       };
     };
 }
