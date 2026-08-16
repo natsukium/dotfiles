@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-08-14 18:13+0900\n"
+"POT-Creation-Date: 2026-08-16 18:59+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -429,8 +429,8 @@ msgstr ""
 #. type: heading ***
 #: configuration.org:70 modules/features/emacs/init.org:651
 #: modules/configuration.org:80 modules/configuration.org:452
-#: modules/configuration.org:599 modules/configuration.org:2330
-#: modules/configuration.org:4088
+#: modules/configuration.org:599 modules/configuration.org:2360
+#: modules/configuration.org:4118
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -4051,7 +4051,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:93 modules/configuration.org:4045
+#: modules/features/emacs/init.org:93 modules/configuration.org:4075
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -7291,7 +7291,7 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:156 modules/configuration.org:3373
+#: overlays/configuration.org:156 modules/configuration.org:3403
 #, no-wrap
 msgid "Handy"
 msgstr ""
@@ -7526,7 +7526,7 @@ msgstr ""
 "darwinで共有され、すべてのマシンで一貫したNixの動作を提供します。"
 
 #. type: heading ***
-#: modules/configuration.org:20 modules/configuration.org:1641
+#: modules/configuration.org:20 modules/configuration.org:1671
 #, no-wrap
 msgid "Core Settings"
 msgstr "コア設定"
@@ -7595,7 +7595,7 @@ msgstr "home-manager"
 
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:357
-#: modules/configuration.org:558 modules/configuration.org:4075
+#: modules/configuration.org:558 modules/configuration.org:4105
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -8824,21 +8824,62 @@ msgid ""
 "})"
 msgstr ""
 
-#. type: heading *
+#. type: heading **
 #: modules/configuration.org:694
+#, no-wrap
+msgid "SSH Client"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:696
+msgid ""
+"SSH is mostly tailscale's business, but a client still needs =~/.ssh/config= "
+"for the few hosts I reach by a name that is not their real address.  This "
+"module only claims the file and turns off =enableDefaultConfig=, as upstream "
+"recommends."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:707
+#, no-wrap
+msgid ""
+"{ ... }:\n"
+"{\n"
+"  flake.modules.homeManager.ssh =\n"
+"    { config, lib, ... }:\n"
+"    {\n"
+"      options.my.programs.ssh.enable = lib.mkEnableOption \"ssh client\";"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:714
+#, no-wrap
+msgid ""
+"      config = lib.mkIf config.my.programs.ssh.enable {\n"
+"        programs.ssh = {\n"
+"          enable = true;\n"
+"          enableDefaultConfig = false;\n"
+"        };\n"
+"      };\n"
+"    };\n"
+"}"
+msgstr ""
+
+#. type: heading *
+#: modules/configuration.org:724
 #, no-wrap
 msgid "File Synchronization"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:696
+#: modules/configuration.org:726
 #, fuzzy, no-wrap
 #| msgid "org-agenda"
 msgid "org-sync"
 msgstr "org-agenda"
 
 #. type: paragraph
-#: modules/configuration.org:698
+#: modules/configuration.org:728
 msgid ""
 "I keep my org notes in =~/dropbox/org= and have synced them across my "
 "desktop and laptops through Dropbox. I added Syncthing so the hermes-agent "
@@ -8847,7 +8888,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:703
+#: modules/configuration.org:733
 msgid ""
 "This is a user-level =services.syncthing= instance, separate from the system-"
 "level daemon kilimanjaro already runs; its ports are shifted off the "
@@ -8855,7 +8896,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:713
+#: modules/configuration.org:743
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -8875,7 +8916,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:728
+#: modules/configuration.org:758
 #, no-wrap
 msgid ""
 "  devices = lib.mkOption {\n"
@@ -8894,7 +8935,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:742
+#: modules/configuration.org:772
 #, no-wrap
 msgid ""
 "      config = lib.mkIf cfg.enable {\n"
@@ -8921,13 +8962,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:765
+#: modules/configuration.org:795
 #, no-wrap
 msgid "Shell"
 msgstr "シェル"
 
 #. type: paragraph
-#: modules/configuration.org:767
+#: modules/configuration.org:797
 msgid ""
 "Interactive shells and scripting shells serve different purposes. An "
 "interactive shell does not need to be POSIX-compatible — what matters is "
@@ -8937,13 +8978,13 @@ msgstr ""
 "換である必要はなく、重要なのは使いやすさ、幅広い環境サポート、拡張性です。"
 
 #. type: heading **
-#: modules/configuration.org:771
+#: modules/configuration.org:801
 #, no-wrap
 msgid "Fish"
 msgstr "Fish"
 
 #. type: paragraph
-#: modules/configuration.org:773
+#: modules/configuration.org:803
 msgid ""
 "Fish is the primary interactive shell, chosen for its out-of-the-box "
 "experience: syntax highlighting, autosuggestions, and tab completions work "
@@ -8957,7 +8998,7 @@ msgstr ""
 "小限のセットアップで最も便利で拡張可能な対話的エクスペリエンスを提供します。"
 
 #. type: paragraph
-#: modules/configuration.org:778
+#: modules/configuration.org:808
 msgid ""
 "Both NixOS and nix-darwin hand fish its environment by sourcing each "
 "=environment.*Init= snippet -- and on NixOS the whole session environment -- "
@@ -8968,19 +9009,19 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:785
+#: modules/configuration.org:815
 #, no-wrap
 msgid "useBabelfish"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:787
+#: modules/configuration.org:817
 #, no-wrap
 msgid "programs.fish.useBabelfish = true;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:796
+#: modules/configuration.org:826
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -8997,7 +9038,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:810
+#: modules/configuration.org:840
 #, no-wrap
 msgid ""
 "  config = lib.mkIf config.my.programs.fish.enable {\n"
@@ -9010,7 +9051,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:819
+#: modules/configuration.org:849
 #, no-wrap
 msgid ""
 "darwinModule =\n"
@@ -9024,7 +9065,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:828
+#: modules/configuration.org:858
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.fish.enable {\n"
@@ -9036,7 +9077,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:841
+#: modules/configuration.org:871
 #, no-wrap
 msgid ""
 "        users.users.${config.my.username}.uid = lib.mkDefault 501;\n"
@@ -9050,7 +9091,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:850
+#: modules/configuration.org:880
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.fish =\n"
@@ -9068,7 +9109,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:863
+#: modules/configuration.org:893
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.fish.enable {\n"
@@ -9077,25 +9118,25 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:867
+#: modules/configuration.org:897
 #, no-wrap
 msgid "<<fish-interactive-shell-init>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:869
+#: modules/configuration.org:899
 #, no-wrap
 msgid "<<fish-abbreviations>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:871
+#: modules/configuration.org:901
 #, no-wrap
 msgid "<<fish-functions>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:873
+#: modules/configuration.org:903
 #, no-wrap
 msgid ""
 "  <<fish-plugins>>\n"
@@ -9103,7 +9144,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:876
+#: modules/configuration.org:906
 #, no-wrap
 msgid ""
 "        xdg.configFile = {\n"
@@ -9116,13 +9157,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:885
+#: modules/configuration.org:915
 #, no-wrap
 msgid "Interactive Shell Init"
 msgstr "対話シェルの初期化"
 
 #. type: paragraph
-#: modules/configuration.org:887
+#: modules/configuration.org:917
 msgid ""
 "Settings applied when fish starts an interactive session: keybindings, "
 "plugin configuration, environment variables, and shell integrations."
@@ -9131,13 +9172,13 @@ msgstr ""
 "ン設定、環境変数、シェル統合が含まれます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:890
+#: modules/configuration.org:920
 #, no-wrap
 msgid "fish-interactive-shell-init"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:892
+#: modules/configuration.org:922
 #, no-wrap
 msgid ""
 "interactiveShellInit = ''\n"
@@ -9145,19 +9186,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:895
+#: modules/configuration.org:925
 #, no-wrap
 msgid "<<fish-done-config>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:897
+#: modules/configuration.org:927
 #, no-wrap
 msgid "<<fish-pinentry>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:899
+#: modules/configuration.org:929
 #, no-wrap
 msgid ""
 "  <<fish-extra-abbrs>>\n"
@@ -9165,13 +9206,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:903
+#: modules/configuration.org:933
 #, no-wrap
 msgid "Keybindings"
 msgstr "キーバインド"
 
 #. type: paragraph
-#: modules/configuration.org:905
+#: modules/configuration.org:935
 msgid ""
 "=Ctrl+S= is bound to =zi= ([[https://github.com/ajeetdsouza/zoxide][zoxide]] "
 "interactive mode) for fuzzy directory jumping."
@@ -9180,25 +9221,25 @@ msgstr ""
 "クティブモード）をバインドし、ファジーなディレクトリジャンプに使用します。"
 
 #. type: keyword NAME
-#: modules/configuration.org:907
+#: modules/configuration.org:937
 #, no-wrap
 msgid "fish-keybindings"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:909
+#: modules/configuration.org:939
 #, no-wrap
 msgid "bind \\cs zi"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:912
+#: modules/configuration.org:942
 #, no-wrap
 msgid "Pinentry"
 msgstr "Pinentry"
 
 #. type: paragraph
-#: modules/configuration.org:914
+#: modules/configuration.org:944
 msgid ""
 "When connected via SSH, GPG's pinentry is switched to the curses (terminal) "
 "variant.  The default graphical pinentry cannot display on a remote session "
@@ -9215,13 +9256,13 @@ msgstr ""
 "pinentry for SSH logins]]を参照してください。"
 
 #. type: keyword NAME
-#: modules/configuration.org:919
+#: modules/configuration.org:949
 #, no-wrap
 msgid "fish-pinentry"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:922
+#: modules/configuration.org:952
 #, no-wrap
 msgid ""
 "if test \"$SSH_CONNECTION\" != \"\"\n"
@@ -9230,13 +9271,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:927
+#: modules/configuration.org:957
 #, no-wrap
 msgid "Extra Abbreviations"
 msgstr "追加の略語"
 
 #. type: paragraph
-#: modules/configuration.org:929
+#: modules/configuration.org:959
 msgid ""
 "Position-aware [[https://fishshell.com/docs/current/cmds/abbr.html]"
 "[abbreviations]] that use fish's advanced features (=--position anywhere=, "
@@ -9248,13 +9289,13 @@ msgstr ""
 "います。これらはhome-managerの =shellAbbrs= オプションでは利用できません。"
 
 #. type: keyword NAME
-#: modules/configuration.org:932
+#: modules/configuration.org:962
 #, no-wrap
 msgid "fish-extra-abbrs"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:935
+#: modules/configuration.org:965
 #, no-wrap
 msgid ""
 "abbr -a L --position anywhere --set-cursor \"% | less\"\n"
@@ -9264,19 +9305,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:941
+#: modules/configuration.org:971
 #, no-wrap
 msgid "Abbreviations"
 msgstr "略語"
 
 #. type: keyword NAME
-#: modules/configuration.org:943
+#: modules/configuration.org:973
 #, no-wrap
 msgid "fish-abbreviations"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:945
+#: modules/configuration.org:975
 #, no-wrap
 msgid ""
 "shellAbbrs = {\n"
@@ -9284,7 +9325,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:948
+#: modules/configuration.org:978
 #, no-wrap
 msgid ""
 "  <<fish-abbr-nix>>\n"
@@ -9292,31 +9333,31 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:952
+#: modules/configuration.org:982
 #, no-wrap
 msgid "General"
 msgstr "一般"
 
 #. type: keyword NAME
-#: modules/configuration.org:954
+#: modules/configuration.org:984
 #, no-wrap
 msgid "fish-abbr-general"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:957
+#: modules/configuration.org:987
 #, no-wrap
 msgid "l = \"ls\";"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:960
+#: modules/configuration.org:990
 #, no-wrap
 msgid "Nix Remote Build"
 msgstr "Nixリモートビルド"
 
 #. type: paragraph
-#: modules/configuration.org:962
+#: modules/configuration.org:992
 msgid ""
 "Abbreviations for specifying Nix build target systems, primarily used when "
 "working on nixpkgs. Each abbreviation expands to =--system <triple>= and "
@@ -9334,13 +9375,13 @@ msgstr ""
 "クチャの不一致で失敗することを防ぎます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:969
+#: modules/configuration.org:999
 #, no-wrap
 msgid "fish-abbr-nix"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:971
+#: modules/configuration.org:1001
 #, no-wrap
 msgid ""
 "\"--sxl\" = {\n"
@@ -9372,13 +9413,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1000
+#: modules/configuration.org:1030
 #, no-wrap
 msgid "Functions"
 msgstr "関数"
 
 #. type: paragraph
-#: modules/configuration.org:1002
+#: modules/configuration.org:1032
 msgid ""
 "Helper functions used by the abbreviation system. These are separated from "
 "the abbreviation definitions because fish requires functions to be defined "
@@ -9388,13 +9429,13 @@ msgstr ""
 "る前に関数を定義する必要があるため、略語の定義とは分離されています。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1006
+#: modules/configuration.org:1036
 #, no-wrap
 msgid "fish-functions"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1008
+#: modules/configuration.org:1038
 #, no-wrap
 msgid ""
 "functions = {\n"
@@ -9405,13 +9446,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1015
+#: modules/configuration.org:1045
 #, no-wrap
 msgid "any-nix-shell"
 msgstr "any-nix-shell"
 
 #. type: paragraph
-#: modules/configuration.org:1017
+#: modules/configuration.org:1047
 #, fuzzy
 #| msgid ""
 #| "[[https://github.com/haslersn/any-nix-shell][any-nix-shell]] keeps fish "
@@ -9433,7 +9474,7 @@ msgstr ""
 "できるよう、=interactiveShellInit= の末尾でソースされます。"
 
 #. type: paragraph
-#: modules/configuration.org:1021
+#: modules/configuration.org:1051
 msgid ""
 "=any-nix-shell fish= only emits two function definitions (=nix= and =nix-"
 "shell=), but generating them shells out to =/bin/sh= plus three =which= "
@@ -9446,13 +9487,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1029
+#: modules/configuration.org:1059
 #, no-wrap
 msgid "fish-any-nix-shell"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1034
+#: modules/configuration.org:1064
 #, no-wrap
 msgid ""
 "anyNixShellFunction =\n"
@@ -9470,19 +9511,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1048
+#: modules/configuration.org:1078
 #, no-wrap
 msgid "Plugins"
 msgstr "プラグイン"
 
 #. type: keyword NAME
-#: modules/configuration.org:1050
+#: modules/configuration.org:1080
 #, no-wrap
 msgid "fish-plugins"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1052
+#: modules/configuration.org:1082
 #, no-wrap
 msgid ""
 "plugins = [\n"
@@ -9498,7 +9539,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1064
+#: modules/configuration.org:1094
 msgid ""
 "The [[https://github.com/franciscolourenco/done][done]] plugin provides "
 "desktop notifications for long-running commands.  The threshold is set to 15 "
@@ -9514,19 +9555,19 @@ msgstr ""
 "が有用です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1070
+#: modules/configuration.org:1100
 #, no-wrap
 msgid "fish-done-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1073
+#: modules/configuration.org:1103
 #, no-wrap
 msgid "set -U __done_min_cmd_duration 15000"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1076
+#: modules/configuration.org:1106
 msgid ""
 "[[https://github.com/PatrickF1/fzf.fish][fzf-fish]] integrates fzf with "
 "fish's tab completion, history search, and file/directory navigation. It "
@@ -9539,13 +9580,13 @@ msgstr ""
 "処理します。"
 
 #. type: heading **
-#: modules/configuration.org:1080
+#: modules/configuration.org:1110
 #, no-wrap
 msgid "Bash"
 msgstr "Bash"
 
 #. type: paragraph
-#: modules/configuration.org:1082
+#: modules/configuration.org:1112
 msgid ""
 "Bash is configured as a minimal fallback shell rather than a full "
 "interactive environment. The primary use case is ensuring a usable shell "
@@ -9561,7 +9602,7 @@ msgstr ""
 "あれば、問題がfish固有かどうかの切り分けに役立ちます。"
 
 #. type: paragraph
-#: modules/configuration.org:1089
+#: modules/configuration.org:1119
 msgid ""
 "Registered as a home-manager feature behind =my.programs.bash.enable=, "
 "matching the toggle every other shell in this section already has, rather "
@@ -9570,7 +9611,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1099
+#: modules/configuration.org:1129
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -9590,7 +9631,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1114
+#: modules/configuration.org:1144
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -9600,25 +9641,25 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1119
+#: modules/configuration.org:1149
 #, no-wrap
 msgid "<<bash-history>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1121
+#: modules/configuration.org:1151
 #, no-wrap
 msgid "<<bash-completion>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1123
+#: modules/configuration.org:1153
 #, no-wrap
 msgid "<<bash-aliases>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1125
+#: modules/configuration.org:1155
 #, no-wrap
 msgid ""
 "          <<bash-init>>\n"
@@ -9629,13 +9670,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1132
+#: modules/configuration.org:1162
 #, no-wrap
 msgid "History"
 msgstr "履歴"
 
 #. type: paragraph
-#: modules/configuration.org:1134
+#: modules/configuration.org:1164
 msgid ""
 "History is stored under =XDG_CONFIG_HOME= to keep =$HOME= clean, consistent "
 "with the repository's preference for XDG base directories (see [[*User-Level "
@@ -9646,25 +9687,25 @@ msgstr ""
 "[ユーザーレベルの設定]]参照）。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1137
+#: modules/configuration.org:1167
 #, no-wrap
 msgid "bash-history"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1139
+#: modules/configuration.org:1169
 #, no-wrap
 msgid "historyFile = \"$XDG_CONFIG_HOME/bash/history\";"
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1142
+#: modules/configuration.org:1172
 #, no-wrap
 msgid "Completion"
 msgstr "補完"
 
 #. type: paragraph
-#: modules/configuration.org:1144
+#: modules/configuration.org:1174
 msgid ""
 "Bash completion is disabled because bash is not used as the primary "
 "interactive shell. Loading completion scripts adds startup time (~100ms+) "
@@ -9676,25 +9717,25 @@ msgstr ""
 "ルバックやスクリプト実行にのみ使用するシェルではメリットがありません。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1148
+#: modules/configuration.org:1178
 #, no-wrap
 msgid "bash-completion"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1150
+#: modules/configuration.org:1180
 #, no-wrap
 msgid "enableCompletion = false;"
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1153
+#: modules/configuration.org:1183
 #, no-wrap
 msgid "Aliases"
 msgstr "エイリアス"
 
 #. type: paragraph
-#: modules/configuration.org:1155
+#: modules/configuration.org:1185
 msgid ""
 "Basic aliases that provide a minimal quality-of-life improvement if bash is "
 "used interactively. These are intentionally simple — fish handles the rich "
@@ -9705,13 +9746,13 @@ msgstr ""
 "ます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1159
+#: modules/configuration.org:1189
 #, no-wrap
 msgid "bash-aliases"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1161
+#: modules/configuration.org:1191
 #, no-wrap
 msgid ""
 "shellAliases = {\n"
@@ -9723,13 +9764,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1169
+#: modules/configuration.org:1199
 #, no-wrap
 msgid "Init"
 msgstr "初期化"
 
 #. type: paragraph
-#: modules/configuration.org:1171
+#: modules/configuration.org:1201
 msgid ""
 "This configuration is a remnant from before fish was set as the default "
 "login shell.  Previously, bash was the login shell and =.bashrc= launched "
@@ -9742,13 +9783,13 @@ msgstr ""
 "持されています。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1176
+#: modules/configuration.org:1206
 #, no-wrap
 msgid "bash-init"
 msgstr ""
 
 #. type: plain list +
-#: modules/configuration.org:1183
+#: modules/configuration.org:1213
 #, no-wrap
 msgid ""
 "lib.optionalString (!config.programs.kitty.enable) ''\n"
@@ -9756,7 +9797,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1178
+#: modules/configuration.org:1208
 #, no-wrap
 msgid ""
 "initExtra = ''\n"
@@ -9766,13 +9807,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1186
+#: modules/configuration.org:1216
 #, no-wrap
 msgid "Terminal Settings"
 msgstr "ターミナル設定"
 
 #. type: paragraph
-#: modules/configuration.org:1188
+#: modules/configuration.org:1218
 #, fuzzy
 #| msgid ""
 #| "=stty stop undef=: Disables =Ctrl+S= from sending =XOFF= (terminal "
@@ -9795,25 +9836,25 @@ msgstr ""
 "これは現代のターミナルではほとんど役に立たないレガシーなフロー制御機構です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1192
+#: modules/configuration.org:1222
 #, no-wrap
 msgid "bash-terminal-settings"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1194
+#: modules/configuration.org:1224
 #, no-wrap
 msgid "stty stop undef  # Ctrl-s"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1197
+#: modules/configuration.org:1227
 #, no-wrap
 msgid "TMUX Auto-attach"
 msgstr "TMUXの自動アタッチ"
 
 #. type: paragraph
-#: modules/configuration.org:1199
+#: modules/configuration.org:1229
 msgid ""
 "Automatically starts or attaches to a tmux session when bash is the "
 "interactive shell, but only when kitty is not the terminal emulator. Kitty "
@@ -9831,13 +9872,13 @@ msgstr ""
 "以外では欠けるセッション永続性とウィンドウ管理を提供します。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1206
+#: modules/configuration.org:1236
 #, no-wrap
 msgid "bash-tmux-autostart"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1209
+#: modules/configuration.org:1239
 #, no-wrap
 msgid ""
 "if type tmux > /dev/null 2>&1; then\n"
@@ -9845,7 +9886,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1214
+#: modules/configuration.org:1244
 #, no-wrap
 msgid ""
 "  while test -z $TMUX; do\n"
@@ -9855,14 +9896,14 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:1220
+#: modules/configuration.org:1250
 #, fuzzy, no-wrap
 #| msgid "headerline"
 msgid "Readline"
 msgstr "headerline"
 
 #. type: paragraph
-#: modules/configuration.org:1222
+#: modules/configuration.org:1252
 msgid ""
 "readline provides line editing for bash and for most REPLs with a plain "
 "prompt, such as the Python interpreter and =psql=. Configuring it here "
@@ -9870,7 +9911,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1226
+#: modules/configuration.org:1256
 msgid ""
 "=Ctrl+W= deletes back to the previous =/= rather than the previous word "
 "boundary, which suits the paths that make up most of what I type at a "
@@ -9880,12 +9921,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1232
+#: modules/configuration.org:1262
 msgid "=completion-ignore-case= makes tab completion case-insensitive."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1240
+#: modules/configuration.org:1270
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -9904,7 +9945,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1254
+#: modules/configuration.org:1284
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -9913,7 +9954,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1258
+#: modules/configuration.org:1288
 #, no-wrap
 msgid ""
 "variables = {\n"
@@ -9923,7 +9964,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1263
+#: modules/configuration.org:1293
 #, no-wrap
 msgid ""
 "          bindings = {\n"
@@ -9936,13 +9977,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:1272
+#: modules/configuration.org:1302
 #, no-wrap
 msgid "Nushell"
 msgstr "Nushell"
 
 #. type: paragraph
-#: modules/configuration.org:1274
+#: modules/configuration.org:1304
 msgid ""
 "Nushell is enabled for its ability to handle structured data natively, "
 "similar to PowerShell. Where traditional shells pipe text between commands, "
@@ -9959,7 +10000,7 @@ msgstr ""
 "換性は要件ではありません。"
 
 #. type: paragraph
-#: modules/configuration.org:1281
+#: modules/configuration.org:1311
 msgid ""
 "No custom configuration is added yet — the defaults are sufficient for "
 "exploratory use, and committing to Nushell-specific workflows would be "
@@ -9969,14 +10010,14 @@ msgstr ""
 "り、Nushell固有のワークフローにコミットするのは時期尚早です。"
 
 #. type: paragraph
-#: modules/configuration.org:1284
+#: modules/configuration.org:1314
 msgid ""
 "Registered behind =my.programs.nushell.enable=, like the other shells in "
 "this section."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1292
+#: modules/configuration.org:1322
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -9997,13 +10038,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1308
+#: modules/configuration.org:1338
 #, no-wrap
 msgid "<<nushell-external-completer-option>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1310
+#: modules/configuration.org:1340
 #, no-wrap
 msgid ""
 "config = lib.mkMerge [\n"
@@ -10013,7 +10054,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1315
+#: modules/configuration.org:1345
 #, no-wrap
 msgid ""
 "        <<nushell-external-completer-config>>\n"
@@ -10023,13 +10064,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1321
+#: modules/configuration.org:1351
 #, no-wrap
 msgid "External Completer"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1323
+#: modules/configuration.org:1353
 msgid ""
 "Nushell has no built-in tab-completion source for external (non-Nushell)  "
 "commands. Piping candidates through fish's own completion engine reuses "
@@ -10038,7 +10079,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1328
+#: modules/configuration.org:1358
 msgid ""
 "=externalCompleter= defaults to following whether Nushell itself is enabled, "
 "so enabling the shell is enough to get external completions without a second "
@@ -10047,13 +10088,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1333
+#: modules/configuration.org:1363
 #, no-wrap
 msgid "nushell-external-completer-option"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1335
+#: modules/configuration.org:1365
 #, no-wrap
 msgid ""
 "options.ext.programs.nushell.externalCompleter = {\n"
@@ -10069,25 +10110,25 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1347
+#: modules/configuration.org:1377
 #, no-wrap
 msgid "nushell-external-completer-config"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:1353
+#: modules/configuration.org:1383
 #, no-wrap
 msgid "$\"value(char tab)description(char newline)\" + $in"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:1354
+#: modules/configuration.org:1384
 #, no-wrap
 msgid "from tsv --flexible --no-infer"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1349
+#: modules/configuration.org:1379
 #, no-wrap
 msgid ""
 "(lib.mkIf completerCfg.enable {\n"
@@ -10098,25 +10139,25 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:1361
+#: modules/configuration.org:1391
 #, no-wrap
 msgid "default {}"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:1362
+#: modules/configuration.org:1392
 #, no-wrap
 msgid "insert enable { true }"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:1363
+#: modules/configuration.org:1393
 #, no-wrap
 msgid "insert completer { $fish_completer }"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1357
+#: modules/configuration.org:1387
 #, no-wrap
 msgid ""
 "    $env.config = ($env.config? | default {})\n"
@@ -10129,13 +10170,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:1369
+#: modules/configuration.org:1399
 #, no-wrap
 msgid "Starship"
 msgstr "Starship"
 
 #. type: paragraph
-#: modules/configuration.org:1371
+#: modules/configuration.org:1401
 msgid ""
 "[[https://starship.rs/][Starship]] is a cross-shell prompt written in Rust, "
 "used across all shells configured here to provide a consistent prompt "
@@ -10149,7 +10190,7 @@ msgstr ""
 "から使用されており、簡単なTOMLベースの設定が使い続けている主な理由です。"
 
 #. type: paragraph
-#: modules/configuration.org:1375
+#: modules/configuration.org:1405
 msgid ""
 "Starship does not natively support asynchronous prompt rendering, so this "
 "section also includes a custom async prompt module for fish."
@@ -10159,7 +10200,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: modules/configuration.org:1378
+#: modules/configuration.org:1408
 msgid ""
 "Registered behind =my.programs.starship.enable=, with "
 "=enableFishAsyncPrompt= as a second, independent toggle on the same module — "
@@ -10167,7 +10208,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1388
+#: modules/configuration.org:1418
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -10187,7 +10228,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1403
+#: modules/configuration.org:1433
 #, no-wrap
 msgid ""
 "  enableFishAsyncPrompt = lib.mkOption {\n"
@@ -10198,7 +10239,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1409
+#: modules/configuration.org:1439
 #, no-wrap
 msgid ""
 "config = lib.mkMerge [\n"
@@ -10211,7 +10252,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1417
+#: modules/configuration.org:1447
 #, no-wrap
 msgid ""
 "        <<starship-async-prompt-config>>\n"
@@ -10221,13 +10262,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1428
+#: modules/configuration.org:1458
 #, no-wrap
 msgid "Prompt Format"
 msgstr "プロンプトフォーマット"
 
 #. type: paragraph
-#: modules/configuration.org:1430
+#: modules/configuration.org:1460
 msgid ""
 "The prompt format prepends a shell indicator before the default modules.  "
 "This makes it immediately visible which shell is active, useful when "
@@ -10238,25 +10279,25 @@ msgstr ""
 "グでfishとbashを切り替える際に便利です。"
 
 #. type: paragraph in src
-#: modules/configuration.org:1435
+#: modules/configuration.org:1465
 #, no-wrap
 msgid "\"$schema\" = \"https://starship.rs/config-schema.json\""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1437
+#: modules/configuration.org:1467
 #, no-wrap
 msgid "format = \"$shell$all$line_break$character\""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1440
+#: modules/configuration.org:1470
 #, no-wrap
 msgid "Shell Indicator"
 msgstr "シェルインジケーター"
 
 #. type: paragraph
-#: modules/configuration.org:1442
+#: modules/configuration.org:1472
 msgid ""
 "Each shell has a distinct icon: =󰈺= (fish icon) for fish. Bash and nushell "
 "use the default indicator."
@@ -10265,7 +10306,7 @@ msgstr ""
 "nushellはデフォルトのインジケーターを使用します。"
 
 #. type: paragraph in src
-#: modules/configuration.org:1446
+#: modules/configuration.org:1476
 #, no-wrap
 msgid ""
 "[shell]\n"
@@ -10275,13 +10316,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1452
+#: modules/configuration.org:1482
 #, no-wrap
 msgid "Remote Container Detection"
 msgstr "リモートコンテナの検出"
 
 #. type: paragraph
-#: modules/configuration.org:1454
+#: modules/configuration.org:1484
 msgid ""
 "A custom module detects when running inside a VS Code Remote Container (Dev "
 "Container) by checking the =REMOTE_CONTAINERS= environment variable, "
@@ -10294,7 +10335,7 @@ msgstr ""
 "らず、もう関連性がないかもしれません。"
 
 #. type: paragraph in src
-#: modules/configuration.org:1460
+#: modules/configuration.org:1490
 #, no-wrap
 msgid ""
 "[custom.remote-container]\n"
@@ -10304,13 +10345,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1466
+#: modules/configuration.org:1496
 #, no-wrap
 msgid "Disabled Modules"
 msgstr "無効化されたモジュール"
 
 #. type: paragraph
-#: modules/configuration.org:1468
+#: modules/configuration.org:1498
 msgid ""
 "=gcloud= is disabled because it reads the active GCP configuration from the "
 "home directory (=~/.config/gcloud/=), causing it to appear in every "
@@ -10321,7 +10362,7 @@ msgstr ""
 "なく、すべてのリポジトリで表示されてしまいます。"
 
 #. type: paragraph in src
-#: modules/configuration.org:1473
+#: modules/configuration.org:1503
 #, no-wrap
 msgid ""
 "[gcloud]\n"
@@ -10329,13 +10370,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1477
+#: modules/configuration.org:1507
 #, no-wrap
 msgid "Async Prompt Module"
 msgstr "非同期プロンプトモジュール"
 
 #. type: paragraph
-#: modules/configuration.org:1479
+#: modules/configuration.org:1509
 #, fuzzy
 #| msgid ""
 #| "A custom home-manager module that replaces starship's default fish "
@@ -10364,13 +10405,13 @@ msgstr ""
 "さい。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1486
+#: modules/configuration.org:1516
 #, no-wrap
 msgid "starship-async-prompt-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1488
+#: modules/configuration.org:1518
 #, no-wrap
 msgid ""
 "(lib.mkIf cfg.enableFishAsyncPrompt {\n"
@@ -10378,7 +10419,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1492
+#: modules/configuration.org:1522
 #, no-wrap
 msgid ""
 "  programs.fish.interactiveShellInit = ''\n"
@@ -10391,13 +10432,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1501
+#: modules/configuration.org:1531
 #, no-wrap
 msgid "Async Prompt Script"
 msgstr "非同期プロンプトスクリプト"
 
 #. type: paragraph in src
-#: modules/configuration.org:1510
+#: modules/configuration.org:1540
 #, no-wrap
 msgid ""
 "status is-interactive\n"
@@ -10405,7 +10446,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1513
+#: modules/configuration.org:1543
 #, no-wrap
 msgid ""
 "if test -n \"$XDG_RUNTIME_DIR\"\n"
@@ -10418,7 +10459,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1522
+#: modules/configuration.org:1552
 #, no-wrap
 msgid ""
 "set -g VIRTUAL_ENV_DISABLE_PROMPT 1\n"
@@ -10428,7 +10469,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1528
+#: modules/configuration.org:1558
 #, no-wrap
 msgid ""
 "function fish_prompt\n"
@@ -10442,7 +10483,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1538
+#: modules/configuration.org:1568
 #, no-wrap
 msgid ""
 "function __starship_async_fire --on-event fish_prompt\n"
@@ -10459,7 +10500,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1550
+#: modules/configuration.org:1580
 #, no-wrap
 msgid ""
 "    set -l tmpfile \"$__starship_async_tmpdir\"/\"$fish_pid\"_fish_prompt\n"
@@ -10471,7 +10512,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1557
+#: modules/configuration.org:1587
 #, no-wrap
 msgid ""
 "function __starship_async_simple_prompt\n"
@@ -10483,7 +10524,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1564
+#: modules/configuration.org:1594
 #, no-wrap
 msgid ""
 "function __starship_async_repaint_prompt --on-signal \"$__starship_async_signal\"\n"
@@ -10492,7 +10533,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1568
+#: modules/configuration.org:1598
 #, no-wrap
 msgid ""
 "function __starship_async_cleanup --on-event fish_exit\n"
@@ -10501,19 +10542,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:1576
+#: modules/configuration.org:1606
 #, no-wrap
 msgid "Version Control"
 msgstr "バージョン管理"
 
 #. type: heading **
-#: modules/configuration.org:1578
+#: modules/configuration.org:1608
 #, no-wrap
 msgid "Git"
 msgstr "Git"
 
 #. type: paragraph
-#: modules/configuration.org:1580
+#: modules/configuration.org:1610
 msgid ""
 "Git version control configuration. Git is configured directly through home-"
 "manager's =programs.git= module, which generates =~/.config/git/config= "
@@ -10523,7 +10564,7 @@ msgstr ""
 "じて直接設定され、=~/.config/git/config= を宣言的に生成します。"
 
 #. type: paragraph
-#: modules/configuration.org:1583
+#: modules/configuration.org:1613
 msgid ""
 "Registered behind =my.programs.git.enable=. The [[*Scalar][Scalar]] "
 "performance tuning below is a second, independent toggle on the same module "
@@ -10532,7 +10573,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1593
+#: modules/configuration.org:1623
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -10552,13 +10593,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1608
+#: modules/configuration.org:1638
 #, no-wrap
 msgid "<<git-scalar-option>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1610
+#: modules/configuration.org:1640
 #, no-wrap
 msgid ""
 "config = lib.mkMerge [\n"
@@ -10568,25 +10609,25 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1615
+#: modules/configuration.org:1645
 #, no-wrap
 msgid "<<git-settings>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1617
+#: modules/configuration.org:1647
 #, no-wrap
 msgid "<<git-signing>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1619
+#: modules/configuration.org:1649
 #, no-wrap
 msgid "<<git-ignores>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1621
+#: modules/configuration.org:1651
 #, no-wrap
 msgid ""
 "  <<git-scalar>>\n"
@@ -10594,31 +10635,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1624
+#: modules/configuration.org:1654
 #, no-wrap
 msgid "<<git-gh>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1626
+#: modules/configuration.org:1656
 #, no-wrap
 msgid "<<git-delta>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1628
+#: modules/configuration.org:1658
 #, no-wrap
 msgid "<<git-difftastic>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1630
+#: modules/configuration.org:1660
 #, no-wrap
 msgid "<<git-lazygit>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1632
+#: modules/configuration.org:1662
 #, fuzzy, no-wrap
 #| msgid "Fish Abbreviations"
 msgid ""
@@ -10627,7 +10668,7 @@ msgid ""
 msgstr "Fishの略語"
 
 #. type: paragraph in src
-#: modules/configuration.org:1635
+#: modules/configuration.org:1665
 #, no-wrap
 msgid ""
 "        <<git-scalar-config>>\n"
@@ -10637,18 +10678,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:1643
+#: modules/configuration.org:1673
 msgid "Basic git behavior settings."
 msgstr "基本的なgitの動作設定です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1645
+#: modules/configuration.org:1675
 #, no-wrap
 msgid "git-settings"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1647
+#: modules/configuration.org:1677
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -10662,20 +10703,20 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1657
+#: modules/configuration.org:1687
 #, fuzzy, no-wrap
 #| msgid "User Identity"
 msgid "User Identity"
 msgstr "ユーザーID"
 
 #. type: keyword NAME
-#: modules/configuration.org:1659
+#: modules/configuration.org:1689
 #, no-wrap
 msgid "git-user-identity"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1661
+#: modules/configuration.org:1691
 #, no-wrap
 msgid ""
 "user = {\n"
@@ -10685,14 +10726,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1667
+#: modules/configuration.org:1697
 #, fuzzy, no-wrap
 #| msgid "User Identity"
 msgid "GitHub Identity"
 msgstr "ユーザーID"
 
 #. type: paragraph
-#: modules/configuration.org:1669
+#: modules/configuration.org:1699
 msgid ""
 "I read GitHub issues and notifications in Emacs through [[https://github.com/"
 "magit/forge][forge]], whose API layer =ghub= takes the account name from "
@@ -10703,25 +10744,25 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1676
+#: modules/configuration.org:1706
 #, no-wrap
 msgid "git-github-user"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1678
+#: modules/configuration.org:1708
 #, no-wrap
 msgid "github.user = \"natsukium\";"
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:1681 modules/configuration.org:3118
+#: modules/configuration.org:1711 modules/configuration.org:3148
 #, no-wrap
 msgid "Editor"
 msgstr "エディター"
 
 #. type: paragraph
-#: modules/configuration.org:1683
+#: modules/configuration.org:1713
 msgid ""
 "=core.editor = \"vim\"= is set as the fallback editor for git operations. "
 "Although the =EDITOR= environment variable is set to =nvim= in the home "
@@ -10736,36 +10777,36 @@ msgstr ""
 "す。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1688
+#: modules/configuration.org:1718
 #, no-wrap
 msgid "git-editor"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1690
+#: modules/configuration.org:1720
 #, no-wrap
 msgid "core.editor = \"vim\";"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1693
+#: modules/configuration.org:1723
 #, no-wrap
 msgid "Color"
 msgstr "カラー"
 
 #. type: paragraph
-#: modules/configuration.org:1695
+#: modules/configuration.org:1725
 msgid "Auto-detect terminal color support for all git subcommands."
 msgstr "すべてのgitサブコマンドでターミナルのカラーサポートを自動検出します。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1697
+#: modules/configuration.org:1727
 #, no-wrap
 msgid "git-color"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1699
+#: modules/configuration.org:1729
 #, no-wrap
 msgid ""
 "color = {\n"
@@ -10778,31 +10819,31 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1708
+#: modules/configuration.org:1738
 #, no-wrap
 msgid "Default Branch"
 msgstr "デフォルトブランチ"
 
 #. type: keyword NAME
-#: modules/configuration.org:1710
+#: modules/configuration.org:1740
 #, no-wrap
 msgid "git-default-branch"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1712
+#: modules/configuration.org:1742
 #, no-wrap
 msgid "init.defaultBranch = \"main\";"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1715
+#: modules/configuration.org:1745
 #, no-wrap
 msgid "Force Push Safety"
 msgstr "強制プッシュの安全対策"
 
 #. type: paragraph
-#: modules/configuration.org:1717
+#: modules/configuration.org:1747
 msgid ""
 "=push.useForceIfIncludes= enables a safety check for force pushes: git "
 "verifies that the local branch includes the remote's current tip before "
@@ -10819,25 +10860,25 @@ msgstr ""
 "=git fetch=）に検出できません。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1723
+#: modules/configuration.org:1753
 #, no-wrap
 msgid "git-push-safety"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1725
+#: modules/configuration.org:1755
 #, no-wrap
 msgid "push.useForceIfIncludes = true;"
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1728
+#: modules/configuration.org:1758
 #, no-wrap
 msgid "Commit Signing"
 msgstr "コミット署名"
 
 #. type: paragraph
-#: modules/configuration.org:1730
+#: modules/configuration.org:1760
 msgid ""
 "SSH-based commit signing. SSH keys were chosen over GPG because SSH keys are "
 "already required for push authentication, eliminating the need to manage a "
@@ -10851,7 +10892,7 @@ msgstr ""
 "合性保証を提供します。認証と署名の両方に1つの鍵ペアで対応できます。"
 
 #. type: paragraph
-#: modules/configuration.org:1735
+#: modules/configuration.org:1765
 msgid ""
 "GitHub has [[https://github.blog/changelog/2022-08-23-ssh-commit-"
 "verification-now-supported/][supported SSH commit verification since August "
@@ -10871,7 +10912,7 @@ msgstr ""
 "点がなくなりました。"
 
 #. type: paragraph
-#: modules/configuration.org:1740
+#: modules/configuration.org:1770
 msgid ""
 "In the future, migrating to a keyless solution like [[https://github.com/"
 "sigstore/gitsign][gitsign]] (Sigstore-based signing)  would further simplify "
@@ -10884,7 +10925,7 @@ msgstr ""
 "トするのを待っている状態です。"
 
 #. type: paragraph
-#: modules/configuration.org:1744
+#: modules/configuration.org:1774
 msgid ""
 "=signByDefault = true= ensures all commits are signed without requiring =git "
 "commit -S=, preventing unsigned commits from slipping through."
@@ -10893,13 +10934,13 @@ msgstr ""
 "名のコミットが紛れ込むのを防ぎます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1747
+#: modules/configuration.org:1777
 #, no-wrap
 msgid "git-signing"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1749
+#: modules/configuration.org:1779
 #, no-wrap
 msgid ""
 "signing = {\n"
@@ -10910,13 +10951,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1756
+#: modules/configuration.org:1786
 #, no-wrap
 msgid "Global Ignores"
 msgstr "グローバルIgnore"
 
 #. type: paragraph
-#: modules/configuration.org:1758
+#: modules/configuration.org:1788
 msgid ""
 "Patterns that should never be committed across all repositories. These are "
 "global ignores rather than per-repo =.gitignore= entries because they "
@@ -10927,13 +10968,13 @@ msgstr ""
 "択を反映しており、共同作業者に押し付けるべきではないためです。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1762
+#: modules/configuration.org:1792
 #, no-wrap
 msgid "git-ignores"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1764
+#: modules/configuration.org:1794
 #, no-wrap
 msgid ""
 "ignores = [\n"
@@ -10945,13 +10986,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1772
+#: modules/configuration.org:1802
 #, no-wrap
 msgid "OS Artifacts"
 msgstr "OSアーティファクト"
 
 #. type: paragraph
-#: modules/configuration.org:1774
+#: modules/configuration.org:1804
 msgid ""
 "macOS Finder metadata files. Present in the global ignore because this is a "
 "cross-platform dotfiles repository used on both Linux and macOS."
@@ -10960,30 +11001,30 @@ msgstr ""
 "ラットフォームなdotfilesリポジトリのため、グローバルignoreに含めています。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1777
+#: modules/configuration.org:1807
 #, no-wrap
 msgid "git-ignores-os"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1779
+#: modules/configuration.org:1809
 #, no-wrap
 msgid "\".DS_Store\""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1782
+#: modules/configuration.org:1812
 #, no-wrap
 msgid "Development Environment"
 msgstr "開発環境"
 
 #. type: paragraph
-#: modules/configuration.org:1784
+#: modules/configuration.org:1814
 msgid "Artifacts generated by development tools that should remain local:"
 msgstr "ローカルに留めるべき開発ツールが生成するアーティファクトです："
 
 #. type: plain list -
-#: modules/configuration.org:1788
+#: modules/configuration.org:1818
 #, no-wrap
 msgid ""
 "=.aider*= matches aider's conversation history and configuration files. These contain\n"
@@ -10993,7 +11034,7 @@ msgstr ""
 "セッション固有のコンテキストを含むため、リポジトリに漏れるべきではありません。"
 
 #. type: plain list -
-#: modules/configuration.org:1791
+#: modules/configuration.org:1821
 #, no-wrap
 msgid ""
 "=.direnv=, =.envrc=: direnv state and configuration. Each project may define its own\n"
@@ -11005,13 +11046,13 @@ msgstr ""
 "=.envrc= ファイルは自動生成されコミットすべきではありません。"
 
 #. type: plain list -
-#: modules/configuration.org:1792
+#: modules/configuration.org:1822
 #, no-wrap
 msgid "=.ipynb_checkpoints=: Jupyter Notebook autosave files."
 msgstr "=.ipynb_checkpoints=: Jupyter Notebookの自動保存ファイル。"
 
 #. type: plain list -
-#: modules/configuration.org:1794
+#: modules/configuration.org:1824
 #, no-wrap
 msgid ""
 "=.pre-commit-config.yaml=: Managed per-project by devshell environments rather than committed,\n"
@@ -11021,25 +11062,25 @@ msgstr ""
 "ツールバージョンの異なるコントリビューター間のバージョン競合を避けます。"
 
 #. type: plain list -
-#: modules/configuration.org:1795
+#: modules/configuration.org:1825
 #, no-wrap
 msgid "=.vscode/=: Editor-specific settings that vary per developer."
 msgstr "=.vscode/=: 開発者ごとに異なるエディター固有の設定。"
 
 #. type: plain list -
-#: modules/configuration.org:1796
+#: modules/configuration.org:1826
 #, no-wrap
 msgid "=__pycache__/=: Python bytecode cache, regenerated on each run."
 msgstr "=__pycache__/=: Pythonバイトコードキャッシュ。実行ごとに再生成されます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1797
+#: modules/configuration.org:1827
 #, no-wrap
 msgid "git-ignores-dev"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1799
+#: modules/configuration.org:1829
 #, no-wrap
 msgid ""
 "\".aider*\"\n"
@@ -11052,37 +11093,37 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1808
+#: modules/configuration.org:1838
 #, no-wrap
 msgid "Workflow"
 msgstr "ワークフロー"
 
 #. type: plain list -
-#: modules/configuration.org:1811
+#: modules/configuration.org:1841
 #, no-wrap
 msgid "=.worktree=: Marker file used by git worktree workflows."
 msgstr "=.worktree=: git worktreeワークフローで使用されるマーカーファイル。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1812
+#: modules/configuration.org:1842
 #, no-wrap
 msgid "git-ignores-workflow"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1814
+#: modules/configuration.org:1844
 #, no-wrap
 msgid "\".worktree\""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:1817
+#: modules/configuration.org:1847
 #, no-wrap
 msgid "Private Notes"
 msgstr "プライベートノート"
 
 #. type: paragraph
-#: modules/configuration.org:1819
+#: modules/configuration.org:1849
 msgid ""
 "=.private/= is a directory for personal notes, LLM context files, and other "
 "local-only documentation that should never be shared."
@@ -11091,25 +11132,25 @@ msgstr ""
 "ローカル専用のドキュメントのためのディレクトリです。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1822
+#: modules/configuration.org:1852
 #, no-wrap
 msgid "git-ignores-private"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1824
+#: modules/configuration.org:1854
 #, no-wrap
 msgid "\".private/\""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1827
+#: modules/configuration.org:1857
 #, no-wrap
 msgid "Scalar"
 msgstr "Scalar"
 
 #. type: paragraph
-#: modules/configuration.org:1829
+#: modules/configuration.org:1859
 msgid ""
 "[[https://git-scm.com/docs/scalar][Scalar]] optimizes git performance for "
 "large repositories. Enabled specifically for the nixpkgs repository, which "
@@ -11124,7 +11165,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: modules/configuration.org:1834
+#: modules/configuration.org:1864
 msgid ""
 "=programs.git.scalar= is a custom option this module extends git with, "
 "configuring git's built-in performance optimizations (multipack index, "
@@ -11135,13 +11176,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1840
+#: modules/configuration.org:1870
 #, no-wrap
 msgid "git-scalar-option"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1842
+#: modules/configuration.org:1872
 #, no-wrap
 msgid ""
 "options.programs.git.scalar = {\n"
@@ -11149,7 +11190,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1845
+#: modules/configuration.org:1875
 #, no-wrap
 msgid ""
 "  repo = lib.mkOption {\n"
@@ -11161,13 +11202,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1853
+#: modules/configuration.org:1883
 #, no-wrap
 msgid "git-scalar"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1855
+#: modules/configuration.org:1885
 #, no-wrap
 msgid ""
 "scalar = {\n"
@@ -11177,13 +11218,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1861
+#: modules/configuration.org:1891
 #, no-wrap
 msgid "git-scalar-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1863
+#: modules/configuration.org:1893
 #, no-wrap
 msgid ""
 "(lib.mkIf scalarCfg.enable {\n"
@@ -11246,13 +11287,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1922
+#: modules/configuration.org:1952
 #, no-wrap
 msgid "GitHub CLI"
 msgstr "GitHub CLI"
 
 #. type: paragraph
-#: modules/configuration.org:1924
+#: modules/configuration.org:1954
 #, fuzzy
 #| msgid ""
 #| "[[https://cli.github.com/][gh]] (GitHub CLI) is enabled alongside git "
@@ -11282,7 +11323,7 @@ msgstr ""
 "認証コンテキストはHTTPS経由のfetchとpushの両方をカバーします。"
 
 #. type: paragraph
-#: modules/configuration.org:1930
+#: modules/configuration.org:1960
 msgid ""
 "I used to rewrite push URLs to SSH with =url.\"git@github.com:"
 "\".pushInsteadOf=, on the theory that it was a harmless fallback for "
@@ -11296,25 +11337,25 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:1939
+#: modules/configuration.org:1969
 #, no-wrap
 msgid "git-gh"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1941
+#: modules/configuration.org:1971
 #, no-wrap
 msgid "programs.gh.enable = true;"
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1944
+#: modules/configuration.org:1974
 #, no-wrap
 msgid "Delta"
 msgstr "Delta"
 
 #. type: paragraph
-#: modules/configuration.org:1946
+#: modules/configuration.org:1976
 msgid ""
 "[[https://github.com/dandavison/delta][delta]] provides syntax-highlighted "
 "diffs in the terminal with line numbers and side-by-side view support. "
@@ -11325,13 +11366,13 @@ msgstr ""
 "リーンな視覚的表現が選定理由です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1949
+#: modules/configuration.org:1979
 #, no-wrap
 msgid "git-delta"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1951
+#: modules/configuration.org:1981
 #, no-wrap
 msgid ""
 "programs.delta = {\n"
@@ -11341,13 +11382,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1957
+#: modules/configuration.org:1987
 #, no-wrap
 msgid "Difftastic"
 msgstr "Difftastic"
 
 #. type: paragraph
-#: modules/configuration.org:1959
+#: modules/configuration.org:1989
 msgid ""
 "[[https://github.com/Wilfred/difftastic][Difftastic]] is a structural diff "
 "tool that operates at the AST level rather than comparing lines. It "
@@ -11364,7 +11405,7 @@ msgstr ""
 "します。"
 
 #. type: paragraph
-#: modules/configuration.org:1965
+#: modules/configuration.org:1995
 msgid ""
 "Both difftastic and [[*Delta][delta]] are kept because they serve "
 "complementary roles: delta enhances git's built-in line diffs with syntax "
@@ -11378,13 +11419,13 @@ msgstr ""
 "[[*Lazygit][lazygit]]経由で使用します。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1970
+#: modules/configuration.org:2000
 #, no-wrap
 msgid "git-difftastic"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1972
+#: modules/configuration.org:2002
 #, no-wrap
 msgid ""
 "programs.difftastic = {\n"
@@ -11393,13 +11434,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:1977
+#: modules/configuration.org:2007
 #, no-wrap
 msgid "Lazygit"
 msgstr "Lazygit"
 
 #. type: paragraph
-#: modules/configuration.org:1979
+#: modules/configuration.org:2009
 msgid ""
 "[[https://github.com/jesseduffield/lazygit][Lazygit]] is a terminal UI for "
 "git. A TUI was chosen over raw git commands for interactive operations like "
@@ -11417,7 +11458,7 @@ msgstr ""
 "優位性は実際には現れず、ワークフローに不可欠な操作がいくつか欠けていました。"
 
 #. type: paragraph
-#: modules/configuration.org:1985
+#: modules/configuration.org:2015
 msgid ""
 "Performance degrades noticeably on large repositories like nixpkgs, but the "
 "ergonomics and active development make it a trusted part of the workflow "
@@ -11428,13 +11469,13 @@ msgstr ""
 "部となっています。"
 
 #. type: keyword NAME
-#: modules/configuration.org:1988
+#: modules/configuration.org:2018
 #, no-wrap
 msgid "git-lazygit"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1990
+#: modules/configuration.org:2020
 #, no-wrap
 msgid ""
 "programs.lazygit = {\n"
@@ -11444,7 +11485,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:1995
+#: modules/configuration.org:2025
 #, no-wrap
 msgid ""
 "    <<lazygit-git>>\n"
@@ -11453,26 +11494,26 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2000
+#: modules/configuration.org:2030
 #, no-wrap
 msgid "GUI"
 msgstr "GUI"
 
 #. type: paragraph
-#: modules/configuration.org:2002
+#: modules/configuration.org:2032
 msgid "Enable Nerd Font icons in the lazygit interface for visual clarity."
 msgstr ""
 "視認性向上のため、lazygitのインターフェースでNerd Fontアイコンを有効にしま"
 "す。"
 
 #. type: keyword NAME
-#: modules/configuration.org:2004
+#: modules/configuration.org:2034
 #, no-wrap
 msgid "lazygit-gui"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2006
+#: modules/configuration.org:2036
 #, no-wrap
 msgid ""
 "gui = {\n"
@@ -11481,13 +11522,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2011
+#: modules/configuration.org:2041
 #, no-wrap
 msgid "Git Integration"
 msgstr "Git連携"
 
 #. type: paragraph
-#: modules/configuration.org:2013
+#: modules/configuration.org:2043
 msgid ""
 "=overrideGpg = true= tells lazygit to run git commands inline instead of "
 "spawning a subprocess for GPG/SSH signing. By default, lazygit defers to a "
@@ -11512,7 +11553,7 @@ msgstr ""
 "ンプトが不要になり、すべてのリベース操作が正常に動作します。"
 
 #. type: paragraph
-#: modules/configuration.org:2022
+#: modules/configuration.org:2052
 msgid ""
 "The pager configuration integrates both [[*Delta][delta]] and [[*Difftastic]"
 "[difftastic]] into lazygit's diff views.  Delta provides syntax-highlighted "
@@ -11527,13 +11568,13 @@ msgstr ""
 "用できます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:2027
+#: modules/configuration.org:2057
 #, no-wrap
 msgid "lazygit-git"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2029
+#: modules/configuration.org:2059
 #, no-wrap
 msgid ""
 "git = {\n"
@@ -11551,13 +11592,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2043
+#: modules/configuration.org:2073
 #, no-wrap
 msgid "Fish Abbreviations"
 msgstr "Fishの略語"
 
 #. type: paragraph
-#: modules/configuration.org:2045
+#: modules/configuration.org:2075
 msgid ""
 "Shell abbreviations for frequent git operations. Abbreviations (not aliases) "
 "are used because fish expands them inline before execution, making the "
@@ -11568,13 +11609,13 @@ msgstr ""
 "前の修正も可能になるためです。"
 
 #. type: keyword NAME
-#: modules/configuration.org:2049
+#: modules/configuration.org:2079
 #, no-wrap
 msgid "git-fish-abbreviations"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2051
+#: modules/configuration.org:2081
 #, no-wrap
 msgid ""
 "programs.fish.shellAbbrs = {\n"
@@ -11588,13 +11629,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2061
+#: modules/configuration.org:2091
 #, no-wrap
 msgid "Push"
 msgstr "Push"
 
 #. type: paragraph
-#: modules/configuration.org:2063
+#: modules/configuration.org:2093
 msgid ""
 "Force push with lease — safer than =--force= as it prevents overwriting "
 "remote changes not yet fetched."
@@ -11603,25 +11644,25 @@ msgstr ""
 "ぐため、=--force= よりも安全です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:2066
+#: modules/configuration.org:2096
 #, no-wrap
 msgid "git-abbr-push"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2068
+#: modules/configuration.org:2098
 #, no-wrap
 msgid "gpf = \"git push --force-with-lease\";"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2071
+#: modules/configuration.org:2101
 #, no-wrap
 msgid "Pull"
 msgstr "Pull"
 
 #. type: paragraph
-#: modules/configuration.org:2073
+#: modules/configuration.org:2103
 msgid ""
 "=gpm= pulls from the remote's default branch, dynamically detected via =git "
 "remote show= rather than hardcoding =main= or =master=. This handles "
@@ -11632,7 +11673,7 @@ msgstr ""
 "=master= や他のブランチ命名規約を使用するリポジトリにも対応できます。"
 
 #. type: paragraph
-#: modules/configuration.org:2077
+#: modules/configuration.org:2107
 msgid ""
 "=gpu= pulls from upstream — used in fork workflows to sync with the original "
 "repository."
@@ -11641,13 +11682,13 @@ msgstr ""
 "と同期するために使用されます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:2079
+#: modules/configuration.org:2109
 #, no-wrap
 msgid "git-abbr-pull"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2081
+#: modules/configuration.org:2111
 #, no-wrap
 msgid ""
 "gpm = \"git pull (git remote show origin | sed -n '/HEAD branch/s/.*: //p')\";\n"
@@ -11655,13 +11696,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2085
+#: modules/configuration.org:2115
 #, no-wrap
 msgid "Commit"
 msgstr "Commit"
 
 #. type: paragraph
-#: modules/configuration.org:2087
+#: modules/configuration.org:2117
 msgid ""
 "=gci= creates a commit. The trailing space allows directly appending =-m "
 "\"message\"=."
@@ -11670,7 +11711,7 @@ msgstr ""
 "加できます。"
 
 #. type: paragraph
-#: modules/configuration.org:2089
+#: modules/configuration.org:2119
 msgid ""
 "=gca= amends the last commit, frequently used during interactive rebase "
 "workflows."
@@ -11679,13 +11720,13 @@ msgstr ""
 "繁に使用されます。"
 
 #. type: keyword NAME
-#: modules/configuration.org:2091
+#: modules/configuration.org:2121
 #, no-wrap
 msgid "git-abbr-commit"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2093
+#: modules/configuration.org:2123
 #, no-wrap
 msgid ""
 "gci = \"git commit \";\n"
@@ -11693,37 +11734,37 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2097
+#: modules/configuration.org:2127
 #, no-wrap
 msgid "Status"
 msgstr "Status"
 
 #. type: keyword NAME
-#: modules/configuration.org:2099
+#: modules/configuration.org:2129
 #, no-wrap
 msgid "git-abbr-status"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2101
+#: modules/configuration.org:2131
 #, no-wrap
 msgid "gs = \"git status\";"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2104
+#: modules/configuration.org:2134
 #, no-wrap
 msgid "Stash"
 msgstr "Stash"
 
 #. type: keyword NAME
-#: modules/configuration.org:2106
+#: modules/configuration.org:2136
 #, no-wrap
 msgid "git-abbr-stash"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2108
+#: modules/configuration.org:2138
 #, no-wrap
 msgid ""
 "gst = \"git stash\";\n"
@@ -11731,19 +11772,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2112
+#: modules/configuration.org:2142
 #, no-wrap
 msgid "Switch"
 msgstr "Switch"
 
 #. type: keyword NAME
-#: modules/configuration.org:2114
+#: modules/configuration.org:2144
 #, no-wrap
 msgid "git-abbr-switch"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2116
+#: modules/configuration.org:2146
 #, no-wrap
 msgid ""
 "gsw = \"git switch\";\n"
@@ -11751,20 +11792,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:2120
+#: modules/configuration.org:2150
 #, fuzzy, no-wrap
 #| msgid "Git Integration"
 msgid "Continuous Integration"
 msgstr "Git連携"
 
 #. type: heading **
-#: modules/configuration.org:2122
+#: modules/configuration.org:2152
 #, no-wrap
 msgid "Forgejo Actions Runner"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2124
+#: modules/configuration.org:2154
 msgid ""
 "My Forgejo instance dispatches Actions jobs to registered runners. Linux "
 "hosts use nixpkgs' =services.gitea-actions-runner=; macOS has no such "
@@ -11773,7 +11814,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2129
+#: modules/configuration.org:2159
 msgid ""
 "I split this into three modules. The nix-darwin mechanism is neutral, so I "
 "publish it as =flake.darwinModules.forgejo-runner= via [[file:exports.nix]"
@@ -11784,7 +11825,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2141
+#: modules/configuration.org:2171
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -11793,7 +11834,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2145
+#: modules/configuration.org:2175
 #, no-wrap
 msgid ""
 "  <<forgejo-runner-wrappers>>\n"
@@ -11805,13 +11846,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2153
+#: modules/configuration.org:2183
 #, no-wrap
 msgid "nix-darwin module"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2155
+#: modules/configuration.org:2185
 msgid ""
 "This module carries nothing personal — just =services.forgejo-runner=, "
 "mirroring the instance schema of nixpkgs' =services.gitea-actions-runner= "
@@ -11822,7 +11863,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2168
+#: modules/configuration.org:2198
 #, no-wrap
 msgid ""
 "{\n"
@@ -11837,13 +11878,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2178
+#: modules/configuration.org:2208
 #, no-wrap
 msgid "<<forgejo-runner-instance-submodule>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2180
+#: modules/configuration.org:2210
 #, no-wrap
 msgid ""
 "  enabledInstances = lib.filterAttrs (_: i: i.enable) cfg.instances;\n"
@@ -11853,7 +11894,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2185
+#: modules/configuration.org:2215
 #, no-wrap
 msgid ""
 "  <<forgejo-runner-darwin-config>>\n"
@@ -11861,14 +11902,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2189
+#: modules/configuration.org:2219
 #, fuzzy, no-wrap
 #| msgid "Extra Options"
 msgid "Instance options"
 msgstr "追加オプション"
 
 #. type: paragraph
-#: modules/configuration.org:2191
+#: modules/configuration.org:2221
 msgid ""
 "An instance carries its registration details and the tools its jobs need on "
 "=PATH=. Exactly one of =token= or =tokenFile= supplies the token, matching "
@@ -11877,13 +11918,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2196
+#: modules/configuration.org:2226
 #, no-wrap
 msgid "forgejo-runner-instance-submodule"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2198
+#: modules/configuration.org:2228
 #, no-wrap
 msgid ""
 "instanceModule =\n"
@@ -11894,7 +11935,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2204
+#: modules/configuration.org:2234
 #, no-wrap
 msgid ""
 "name = lib.mkOption {\n"
@@ -11906,7 +11947,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2211
+#: modules/configuration.org:2241
 #, no-wrap
 msgid ""
 "url = lib.mkOption {\n"
@@ -11917,7 +11958,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2217
+#: modules/configuration.org:2247
 #, no-wrap
 msgid ""
 "token = lib.mkOption {\n"
@@ -11932,7 +11973,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2227
+#: modules/configuration.org:2257
 #, no-wrap
 msgid ""
 "tokenFile = lib.mkOption {\n"
@@ -11949,7 +11990,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2239
+#: modules/configuration.org:2269
 #, no-wrap
 msgid ""
 "labels = lib.mkOption {\n"
@@ -11960,7 +12001,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2245
+#: modules/configuration.org:2275
 #, no-wrap
 msgid ""
 "settings = lib.mkOption {\n"
@@ -11974,7 +12015,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2254
+#: modules/configuration.org:2284
 #, no-wrap
 msgid ""
 "hostPackages = lib.mkOption {\n"
@@ -12000,7 +12041,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2275
+#: modules/configuration.org:2305
 #, no-wrap
 msgid ""
 "    stateDir = lib.mkOption {\n"
@@ -12014,14 +12055,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2285
+#: modules/configuration.org:2315
 #, fuzzy, no-wrap
 #| msgid "Modules"
 msgid "Module options"
 msgstr "モジュール"
 
 #. type: paragraph
-#: modules/configuration.org:2287
+#: modules/configuration.org:2317
 msgid ""
 "The daemons run as a dedicated unprivileged user, not root: a root daemon is "
 "a trusted-user client of the nix daemon, whose post-build-hook push path the "
@@ -12031,13 +12072,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2293
+#: modules/configuration.org:2323
 #, no-wrap
 msgid "forgejo-runner-darwin-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2295
+#: modules/configuration.org:2325
 #, no-wrap
 msgid ""
 "options.services.forgejo-runner = {\n"
@@ -12045,7 +12086,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2298
+#: modules/configuration.org:2328
 #, no-wrap
 msgid ""
 "user = lib.mkOption {\n"
@@ -12056,7 +12097,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2304
+#: modules/configuration.org:2334
 #, no-wrap
 msgid ""
 "group = lib.mkOption {\n"
@@ -12067,7 +12108,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2310
+#: modules/configuration.org:2340
 #, no-wrap
 msgid ""
 "uid = lib.mkOption {\n"
@@ -12078,7 +12119,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2316
+#: modules/configuration.org:2346
 #, no-wrap
 msgid ""
 "gid = lib.mkOption {\n"
@@ -12089,7 +12130,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2322
+#: modules/configuration.org:2352
 #, no-wrap
 msgid ""
 "  instances = lib.mkOption {\n"
@@ -12101,13 +12142,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2332
+#: modules/configuration.org:2362
 #, no-wrap
 msgid "forgejo-runner-darwin-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2334
+#: modules/configuration.org:2364
 #, no-wrap
 msgid ""
 "config = lib.mkIf (enabledInstances != { }) {\n"
@@ -12118,19 +12159,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2340
+#: modules/configuration.org:2370
 #, no-wrap
 msgid "<<forgejo-runner-daemons>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2342
+#: modules/configuration.org:2372
 #, no-wrap
 msgid "<<forgejo-runner-user>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2344
+#: modules/configuration.org:2374
 #, no-wrap
 msgid ""
 "  <<forgejo-runner-ownership>>\n"
@@ -12138,13 +12179,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *****
-#: modules/configuration.org:2348
+#: modules/configuration.org:2378
 #, no-wrap
 msgid "Launchd daemons"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2350
+#: modules/configuration.org:2380
 msgid ""
 "One launchd job per enabled instance. launchd has no =EnvironmentFile=, so a "
 "=tokenFile= instance sources it in-script while an inline =token= rides on "
@@ -12154,7 +12195,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: modules/configuration.org:2359
+#: modules/configuration.org:2389
 #, no-wrap
 msgid ""
 "=WorkingDirectory= cannot be the state directory: launchd chdir()s into it\n"
@@ -12163,7 +12204,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: modules/configuration.org:2363
+#: modules/configuration.org:2393
 #, no-wrap
 msgid ""
 "The logs live in the user-owned state directory, not =/var/log=: launchd\n"
@@ -12173,13 +12214,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2364
+#: modules/configuration.org:2394
 #, no-wrap
 msgid "forgejo-runner-daemons"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2366
+#: modules/configuration.org:2396
 #, no-wrap
 msgid ""
 "launchd.daemons = lib.mapAttrs' (\n"
@@ -12202,7 +12243,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2384
+#: modules/configuration.org:2414
 #, no-wrap
 msgid ""
 "if [ ! -f .runner ] || [ \"$(cat .registration-state 2>/dev/null)\" != \"$state\" ]; then\n"
@@ -12219,7 +12260,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2396
+#: modules/configuration.org:2426
 #, no-wrap
 msgid ""
 "      exec ${lib.getExe cfg.package} daemon --config ${configFile}\n"
@@ -12245,20 +12286,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *****
-#: modules/configuration.org:2418
+#: modules/configuration.org:2448
 #, no-wrap
 msgid "Runner user"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2420
+#: modules/configuration.org:2450
 msgid ""
 "nix-darwin only manages accounts listed in =users.knownUsers= / "
 "=users.knownGroups=, so I add the entries."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2423
+#: modules/configuration.org:2453
 msgid ""
 "I leave =createHome= off: it runs =createhomedir=, which resolves the =/var= "
 "firmlink and records the home as =/private/var/…=, then nix-darwin string-"
@@ -12268,13 +12309,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2429
+#: modules/configuration.org:2459
 #, no-wrap
 msgid "forgejo-runner-user"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2431
+#: modules/configuration.org:2461
 #, no-wrap
 msgid ""
 "users.users.${cfg.user} = {\n"
@@ -12289,14 +12330,14 @@ msgid ""
 msgstr ""
 
 #. type: heading *****
-#: modules/configuration.org:2442
+#: modules/configuration.org:2472
 #, fuzzy, no-wrap
 #| msgid "Starship"
 msgid "State ownership"
 msgstr "Starship"
 
 #. type: paragraph
-#: modules/configuration.org:2444
+#: modules/configuration.org:2474
 msgid ""
 "Each state directory must exist and belong to the runner user before its "
 "daemon starts. With =createHome= off nothing else creates it, so activation "
@@ -12304,13 +12345,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2448
+#: modules/configuration.org:2478
 #, no-wrap
 msgid "forgejo-runner-ownership"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2450
+#: modules/configuration.org:2480
 #, no-wrap
 msgid ""
 "system.activationScripts.launchd.text = lib.mkBefore (\n"
@@ -12322,13 +12363,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2458
+#: modules/configuration.org:2488
 #, no-wrap
 msgid "Opinionated wrappers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2460
+#: modules/configuration.org:2490
 msgid ""
 "The two platforms drive different options — =services.forgejo-runner= on "
 "Darwin, =services.gitea-actions-runner= on NixOS — but since the nix-darwin "
@@ -12343,13 +12384,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2470
+#: modules/configuration.org:2500
 #, no-wrap
 msgid "forgejo-runner-wrapper-shared"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2472
+#: modules/configuration.org:2502
 #, no-wrap
 msgid ""
 "wrapperOptions =\n"
@@ -12360,7 +12401,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2478
+#: modules/configuration.org:2508
 #, no-wrap
 msgid ""
 "url = lib.mkOption {\n"
@@ -12371,7 +12412,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2484
+#: modules/configuration.org:2514
 #, no-wrap
 msgid ""
 "tokenFile = lib.mkOption {\n"
@@ -12385,7 +12426,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2493
+#: modules/configuration.org:2523
 #, no-wrap
 msgid ""
 "    labels = lib.mkOption {\n"
@@ -12397,7 +12438,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2500
+#: modules/configuration.org:2530
 #, no-wrap
 msgid ""
 "mkInstance = config: hostPackages: {\n"
@@ -12411,13 +12452,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2510
+#: modules/configuration.org:2540
 #, no-wrap
 msgid "forgejo-runner-wrappers"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2512
+#: modules/configuration.org:2542
 #, no-wrap
 msgid ""
 "darwinWrapper =\n"
@@ -12436,7 +12477,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2526
+#: modules/configuration.org:2556
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.services.forgejo-runner.enable {\n"
@@ -12447,7 +12488,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2532
+#: modules/configuration.org:2562
 #, no-wrap
 msgid ""
 "    services.forgejo-runner.instances.default = mkInstance config (\n"
@@ -12467,7 +12508,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2547
+#: modules/configuration.org:2577
 #, no-wrap
 msgid ""
 "nixosWrapper =\n"
@@ -12483,7 +12524,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2558
+#: modules/configuration.org:2588
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.services.forgejo-runner.enable {\n"
@@ -12494,7 +12535,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2564
+#: modules/configuration.org:2594
 #, no-wrap
 msgid ""
 "services.gitea-actions-runner = {\n"
@@ -12515,7 +12556,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2580
+#: modules/configuration.org:2610
 #, no-wrap
 msgid ""
 "    virtualisation.docker.enable = true;\n"
@@ -12524,14 +12565,14 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:2585
+#: modules/configuration.org:2615
 #, fuzzy, no-wrap
 #| msgid "Device"
 msgid "Devices"
 msgstr "デバイス"
 
 #. type: paragraph
-#: modules/configuration.org:2587
+#: modules/configuration.org:2617
 msgid ""
 "Peripherals that move between machines belong here, not in =hardware-"
 "configuration=, which describes a host's fixed internals. Each device is a "
@@ -12541,19 +12582,19 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2593
+#: modules/configuration.org:2623
 #, no-wrap
 msgid "Audio"
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2595
+#: modules/configuration.org:2625
 #, no-wrap
 msgid "AT2040 microphone"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2597
+#: modules/configuration.org:2627
 msgid ""
 "The AT2040 is a USB microphone that also exposes a headphone output. "
 "WirePlumber gives that output a higher default priority (1109) than the HDMI "
@@ -12564,7 +12605,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2604
+#: modules/configuration.org:2634
 msgid ""
 "The rule matches on =alsa.card_name= rather than the serial-bearing "
 "=node.name=, so it survives re-plugging and would apply to a replacement "
@@ -12572,7 +12613,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2613
+#: modules/configuration.org:2643
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -12592,7 +12633,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2629
+#: modules/configuration.org:2659
 #, no-wrap
 msgid ""
 "      config = lib.mkIf cfg.audio.at2040.enable {\n"
@@ -12618,20 +12659,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:2651
+#: modules/configuration.org:2681
 #, fuzzy, no-wrap
 #| msgid "Documentation"
 msgid "Authentication"
 msgstr "ドキュメント"
 
 #. type: heading **
-#: modules/configuration.org:2653
+#: modules/configuration.org:2683
 #, no-wrap
 msgid "Ente Auth"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2655
+#: modules/configuration.org:2685
 msgid ""
 "[[https://ente.io/auth/][Ente Auth]] holds my TOTP secrets and syncs them "
 "with end-to-end encryption between Android and every machine here, so a lost "
@@ -12641,7 +12682,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2661
+#: modules/configuration.org:2691
 msgid ""
 "Before this I used Google Authenticator and then Microsoft Authenticator, "
 "out of inertia more than choice. Neither could hand its secrets to a new "
@@ -12650,7 +12691,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2665
+#: modules/configuration.org:2695
 msgid ""
 "A password manager would solve the sync problem too (Bitwarden sells TOTP on "
 "a paid plan, and a self-hosted Vaultwarden gives it away), but I keep the "
@@ -12660,7 +12701,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2671
+#: modules/configuration.org:2701
 msgid ""
 "nixpkgs builds =ente-auth= for Linux only. The app is written in Flutter, "
 "and the Flutter tooling in nixpkgs can only produce Linux desktop bundles; a "
@@ -12669,7 +12710,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2682
+#: modules/configuration.org:2712
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -12697,7 +12738,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2707
+#: modules/configuration.org:2737
 #, no-wrap
 msgid ""
 "      config = lib.mkIf cfg.enable {\n"
@@ -12708,13 +12749,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:2714
+#: modules/configuration.org:2744
 #, no-wrap
 msgid "Browser"
 msgstr "ブラウザー"
 
 #. type: paragraph
-#: modules/configuration.org:2716
+#: modules/configuration.org:2746
 msgid ""
 "Compared with Chromium, Firefox lets me declare far more of its "
 "configuration (search engines and extensions, to name two), and that plays "
@@ -12725,7 +12766,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2722
+#: modules/configuration.org:2752
 msgid ""
 "For about a year and a half that Firefox was [[https://zen-browser.app/][Zen "
 "Browser]], a fork with better UI/UX, though I always had some reservations "
@@ -12734,7 +12775,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:2729
+#: modules/configuration.org:2759
 #, no-wrap
 msgid ""
 "Vertical tabs ([[https://www.firefox.com/en-US/firefox/136.0/releasenotes/][Firefox 136]]). I keep a hundred tabs open at all times, so a\n"
@@ -12742,7 +12783,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:2731
+#: modules/configuration.org:2761
 #, no-wrap
 msgid ""
 "Configurable keyboard shortcuts ([[https://www.firefox.com/en-US/firefox/147.0/releasenotes/][Firefox 147]]). Firefox finally lets me rebind\n"
@@ -12750,7 +12791,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 3.
-#: modules/configuration.org:2733
+#: modules/configuration.org:2763
 #, no-wrap
 msgid ""
 "Split view ([[https://www.firefox.com/en-US/firefox/149.0/releasenotes/][Firefox 149]]). Not an everyday feature, but comparing two pages\n"
@@ -12758,13 +12799,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2734
+#: modules/configuration.org:2764
 msgid ""
 "What I liked about Zen beyond that turned out to need nothing more than CSS:"
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:2738
+#: modules/configuration.org:2768
 #, no-wrap
 msgid ""
 "[[https://docs.zen-browser.app/user-manual/compact-mode][Compact mode]]. A browser, like almost every program, has no need for bars;\n"
@@ -12772,7 +12813,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:2743
+#: modules/configuration.org:2773
 #, no-wrap
 msgid ""
 "[[https://docs.zen-browser.app/user-manual/urlbar][Floating URL bar]]. Zen's URL bar searches like any other, but the input\n"
@@ -12783,7 +12824,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2744
+#: modules/configuration.org:2774
 msgid ""
 "Neither needs a fork; a =userChrome.css= theme is enough. With [[https://"
 "github.com/reizumii/parfait][parfait]] I get everything I wanted from Zen on "
@@ -12793,7 +12834,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2748
+#: modules/configuration.org:2778
 msgid ""
 "With the UI gap closed, what remains are my reservations: Zen's stability, "
 "its prospects as a project, and how well it is maintained in nixpkgs. So I "
@@ -12802,7 +12843,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2759
+#: modules/configuration.org:2789
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -12815,7 +12856,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2767
+#: modules/configuration.org:2797
 #, fuzzy, no-wrap
 #| msgid "home-manager"
 msgid ""
@@ -12824,13 +12865,13 @@ msgid ""
 msgstr "home-manager"
 
 #. type: heading **
-#: modules/configuration.org:2771
+#: modules/configuration.org:2801
 #, no-wrap
 msgid "Firefox"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2773
+#: modules/configuration.org:2803
 msgid ""
 "Stock Firefox is dressed in parfait, a chrome theme written entirely in "
 "=userChrome.css= (no extension, no =userChrome.js= loader), so it lives "
@@ -12838,13 +12879,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2777
+#: modules/configuration.org:2807
 #, no-wrap
 msgid "firefox-parfait-source"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2780
+#: modules/configuration.org:2810
 #, no-wrap
 msgid ""
 "version = \"0.19\";\n"
@@ -12857,7 +12898,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2789
+#: modules/configuration.org:2819
 msgid ""
 "On Linux, home-manager still defaults the profile directory to =~/.mozilla/"
 "firefox= for =home.stateVersion= below 26.05 and warns on every evaluation "
@@ -12865,13 +12906,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2793
+#: modules/configuration.org:2823
 #, no-wrap
 msgid "firefox-module"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2795
+#: modules/configuration.org:2825
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.firefox =\n"
@@ -12892,7 +12933,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2811
+#: modules/configuration.org:2841
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -12905,7 +12946,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2819
+#: modules/configuration.org:2849
 #, no-wrap
 msgid ""
 "    <<firefox-settings>>\n"
@@ -12914,7 +12955,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2823
+#: modules/configuration.org:2853
 #, no-wrap
 msgid ""
 "    <<firefox-parfait-tree>>\n"
@@ -12923,13 +12964,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2828 modules/configuration.org:2944
+#: modules/configuration.org:2858 modules/configuration.org:2974
 #, no-wrap
 msgid "Settings"
 msgstr "設定"
 
 #. type: paragraph
-#: modules/configuration.org:2830
+#: modules/configuration.org:2860
 msgid ""
 "=extensions.autoDisableScopes= is 0 in both profiles: by default Firefox "
 "asks for confirmation of each extension the profile installs, so the first "
@@ -12937,13 +12978,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2834
+#: modules/configuration.org:2864
 msgid ""
 "I keep my passwords in Bitwarden, so I turn off =signon.rememberSignons=."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2836
+#: modules/configuration.org:2866
 msgid ""
 "parfait ships its defaults in a =user.js= that its install instructions tell "
 "you to copy into the profile. home-manager generates =user.js= itself from "
@@ -12954,7 +12995,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2842
+#: modules/configuration.org:2872
 msgid ""
 "Four values depart from that baseline. =sidebar.verticalTabs= and "
 "=sidebar.visibility= are Firefox's own preferences, and the =hide-sidebar= "
@@ -12966,14 +13007,14 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2849
+#: modules/configuration.org:2879
 #, fuzzy, no-wrap
 #| msgid "Core Settings"
 msgid "firefox-settings"
 msgstr "コア設定"
 
 #. type: paragraph in src
-#: modules/configuration.org:2851 modules/configuration.org:2951
+#: modules/configuration.org:2881 modules/configuration.org:2981
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -12981,7 +13022,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2856
+#: modules/configuration.org:2886
 #, no-wrap
 msgid ""
 "\"toolkit.legacyUserProfileCustomizations.stylesheets\" = true;\n"
@@ -12989,7 +13030,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2859
+#: modules/configuration.org:2889
 #, no-wrap
 msgid ""
 "\"sidebar.verticalTabs\" = true;\n"
@@ -12997,7 +13038,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2862
+#: modules/configuration.org:2892
 #, no-wrap
 msgid ""
 "\"browser.translations.automaticallyPopup\" = false;\n"
@@ -13006,7 +13047,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2866
+#: modules/configuration.org:2896
 #, no-wrap
 msgid ""
 "  \"parfait.animations.enabled\" = true;\n"
@@ -13033,13 +13074,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2889
+#: modules/configuration.org:2919
 #, no-wrap
 msgid "Theme files"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2891
+#: modules/configuration.org:2921
 msgid ""
 "parfait's repository is already shaped like a profile's =chrome/= directory, "
 "so the whole tree is linked in as-is. =profilesPath= is an internal option, "
@@ -13048,32 +13089,32 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2896
+#: modules/configuration.org:2926
 #, no-wrap
 msgid "firefox-parfait-tree"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2898
+#: modules/configuration.org:2928
 #, no-wrap
 msgid "home.file.\"${config.programs.firefox.profilesPath}/natsukium/chrome\".source = parfait;"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2901
+#: modules/configuration.org:2931
 #, no-wrap
 msgid "Zen Browser"
 msgstr "Zen Browser"
 
 #. type: paragraph
-#: modules/configuration.org:2903
+#: modules/configuration.org:2933
 msgid ""
 "Zen ships its own home-manager module in its flake, so mine only imports it "
 "and fills in the shared profile pieces."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2906
+#: modules/configuration.org:2936
 msgid ""
 "It never got along with Nix on darwin: with home-manager managing its "
 "profiles, launch kept ending in an error loop at the profile chooser, and "
@@ -13081,13 +13122,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2910
+#: modules/configuration.org:2940
 #, no-wrap
 msgid "zen-browser-module"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2912
+#: modules/configuration.org:2942
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.\"zen-browser\" =\n"
@@ -13106,7 +13147,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2926
+#: modules/configuration.org:2956
 #, no-wrap
 msgid ""
 "options.my.programs.zen-browser = {\n"
@@ -13115,7 +13156,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2930
+#: modules/configuration.org:2960
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -13127,7 +13168,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2937
+#: modules/configuration.org:2967
 #, no-wrap
 msgid ""
 "        <<zen-browser-settings>>\n"
@@ -13138,20 +13179,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2946
+#: modules/configuration.org:2976
 msgid ""
 "Zen is a Firefox fork, so the preferences that are not about parfait carry "
 "over unchanged, for the reasons given in the Firefox profile."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2949
+#: modules/configuration.org:2979
 #, no-wrap
 msgid "zen-browser-settings"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2954
+#: modules/configuration.org:2984
 #, no-wrap
 msgid ""
 "  \"browser.translations.automaticallyPopup\" = false;\n"
@@ -13161,13 +13202,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:2960
+#: modules/configuration.org:2990
 #, no-wrap
 msgid "Search Engines"
 msgstr "検索エンジン"
 
 #. type: paragraph
-#: modules/configuration.org:2962
+#: modules/configuration.org:2992
 #, fuzzy
 #| msgid ""
 #| "Custom search engines for quick access to development-related package "
@@ -13185,7 +13226,7 @@ msgstr ""
 "おり、アドレスバーで使用でき、各サイトに手動で移動する必要がなくなります。"
 
 #. type: paragraph in src
-#: modules/configuration.org:2973
+#: modules/configuration.org:3003
 #, no-wrap
 msgid ""
 "{ pkgs }:\n"
@@ -13196,31 +13237,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2979
+#: modules/configuration.org:3009
 #, no-wrap
 msgid "<<browser-search-engine-nixos-wiki>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2981
+#: modules/configuration.org:3011
 #, no-wrap
 msgid "<<browser-search-engine-noogle>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2983
+#: modules/configuration.org:3013
 #, no-wrap
 msgid "<<browser-search-engine-crates-io>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2985
+#: modules/configuration.org:3015
 #, no-wrap
 msgid "<<browser-search-engine-npm>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2987
+#: modules/configuration.org:3017
 #, no-wrap
 msgid ""
 "    <<browser-search-engine-pypi>>\n"
@@ -13229,26 +13270,26 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2992
+#: modules/configuration.org:3022
 #, no-wrap
 msgid "Nix Packages"
 msgstr "Nixパッケージ"
 
 #. type: paragraph
-#: modules/configuration.org:2994
+#: modules/configuration.org:3024
 msgid ""
 "The icon comes from =nixos-icons= in nixpkgs rather than an external URL "
 "that could move or vanish."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2997
+#: modules/configuration.org:3027
 #, no-wrap
 msgid "browser-search-engine-nix-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2999
+#: modules/configuration.org:3029
 #, no-wrap
 msgid ""
 "nix-packages = {\n"
@@ -13271,7 +13312,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3017
+#: modules/configuration.org:3047
 #, no-wrap
 msgid ""
 "  icon = \"${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg\";\n"
@@ -13280,19 +13321,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3022
+#: modules/configuration.org:3052
 #, no-wrap
 msgid "NixOS Wiki"
 msgstr "NixOS Wiki"
 
 #. type: keyword NAME
-#: modules/configuration.org:3024
+#: modules/configuration.org:3054
 #, no-wrap
 msgid "browser-search-engine-nixos-wiki"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3026
+#: modules/configuration.org:3056
 #, no-wrap
 msgid ""
 "nixos-wiki = {\n"
@@ -13304,13 +13345,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3034
+#: modules/configuration.org:3064
 #, no-wrap
 msgid "noogle"
 msgstr "noogle"
 
 #. type: paragraph
-#: modules/configuration.org:3036
+#: modules/configuration.org:3066
 #, fuzzy
 #| msgid ""
 #| "[[https://noogle.dev/][noogle]] is a Nix function search engine — the "
@@ -13325,13 +13366,13 @@ msgstr ""
 "るのに便利です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:3038
+#: modules/configuration.org:3068
 #, no-wrap
 msgid "browser-search-engine-noogle"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3040
+#: modules/configuration.org:3070
 #, no-wrap
 msgid ""
 "noogle = {\n"
@@ -13343,19 +13384,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3048
+#: modules/configuration.org:3078
 #, no-wrap
 msgid "crates.io"
 msgstr "crates.io"
 
 #. type: keyword NAME
-#: modules/configuration.org:3050
+#: modules/configuration.org:3080
 #, no-wrap
 msgid "browser-search-engine-crates-io"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3052
+#: modules/configuration.org:3082
 #, no-wrap
 msgid ""
 "crates-io = {\n"
@@ -13367,19 +13408,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3060
+#: modules/configuration.org:3090
 #, no-wrap
 msgid "npm"
 msgstr "npm"
 
 #. type: keyword NAME
-#: modules/configuration.org:3062
+#: modules/configuration.org:3092
 #, no-wrap
 msgid "browser-search-engine-npm"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3064
+#: modules/configuration.org:3094
 #, no-wrap
 msgid ""
 "npm = {\n"
@@ -13391,19 +13432,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3072
+#: modules/configuration.org:3102
 #, no-wrap
 msgid "PyPI"
 msgstr "PyPI"
 
 #. type: keyword NAME
-#: modules/configuration.org:3074
+#: modules/configuration.org:3104
 #, no-wrap
 msgid "browser-search-engine-pypi"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3076
+#: modules/configuration.org:3106
 #, no-wrap
 msgid ""
 "pypi = {\n"
@@ -13415,13 +13456,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3084
+#: modules/configuration.org:3114
 #, no-wrap
 msgid "Extensions"
 msgstr "拡張機能"
 
 #. type: paragraph
-#: modules/configuration.org:3086
+#: modules/configuration.org:3116
 #, fuzzy
 #| msgid ""
 #| "Browser extensions managed declaratively. Extensions are sourced from two "
@@ -13438,7 +13479,7 @@ msgstr ""
 "と =my-firefox-addons=（アップストリームにないカスタムの追加）です。"
 
 #. type: paragraph in src
-#: modules/configuration.org:3096
+#: modules/configuration.org:3126
 #, no-wrap
 msgid ""
 "{ pkgs }:\n"
@@ -13464,20 +13505,20 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3120
+#: modules/configuration.org:3150
 #, no-wrap
 msgid "Neovim"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3122
+#: modules/configuration.org:3152
 msgid ""
 "Neovim is the editor I spend the most time in, primarily for coding — though "
 "the gravitational pull of =org-mode= is slowly dragging me over to Emacs."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3126
+#: modules/configuration.org:3156
 msgid ""
 "Everything Neovim-related lives under =features/neovim/=: the wrapped "
 "derivation (=package.nix=) and the lua configuration. The flake-parts module "
@@ -13485,7 +13526,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:3132
+#: modules/configuration.org:3162
 #, no-wrap
 msgid ""
 "=perSystem.packages.neovim= makes =nix run .#neovim= work on every\n"
@@ -13493,7 +13534,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:3137
+#: modules/configuration.org:3167
 #, no-wrap
 msgid ""
 "=flake.modules.homeManager.neovim= registers the module in the\n"
@@ -13504,7 +13545,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3139
+#: modules/configuration.org:3169
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -13521,7 +13562,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3151
+#: modules/configuration.org:3181
 #, no-wrap
 msgid ""
 "  config = lib.mkIf config.my.programs.neovim.enable {\n"
@@ -13535,7 +13576,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3160
+#: modules/configuration.org:3190
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -13547,13 +13588,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3168
+#: modules/configuration.org:3198
 #, no-wrap
 msgid "Emacs"
 msgstr "Emacs"
 
 #. type: paragraph
-#: modules/configuration.org:3170
+#: modules/configuration.org:3200
 msgid ""
 "Emacs has been my second-most-used editor since early 2026. The draw is =org-"
 "mode= — the workflows built around =org-capture= and =org-agenda= are slowly "
@@ -13563,14 +13604,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3176
+#: modules/configuration.org:3206
 msgid ""
 "The feature lives alongside Neovim under =features/emacs/= and pulls the "
 "same double duty:"
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:3183
+#: modules/configuration.org:3213
 #, no-wrap
 msgid ""
 "=perSystem.packages.emacs= exposes a wrapped emacs as a flake\n"
@@ -13580,7 +13621,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:3189
+#: modules/configuration.org:3219
 #, no-wrap
 msgid ""
 "=flake.modules.homeManager.emacs= registers the module in the internal\n"
@@ -13592,7 +13633,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3192
+#: modules/configuration.org:3222
 #, no-wrap
 msgid ""
 "{ lib, inputs, ... }:\n"
@@ -13601,7 +13642,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3196
+#: modules/configuration.org:3226
 #, no-wrap
 msgid ""
 "emacsUnwrapped =\n"
@@ -13613,7 +13654,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3206
+#: modules/configuration.org:3236
 #, no-wrap
 msgid ""
 "tangle =\n"
@@ -13633,7 +13674,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3221
+#: modules/configuration.org:3251
 #, no-wrap
 msgid ""
 "tangleEl =\n"
@@ -13648,7 +13689,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3231
+#: modules/configuration.org:3261
 #, no-wrap
 msgid ""
 "  mkEmacs =\n"
@@ -13674,7 +13715,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3252
+#: modules/configuration.org:3282
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.emacs.enable {\n"
@@ -13685,7 +13726,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3258
+#: modules/configuration.org:3288
 #, no-wrap
 msgid ""
 "services.emacs = {\n"
@@ -13695,13 +13736,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3263
+#: modules/configuration.org:3293
 #, no-wrap
 msgid "<<emacs-daemon-path>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3265
+#: modules/configuration.org:3295
 #, no-wrap
 msgid ""
 "xdg.configFile.\"emacs/init.el\".source = tangleEl pkgs ./init.org;\n"
@@ -13710,7 +13751,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3269
+#: modules/configuration.org:3299
 #, no-wrap
 msgid ""
 "    home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -13721,7 +13762,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3275
+#: modules/configuration.org:3305
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -13733,7 +13774,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3284
+#: modules/configuration.org:3314
 #, no-wrap
 msgid ""
 "{\n"
@@ -13790,13 +13831,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3340
+#: modules/configuration.org:3370
 #, no-wrap
 msgid "Daemon PATH"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3342
+#: modules/configuration.org:3372
 msgid ""
 "launchd hands its agents only the system =PATH=, and =init.org= repairs "
 "=PATH= with =exec-path-from-shell= only when =window-system= is non-nil, "
@@ -13808,13 +13849,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3351
+#: modules/configuration.org:3381
 #, no-wrap
 msgid "emacs-daemon-path"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3353
+#: modules/configuration.org:3383
 #, no-wrap
 msgid ""
 "launchd.agents = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -13831,39 +13872,39 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3366
+#: modules/configuration.org:3396
 #, no-wrap
 msgid "early-init.org"
 msgstr "early-init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:3367
+#: modules/configuration.org:3397
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/early-init.org\""
 msgid "\"./features/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: modules/configuration.org:3368
+#: modules/configuration.org:3398
 #, no-wrap
 msgid "init.org"
 msgstr "init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:3369
+#: modules/configuration.org:3399
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/init.org\""
 msgid "\"./features/emacs/init.org\""
 msgstr "\"./applications/emacs/init.ja.org\""
 
 #. type: heading *
-#: modules/configuration.org:3371
+#: modules/configuration.org:3401
 #, no-wrap
 msgid "Speech to Text"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3375
+#: modules/configuration.org:3405
 msgid ""
 "[[https://handy.computer][Handy]] is an offline speech-to-text app: press a "
 "hotkey, speak, and the transcription is typed into the focused field. The "
@@ -13874,7 +13915,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3381
+#: modules/configuration.org:3411
 msgid ""
 "Almost everything is per-user and cross-platform, so it lives in a home-"
 "manager module: the package plus an autostart agent, a systemd user service "
@@ -13884,7 +13925,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3387
+#: modules/configuration.org:3417
 msgid ""
 "The one piece home-manager cannot express is system-level. Handy reads its "
 "global hotkey straight from =/dev/input/event*= via evdev, which only the "
@@ -13898,7 +13939,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3397
+#: modules/configuration.org:3427
 msgid ""
 "The desktop profile enables it by default, setting the home switch on every "
 "desktop and, on NixOS only, adding the =input= group through its =nixos= "
@@ -13906,7 +13947,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3406
+#: modules/configuration.org:3436
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -13933,7 +13974,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3428
+#: modules/configuration.org:3458
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable (\n"
@@ -13942,7 +13983,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3432
+#: modules/configuration.org:3462
 #, no-wrap
 msgid ""
 "(lib.mkIf pkgs.stdenv.hostPlatform.isLinux {\n"
@@ -13963,7 +14004,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3448
+#: modules/configuration.org:3478
 #, no-wrap
 msgid ""
 "      (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -13984,7 +14025,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3466
+#: modules/configuration.org:3496
 #, no-wrap
 msgid ""
 "nixosModule =\n"
@@ -13998,7 +14039,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3475
+#: modules/configuration.org:3505
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.handy.enable {\n"
@@ -14013,19 +14054,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3488
+#: modules/configuration.org:3518
 #, no-wrap
 msgid "Launcher"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3490
+#: modules/configuration.org:3520
 #, no-wrap
 msgid "Vicinae"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3492
+#: modules/configuration.org:3522
 msgid ""
 "[[https://github.com/vicinae/vicinae][Vicinae]] is a cross-platform launcher "
 "for Linux and macOS, designed to run extensions from Raycast, the popular "
@@ -14034,14 +14075,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3497
+#: modules/configuration.org:3527
 msgid ""
 "On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as "
 "described later."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3506
+#: modules/configuration.org:3536
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -14058,13 +14099,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3518
+#: modules/configuration.org:3548
 #, no-wrap
 msgid "options.my.programs.vicinae.enable = lib.mkEnableOption \"vicinae launcher\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3520
+#: modules/configuration.org:3550
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.vicinae.enable {\n"
@@ -14104,20 +14145,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3556
+#: modules/configuration.org:3586
 #, fuzzy, no-wrap
 #| msgid "terminal"
 msgid "Terminal"
 msgstr "ターミナル"
 
 #. type: heading **
-#: modules/configuration.org:3558
+#: modules/configuration.org:3588
 #, no-wrap
 msgid "Felis"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3560
+#: modules/configuration.org:3590
 msgid ""
 "[[https://git.natsukium.com/natsukium/felis][felis]] is a daemon/client "
 "terminal whose defining feature is session persistence across hosts. Apart "
@@ -14126,7 +14167,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3564
+#: modules/configuration.org:3594
 msgid ""
 "The client names a separate [[https://github.com/yuru7/moralerspace]"
 "[Moralerspace]] flavor per text style — Neon, Xenon, Radon, Krypton. felis "
@@ -14136,7 +14177,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3569
+#: modules/configuration.org:3599
 msgid ""
 "Two keymap entries work around problems outside felis. On a JIS keyboard the "
 "yen key still types =¥= though macOS is set to emit =\\=, because winit "
@@ -14148,7 +14189,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3577
+#: modules/configuration.org:3607
 msgid ""
 "The built-in =switch_{next,previous}_session= bindings only step one session "
 "at a time. =felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead "
@@ -14157,7 +14198,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3582
+#: modules/configuration.org:3612
 msgid ""
 "felis makes only OSC 8 hyperlinks clickable, not the plain-text URLs that "
 "fill real output, leaving that heuristic to an external tool as kitty does.  "
@@ -14172,7 +14213,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3592
+#: modules/configuration.org:3622
 msgid ""
 "=felis-nix-log= (=Ctrl+Shift+l=, ported from kitty) scans the grid for a "
 "=nix log <drv>= line and pages that build log. It uses grep + fzf rather "
@@ -14182,7 +14223,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3598
+#: modules/configuration.org:3628
 msgid ""
 "Desktop notifications now come from felis' own home-manager module, not a "
 "helper of mine: =notifications.enable= runs a relay that streams =felis "
@@ -14193,7 +14234,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3611
+#: modules/configuration.org:3641
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -14210,7 +14251,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3623
+#: modules/configuration.org:3653
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -14226,7 +14267,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3634
+#: modules/configuration.org:3664
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -14244,7 +14285,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3652
+#: modules/configuration.org:3682
 #, no-wrap
 msgid ""
 "inherit\n"
@@ -14267,7 +14308,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3672
+#: modules/configuration.org:3702
 #, no-wrap
 msgid ""
 "  moralerspace = flavor: \"Moralerspace ${flavor} HW\";\n"
@@ -14286,13 +14327,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3686
+#: modules/configuration.org:3716
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3688
+#: modules/configuration.org:3718
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -14300,7 +14341,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3691
+#: modules/configuration.org:3721
 #, no-wrap
 msgid ""
 "home.packages = [\n"
@@ -14311,7 +14352,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3697
+#: modules/configuration.org:3727
 #, no-wrap
 msgid ""
 "programs.felis = {\n"
@@ -14320,13 +14361,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3703
+#: modules/configuration.org:3733
 #, no-wrap
 msgid "notifications.enable = true;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3705
+#: modules/configuration.org:3735
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -14341,7 +14382,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3717
+#: modules/configuration.org:3747
 #, no-wrap
 msgid ""
 "theme = {\n"
@@ -14381,7 +14422,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3753
+#: modules/configuration.org:3783
 #, no-wrap
 msgid ""
 "keymap = {\n"
@@ -14435,7 +14476,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3812
+#: modules/configuration.org:3842
 #, no-wrap
 msgid ""
 "            mouse.wheel_scroll_multiplier = 5;\n"
@@ -14447,13 +14488,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3820
+#: modules/configuration.org:3850
 #, no-wrap
 msgid "Session and hint helpers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3822
+#: modules/configuration.org:3852
 msgid ""
 "The keymap points at six shell programs, none touching the module system; "
 "their =writeShellApplication= bodies would bury the configuration if they "
@@ -14466,7 +14507,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3837
+#: modules/configuration.org:3867
 #, no-wrap
 msgid ""
 "{\n"
@@ -14481,7 +14522,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3852
+#: modules/configuration.org:3882
 #, no-wrap
 msgid ""
 "felis-switch = pkgs.writeShellApplication {\n"
@@ -14500,19 +14541,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3870
+#: modules/configuration.org:3900
 #, no-wrap
 msgid "awk -v self=\"''${FELIS_SESSION_ID:-}\" '$1 != self' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3871 modules/configuration.org:3901
+#: modules/configuration.org:3901 modules/configuration.org:3931
 #, no-wrap
 msgid "fzf --ansi \\"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3868
+#: modules/configuration.org:3898
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -14524,7 +14565,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3877
+#: modules/configuration.org:3907
 #, no-wrap
 msgid ""
 "    id=''${selection%% *}\n"
@@ -14534,7 +14575,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3885
+#: modules/configuration.org:3915
 #, no-wrap
 msgid ""
 "felis-kill = pkgs.writeShellApplication {\n"
@@ -14553,7 +14594,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3899
+#: modules/configuration.org:3929
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -14566,19 +14607,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3909 modules/configuration.org:3930
+#: modules/configuration.org:3939 modules/configuration.org:3960
 #, no-wrap
 msgid "awk 'NF {print $1}' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3910 modules/configuration.org:3931
+#: modules/configuration.org:3940 modules/configuration.org:3961
 #, no-wrap
 msgid "while read -r id; do"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3908
+#: modules/configuration.org:3938
 #, no-wrap
 msgid ""
 "    printf '%s\\n' \"$selection\" \\\n"
@@ -14589,13 +14630,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3933
+#: modules/configuration.org:3963
 #, no-wrap
 msgid "awk -v id=\"$id\" 'NF {print id\"\\t\"$0}'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3920
+#: modules/configuration.org:3950
 #, no-wrap
 msgid ""
 "felis-grep = pkgs.writeShellApplication {\n"
@@ -14618,13 +14659,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:3943
+#: modules/configuration.org:3973
 #, no-wrap
 msgid "fzf --delimiter='\\t' --with-nth=2.. --prompt='grep scrollback> '"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3941
+#: modules/configuration.org:3971
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -14633,7 +14674,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3946
+#: modules/configuration.org:3976
 #, no-wrap
 msgid ""
 "    id=$(printf '%s' \"$selection\" | awk -F'\\t' '{print $1; exit}')\n"
@@ -14643,7 +14684,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3956
+#: modules/configuration.org:3986
 #, no-wrap
 msgid ""
 "felis-scrollback = pkgs.writeShellApplication {\n"
@@ -14659,7 +14700,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3982
+#: modules/configuration.org:4012
 #, no-wrap
 msgid ""
 "felis-hints = pkgs.writeShellApplication {\n"
@@ -14683,19 +14724,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4021
+#: modules/configuration.org:4051
 #, no-wrap
 msgid "sed 's/^nix log //' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4022
+#: modules/configuration.org:4052
 #, no-wrap
 msgid "awk '!seen[$0]++'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4009
+#: modules/configuration.org:4039
 #, no-wrap
 msgid ""
 "  felis-nix-log = pkgs.writeShellApplication {\n"
@@ -14733,13 +14774,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4047
+#: modules/configuration.org:4077
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4049
+#: modules/configuration.org:4079
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -14749,7 +14790,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4060
+#: modules/configuration.org:4090
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -14764,7 +14805,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4070
+#: modules/configuration.org:4100
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -14773,13 +14814,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4077
+#: modules/configuration.org:4107
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4079
+#: modules/configuration.org:4109
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -14792,7 +14833,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4090
+#: modules/configuration.org:4120
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -14802,13 +14843,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4095
+#: modules/configuration.org:4125
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4097
+#: modules/configuration.org:4127
 #, no-wrap
 msgid ""
 "config = {\n"

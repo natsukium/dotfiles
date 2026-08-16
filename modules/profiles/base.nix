@@ -17,6 +17,7 @@ import ../../lib/mkProfile.nix { inherit lib; } {
     my.programs.bash.enable = lib.mkDefault true;
     my.programs.nushell.enable = lib.mkDefault true;
     my.programs.readline.enable = lib.mkDefault true;
+    my.programs.ssh.enable = lib.mkDefault true;
     my.programs.starship = {
       enable = lib.mkDefault true;
       enableFishAsyncPrompt = lib.mkDefault true;

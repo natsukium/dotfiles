@@ -691,6 +691,36 @@ typically on desktop systems that suspend/resume.
 })
 #+end_src
 
+** SSH Client
+
+SSH is mostly tailscale's business, but a client still needs =~/.ssh/config= for
+the few hosts I reach by a name that is not their real address.
+This module only claims the file and turns off =enableDefaultConfig=, as
+upstream recommends.
+
+#+begin_src nix :tangle features/ssh.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/ssh.nix
+{ ... }:
+{
+  flake.modules.homeManager.ssh =
+    { config, lib, ... }:
+    {
+      options.my.programs.ssh.enable = lib.mkEnableOption "ssh client";
+
+      config = lib.mkIf config.my.programs.ssh.enable {
+        programs.ssh = {
+          enable = true;
+          enableDefaultConfig = false;
+        };
+      };
+    };
+}
+#+end_src
+
 * File Synchronization
 
 ** org-sync
