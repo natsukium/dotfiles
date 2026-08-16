@@ -2252,7 +2252,7 @@ and hands out a plain shell as =forgejo=. That bypasses the ~command="forgejo se
 restriction git depends on, so sshd moves to 2022.
 =SSH_PORT= is pinned to 22 anyway: forgejo only uses it to
 render clone URLs, and any other value turns them into full ~ssh://~ URIs. The
-[[*Client Route][client route]] carries the real port.
+[[*SSH Route][ssh route]] on the client carries the real port.
 
 #+NAME: forgejo-ssh-port
 #+begin_src nix
@@ -2282,12 +2282,10 @@ my.services.restic.backups.forgejo.paths = [
 ];
 #+end_src
 
-*** Client Route
+*** Client Settings
 
-=git.natsukium.com= resolves publicly to the cloudflared tunnel, which carries
-HTTP only, so ssh needs another path. Every machine of mine reaches manyara over
-tailscale, so this block points the public name at the tailnet one. It lands in
-=~/.ssh/config= through the [[*SSH Client][SSH Client]] module, which owns the file.
+What every machine of mine needs to talk to the instance: where ssh goes, and
+which remotes take that route.
 
 #+NAME: forgejo-client
 #+begin_src nix
@@ -2297,12 +2295,36 @@ flake.modules.homeManager.forgejo =
     options.my.programs.forgejo.enable = lib.mkEnableOption "the ssh route to my forge";
 
     config = lib.mkIf config.my.programs.forgejo.enable {
-      programs.ssh.settings."git.natsukium.com" = {
-        HostName = "manyara.tail4108.ts.net";
-        Port = 2022;
-      };
+      <<forgejo-ssh-route>>
+
+      <<forgejo-push-url>>
     };
   };
+#+end_src
+
+**** SSH Route
+
+=git.natsukium.com= resolves publicly to the cloudflared tunnel, which carries
+HTTP only, so ssh needs another path. Every machine of mine reaches manyara over
+tailscale, so this block points the public name at the tailnet one. It lands in
+=~/.ssh/config= through the [[*SSH Client][SSH Client]] module, which owns the file.
+
+#+NAME: forgejo-ssh-route
+#+begin_src nix
+programs.ssh.settings."git.natsukium.com" = {
+  HostName = "manyara.tail4108.ts.net";
+  Port = 2022;
+};
+#+end_src
+
+**** Push URLs
+
+Remotes cloned over https would push over https as well. This rewrite routes
+every push to the forge over ssh instead, leaving fetch on the tunnel.
+
+#+NAME: forgejo-push-url
+#+begin_src nix
+programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
 #+end_src
 
 * Continuous Integration

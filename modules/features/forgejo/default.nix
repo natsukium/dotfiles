@@ -91,6 +91,8 @@
           HostName = "manyara.tail4108.ts.net";
           Port = 2022;
         };
+
+        programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
       };
     };
 }
