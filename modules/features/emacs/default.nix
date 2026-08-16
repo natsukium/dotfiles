@@ -46,6 +46,10 @@ let
         org = ./init.org;
       };
       org-clickup-src = inputs.org-clickup;
+      # Tangled here rather than inside package.nix so the library reaches the
+      # package set as a plain .el, which is all trivialBuild wants.
+      org-code-review-el = tangleEl pkgs ./org-code-review.org;
+      org-code-review-tests = ./org-code-review-tests.el;
     };
 in
 {

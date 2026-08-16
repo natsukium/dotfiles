@@ -1,0 +1,647 @@
+#+TITLE: org-code-review
+#+STARTUP: overview
+
+Review comments about code, captured with =org-capture= and kept in an Org file
+inside the project they are about.
+
+I read code more carefully when there is somewhere to put the objection, and the
+somewhere I already reach for is =org-capture=. So a review comment is captured
+like any other passing thought, and being an Org entry it arrives with a TODO
+keyword and a priority cookie already attached — I do not have to invent a status
+field or a severity scale, and closing a comment is =org-todo= rather than
+deleting a line out of a scratch file.
+
+[[https://github.com/bastibe/annotate.el][annotate.el]] and
+[[https://github.com/nobiot/org-remark][org-remark]] both do the visible half of
+this well, and I took the shape of the display from annotate.el. What stopped me
+using either is that each carries its own store, which would put review comments
+somewhere other than where my notes live.
+
+The comments live in =.private/review.org= at the root of the project they are
+about. Review notes are tied to a branch and mostly die with it, so keeping them
+beside the code keeps them out of the permanent notes in =~/dropbox/org=, and
+=.private/= is already in my global gitignore, which means no project needs a
+=.gitignore= edit to host one. Because the file sits at the project root, the
+links inside it can be relative to that root, and a relative anchor still
+resolves in a worktree, in a VM, or in a checkout on another machine — none of
+which agree on an absolute path.
+
+This document lives beside =init.org= rather than inside it because it stopped
+being configuration. It has a data model, a cache and a minor mode, and it earns
+the test suite in =org-code-review-tests.el=, which is a flake check. Being its
+own file it is also byte-compiled, where the tangled =init.el= is not; every
+closure here would otherwise run under dynamic binding. Nothing below binds a
+key or touches =org-capture-templates= — =init.org= does that — so the whole
+document can be lifted into a package unchanged.
+
+* Header
+
+#+begin_src emacs-lisp
+;;; org-code-review.el --- Review comments about code, kept in Org  -*- lexical-binding: t; -*-
+
+;;; Commentary:
+
+;; Review comments are captured with `org-capture' and stored as Org entries in
+;; a file inside the project.  Each entry anchors itself to a piece of code with
+;; an ordinary Org file link, and the comments are shown back in the source
+;; buffer as Flymake diagnostics and as text rendered under the line they talk
+;; about.
+;;
+;; The prose explaining why this is built the way it is lives in the Org
+;; document this file is tangled from.
+
+;;; Code:
+#+end_src
+
+* Options
+
+Severity is the Org priority cookie rather than a property of my own: =[#A]= is
+an error, =[#C]= a note, anything else a warning. The diagnostic types are also
+mine rather than plain =:error= and friends, so a review comment stays
+distinguishable from whatever the language server is reporting on the same line.
+
+#+begin_src emacs-lisp
+(require 'cl-lib)
+(require 'flymake)
+(require 'ol)
+(require 'org)
+(require 'org-capture)
+(require 'org-element)
+(require 'project)
+(require 'seq)
+
+(defgroup org-code-review nil
+  "Review comments about code, captured into an Org file."
+  :group 'tools
+  :prefix "org-code-review-")
+
+(defcustom org-code-review-file-name ".private/review.org"
+  "Name of the review file, relative to the project root."
+  :type 'string)
+
+(defcustom org-code-review-file-header
+  "#+TITLE: Review\n#+TODO: OPEN(o) | RESOLVED(r) WONTFIX(w)\n"
+  "Text written into a review file when it is created.
+Its first line must not be a heading, because
+`org-code-review-capture-target' leaves point there to tell Org to
+append the capture at the end of the file."
+  :type 'string)
+
+(defcustom org-code-review-open-keyword "OPEN"
+  "TODO keyword of a comment that still asks for something."
+  :type 'string)
+
+(defcustom org-code-review-resolved-keyword "RESOLVED"
+  "TODO keyword `org-code-review-resolve' assigns."
+  :type 'string)
+
+(defcustom org-code-review-capture-key "r"
+  "Key of the template returned by `org-code-review-capture-template'."
+  :type 'string)
+
+(defcustom org-code-review-inline-comments t
+  "Whether `org-code-review-mode' renders comment bodies in the buffer."
+  :type 'boolean)
+
+(defcustom org-code-review-inline-prefix "│ "
+  "String opening every rendered line of a comment."
+  :type 'string)
+
+(defface org-code-review-inline
+  '((t :inherit font-lock-comment-face))
+  "Face for comment text rendered in a source buffer.")
+
+(defface org-code-review-marker
+  '((t :inherit shadow))
+  "Face for `org-code-review-inline-prefix'.")
+
+(put 'org-code-review-error 'flymake-category 'flymake-error)
+(put 'org-code-review-warning 'flymake-category 'flymake-warning)
+(put 'org-code-review-note 'flymake-category 'flymake-note)
+(dolist (type '(org-code-review-error org-code-review-warning org-code-review-note))
+  (put type 'flymake-type-name "review"))
+
+(defun org-code-review-root (&optional buffer)
+  "Return the project root of BUFFER, or nil when it is in no project."
+  (with-current-buffer (or buffer (current-buffer))
+    (when-let* ((project (project-current nil)))
+      (expand-file-name (project-root project)))))
+
+(defun org-code-review-file (&optional buffer)
+  "Return the review file covering BUFFER, or nil when it is in no project."
+  (when-let* ((root (org-code-review-root buffer)))
+    (expand-file-name org-code-review-file-name root)))
+
+(defun org-code-review--ensure-file (file)
+  "Create FILE with `org-code-review-file-header' unless it exists.
+Return FILE."
+  (unless (file-exists-p file)
+    (make-directory (file-name-directory file) t)
+    (write-region org-code-review-file-header nil file))
+  file)
+#+end_src
+
+* Capturing
+
+The capture target has to be computed rather than named, because which review
+file a comment belongs to depends on the buffer the capture was started from.
+Org fills =:original-buffer= into the capture plist before it resolves the
+target, so the project is known by the time the target function runs.
+
+The anchor is an ordinary Org file link whose search string is the text of the
+line at point, or of the region when there is one. That search string, not a
+line number, is what makes a comment survive editing: insert twenty lines above
+it and the anchor still finds its line, where a stored line number would by then
+point at something unrelated. The line number is kept in the link description
+anyway, as a tie-breaker for when the same text appears more than once in the
+file.
+
+Org has a function for exactly this, =org-link-precise-link-target=, and I do
+not use it. In an Org buffer it answers with the enclosing element rather than
+the line: prose under a heading gives =*org-capture=, a line inside a source
+block gives that block's =#+NAME=, and anything under a heading with a
+=CUSTOM_ID= gives =#the-id=. Two things go wrong at once. Those are Org's search
+*syntax* — a heading, a custom id — and not text to look for, so resolving them
+literally finds nothing. And even read correctly they point at the section, not
+at the line I objected to. In a configuration that is mostly Org files, that is
+every capture, which is how I found this: every comment came back =(anchor
+lost)=.
+
+So the search string is built here instead, and normalised the way Org
+normalises one, because the link still has to work when I follow it with
+=C-c C-o= from the review file. Collapsing whitespace and stripping wrapping
+parentheses and leading =#= or =*= keeps a line of punctuation-heavy code from
+reading as coderef, custom-id or heading syntax. What is left is a plain
+substring of the line, which is what the resolver below searches for.
+
+#+begin_src emacs-lisp
+(defvar org-code-review--captured nil
+  "Review file the running capture is filing into, if any.")
+
+(defun org-code-review-capture-target ()
+  "Visit the review file of the project the capture was started from."
+  (let ((file (or (org-code-review-file (org-capture-get :original-buffer))
+                  (user-error "Not visiting a project"))))
+    (setq org-code-review--captured file)
+    (set-buffer (org-capture-target-buffer (org-code-review--ensure-file file)))
+    (org-capture-put-target-region-and-position)
+    (widen)
+    ;; Org appends the entry at end of file as long as point is not on a
+    ;; heading when this returns, and moving to the header line says that
+    ;; without touching a buffer the user may still abort out of.
+    (goto-char (point-min))))
+
+(defun org-code-review-annotation ()
+  "Return an Org link to the code the running capture was started from.
+Meant for the %(sexp) escape of `org-code-review-capture-template'."
+  (let ((buffer (org-capture-get :original-buffer)))
+    (when (buffer-live-p buffer)
+      (with-current-buffer buffer
+        (org-code-review--link-to-point)))))
+
+(defun org-code-review--normalize (string)
+  "Return STRING as an Org search string, or nil when nothing is left.
+Org reads a search string wrapped in parentheses as a coderef, one
+starting with # as a custom id and one starting with * as a heading, so
+those are stripped: a line of code is punctuation-heavy enough to trip
+over all three."
+  (let ((string (string-trim (replace-regexp-in-string "[ \t\n]+" " " string))))
+    (while (cond
+            ((and (string-prefix-p "(" string) (string-suffix-p ")" string))
+             (setq string (string-trim (substring string 1 -1))))
+            ((string-match "\\`[#*]+[ \t]*" string)
+             (setq string (substring string (match-end 0))))))
+    (org-string-nw-p string)))
+
+(defun org-code-review--context-at-point ()
+  "Return a search string for point, or nil when the line holds nothing."
+  (org-code-review--normalize
+   (if (use-region-p)
+       (buffer-substring-no-properties (region-beginning) (region-end))
+     (buffer-substring-no-properties (line-beginning-position)
+                                     (line-end-position)))))
+
+(defun org-code-review--link-to-point ()
+  "Return an Org link to point in the current buffer, or nil."
+  (when-let* ((root (org-code-review-root))
+              (file (buffer-file-name (buffer-base-buffer))))
+    (let ((search (org-code-review--context-at-point))
+          (relative (file-relative-name file root))
+          (line (line-number-at-pos (if (use-region-p) (region-beginning) (point)))))
+      (org-link-make-string
+       (concat "file:" relative (and search (concat "::" search)))
+       (format "%s:%d" relative line)))))
+
+(defun org-code-review-capture-template ()
+  "Return the capture template entry for review comments."
+  `(,org-code-review-capture-key "Review comment" entry
+    (function org-code-review-capture-target)
+    ,(concat "* " org-code-review-open-keyword
+             " [#%^{Severity|B|A|C}] %^{Comment}\n"
+             ":PROPERTIES:\n:CREATED: %U\n:END:\n"
+             "%(org-code-review-annotation)\n\n%?")
+    :empty-lines 1))
+
+(defun org-code-review-capture ()
+  "Capture a review comment about the code at point."
+  (interactive)
+  (org-capture nil org-code-review-capture-key))
+#+end_src
+
+* Reading the file back
+
+Flymake re-runs its backends on every idle change, so parsing the review file
+on each pass would mean re-reading an Org file for every keystroke. The result
+is cached against the file's modification time together with the modification
+tick of any buffer visiting it, since a review file I have open holds edits the
+modification time does not know about yet.
+
+Reading happens in a temporary buffer whenever nothing is visiting the file
+already, and that is not an optimisation. Visiting it runs the mode hooks, one
+of which is the globalized mode below, which asks to read the review file, which
+visits it: the first version of this went round that loop and got the buffer
+handed back to it while it was still =fundamental-mode=, where every Org
+accessor fails. Parsing therefore stays off =find-file-hook= entirely, and a
+buffer that is visiting the file but has not reached =org-mode= yet is treated
+as not readable rather than parsed anyway.
+
+#+begin_src emacs-lisp
+(cl-defstruct (org-code-review-comment
+               (:constructor org-code-review-comment--create)
+               (:copier nil))
+  "One review comment, as recorded in the review file."
+  file search line keyword priority heading body position)
+
+(defvar org-code-review--cache nil
+  "Alist of (FILE STAMP COMMENTS), see `org-code-review--stamp'.")
+
+(defun org-code-review--stamp (file)
+  "Return a value for FILE that changes whenever its comments might have."
+  (let ((buffer (find-buffer-visiting file)))
+    (cons (file-attribute-modification-time (file-attributes file))
+          (and buffer (buffer-chars-modified-tick buffer)))))
+
+(defun org-code-review--readable-p (file)
+  "Return non-nil when FILE's comments can be read right now."
+  (let ((buffer (find-buffer-visiting file)))
+    (or (null buffer)
+        (with-current-buffer buffer (derived-mode-p 'org-mode)))))
+
+(defun org-code-review-comments (&optional file)
+  "Return the comments recorded in FILE."
+  (when-let* ((file (or file (org-code-review-file)))
+              ((file-exists-p file))
+              ;; Visiting the review file runs the mode hooks that lead back
+              ;; here, and the buffer is handed over before its major mode is
+              ;; in place.  Reporting nothing beats caching an empty parse
+              ;; against a stamp that will not change once Org mode arrives.
+              ((org-code-review--readable-p file)))
+    (let ((stamp (org-code-review--stamp file))
+          (cached (assoc file org-code-review--cache)))
+      (if (and cached (equal (nth 1 cached) stamp))
+          (nth 2 cached)
+        (let ((comments (org-code-review--parse file)))
+          (setq org-code-review--cache
+                (cons (list file stamp comments)
+                      (assoc-delete-all file org-code-review--cache)))
+          comments)))))
+
+(defun org-code-review--parse (file)
+  "Return the comments FILE records."
+  (let ((buffer (find-buffer-visiting file)))
+    (if buffer
+        (with-current-buffer buffer (org-with-wide-buffer (org-code-review--scan)))
+      ;; Reading into a temporary buffer rather than visiting the file keeps
+      ;; parsing off `find-file-hook' and the mode hooks, one of which is the
+      ;; globalized mode that asks for this parse in the first place.
+      (with-temp-buffer
+        (insert-file-contents file)
+        (let ((org-inhibit-startup t))
+          (delay-mode-hooks (org-mode)))
+        (org-code-review--scan)))))
+
+(defun org-code-review--scan ()
+  "Return the comments recorded in the current Org buffer."
+  (goto-char (point-min))
+  ;; A plain heading scan, and not `org-map-entries': that one goes through
+  ;; `org-scan-tags', which insists on an active org-element cache and
+  ;; signals when it finds none.  Parsing runs from modification hooks,
+  ;; where Org disables the cache on purpose.
+  (let (comments)
+    (while (re-search-forward org-outline-regexp-bol nil t)
+      (save-excursion
+        (goto-char (match-beginning 0))
+        (when-let* ((comment (org-code-review--comment-at-point)))
+          (push comment comments))))
+    (nreverse comments)))
+
+(defun org-code-review--comment-at-point ()
+  "Return the comment described by the Org entry at point, or nil."
+  (let* ((bound (save-excursion (org-end-of-subtree t t)))
+         (link (save-excursion
+                 (when (re-search-forward org-link-bracket-re bound t)
+                   (goto-char (match-beginning 0))
+                   (org-element-link-parser)))))
+    (when (and link (equal (org-element-property :type link) "file"))
+      (org-code-review-comment--create
+       :file (org-element-property :path link)
+       :search (org-element-property :search-option link)
+       :line (org-code-review--described-line link)
+       :keyword (org-get-todo-state)
+       :priority (org-entry-get nil "PRIORITY")
+       :heading (org-get-heading t t t t)
+       :body (save-excursion
+               (goto-char (org-element-end link))
+               (forward-line 1)
+               (string-trim (buffer-substring-no-properties
+                             (min (point) bound) bound)))
+       :position (point)))))
+
+(defun org-code-review--described-line (link)
+  "Return the line number LINK's description ends with, or nil."
+  (when-let* ((begin (org-element-contents-begin link))
+              (finish (org-element-contents-end link))
+              (description (buffer-substring-no-properties begin finish))
+              ((string-match ":\\([0-9]+\\)\\'" description)))
+    (string-to-number (match-string 1 description))))
+
+(defun org-code-review--comments-for-buffer (&optional buffer)
+  "Return the open comments about the file BUFFER visits."
+  (with-current-buffer (or buffer (current-buffer))
+    (when-let* ((file (buffer-file-name (buffer-base-buffer)))
+                (root (org-code-review-root))
+                (name (file-relative-name file root)))
+      (seq-filter (lambda (comment)
+                    (and (equal (org-code-review-comment-file comment) name)
+                         (equal (org-code-review-comment-keyword comment)
+                                org-code-review-open-keyword)))
+                  ;; The review file is derived from the root already in hand,
+                  ;; because this runs for every buffer the globalized mode
+                  ;; considers and a second project lookup would be free of
+                  ;; information.
+                  (org-code-review-comments
+                   (expand-file-name org-code-review-file-name root))))))
+#+end_src
+
+* Finding the line again
+
+Resolving an anchor is the one thing =org-link-search= would do for me, and I
+do not use it: it moves point, unfolds around the match, and calls =occur= for
+some inputs, none of which a Flymake backend should be doing on every idle
+change. What it is worth copying is how it matches, treating runs of whitespace
+as interchangeable, because Org collapses the whitespace of a search string when
+it stores one.
+
+Org also strips the parentheses wrapping a context string so it cannot be
+mistaken for coderef syntax, which for a line like =(defun beta ()= leaves
+=defun beta (=. That is still a substring of the line, so the match holds. A
+line that summarises to nothing at all — a blank one, or one made only of the
+delimiters Org strips — has no anchor to search for, and falls back to the line
+number recorded at capture time.
+
+#+begin_src emacs-lisp
+(defun org-code-review--locate (comment)
+  "Return the (BEGIN . END) region COMMENT is about, or nil.
+Search happens in the current buffer."
+  (let ((search (org-code-review-comment-search comment))
+        (line (org-code-review-comment-line comment)))
+    (if (org-string-nw-p search)
+        (org-code-review--search search line)
+      (and line (org-code-review--line-region line)))))
+
+(defun org-code-review--search (search line)
+  "Return the region matching SEARCH nearest to LINE, or nil."
+  (or (org-code-review--search-literally search line)
+      ;; A link stored by `org-store-link' inside an Org file names the
+      ;; enclosing heading as "*Heading" or its custom id as "#id".  Dropping
+      ;; the marker turns both back into text that appears on the line they
+      ;; name, which lands the comment on the right heading or property
+      ;; rather than losing it.
+      (and (string-match "\\`[#*]+[ \t]*" search)
+           (org-code-review--search-literally
+            (substring search (match-end 0)) line))))
+
+(defun org-code-review--search-literally (search line)
+  "Return the region whose text is SEARCH, nearest to LINE, or nil."
+  (when-let* ((words (split-string search)))
+    (save-excursion
+      (goto-char (point-min))
+      (let ((regexp (mapconcat #'regexp-quote words "[ \t\n]+"))
+            (case-fold-search nil)
+            matches)
+        (while (re-search-forward regexp nil t)
+          (push (cons (match-beginning 0) (match-end 0)) matches))
+        (org-code-review--closest (nreverse matches) line)))))
+
+(defun org-code-review--closest (matches line)
+  "Return the region in MATCHES nearest to LINE, else the first one."
+  (cond
+   ((null (cdr matches)) (car matches))
+   ((null line) (car matches))
+   (t (car (sort (copy-sequence matches)
+                 (lambda (a b)
+                   (< (abs (- (line-number-at-pos (car a)) line))
+                      (abs (- (line-number-at-pos (car b)) line)))))))))
+
+(defun org-code-review--line-region (line)
+  "Return the region covering LINE, or nil when the buffer is shorter."
+  (save-excursion
+    (goto-char (point-min))
+    (when (zerop (forward-line (1- line)))
+      (cons (line-beginning-position)
+            (max (line-end-position)
+                 (min (point-max) (1+ (line-beginning-position))))))))
+
+(defun org-code-review-comment-at-point ()
+  "Return the review comment about the line at point, or nil."
+  (let ((line (line-number-at-pos)))
+    (seq-find (lambda (comment)
+                (when-let* ((region (org-code-review--locate comment)))
+                  (= line (line-number-at-pos (car region)))))
+              (org-code-review--comments-for-buffer))))
+#+end_src
+
+* Showing comments
+
+Comments are shown twice over, because the two things I want from them are not
+the same thing. As Flymake diagnostics they get the fringe marker, the mode-line
+count, =M-g f= to jump between them and =flymake-show-project-diagnostics= to
+list them across the project files I have open — an index, for free, in a shape
+I already navigate. As overlays they get their prose rendered under the line they
+are about, which is the part Flymake cannot do, since a diagnostic message is
+built for the echo area and a comment worth writing rarely fits there.
+
+A comment whose anchor no longer matches is reported at the top of the file
+rather than dropped. Code moving out from under a comment is exactly the moment
+the comment needs looking at, and silently discarding it would hide that.
+
+#+begin_src emacs-lisp
+(defun org-code-review--type (comment)
+  "Return the Flymake diagnostic type COMMENT's priority asks for."
+  (let ((priority (org-code-review-comment-priority comment)))
+    (cond
+     ((equal priority (char-to-string org-priority-highest)) 'org-code-review-error)
+     ((equal priority (char-to-string org-priority-lowest)) 'org-code-review-note)
+     (t 'org-code-review-warning))))
+
+(defun org-code-review-flymake (report-fn &rest _ignored)
+  "Report the review comments about this buffer to REPORT-FN."
+  (funcall
+   report-fn
+   (mapcar
+    (lambda (comment)
+      (let ((region (org-code-review--locate comment))
+            (heading (org-code-review-comment-heading comment)))
+        (flymake-make-diagnostic
+         (current-buffer)
+         (if region (car region) (point-min))
+         (if region (cdr region) (min (point-max) (1+ (point-min))))
+         (org-code-review--type comment)
+         (if region heading (concat heading " (anchor lost)")))))
+    (org-code-review--comments-for-buffer))))
+
+(defun org-code-review--render (comment region)
+  "Render COMMENT under the line REGION starts on."
+  (save-excursion
+    (goto-char (car region))
+    (let* ((indent (buffer-substring-no-properties
+                    (line-beginning-position)
+                    (progn (back-to-indentation) (point))))
+           (lines (cons (org-code-review-comment-heading comment)
+                        (split-string (or (org-code-review-comment-body comment) "")
+                                      "\n" t)))
+           (overlay (make-overlay (line-end-position) (line-end-position))))
+      (overlay-put overlay 'org-code-review t)
+      (overlay-put overlay 'after-string
+                   (concat "\n"
+                           (mapconcat
+                            (lambda (line)
+                              (concat indent
+                                      (propertize org-code-review-inline-prefix
+                                                  'face 'org-code-review-marker)
+                                      (propertize line 'face 'org-code-review-inline)))
+                            lines "\n"))))))
+
+(defun org-code-review--render-buffer ()
+  "Render every comment about the current buffer."
+  (remove-overlays (point-min) (point-max) 'org-code-review t)
+  (when org-code-review-inline-comments
+    (dolist (comment (org-code-review--comments-for-buffer))
+      (when-let* ((region (org-code-review--locate comment)))
+        (org-code-review--render comment region)))))
+#+end_src
+
+* The mode
+
+The mode turns itself on only in buffers that actually have comments, so a
+project with no review file costs one project lookup per buffer and nothing
+else. That leaves a gap the moment a comment is first captured about a file, and
+the hooks close it: finishing a capture into a review file, or saving one by
+hand, re-reads it and updates every buffer it describes.
+
+#+begin_src emacs-lisp
+(defvar-keymap org-code-review-mode-map
+  :doc "Keymap for `org-code-review-mode'.")
+
+(define-minor-mode org-code-review-mode
+  "Show the review comments captured about this file."
+  :lighter " Review"
+  :keymap org-code-review-mode-map
+  (cond
+   (org-code-review-mode
+    (add-hook 'flymake-diagnostic-functions #'org-code-review-flymake nil t)
+    ;; Turning Flymake on runs the backends, but when lsp-mode got there
+    ;; first there is nothing to turn on and the backend just added would
+    ;; sit idle until the next change to the buffer.
+    (if flymake-mode (flymake-start) (flymake-mode 1))
+    (org-code-review--render-buffer))
+   (t
+    (remove-hook 'flymake-diagnostic-functions #'org-code-review-flymake t)
+    (remove-overlays (point-min) (point-max) 'org-code-review t))))
+
+(defun org-code-review--maybe-enable ()
+  "Turn on `org-code-review-mode' when this buffer has comments."
+  (when (and buffer-file-name (org-code-review--comments-for-buffer))
+    (org-code-review-mode 1)))
+
+(define-globalized-minor-mode global-org-code-review-mode
+  org-code-review-mode org-code-review--maybe-enable)
+
+(defun org-code-review-refresh ()
+  "Re-read the review files and update every buffer they describe."
+  (interactive)
+  (setq org-code-review--cache nil)
+  (dolist (buffer (buffer-list))
+    (with-current-buffer buffer
+      (when buffer-file-name
+        (cond
+         ((org-code-review--comments-for-buffer)
+          (org-code-review-mode 1)
+          (org-code-review--render-buffer)
+          (when flymake-mode (flymake-start)))
+         (org-code-review-mode
+          (org-code-review-mode -1)))))))
+
+(defun org-code-review--after-capture ()
+  "Refresh after a capture that filed into a review file."
+  (when org-code-review--captured
+    (setq org-code-review--captured nil)
+    (org-code-review-refresh)))
+
+(defun org-code-review--after-save ()
+  "Refresh after the review file itself is saved."
+  (when (and buffer-file-name
+             (equal (expand-file-name buffer-file-name) (org-code-review-file)))
+    (org-code-review-refresh)))
+
+(add-hook 'org-capture-after-finalize-hook #'org-code-review--after-capture)
+(add-hook 'after-save-hook #'org-code-review--after-save)
+
+(defun org-code-review-visit-file ()
+  "Visit the review file of this project."
+  (interactive)
+  (find-file (org-code-review--ensure-file
+              (or (org-code-review-file) (user-error "Not visiting a project")))))
+
+(defun org-code-review-goto ()
+  "Visit the Org entry of the review comment at point."
+  (interactive)
+  (let ((comment (or (org-code-review-comment-at-point)
+                     (user-error "No review comment on this line"))))
+    (find-file (org-code-review-file))
+    (widen)
+    (goto-char (org-code-review-comment-position comment))
+    (org-fold-show-context)))
+
+(defun org-code-review-resolve (&optional ask)
+  "Close the review comment at point.
+With a prefix argument, ASK for the keyword to assign instead of
+using `org-code-review-resolved-keyword'."
+  (interactive "P")
+  (let ((comment (or (org-code-review-comment-at-point)
+                     (user-error "No review comment on this line"))))
+    (with-current-buffer (find-file-noselect (org-code-review-file) t)
+      (org-with-wide-buffer
+       (goto-char (org-code-review-comment-position comment))
+       ;; The keywords are the review file's own, so they can only be read
+       ;; once this buffer is current.
+       (org-todo (if ask
+                     (completing-read "Keyword: " org-todo-keywords-1 nil t)
+                   org-code-review-resolved-keyword)))
+      (save-buffer))
+    (org-code-review-refresh)))
+
+(defun org-code-review-toggle-comments ()
+  "Toggle whether comment bodies are rendered in source buffers."
+  (interactive)
+  (setq org-code-review-inline-comments (not org-code-review-inline-comments))
+  (org-code-review-refresh))
+#+end_src
+
+
+* Footer
+
+#+begin_src emacs-lisp
+(provide 'org-code-review)
+;;; org-code-review.el ends here
+#+end_src

@@ -929,6 +929,40 @@ Used when converting Org files to HTML with syntax highlighting for code blocks.
   :ensure t)
 #+end_src
 
+* review
+
+Review comments about code, captured with =org-capture= and shown back in the
+source buffer as Flymake diagnostics and as text rendered under the line they
+are about. The feature and the reasoning behind it live in
+[[file:org-code-review.org][org-code-review.org]] beside this document, because
+it grew a data model, a cache and a test suite, and stopped being configuration.
+What belongs here is the part that is a matter of taste: where the keys go, and
+that I want the capture template and the mode switched on.
+
+The bindings hang off =C-c v=, for review, as a prefix map rather than entries
+in the minor mode's keymap: a minor mode shadows the major mode, and =C-c C-r=
+in a Python buffer is =python-shell-send-region= for a good reason. Capturing
+stays on =C-c c r=, since it is an ordinary capture template.
+
+#+begin_src emacs-lisp
+(use-package org-code-review
+  :ensure t
+  :demand t
+  :config
+  (defvar-keymap my/review-map
+    :doc "Prefix map for review comments."
+    "v" #'org-code-review-visit-file
+    "g" #'org-code-review-goto
+    "r" #'org-code-review-resolve
+    "t" #'org-code-review-toggle-comments)
+
+  (keymap-global-set "C-c v" my/review-map)
+
+  (add-to-list 'org-capture-templates (org-code-review-capture-template) t)
+
+  (global-org-code-review-mode 1))
+#+end_src
+
 * document
 
 ** pdf-tools
