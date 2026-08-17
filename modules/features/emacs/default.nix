@@ -13,6 +13,9 @@ let
   # Pass target-file to org-babel-tangle-file so blocks without an explicit
   # :tangle header still get tangled; emacs-overlay's defaultInitFile path
   # calls plain org-babel-tangle, which would tangle 0 blocks here.
+  #
+  # Tangling writes no file header, so the lexical-binding cookie is prepended
+  # here; without it Emacs loads the config under dynamic binding.
   tangle =
     pkgs:
     {
@@ -25,7 +28,10 @@ let
         "(progn
           (require 'ob-tangle)
           (org-babel-tangle-file \"tmp.org\" \"emacs-lisp\"))"
-      install emacs-lisp $out
+      {
+        echo ";;; -*- lexical-binding: t; -*-"
+        cat emacs-lisp
+      } > $out
     '';
 
   tangleEl =
