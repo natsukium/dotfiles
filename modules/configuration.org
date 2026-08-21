@@ -2957,8 +2957,7 @@ theme; [[https://github.com/greeeen-dev/natsumi-browser][natsumi-browser]] was t
 
 With the UI gap closed, what remains are my reservations: Zen's stability, its
 prospects as a project, and how well it is maintained in nixpkgs. So I switched to
-Firefox. Both browsers stay installed for now, sharing one set of search engines
-and extensions.
+Firefox and removed Zen from the configuration entirely.
 
 #+begin_src nix :tangle features/firefox/default.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -2973,8 +2972,6 @@ let
 in
 {
   <<firefox-module>>
-
-  <<zen-browser-module>>
 }
 #+end_src
 
@@ -3108,71 +3105,11 @@ darwin and Linux.
 home.file."${config.programs.firefox.profilesPath}/natsukium/chrome".source = parfait;
 #+end_src
 
-** Zen Browser
-
-Zen ships its own home-manager module in its flake, so mine only imports it and
-fills in the shared profile pieces.
-
-It never got along with Nix on darwin: with home-manager managing its profiles,
-launch kept ending in an error loop at the profile chooser, and the app bundle's
-code signature makes it hard to build in the Nix sandbox.
-
-#+NAME: zen-browser-module
-#+begin_src nix
-flake.modules.homeManager."zen-browser" =
-  {
-    inputs,
-    config,
-    lib,
-    pkgs,
-    ...
-  }:
-  let
-    cfg = config.my.programs.zen-browser;
-  in
-  {
-    imports = [ inputs.zen-browser.homeModules.beta ];
-
-    options.my.programs.zen-browser = {
-      enable = lib.mkEnableOption "Zen Browser";
-    };
-
-    config = lib.mkIf cfg.enable {
-      programs.zen-browser = {
-        enable = true;
-        profiles.natsukium = {
-          search = sharedSearch { inherit pkgs; };
-          extensions = sharedExtensions { inherit pkgs; };
-
-          <<zen-browser-settings>>
-        };
-      };
-    };
-  };
-#+end_src
-
-*** Settings
-
-Zen is a Firefox fork, so the preferences that are not about parfait carry over
-unchanged, for the reasons given in the Firefox profile.
-
-#+NAME: zen-browser-settings
-#+begin_src nix
-settings = {
-  "extensions.autoDisableScopes" = 0;
-
-  "browser.translations.automaticallyPopup" = false;
-  "layout.spellcheckDefault" = 0;
-  "signon.rememberSignons" = false;
-};
-#+end_src
-
 ** Search Engines
 
 Custom search engines for the package registries and documentation I search daily;
 a short alias in the address bar (=@np= and friends) beats navigating to each site
-first. Both browser profiles take this file, so an alias means the same thing
-whichever one is open.
+first.
 
 #+begin_src nix :tangle features/firefox/search.nix :exports none
 # This file is auto-generated from configuration.org.

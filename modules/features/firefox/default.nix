@@ -17,12 +17,12 @@ in
     let
       cfg = config.my.programs.firefox;
       # renovate: datasource=github-releases depName=reizumii/parfait extractVersion=^v(?<version>.+)$
-      version = "0.20";
+      version = "0.19";
       parfait = pkgs.fetchFromGitHub {
         owner = "reizumii";
         repo = "parfait";
         tag = "v${version}";
-        hash = "sha256-7RZntDeQEddmjXA6ksWX7UfB3EOrhN/HSWevmm5dau8=";
+        hash = "sha256-6r4jQoqleNTLIA1G5N1dlVMWQe/kxTi6miLkuQxCDu4=";
       };
     in
     {
@@ -78,43 +78,6 @@ in
         };
 
         home.file."${config.programs.firefox.profilesPath}/natsukium/chrome".source = parfait;
-      };
-    };
-
-  flake.modules.homeManager."zen-browser" =
-    {
-      inputs,
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
-    let
-      cfg = config.my.programs.zen-browser;
-    in
-    {
-      imports = [ inputs.zen-browser.homeModules.beta ];
-
-      options.my.programs.zen-browser = {
-        enable = lib.mkEnableOption "Zen Browser";
-      };
-
-      config = lib.mkIf cfg.enable {
-        programs.zen-browser = {
-          enable = true;
-          profiles.natsukium = {
-            search = sharedSearch { inherit pkgs; };
-            extensions = sharedExtensions { inherit pkgs; };
-
-            settings = {
-              "extensions.autoDisableScopes" = 0;
-
-              "browser.translations.automaticallyPopup" = false;
-              "layout.spellcheckDefault" = 0;
-              "signon.rememberSignons" = false;
-            };
-          };
-        };
       };
     };
 }
