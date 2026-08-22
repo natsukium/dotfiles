@@ -13,7 +13,16 @@
       enable = true;
       nix-direnv.enable = true;
     };
-    fzf.enable = true;
+    fzf = {
+      enable = true;
+      # Atuin is sourced after fzf in fish and nushell and rebinds Ctrl-R, so
+      # fzf's own binding there is dead weight and trips Home Manager's conflict
+      # warning.
+      historyWidget = {
+        fish.command = "";
+        nushell.command = "";
+      };
+    };
     jq.enable = true;
     lsd.enable = true;
     nix-index.enable = true;
