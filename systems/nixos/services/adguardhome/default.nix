@@ -15,6 +15,14 @@
       };
       filtering = {
         rewrites = [
+          # Exact entries beat the wildcard below, so this steers only hydra to
+          # kilimanjaro, where caddy runs next to it; every other
+          # *.home.natsukium.com host lives on manyara.
+          {
+            domain = "hydra.home.natsukium.com";
+            answer = "kilimanjaro.tail4108.ts.net";
+            enabled = true;
+          }
           {
             domain = "*.home.natsukium.com";
             answer = "manyara.tail4108.ts.net";
