@@ -17,7 +17,6 @@ in
     inputs.comin.nixosModules.comin
     inputs.disko.nixosModules.disko
     inputs.sops-nix.nixosModules.sops
-    inputs.tsnsrv.nixosModules.default
   ];
 
   my.programs.felis.enable = true;

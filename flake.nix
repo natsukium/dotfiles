@@ -68,11 +68,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    tsnsrv = {
-      url = "github:boinkor-net/tsnsrv";
-      inputs.flake-parts.follows = "flake-parts";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     # Development Tools
     git-hooks = {
       url = "github:cachix/git-hooks.nix";

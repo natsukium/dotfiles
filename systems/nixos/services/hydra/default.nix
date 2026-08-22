@@ -15,12 +15,6 @@
     useSubstitutes = true;
   };
 
-  services.tsnsrv.services.hydra = {
-    ephemeral = true;
-    authKeyPath = config.sops.secrets.tailscale-authkey.path;
-    toURL = config.services.hydra.hydraURL;
-  };
-
   sops.secrets = {
     hydra-admin-password = {
       sopsFile = ./secrets.yaml;
