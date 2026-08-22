@@ -16,6 +16,11 @@
       filtering = {
         rewrites = [
           {
+            domain = "hydra.home.natsukium.com";
+            answer = "kilimanjaro.tail4108.ts.net";
+            enabled = true;
+          }
+          {
             domain = "*.home.natsukium.com";
             answer = "manyara.tail4108.ts.net";
             enabled = true;

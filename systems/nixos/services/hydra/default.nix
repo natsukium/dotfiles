@@ -15,6 +15,13 @@
     useSubstitutes = true;
   };
 
+  services.caddy = {
+    enable = true;
+    virtualHosts."http://hydra.home.natsukium.com".extraConfig = ''
+      reverse_proxy localhost:${toString config.services.hydra.port}
+    '';
+  };
+
   sops.secrets = {
     hydra-admin-password = {
       sopsFile = ./secrets.yaml;
