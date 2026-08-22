@@ -17,12 +17,12 @@ in
     let
       cfg = config.my.programs.firefox;
       # renovate: datasource=github-releases depName=reizumii/parfait extractVersion=^v(?<version>.+)$
-      version = "0.19";
+      version = "0.20";
       parfait = pkgs.fetchFromGitHub {
         owner = "reizumii";
         repo = "parfait";
         tag = "v${version}";
-        hash = "sha256-6r4jQoqleNTLIA1G5N1dlVMWQe/kxTi6miLkuQxCDu4=";
+        hash = "sha256-7RZntDeQEddmjXA6ksWX7UfB3EOrhN/HSWevmm5dau8=";
       };
     in
     {
