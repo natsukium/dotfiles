@@ -12,7 +12,6 @@
     ../../../systems/nixos/services/atuin
     ../../../systems/nixos/services/calibre-web
     ../../../systems/nixos/services/continuwuity
-    ../../../systems/nixos/services/forgejo
     ../../../systems/nixos/services/hermes-agent
     ../../../systems/nixos/services/home-assistant
     ../../../systems/nixos/services/miniflux
@@ -36,6 +35,7 @@
   my.services.blackbox.enable = true;
   my.services.postgres-exporter.enable = true;
   my.services.cloudflare-r2-exporter.enable = true;
+  my.services.forgejo.enable = true;
   my.services.restic.enable = true;
 
   inherit (pkgs.callPackage ./disko-config.nix { disks = [ "/dev/nvme0n1" ]; }) disko;

@@ -30,8 +30,7 @@ in
           let
             inherit (config.home-manager.users.${config.my.username}) programs;
           in
-          [ "${programs.zen-browser.package}/Applications/Zen Browser (Beta).app" ]
-          ++ lib.optional programs.kitty.enable "${programs.kitty.package}/Applications/kitty.app"
+          lib.optional programs.kitty.enable "${programs.kitty.package}/Applications/kitty.app"
           ++ lib.optional programs.emacs.enable "${programs.emacs.package}/Applications/Emacs.app";
       };
       finder = {

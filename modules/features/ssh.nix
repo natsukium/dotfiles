@@ -12,7 +12,6 @@
         programs.ssh = {
           enable = true;
           enableDefaultConfig = false;
-          settings."*".ConnectTimeout = 5;
         };
       };
     };

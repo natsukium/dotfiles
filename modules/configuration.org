@@ -693,17 +693,10 @@ typically on desktop systems that suspend/resume.
 
 ** SSH Client
 
-Home-manager owns =~/.ssh/config= so that the handful of hosts I reach by a name that
-is not their real address stay in the repository rather than in a file I edit by
-hand. It still ships a set of legacy defaults behind =enableDefaultConfig= and warns
-whenever they are left on, so this module turns them off and writes only what the
-sections below ask for.
-
-=ConnectTimeout 5= is the one thing that applies to every host. The default lets ssh
-sit on an unreachable machine for over two minutes, which is long enough that a
-laptop that has wandered off the tailnet reads as a hang rather than a failure. The
-per-host blocks come from the feature that needs them; [[*Git][Git]] contributes the route to
-my forge.
+SSH is mostly tailscale's business, but a client still needs =~/.ssh/config= for
+the few hosts I reach by a name that is not their real address.
+This module only claims the file and turns off =enableDefaultConfig=, as
+upstream recommends.
 
 #+begin_src nix :tangle features/ssh.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -722,7 +715,6 @@ my forge.
         programs.ssh = {
           enable = true;
           enableDefaultConfig = false;
-          settings."*".ConnectTimeout = 5;
         };
       };
     };
@@ -1668,8 +1660,6 @@ scalar has no meaning without the git module it extends.
           <<git-lazygit>>
 
           <<git-fish-abbreviations>>
-
-          <<git-ssh>>
         })
 
         <<git-scalar-config>>
@@ -2157,32 +2147,184 @@ gsw = "git switch";
 gswc = "git switch -c";
 #+end_src
 
-*** Forge Route
+** Forgejo
 
-=git.natsukium.com= resolves publicly to the cloudflared tunnel, which carries HTTP
-only, so ssh has to be aimed somewhere else. The tailnet name reaches manyara from
-anywhere I am signed into tailscale and never changes, whereas the LAN address I
-pointed at before comes from DHCP and has already drifted once, turning a push into
-"No route to host" until I noticed and edited the file by hand. Port 2022 is a
-second sshd port on that host: tailscale runs with =--ssh=, so on the tailnet
-tailscaled answers 22 itself and hands out a plain shell as =forgejo=, never letting
-sshd apply the ~command="forgejo serv"~ restriction that git depends on.
+I self-host [[https://forgejo.org/][Forgejo]] on manyara as my personal forge at =git.natsukium.com=. This
+feature carries the NixOS module that runs the instance and the home-manager
+module that routes git's ssh traffic to it.
 
-Both belong here rather than in Forgejo's own settings. Forgejo renders a clone URL
-from =SSH_DOMAIN= and =SSH_PORT=, and any port other than 22 turns the short
-~forgejo@host:owner/repo.git~ form into a full ~ssh://host:2022/~ URI that I would
-then paste into every remote. The tailnet name and the port are properties of how I
-get there, not of the forge, so the web UI keeps advertising the plain address and
-this block redirects it.
+#+begin_src nix :tangle features/forgejo/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
 
-The block lands in =~/.ssh/config= through the [[*SSH Client][SSH Client]] module, which owns the file.
+#+begin_src nix :tangle features/forgejo/default.nix
+{ ... }:
+{
+  <<forgejo-instance>>
 
-#+NAME: git-ssh
+  <<forgejo-client>>
+}
+#+end_src
+
+*** Instance
+
+Registration is closed since I am the only human user. Forgejo has no
+declarative way to define users, so my admin account and the renovate bot's are
+created at service start instead.
+
+#+NAME: forgejo-instance
+#+begin_src nix
+flake.modules.nixos.forgejo =
+  {
+    config,
+    lib,
+    pkgs,
+    ...
+  }:
+  let
+    cfg = config.my.services.forgejo;
+  in
+  {
+    options.my.services.forgejo.enable = lib.mkEnableOption "my forgejo instance";
+
+    config = lib.mkIf cfg.enable {
+      services.forgejo = {
+        enable = true;
+        package = pkgs.forgejo;
+        database.type = "postgres";
+        settings = {
+          service.DISABLE_REGISTRATION = true;
+          server = {
+            HTTP_PORT = 3010;
+            DOMAIN = "git.natsukium.com";
+            ROOT_URL = "https://git.natsukium.com/";
+          };
+          actions = {
+            ENABLED = true;
+            DEFAULT_ACTIONS_URL = "github";
+          };
+        };
+      };
+
+      systemd.services.forgejo.preStart = ''
+        ${lib.getExe config.services.forgejo.package} admin user create \
+          --username natsukium \
+          --email "tomoya.otabi@gmail.com" \
+          --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})" || true
+
+        ${lib.getExe config.services.forgejo.package} admin user create \
+          --username renovate \
+          --email "renovate@natsukium.com" \
+          --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-renovate-password.path})" \
+          --must-change-password=false || true
+      '';
+
+      sops.secrets.forgejo-admin-password = {
+        sopsFile = ./secrets.yaml;
+        owner = "forgejo";
+      };
+
+      sops.secrets.forgejo-renovate-password = {
+        sopsFile = ./secrets.yaml;
+        owner = "forgejo";
+      };
+
+      my.services.cloudflared-tunnel.ingress.${config.services.forgejo.settings.server.DOMAIN} =
+        let
+          inherit (config.services.forgejo.settings.server) HTTP_ADDR HTTP_PORT;
+        in
+        {
+          service = "http://${toString HTTP_ADDR}:${toString HTTP_PORT}";
+        };
+
+      <<forgejo-ssh-port>>
+
+      <<forgejo-backup>>
+    };
+  };
+#+end_src
+
+**** SSH Port
+
+Tailscale runs with [[*Service Settings][=--ssh=]], so on the tailnet tailscaled answers port 22 itself
+and hands out a plain shell as =forgejo=. That bypasses the ~command="forgejo serv"~
+restriction git depends on, so sshd moves to 2022.
+=SSH_PORT= is pinned to 22 anyway: forgejo only uses it to
+render clone URLs, and any other value turns them into full ~ssh://~ URIs. The
+[[*SSH Route][ssh route]] on the client carries the real port.
+
+#+NAME: forgejo-ssh-port
+#+begin_src nix
+services.openssh.ports = [ 2022 ];
+services.forgejo.settings.server.SSH_PORT = 22;
+#+end_src
+
+**** Backup
+
+The repositories under =stateDir= are only half the instance: issues, users and
+access tokens live in postgres, and restoring one without the other leaves a
+Forgejo that cannot serve any of it. Upstream's =forgejo dump= is not an
+alternative: it warns that its own SQL dump has long-standing re-import bugs,
+and its zip would arrive as a fresh opaque blob every time, leaving restic
+nothing to deduplicate against yesterday's.
+
+#+NAME: forgejo-backup
+#+begin_src nix
+services.postgresqlBackup = {
+  enable = true;
+  databases = [ config.services.forgejo.database.name ];
+};
+
+my.services.restic.backups.forgejo.paths = [
+  config.services.forgejo.stateDir
+  "${config.services.postgresqlBackup.location}/${config.services.forgejo.database.name}.sql.gz"
+];
+#+end_src
+
+*** Client Settings
+
+What every machine of mine needs to talk to the instance: where ssh goes, and
+which remotes take that route.
+
+#+NAME: forgejo-client
+#+begin_src nix
+flake.modules.homeManager.forgejo =
+  { config, lib, ... }:
+  {
+    options.my.programs.forgejo.enable = lib.mkEnableOption "the ssh route to my forge";
+
+    config = lib.mkIf config.my.programs.forgejo.enable {
+      <<forgejo-ssh-route>>
+
+      <<forgejo-push-url>>
+    };
+  };
+#+end_src
+
+**** SSH Route
+
+=git.natsukium.com= resolves publicly to the cloudflared tunnel, which carries
+HTTP only, so ssh needs another path. Every machine of mine reaches manyara over
+tailscale, so this block points the public name at the tailnet one. It lands in
+=~/.ssh/config= through the [[*SSH Client][SSH Client]] module, which owns the file.
+
+#+NAME: forgejo-ssh-route
 #+begin_src nix
 programs.ssh.settings."git.natsukium.com" = {
   HostName = "manyara.tail4108.ts.net";
   Port = 2022;
 };
+#+end_src
+
+**** Push URLs
+
+Remotes cloned over https would push over https as well. This rewrite routes
+every push to the forge over ssh instead, leaving fetch on the tunnel.
+
+#+NAME: forgejo-push-url
+#+begin_src nix
+programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
 #+end_src
 
 * Continuous Integration
@@ -2815,8 +2957,7 @@ theme; [[https://github.com/greeeen-dev/natsumi-browser][natsumi-browser]] was t
 
 With the UI gap closed, what remains are my reservations: Zen's stability, its
 prospects as a project, and how well it is maintained in nixpkgs. So I switched to
-Firefox. Both browsers stay installed for now, sharing one set of search engines
-and extensions.
+Firefox and removed Zen from the configuration entirely.
 
 #+begin_src nix :tangle features/firefox/default.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -2831,8 +2972,6 @@ let
 in
 {
   <<firefox-module>>
-
-  <<zen-browser-module>>
 }
 #+end_src
 
@@ -2845,12 +2984,12 @@ profile home-manager already writes.
 #+NAME: firefox-parfait-source
 #+begin_src nix
 # renovate: datasource=github-releases depName=reizumii/parfait extractVersion=^v(?<version>.+)$
-version = "0.20";
+version = "0.19";
 parfait = pkgs.fetchFromGitHub {
   owner = "reizumii";
   repo = "parfait";
   tag = "v${version}";
-  hash = "sha256-7RZntDeQEddmjXA6ksWX7UfB3EOrhN/HSWevmm5dau8=";
+  hash = "sha256-6r4jQoqleNTLIA1G5N1dlVMWQe/kxTi6miLkuQxCDu4=";
 };
 #+end_src
 
@@ -2966,71 +3105,11 @@ darwin and Linux.
 home.file."${config.programs.firefox.profilesPath}/natsukium/chrome".source = parfait;
 #+end_src
 
-** Zen Browser
-
-Zen ships its own home-manager module in its flake, so mine only imports it and
-fills in the shared profile pieces.
-
-It never got along with Nix on darwin: with home-manager managing its profiles,
-launch kept ending in an error loop at the profile chooser, and the app bundle's
-code signature makes it hard to build in the Nix sandbox.
-
-#+NAME: zen-browser-module
-#+begin_src nix
-flake.modules.homeManager."zen-browser" =
-  {
-    inputs,
-    config,
-    lib,
-    pkgs,
-    ...
-  }:
-  let
-    cfg = config.my.programs.zen-browser;
-  in
-  {
-    imports = [ inputs.zen-browser.homeModules.beta ];
-
-    options.my.programs.zen-browser = {
-      enable = lib.mkEnableOption "Zen Browser";
-    };
-
-    config = lib.mkIf cfg.enable {
-      programs.zen-browser = {
-        enable = true;
-        profiles.natsukium = {
-          search = sharedSearch { inherit pkgs; };
-          extensions = sharedExtensions { inherit pkgs; };
-
-          <<zen-browser-settings>>
-        };
-      };
-    };
-  };
-#+end_src
-
-*** Settings
-
-Zen is a Firefox fork, so the preferences that are not about parfait carry over
-unchanged, for the reasons given in the Firefox profile.
-
-#+NAME: zen-browser-settings
-#+begin_src nix
-settings = {
-  "extensions.autoDisableScopes" = 0;
-
-  "browser.translations.automaticallyPopup" = false;
-  "layout.spellcheckDefault" = 0;
-  "signon.rememberSignons" = false;
-};
-#+end_src
-
 ** Search Engines
 
 Custom search engines for the package registries and documentation I search daily;
 a short alias in the address bar (=@np= and friends) beats navigating to each site
-first. Both browser profiles take this file, so an alias means the same thing
-whichever one is open.
+first.
 
 #+begin_src nix :tangle features/firefox/search.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -3271,6 +3350,9 @@ let
   # Pass target-file to org-babel-tangle-file so blocks without an explicit
   # :tangle header still get tangled; emacs-overlay's defaultInitFile path
   # calls plain org-babel-tangle, which would tangle 0 blocks here.
+  #
+  # Tangling writes no file header, so the lexical-binding cookie is prepended
+  # here; without it Emacs loads the config under dynamic binding.
   tangle =
     pkgs:
     {
@@ -3283,7 +3365,10 @@ let
         "(progn
           (require 'ob-tangle)
           (org-babel-tangle-file \"tmp.org\" \"emacs-lisp\"))"
-      install emacs-lisp $out
+      {
+        echo ";;; -*- lexical-binding: t; -*-"
+        cat emacs-lisp
+      } > $out
     '';
 
   tangleEl =

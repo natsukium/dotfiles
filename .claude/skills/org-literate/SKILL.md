@@ -13,9 +13,9 @@ translated to English and to the register of a personal configuration narrative.
 ## Formatting
 
 - Fill-wrap paragraphs at roughly 85 columns, matching the surrounding text.
-- Org markup: =code= for commands, option paths, and file names; ~verbatim~ for
-  literal values; `[[url][description]]` for links, with proper nouns kept as
-  the description.
+- Org markup: =code= for commands, option paths, and file names; `~verbatim~`
+  for literal values; `[[url][description]]` for links, with proper nouns kept
+  as the description.
 - Fragments of code, diffs, logs, and config belong in src blocks, not inline
   prose.
 - Bold a repo-specific term at its first definition; refer to it in plain text
@@ -44,6 +44,9 @@ someone's dotfiles, not a student reading a manual.
   architectural choices, package pins, temporary workarounds, forks.
 - Prose explains why and why-not-the-alternative; the code block already shows
   what. Never paraphrase the code line by line.
+- When a fact can be stated as configuration, state it in the code block even
+  if it only repeats a default. An explicit setting is clearer than a sentence
+  about the default.
 
 ## Paragraphs and argument
 
@@ -80,6 +83,9 @@ someone's dotfiles, not a student reading a manual.
   itself is the point (a 100 MiB request cap that forced a redesign earns its
   place).
 - Before adding a second example or scene, say what the first one didn't cover.
+- Keep sentences short. A semicolon joining two clauses is a sign the sentence
+  should be two sentences. Colons for elaboration and parentheses for asides
+  are fine.
 
 ## Restraint
 
