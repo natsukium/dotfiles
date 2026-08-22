@@ -29,6 +29,11 @@
           enable = true;
           configDir = "${config.xdg.configHome}/pi/agent";
           context = ../common/AGENTS.md;
+          settings.enabledModels = [
+            "openai-codex/gpt-5.6-luna"
+            "openai-codex/gpt-5.6-sol"
+            "opencode/x-preview-f-free"
+          ];
         };
 
         # Reuse repo-local Claude skills in pi instead of maintaining parallel
