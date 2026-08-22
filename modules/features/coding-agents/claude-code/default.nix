@@ -30,7 +30,7 @@
             outputStyle = "Concise";
 
             attribution = {
-              commit = "Assisted-by: Claude Code Opus 5";
+              commit = "";
               pr = "";
               sessionUrl = false;
             };
