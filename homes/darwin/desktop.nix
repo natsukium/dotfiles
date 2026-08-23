@@ -14,10 +14,11 @@ let
 in
 {
   imports = [
-    ../../applications/paneru
     ../desktop.nix
     ./gui-apps-utils
   ];
+
+  my.programs.paneru.enable = true;
 
   home.packages = with pkgs; [
     monitorcontrol

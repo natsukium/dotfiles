@@ -55,7 +55,7 @@
       #    in the Cloudflare dashboard; the Terraform provider cannot create
       #    API tokens.
       # 3. openssl rand -base64 32   # the repository password
-      # 4. sops modules/features/restic/secrets.yaml and fill in
+      # 4. sops modules/features/backup/restic/secrets.yaml and fill in
       #    restic-password and restic-r2-credentials, the latter holding
       #    AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY lines.
       #

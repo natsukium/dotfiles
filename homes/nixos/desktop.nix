@@ -12,10 +12,11 @@ let
 in
 {
   imports = [
-    ../../applications/hyprland
-    ../../applications/niri
     ../desktop.nix
   ];
+
+  my.programs.hyprland.enable = true;
+  my.programs.niri.enable = true;
 
   home.packages = with pkgs; [
     rofi-rbw

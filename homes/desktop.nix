@@ -1,10 +1,11 @@
 { ... }:
 {
+  my.programs.kitty.enable = true;
+  my.programs.qutebrowser.enable = true;
+  my.programs.vscode.enable = true;
+  my.programs.zotero.enable = true;
+
   imports = [
-    ../applications/kitty
-    ../applications/qutebrowser
-    ../applications/vscode
-    ../applications/zotero
     ./shared/email.nix
     ./shared/gpg
     ./shared/weechat.nix

@@ -34,10 +34,5 @@ in
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
     paneru.homeModules.paneru
-    ../applications/atuin
-    ../applications/gh-dash
-    ../applications/misc
-    ../applications/rbw
-    ../applications/tmux
   ];
 }

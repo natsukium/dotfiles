@@ -817,12 +817,12 @@ build time instead.
 programs.fish.useBabelfish = true;
 #+end_src
 
-#+begin_src nix :tangle features/fish/default.nix :exports none
+#+begin_src nix :tangle features/shell/fish/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/fish/default.nix
+#+begin_src nix :tangle features/shell/fish/default.nix
 { ... }:
 let
   # System scope: install fish, register it as a login shell, and make it the
@@ -1120,12 +1120,12 @@ Registered as a home-manager feature behind =my.programs.bash.enable=, matching
 the toggle every other shell in this section already has, rather than applying
 unconditionally to every home that imports the profile it used to live in.
 
-#+begin_src nix :tangle features/bash.nix :exports none
+#+begin_src nix :tangle features/shell/bash.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/bash.nix
+#+begin_src nix :tangle features/shell/bash.nix
 { ... }:
 {
   flake.modules.homeManager.bash =
@@ -1261,12 +1261,12 @@ character into its keymap after reading =inputrc=, which puts =Ctrl+W= back on
 
 =completion-ignore-case= makes tab completion case-insensitive.
 
-#+begin_src nix :tangle features/readline.nix :exports none
+#+begin_src nix :tangle features/shell/readline.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/readline.nix
+#+begin_src nix :tangle features/shell/readline.nix
 { ... }:
 {
   flake.modules.homeManager.readline =
@@ -1313,12 +1313,12 @@ use, and committing to Nushell-specific workflows would be premature.
 
 Registered behind =my.programs.nushell.enable=, like the other shells in this section.
 
-#+begin_src nix :tangle features/nushell.nix :exports none
+#+begin_src nix :tangle features/shell/nushell.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/nushell.nix
+#+begin_src nix :tangle features/shell/nushell.nix
 { ... }:
 {
   flake.modules.homeManager.nushell =
@@ -1409,12 +1409,12 @@ Registered behind =my.programs.starship.enable=, with =enableFishAsyncPrompt=
 as a second, independent toggle on the same module — a host can run starship
 without the async prompt, but not the reverse.
 
-#+begin_src nix :tangle features/starship/default.nix :exports none
+#+begin_src nix :tangle features/shell/starship/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/starship/default.nix
+#+begin_src nix :tangle features/shell/starship/default.nix
 { ... }:
 {
   flake.modules.homeManager.starship =
@@ -1450,7 +1450,7 @@ without the async prompt, but not the reverse.
 }
 #+end_src
 
-#+begin_src toml :tangle features/starship/starship.toml :exports none
+#+begin_src toml :tangle features/shell/starship/starship.toml :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
@@ -1461,7 +1461,7 @@ The prompt format prepends a shell indicator before the default modules.
 This makes it immediately visible which shell is active, useful when switching
 between fish and bash for testing or debugging.
 
-#+begin_src toml :tangle features/starship/starship.toml
+#+begin_src toml :tangle features/shell/starship/starship.toml
 "$schema" = "https://starship.rs/config-schema.json"
 
 format = "$shell$all$line_break$character"
@@ -1472,7 +1472,7 @@ format = "$shell$all$line_break$character"
 Each shell has a distinct icon: =󰈺= (fish icon) for fish. Bash and nushell
 use the default indicator.
 
-#+begin_src toml :tangle features/starship/starship.toml
+#+begin_src toml :tangle features/shell/starship/starship.toml
 [shell]
 fish_indicator = "󰈺"
 powershell_indicator = "󰨊"
@@ -1486,7 +1486,7 @@ A custom module detects when running inside a VS Code Remote Container
 displaying a whale emoji (🐋) as a visual reminder. This has not been used for
 several years and may no longer be relevant.
 
-#+begin_src toml :tangle features/starship/starship.toml
+#+begin_src toml :tangle features/shell/starship/starship.toml
 [custom.remote-container]
 when = """ test "$REMOTE_CONTAINERS" """
 symbol = "🐋"
@@ -1499,7 +1499,7 @@ format = " in $symbol "
 home directory (=~/.config/gcloud/=), causing it to appear in every repository
 regardless of whether the project uses GCP.
 
-#+begin_src toml :tangle features/starship/starship.toml
+#+begin_src toml :tangle features/shell/starship/starship.toml
 [gcloud]
 disabled = true
 #+end_src
@@ -1530,12 +1530,12 @@ See also [[https://github.com/fish-shell/fish-shell/issues/8223][fish-shell#8223
 
 **** Async Prompt Script
 
-#+begin_src fish :tangle features/starship/async_prompt.fish :exports none
+#+begin_src fish :tangle features/shell/starship/async_prompt.fish :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src fish :tangle features/starship/async_prompt.fish
+#+begin_src fish :tangle features/shell/starship/async_prompt.fish
 # cherry picked from https://gist.github.com/duament/bac0181935953b97ca71640727c9c029
 status is-interactive
 or exit 0
@@ -2959,12 +2959,12 @@ With the UI gap closed, what remains are my reservations: Zen's stability, its
 prospects as a project, and how well it is maintained in nixpkgs. So I switched to
 Firefox and removed Zen from the configuration entirely.
 
-#+begin_src nix :tangle features/firefox/default.nix :exports none
+#+begin_src nix :tangle features/browser/firefox/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/firefox/default.nix
+#+begin_src nix :tangle features/browser/firefox/default.nix
 { ... }:
 let
   sharedSearch = import ./search.nix;
@@ -3100,12 +3100,12 @@ Custom search engines for the package registries and documentation I search dail
 a short alias in the address bar (=@np= and friends) beats navigating to each site
 first.
 
-#+begin_src nix :tangle features/firefox/search.nix :exports none
+#+begin_src nix :tangle features/browser/firefox/search.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/firefox/search.nix
+#+begin_src nix :tangle features/browser/firefox/search.nix
 { pkgs }:
 {
   force = true;
@@ -3223,12 +3223,12 @@ Both profiles take the same extension list. The packages come from two overlay
 sets: =firefox-addons= repackages the NUR firefox-addons repository, and
 =my-firefox-addons= carries the ones upstream does not have.
 
-#+begin_src nix :tangle features/firefox/extensions.nix :exports none
+#+begin_src nix :tangle features/browser/firefox/extensions.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/firefox/extensions.nix
+#+begin_src nix :tangle features/browser/firefox/extensions.nix
 { pkgs }:
 {
   packages =
@@ -3259,7 +3259,7 @@ Neovim is the editor I spend the most time in, primarily for coding —
 though the gravitational pull of =org-mode= is slowly dragging me over
 to Emacs.
 
-Everything Neovim-related lives under =features/neovim/=: the
+Everything Neovim-related lives under =features/editor/neovim/=: the
 wrapped derivation (=package.nix=) and the lua configuration. The
 flake-parts module pulls double duty from a single file:
 
@@ -3271,7 +3271,7 @@ flake-parts module pulls double duty from a single file:
    opt in with =my.programs.neovim.enable=, which installs the wrapped
    Neovim plus =neovim-remote= and exports =EDITOR=nvim=.
 
-#+begin_src nix :tangle features/neovim/default.nix
+#+begin_src nix :tangle features/editor/neovim/default.nix
 { ... }:
 {
   flake.modules.homeManager.neovim =
@@ -3309,7 +3309,7 @@ are slowly winning me over, and a widening set of daily inputs (email,
 RSS feeds, and more) now lives inside emacs, where the ongoing
 experiment is wiring each of them back into org.
 
-The feature lives alongside Neovim under =features/emacs/= and
+The feature lives alongside Neovim under =features/editor/emacs/= and
 pulls the same double duty:
 
 1. =perSystem.packages.emacs= exposes a wrapped emacs as a flake
@@ -3325,7 +3325,7 @@ pulls the same double duty:
    =~/.config/emacs/{init,early-init}.el=, and the encrypted
    =~/.authinfo.age=.
 
-#+begin_src nix :tangle features/emacs/default.nix
+#+begin_src nix :tangle features/editor/emacs/default.nix
 # Requires: inputs.emacs-overlay
 { lib, inputs, ... }:
 let
@@ -3445,7 +3445,7 @@ in
 }
 #+end_src
 
-#+begin_src nix :tangle features/emacs/package.nix
+#+begin_src nix :tangle features/editor/emacs/package.nix
 {
   stdenv,
   age,
@@ -3524,9 +3524,9 @@ launchd.agents = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {
 #+end_src
 
 *** early-init.org
-#+INCLUDE: "./features/emacs/early-init.org"
+#+INCLUDE: "./features/editor/emacs/early-init.org"
 *** init.org
-#+INCLUDE: "./features/emacs/init.org"
+#+INCLUDE: "./features/editor/emacs/init.org"
 
 * Speech to Text
 
@@ -3762,12 +3762,12 @@ subscribe= and forwards each alert to =terminal-notifier= (macOS) or
 already flashes its own window. It replaces the subscribe loop I used to
 hand-roll here.
 
-#+begin_src nix :tangle features/felis/default.nix :exports none
+#+begin_src nix :tangle features/terminal/felis/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/felis/default.nix
+#+begin_src nix :tangle features/terminal/felis/default.nix
 { inputs, ... }:
 let
   daemon =
@@ -3988,12 +3988,12 @@ holds =felis-kill=, the multi-select cousin that tears sessions down;
 can't do; and =felis-scrollback=, which opens the scrollback =pipe= region
 read-only in Neovim so editor motions replace the pager.
 
-#+begin_src nix :tangle features/felis/utilities.nix :exports none
+#+begin_src nix :tangle features/terminal/felis/utilities.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/felis/utilities.nix
+#+begin_src nix :tangle features/terminal/felis/utilities.nix
 {
   lib,
   pkgs,
