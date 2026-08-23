@@ -106,7 +106,7 @@
                     text = builtins.readFile ../../scripts/check-org-tangle.sh;
                   }
                 );
-                files = "\\.org$";
+                always_run = true;
                 pass_filenames = false;
               };
             };
