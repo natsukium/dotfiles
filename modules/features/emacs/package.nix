@@ -12,7 +12,6 @@
   nixfmt,
   terraform-ls,
   yaml-language-server,
-  defaultInitFile,
   org-clickup-src,
 }:
 let
@@ -22,10 +21,6 @@ emacsWithPackagesFromUsePackage {
   package = emacs-unwrapped;
   config = ./init.org;
   alwaysTangle = true;
-  # Bundle the tangled init.org as default.el so the package is usable
-  # standalone (e.g. `nix run .#emacs`); a home-manager-managed
-  # ~/.config/emacs/init.el still takes precedence when present.
-  inherit defaultInitFile;
   override =
     epkgs:
     epkgs

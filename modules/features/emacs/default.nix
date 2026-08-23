@@ -11,8 +11,8 @@ let
     if pkgs.stdenv.hostPlatform.isDarwin then epkgs.emacs-plus else epkgs.emacs-pgtk;
 
   # Pass target-file to org-babel-tangle-file so blocks without an explicit
-  # :tangle header still get tangled; emacs-overlay's defaultInitFile path
-  # calls plain org-babel-tangle, which would tangle 0 blocks here.
+  # :tangle header still get tangled; plain org-babel-tangle would tangle
+  # 0 blocks here.
   #
   # Tangling writes no file header, so the lexical-binding cookie is prepended
   # here; without it Emacs loads the config under dynamic binding.
@@ -47,12 +47,33 @@ let
   mkEmacs =
     pkgs:
     (withEmacsOverlay pkgs).callPackage ./package.nix {
-      defaultInitFile = tangle pkgs {
-        name = "default.el";
-        org = ./init.org;
-      };
       org-clickup-src = inputs.org-clickup;
     };
+
+  # `nix run .#emacs` should start this config even for someone who has their
+  # own init files. Bundling the config as default.el cannot deliver that:
+  # default.el loads after the user's init, so a guest gets both configs mixed,
+  # and with the home-manager-managed init.el the whole config was evaluated
+  # twice per startup. A writable --init-directory sidesteps both: the guest's
+  # ~/.config/emacs is never read, and state (elpa, eln-cache, savehist) lands
+  # outside the read-only store.
+  mkStandalone =
+    pkgs:
+    let
+      emacs = mkEmacs pkgs;
+      emacsBin =
+        if pkgs.stdenv.hostPlatform.isDarwin then
+          "${emacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
+        else
+          "${emacs}/bin/emacs";
+    in
+    pkgs.writeShellScriptBin "emacs" ''
+      dir="''${XDG_CACHE_HOME:-$HOME/.cache}/natsukium-emacs"
+      mkdir -p "$dir"
+      ln -sf ${tangleEl pkgs ./init.org} "$dir/init.el"
+      ln -sf ${tangleEl pkgs ./early-init.org} "$dir/early-init.el"
+      exec ${emacsBin} --init-directory "$dir" "$@"
+    '';
 in
 {
   flake.modules.homeManager.emacs =
@@ -101,6 +122,6 @@ in
   perSystem =
     { pkgs, ... }:
     {
-      packages.emacs = mkEmacs pkgs;
+      packages.emacs = mkStandalone pkgs;
     };
 }

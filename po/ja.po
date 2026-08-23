@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-08-23 17:00+0900\n"
+"POT-Creation-Date: 2026-08-23 17:05+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -430,7 +430,7 @@ msgstr ""
 #: configuration.org:70 modules/features/emacs/init.org:652
 #: modules/configuration.org:80 modules/configuration.org:452
 #: modules/configuration.org:599 modules/configuration.org:2540
-#: modules/configuration.org:4241
+#: modules/configuration.org:4259
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -4014,7 +4014,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/emacs/init.org:93 modules/configuration.org:4198
+#: modules/features/emacs/init.org:93 modules/configuration.org:4216
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -7254,7 +7254,7 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:156 modules/configuration.org:3526
+#: overlays/configuration.org:156 modules/configuration.org:3544
 #, no-wrap
 msgid "Handy"
 msgstr ""
@@ -7558,7 +7558,7 @@ msgstr "home-manager"
 
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:357
-#: modules/configuration.org:558 modules/configuration.org:4228
+#: modules/configuration.org:558 modules/configuration.org:4246
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -13812,17 +13812,19 @@ msgid ""
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:3330
+#: modules/configuration.org:3332
 #, no-wrap
 msgid ""
 "=perSystem.packages.emacs= exposes a wrapped emacs as a flake\n"
-"output. =init.org= is pre-tangled into =default.el= and passed to\n"
-"=emacsWithPackagesFromUsePackage= so =nix run .#emacs= loads the\n"
-"full config without home-manager."
+"output: a launcher that seeds a writable directory under\n"
+"=XDG_CACHE_HOME= with the tangled init files and starts emacs with\n"
+"=--init-directory=. =nix run .#emacs= therefore shows this config\n"
+"as-is, even on a machine whose owner has their own\n"
+"=~/.config/emacs=."
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:3336
+#: modules/configuration.org:3338
 #, no-wrap
 msgid ""
 "=flake.modules.homeManager.emacs= registers the module in the internal\n"
@@ -13834,7 +13836,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3339
+#: modules/configuration.org:3341
 #, no-wrap
 msgid ""
 "{ lib, inputs, ... }:\n"
@@ -13843,7 +13845,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3343
+#: modules/configuration.org:3345
 #, no-wrap
 msgid ""
 "emacsUnwrapped =\n"
@@ -13855,7 +13857,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3356
+#: modules/configuration.org:3358
 #, no-wrap
 msgid ""
 "tangle =\n"
@@ -13878,7 +13880,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3374
+#: modules/configuration.org:3376
 #, no-wrap
 msgid ""
 "tangleEl =\n"
@@ -13893,18 +13895,37 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3384
+#: modules/configuration.org:3386
 #, no-wrap
 msgid ""
-"  mkEmacs =\n"
+"mkEmacs =\n"
+"  pkgs:\n"
+"  (withEmacsOverlay pkgs).callPackage ./package.nix {\n"
+"    org-clickup-src = inputs.org-clickup;\n"
+"  };"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:3399
+#, no-wrap
+msgid ""
+"  mkStandalone =\n"
 "    pkgs:\n"
-"    (withEmacsOverlay pkgs).callPackage ./package.nix {\n"
-"      defaultInitFile = tangle pkgs {\n"
-"        name = \"default.el\";\n"
-"        org = ./init.org;\n"
-"      };\n"
-"      org-clickup-src = inputs.org-clickup;\n"
-"    };\n"
+"    let\n"
+"      emacs = mkEmacs pkgs;\n"
+"      emacsBin =\n"
+"        if pkgs.stdenv.hostPlatform.isDarwin then\n"
+"          \"${emacs}/Applications/Emacs.app/Contents/MacOS/Emacs\"\n"
+"        else\n"
+"          \"${emacs}/bin/emacs\";\n"
+"    in\n"
+"    pkgs.writeShellScriptBin \"emacs\" ''\n"
+"      dir=\"''${XDG_CACHE_HOME:-$HOME/.cache}/natsukium-emacs\"\n"
+"      mkdir -p \"$dir\"\n"
+"      ln -sf ${tangleEl pkgs ./init.org} \"$dir/init.el\"\n"
+"      ln -sf ${tangleEl pkgs ./early-init.org} \"$dir/early-init.el\"\n"
+"      exec ${emacsBin} --init-directory \"$dir\" \"$@\"\n"
+"    '';\n"
 "in\n"
 "{\n"
 "  flake.modules.homeManager.emacs =\n"
@@ -13919,7 +13940,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3405
+#: modules/configuration.org:3428
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.emacs.enable {\n"
@@ -13930,7 +13951,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3411
+#: modules/configuration.org:3434
 #, no-wrap
 msgid ""
 "services.emacs = {\n"
@@ -13940,13 +13961,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3416
+#: modules/configuration.org:3439
 #, no-wrap
 msgid "<<emacs-daemon-path>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3418
+#: modules/configuration.org:3441
 #, no-wrap
 msgid ""
 "xdg.configFile.\"emacs/init.el\".source = tangleEl pkgs ./init.org;\n"
@@ -13955,7 +13976,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3422
+#: modules/configuration.org:3445
 #, no-wrap
 msgid ""
 "    home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -13966,19 +13987,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3428
+#: modules/configuration.org:3451
 #, no-wrap
 msgid ""
 "  perSystem =\n"
 "    { pkgs, ... }:\n"
 "    {\n"
-"      packages.emacs = mkEmacs pkgs;\n"
+"      packages.emacs = mkStandalone pkgs;\n"
 "    };\n"
 "}"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3437
+#: modules/configuration.org:3460
 #, no-wrap
 msgid ""
 "{\n"
@@ -13995,7 +14016,6 @@ msgid ""
 "  nixfmt,\n"
 "  terraform-ls,\n"
 "  yaml-language-server,\n"
-"  defaultInitFile,\n"
 "  org-clickup-src,\n"
 "}:\n"
 "let\n"
@@ -14005,7 +14025,6 @@ msgid ""
 "  package = emacs-unwrapped;\n"
 "  config = ./init.org;\n"
 "  alwaysTangle = true;\n"
-"  inherit defaultInitFile;\n"
 "  override =\n"
 "    epkgs:\n"
 "    epkgs\n"
@@ -14035,13 +14054,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3493
+#: modules/configuration.org:3511
 #, no-wrap
 msgid "Daemon PATH"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3495
+#: modules/configuration.org:3513
 msgid ""
 "launchd hands its agents only the system =PATH=, and =init.org= repairs "
 "=PATH= with =exec-path-from-shell= only when =window-system= is non-nil, "
@@ -14053,13 +14072,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3504
+#: modules/configuration.org:3522
 #, no-wrap
 msgid "emacs-daemon-path"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3506
+#: modules/configuration.org:3524
 #, no-wrap
 msgid ""
 "launchd.agents = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -14076,39 +14095,39 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3519
+#: modules/configuration.org:3537
 #, no-wrap
 msgid "early-init.org"
 msgstr "early-init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:3520
+#: modules/configuration.org:3538
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/early-init.org\""
 msgid "\"./features/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: modules/configuration.org:3521
+#: modules/configuration.org:3539
 #, no-wrap
 msgid "init.org"
 msgstr "init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:3522
+#: modules/configuration.org:3540
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/init.org\""
 msgid "\"./features/emacs/init.org\""
 msgstr "\"./applications/emacs/init.ja.org\""
 
 #. type: heading *
-#: modules/configuration.org:3524
+#: modules/configuration.org:3542
 #, no-wrap
 msgid "Speech to Text"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3528
+#: modules/configuration.org:3546
 msgid ""
 "[[https://handy.computer][Handy]] is an offline speech-to-text app: press a "
 "hotkey, speak, and the transcription is typed into the focused field. The "
@@ -14119,7 +14138,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3534
+#: modules/configuration.org:3552
 msgid ""
 "Almost everything is per-user and cross-platform, so it lives in a home-"
 "manager module: the package plus an autostart agent, a systemd user service "
@@ -14129,7 +14148,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3540
+#: modules/configuration.org:3558
 msgid ""
 "The one piece home-manager cannot express is system-level. Handy reads its "
 "global hotkey straight from =/dev/input/event*= via evdev, which only the "
@@ -14143,7 +14162,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3550
+#: modules/configuration.org:3568
 msgid ""
 "The desktop profile enables it by default, setting the home switch on every "
 "desktop and, on NixOS only, adding the =input= group through its =nixos= "
@@ -14151,7 +14170,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3559
+#: modules/configuration.org:3577
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -14178,7 +14197,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3581
+#: modules/configuration.org:3599
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable (\n"
@@ -14187,7 +14206,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3585
+#: modules/configuration.org:3603
 #, no-wrap
 msgid ""
 "(lib.mkIf pkgs.stdenv.hostPlatform.isLinux {\n"
@@ -14208,7 +14227,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3601
+#: modules/configuration.org:3619
 #, no-wrap
 msgid ""
 "      (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -14229,7 +14248,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3619
+#: modules/configuration.org:3637
 #, no-wrap
 msgid ""
 "nixosModule =\n"
@@ -14243,7 +14262,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3628
+#: modules/configuration.org:3646
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.handy.enable {\n"
@@ -14258,19 +14277,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3641
+#: modules/configuration.org:3659
 #, no-wrap
 msgid "Launcher"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3643
+#: modules/configuration.org:3661
 #, no-wrap
 msgid "Vicinae"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3645
+#: modules/configuration.org:3663
 msgid ""
 "[[https://github.com/vicinae/vicinae][Vicinae]] is a cross-platform launcher "
 "for Linux and macOS, designed to run extensions from Raycast, the popular "
@@ -14279,14 +14298,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3650
+#: modules/configuration.org:3668
 msgid ""
 "On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as "
 "described later."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3659
+#: modules/configuration.org:3677
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -14303,13 +14322,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3671
+#: modules/configuration.org:3689
 #, no-wrap
 msgid "options.my.programs.vicinae.enable = lib.mkEnableOption \"vicinae launcher\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3673
+#: modules/configuration.org:3691
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.vicinae.enable {\n"
@@ -14349,20 +14368,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3709
+#: modules/configuration.org:3727
 #, fuzzy, no-wrap
 #| msgid "terminal"
 msgid "Terminal"
 msgstr "ターミナル"
 
 #. type: heading **
-#: modules/configuration.org:3711
+#: modules/configuration.org:3729
 #, no-wrap
 msgid "Felis"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3713
+#: modules/configuration.org:3731
 msgid ""
 "[[https://git.natsukium.com/natsukium/felis][felis]] is a daemon/client "
 "terminal whose defining feature is session persistence across hosts. Apart "
@@ -14371,7 +14390,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3717
+#: modules/configuration.org:3735
 msgid ""
 "The client names a separate [[https://github.com/yuru7/moralerspace]"
 "[Moralerspace]] flavor per text style — Neon, Xenon, Radon, Krypton. felis "
@@ -14381,7 +14400,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3722
+#: modules/configuration.org:3740
 msgid ""
 "Two keymap entries work around problems outside felis. On a JIS keyboard the "
 "yen key still types =¥= though macOS is set to emit =\\=, because winit "
@@ -14393,7 +14412,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3730
+#: modules/configuration.org:3748
 msgid ""
 "The built-in =switch_{next,previous}_session= bindings only step one session "
 "at a time. =felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead "
@@ -14402,7 +14421,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3735
+#: modules/configuration.org:3753
 msgid ""
 "felis makes only OSC 8 hyperlinks clickable, not the plain-text URLs that "
 "fill real output, leaving that heuristic to an external tool as kitty does.  "
@@ -14417,7 +14436,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3745
+#: modules/configuration.org:3763
 msgid ""
 "=felis-nix-log= (=Ctrl+Shift+l=, ported from kitty) scans the grid for a "
 "=nix log <drv>= line and pages that build log. It uses grep + fzf rather "
@@ -14427,7 +14446,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3751
+#: modules/configuration.org:3769
 msgid ""
 "Desktop notifications now come from felis' own home-manager module, not a "
 "helper of mine: =notifications.enable= runs a relay that streams =felis "
@@ -14438,7 +14457,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3764
+#: modules/configuration.org:3782
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -14455,7 +14474,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3776
+#: modules/configuration.org:3794
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -14471,7 +14490,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3787
+#: modules/configuration.org:3805
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -14489,7 +14508,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3805
+#: modules/configuration.org:3823
 #, no-wrap
 msgid ""
 "inherit\n"
@@ -14512,7 +14531,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3825
+#: modules/configuration.org:3843
 #, no-wrap
 msgid ""
 "  moralerspace = flavor: \"Moralerspace ${flavor} HW\";\n"
@@ -14531,13 +14550,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3839
+#: modules/configuration.org:3857
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3841
+#: modules/configuration.org:3859
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -14545,7 +14564,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3844
+#: modules/configuration.org:3862
 #, no-wrap
 msgid ""
 "home.packages = [\n"
@@ -14556,7 +14575,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3850
+#: modules/configuration.org:3868
 #, no-wrap
 msgid ""
 "programs.felis = {\n"
@@ -14565,13 +14584,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3856
+#: modules/configuration.org:3874
 #, no-wrap
 msgid "notifications.enable = true;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3858
+#: modules/configuration.org:3876
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -14586,7 +14605,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3870
+#: modules/configuration.org:3888
 #, no-wrap
 msgid ""
 "theme = {\n"
@@ -14626,7 +14645,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3906
+#: modules/configuration.org:3924
 #, no-wrap
 msgid ""
 "keymap = {\n"
@@ -14680,7 +14699,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3965
+#: modules/configuration.org:3983
 #, no-wrap
 msgid ""
 "            mouse.wheel_scroll_multiplier = 5;\n"
@@ -14692,13 +14711,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3973
+#: modules/configuration.org:3991
 #, no-wrap
 msgid "Session and hint helpers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3975
+#: modules/configuration.org:3993
 msgid ""
 "The keymap points at six shell programs, none touching the module system; "
 "their =writeShellApplication= bodies would bury the configuration if they "
@@ -14711,7 +14730,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3990
+#: modules/configuration.org:4008
 #, no-wrap
 msgid ""
 "{\n"
@@ -14726,7 +14745,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4005
+#: modules/configuration.org:4023
 #, no-wrap
 msgid ""
 "felis-switch = pkgs.writeShellApplication {\n"
@@ -14745,19 +14764,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4023
+#: modules/configuration.org:4041
 #, no-wrap
 msgid "awk -v self=\"''${FELIS_SESSION_ID:-}\" '$1 != self' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4024 modules/configuration.org:4054
+#: modules/configuration.org:4042 modules/configuration.org:4072
 #, no-wrap
 msgid "fzf --ansi \\"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4021
+#: modules/configuration.org:4039
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -14769,7 +14788,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4030
+#: modules/configuration.org:4048
 #, no-wrap
 msgid ""
 "    id=''${selection%% *}\n"
@@ -14779,7 +14798,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4038
+#: modules/configuration.org:4056
 #, no-wrap
 msgid ""
 "felis-kill = pkgs.writeShellApplication {\n"
@@ -14798,7 +14817,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4052
+#: modules/configuration.org:4070
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -14811,19 +14830,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4062 modules/configuration.org:4083
+#: modules/configuration.org:4080 modules/configuration.org:4101
 #, no-wrap
 msgid "awk 'NF {print $1}' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4063 modules/configuration.org:4084
+#: modules/configuration.org:4081 modules/configuration.org:4102
 #, no-wrap
 msgid "while read -r id; do"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4061
+#: modules/configuration.org:4079
 #, no-wrap
 msgid ""
 "    printf '%s\\n' \"$selection\" \\\n"
@@ -14834,13 +14853,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4086
+#: modules/configuration.org:4104
 #, no-wrap
 msgid "awk -v id=\"$id\" 'NF {print id\"\\t\"$0}'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4073
+#: modules/configuration.org:4091
 #, no-wrap
 msgid ""
 "felis-grep = pkgs.writeShellApplication {\n"
@@ -14863,13 +14882,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4096
+#: modules/configuration.org:4114
 #, no-wrap
 msgid "fzf --delimiter='\\t' --with-nth=2.. --prompt='grep scrollback> '"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4094
+#: modules/configuration.org:4112
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -14878,7 +14897,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4099
+#: modules/configuration.org:4117
 #, no-wrap
 msgid ""
 "    id=$(printf '%s' \"$selection\" | awk -F'\\t' '{print $1; exit}')\n"
@@ -14888,7 +14907,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4109
+#: modules/configuration.org:4127
 #, no-wrap
 msgid ""
 "felis-scrollback = pkgs.writeShellApplication {\n"
@@ -14904,7 +14923,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4135
+#: modules/configuration.org:4153
 #, no-wrap
 msgid ""
 "felis-hints = pkgs.writeShellApplication {\n"
@@ -14928,19 +14947,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4174
+#: modules/configuration.org:4192
 #, no-wrap
 msgid "sed 's/^nix log //' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:4175
+#: modules/configuration.org:4193
 #, no-wrap
 msgid "awk '!seen[$0]++'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4162
+#: modules/configuration.org:4180
 #, no-wrap
 msgid ""
 "  felis-nix-log = pkgs.writeShellApplication {\n"
@@ -14978,13 +14997,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4200
+#: modules/configuration.org:4218
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4202
+#: modules/configuration.org:4220
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -14994,7 +15013,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4213
+#: modules/configuration.org:4231
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -15009,7 +15028,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4223
+#: modules/configuration.org:4241
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -15018,13 +15037,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4230
+#: modules/configuration.org:4248
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4232
+#: modules/configuration.org:4250
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -15037,7 +15056,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4243
+#: modules/configuration.org:4261
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -15047,13 +15066,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4248
+#: modules/configuration.org:4266
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4250
+#: modules/configuration.org:4268
 #, no-wrap
 msgid ""
 "config = {\n"
