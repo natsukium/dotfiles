@@ -1,6 +1,6 @@
 { config, pkgs, ... }:
 let
-  inherit (pkgs) lib stdenv;
+  inherit (pkgs) lib;
   isyncWithCyrusSaslXoauth2 = pkgs.isync.override { withCyrusSaslXoauth2 = true; };
 
   notmuchCmd = lib.getExe pkgs.notmuch;
@@ -32,16 +32,6 @@ in
       imapnotify = {
         enable = true;
         boxes = [ "Inbox" ];
-        onNotify = "${lib.getExe config.my.services.mbsync.package} gmail";
-        onNotifyPost =
-          let
-            notification =
-              if stdenv.hostPlatform.isLinux then
-                "${lib.getExe pkgs.libnotify} 'New mail arrived'"
-              else
-                ''osascript -e "display notification \"New mail arrived\" with title \"email\""'';
-          in
-          "${postSyncCmd}; ${notification}";
         extraConfig.xoAuth2 = true;
       };
       notmuch.enable = true;
