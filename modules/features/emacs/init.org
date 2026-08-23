@@ -291,7 +291,7 @@ The built-in savehist package keeps a record of user inputs and stores them acro
 
 (use-package diff-hl
   :ensure t
-  :init
+  :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
   (add-hook 'dired-mode-hook 'diff-hl-dired-mode)
@@ -310,7 +310,8 @@ so magit's own diff stays the default and difftastic is one key away.
 #+begin_src emacs-lisp
 (use-package difftastic
   :ensure t
-  :init
+  :after magit
+  :config
   (difftastic-bindings-mode))
 #+end_src
 
@@ -1338,9 +1339,9 @@ the token is cached under =.cache/gptel-openai/= in =user-emacs-directory=.
 #+end_src
 
 #+begin_src emacs-lisp
-;; Consult users will also want the embark-consult package.
 (use-package embark-consult
-  :ensure t)
+  :ensure t
+  :after (consult embark))
 #+end_src
 
 ** compilation
@@ -1382,11 +1383,14 @@ The format is \"/path/to/file:START-END\"."
 
 (setq-default indent-tabs-mode nil)
 
-(require 'org-tempo)
-
-(org-babel-do-load-languages
- 'org-babel-load-languages
- '((shell . t)))
+;; org-tempo provides the "<s TAB" snippet expansion.  At top level, both this
+;; require and org-babel-do-load-languages (autoloaded from org.el) pull all
+;; of Org into startup (~1s), so they wait here until something loads Org.
+(with-eval-after-load 'org
+  (require 'org-tempo)
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((shell . t))))
 
 (setq org-src-preserve-indentation t)
 #+end_src
