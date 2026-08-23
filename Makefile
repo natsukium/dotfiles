@@ -94,24 +94,31 @@ endif
 
 build: $(SYSTEM)
 
-build-all: x86_64-linux aarch64-linux aarch64-darwin
+ATTRS_x86_64-linux := \
+	.\#nixosConfigurations.arusha.config.system.build.toplevel \
+	.\#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
+	.\#nixosConfigurations.manyara.config.system.build.toplevel \
+	.\#devShells.x86_64-linux.default
 
-x86_64-linux:
-	$(NIX) build --keep-going --no-link --show-trace --eval-system x86_64-linux --print-out-paths \
-		.#nixosConfigurations.arusha.config.system.build.toplevel \
-		.#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
-		.#nixosConfigurations.manyara.config.system.build.toplevel \
-		.#devShells.x86_64-linux.default
+ATTRS_aarch64-linux := \
+	.\#nixosConfigurations.serengeti.config.system.build.toplevel \
+	.\#nixOnDroidConfigurations.default.config.environment.path \
+	.\#devShells.aarch64-linux.default
 
-aarch64-linux:
-	$(NIX) build --keep-going --no-link --show-trace --eval-system aarch64-linux --print-out-paths \
-		.#nixosConfigurations.serengeti.config.system.build.toplevel \
-		.#nixOnDroidConfigurations.default.config.environment.path \
-		.#devShells.aarch64-linux.default
+ATTRS_aarch64-darwin := \
+	.\#darwinConfigurations.katavi.system \
+	.\#darwinConfigurations.mikumi.system \
+	.\#darwinConfigurations.work.system \
+	.\#devShells.aarch64-darwin.default
 
-aarch64-darwin:
-	$(NIX) build --keep-going --no-link --show-trace --eval-system aarch64-darwin --print-out-paths \
-		.#darwinConfigurations.katavi.system \
-		.#darwinConfigurations.mikumi.system \
-		.#darwinConfigurations.work.system \
-		.#devShells.aarch64-darwin.default
+# $(1) is the --eval-system value, left empty to evaluate as the host system.
+define nix-build
+	$(NIX) build --keep-going --no-link --show-trace --print-out-paths \
+		$(if $(1),--eval-system $(1)) $(2)
+endef
+
+x86_64-linux aarch64-linux aarch64-darwin:
+	$(call nix-build,$@,$(ATTRS_$@))
+
+build-all:
+	$(call nix-build,,$(ATTRS_x86_64-linux) $(ATTRS_aarch64-linux) $(ATTRS_aarch64-darwin))
