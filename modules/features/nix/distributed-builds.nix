@@ -33,6 +33,10 @@ let
                 publicKey = lib.mkOption { type = lib.types.str; };
                 systems = lib.mkOption { type = lib.types.listOf lib.types.str; };
                 maxJobs = lib.mkOption { type = lib.types.ints.positive; };
+                speedFactor = lib.mkOption {
+                  type = lib.types.ints.positive;
+                  default = 1;
+                };
                 supportedFeatures = lib.mkOption {
                   type = lib.types.listOf lib.types.str;
                   default = [ ];
@@ -53,6 +57,7 @@ let
                 "i686-linux"
               ];
               maxJobs = tarangire.config.nix.settings.max-jobs;
+              speedFactor = 5;
               supportedFeatures = tarangire.config.nix.settings.system-features;
             };
             kilimanjaro = {
@@ -105,9 +110,13 @@ let
             (lib.mapAttrsToList (
               hostName: machine: {
                 inherit hostName protocol;
-                inherit (machine) systems maxJobs supportedFeatures;
+                inherit (machine)
+                  systems
+                  maxJobs
+                  speedFactor
+                  supportedFeatures
+                  ;
                 sshUser = "natsukium";
-                speedFactor = 1;
                 mandatoryFeatures = [ ];
               }
             ))

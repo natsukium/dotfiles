@@ -356,11 +356,11 @@ and supports content-addressed derivations. Hydra does not speak =ssh-ng=
 
 *** Options
 
-Each machine entry hardcodes only what its host's configuration cannot answer: the host
-key and the platforms it builds for. The job limit and build features are read from the
-machine's own =config.nix.settings=, so raising =max-jobs= on tarangire updates its
-builder entry everywhere with no second edit. mikumi's feature list is the one
-exception, spelled out by hand because its configuration does not declare
+Each machine entry hardcodes what its host's configuration cannot answer: the host key,
+the platforms it builds for, and its speed factor. The job limit and build features are
+read from the machine's own =config.nix.settings=, so raising =max-jobs= on tarangire
+updates its builder entry everywhere with no second edit. mikumi's feature list is the
+one exception, spelled out by hand because its configuration does not declare
 =system-features=.
 
 =excludeHosts= keeps a machine out of one host's builder list beyond the automatic
@@ -392,6 +392,10 @@ options.my.nix.distributedBuilds = {
           publicKey = lib.mkOption { type = lib.types.str; };
           systems = lib.mkOption { type = lib.types.listOf lib.types.str; };
           maxJobs = lib.mkOption { type = lib.types.ints.positive; };
+          speedFactor = lib.mkOption {
+            type = lib.types.ints.positive;
+            default = 1;
+          };
           supportedFeatures = lib.mkOption {
             type = lib.types.listOf lib.types.str;
             default = [ ];
@@ -412,6 +416,7 @@ options.my.nix.distributedBuilds = {
           "i686-linux"
         ];
         maxJobs = tarangire.config.nix.settings.max-jobs;
+        speedFactor = 5;
         supportedFeatures = tarangire.config.nix.settings.system-features;
       };
       kilimanjaro = {
@@ -474,9 +479,13 @@ config = lib.mkIf cfg.enable {
       (lib.mapAttrsToList (
         hostName: machine: {
           inherit hostName protocol;
-          inherit (machine) systems maxJobs supportedFeatures;
+          inherit (machine)
+            systems
+            maxJobs
+            speedFactor
+            supportedFeatures
+            ;
           sshUser = "natsukium";
-          speedFactor = 1;
           mandatoryFeatures = [ ];
         }
       ))
