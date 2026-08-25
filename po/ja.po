@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-08-26 00:36+0900\n"
+"POT-Creation-Date: 2026-08-26 01:22+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -88,7 +88,7 @@ msgstr "日本語版: https://natsukium.github.io/dotfiles/ja/"
 
 #. type: heading *
 #: configuration.org:20 .github/README.org:14
-#: modules/features/editor/emacs/init.org:536 modules/configuration.org:15
+#: modules/features/editor/emacs/init.org:521 modules/configuration.org:15
 #, no-wrap
 msgid "Nix"
 msgstr "Nix"
@@ -427,7 +427,7 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:70 modules/features/editor/emacs/init.org:652
+#: configuration.org:70 modules/features/editor/emacs/init.org:637
 #: modules/configuration.org:80 modules/configuration.org:457
 #: modules/configuration.org:608 modules/configuration.org:2549
 #: modules/configuration.org:4257
@@ -1645,7 +1645,7 @@ msgstr ""
 
 #. type: heading **
 #: configuration.org:716 configuration.org:722
-#: modules/features/editor/emacs/init.org:872
+#: modules/features/editor/emacs/init.org:857
 #, fuzzy, no-wrap
 #| msgid "org-agenda"
 msgid "org-clickup"
@@ -4822,67 +4822,41 @@ msgstr "Markdown"
 
 #. type: paragraph
 #: modules/features/editor/emacs/init.org:503
-msgid "https://github.com/jrblevin/markdown-mode"
-msgstr ""
-
-#. type: paragraph in quote
-#: modules/features/editor/emacs/init.org:506
-msgid "markdown-mode is a major mode for editing Markdown-formatted text."
-msgstr ""
-"markdown-modeはMarkdown形式のテキストを編集するためのメジャーモードです。"
-
-#. type: paragraph
-#: modules/features/editor/emacs/init.org:509
 msgid ""
-"First, enable =markdown-fontify-code-blocks-natively= so fenced code blocks "
-"are highlighted by each language's major mode. A =```nix= block then reads "
-"like a real Nix buffer rather than a flat monochrome region."
-msgstr ""
-
-#. type: paragraph
-#: modules/features/editor/emacs/init.org:513
-msgid ""
-"Also enable =markdown-marginalize-headers= to push leading =#= characters "
-"into the left margin. Header text then starts at the same column across all "
-"depths, keeping the outline aligned with body paragraphs."
-msgstr ""
-
-#. type: paragraph
-#: modules/features/editor/emacs/init.org:518
-msgid ""
-"Finally, set =markdown-indent-on-enter= to ='indent-and-new-item= so =RET= "
-"inside a list inserts the next bullet or number at the correct indent level."
+"Emacs 31 ships =markdown-ts-mode=, a tree-sitter major mode for Markdown.  "
+"Both grammars it needs are provided by =treesit-grammars.with-all-grammars=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:523
+#: modules/features/editor/emacs/init.org:507
 #, no-wrap
 msgid ""
-"(use-package markdown-mode\n"
-"  :ensure t\n"
-"  :mode (\"README\\\\.md\\\\'\" . gfm-mode)\n"
-"  :init (setq markdown-command \"multimarkdown\")\n"
-"  :bind (:map markdown-mode-map\n"
-"              (\"C-c C-e\" . markdown-do))\n"
+"(use-package markdown-ts-mode\n"
+"  :ensure nil\n"
+"  :mode (\"\\\\.md\\\\'\" . markdown-ts-mode)\n"
 "  :config\n"
-"  (setq markdown-header-scaling t)\n"
-"  (setq markdown-fontify-code-blocks-natively t)\n"
-"  (setq markdown-marginalize-headers t)\n"
-"  (setq markdown-indent-on-enter 'indent-and-new-item))"
+"  (setq markdown-ts-fontify-code-blocks-natively t)\n"
+"  (dolist (face-height '((markdown-ts-heading-1 . 2.0)\n"
+"                         (markdown-ts-heading-2 . 1.7)\n"
+"                         (markdown-ts-heading-3 . 1.4)\n"
+"                         (markdown-ts-heading-4 . 1.1)\n"
+"                         (markdown-ts-heading-5 . 1.0)\n"
+"                         (markdown-ts-heading-6 . 1.0)))\n"
+"    (set-face-attribute (car face-height) nil :height (cdr face-height))))"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:538
+#: modules/features/editor/emacs/init.org:523
 msgid "https://github.com/nix-community/nix-ts-mode"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:540
+#: modules/features/editor/emacs/init.org:525
 msgid "Tree-sitter based major mode for Nix expressions."
 msgstr "Nix式のためのtree-sitterベースのメジャーモードです。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:542
+#: modules/features/editor/emacs/init.org:527
 msgid ""
 "[[https://github.com/nix-community/nixd][nixd]] (configured via lsp-mode) "
 "provides IDE features for Nix expressions by interoperating with the C++ Nix "
@@ -4896,7 +4870,7 @@ msgstr ""
 "ション、 flakeの入力に対する正確な補完が可能です。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:549
+#: modules/features/editor/emacs/init.org:534
 msgid ""
 "The bundled =treesit-fold-parsers-nix= only knows about attrsets, "
 "interpolations, lists, and comments. Two extra rules are registered here so "
@@ -4904,7 +4878,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:555
+#: modules/features/editor/emacs/init.org:540
 #, no-wrap
 msgid ""
 "(use-package nix-ts-mode\n"
@@ -4929,13 +4903,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:576
+#: modules/features/editor/emacs/init.org:561
 #, no-wrap
 msgid "Terraform"
 msgstr "Terraform"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:578
+#: modules/features/editor/emacs/init.org:563
 msgid ""
 "[[https://github.com/hcl-emacs/terraform-mode][terraform-mode]] provides "
 "syntax highlighting and indentation for Terraform (HCL) files."
@@ -4944,7 +4918,7 @@ msgstr ""
 "（HCL）ファイルのシンタックスハイライトと インデントを提供します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:580
+#: modules/features/editor/emacs/init.org:565
 msgid ""
 "No tree-sitter variant is available in MELPA, so using the traditional major "
 "mode."
@@ -4953,7 +4927,7 @@ msgstr ""
 "ます。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:583
+#: modules/features/editor/emacs/init.org:568
 msgid ""
 "[[https://github.com/hashicorp/terraform-ls][terraform-ls]] (configured via "
 "lsp-mode) provides IDE features such as completion, diagnostics via "
@@ -4964,7 +4938,7 @@ msgstr ""
 "ジャンプなどのIDE機能を提供します。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:588
+#: modules/features/editor/emacs/init.org:573
 #, no-wrap
 msgid ""
 "(use-package terraform-mode\n"
@@ -4973,13 +4947,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:593
+#: modules/features/editor/emacs/init.org:578
 #, no-wrap
 msgid "PO"
 msgstr "PO"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:595
+#: modules/features/editor/emacs/init.org:580
 msgid ""
 "[[https://www.gnu.org/software/gettext/manual/html_node/PO-Mode.html][po-"
 "mode]] is Emacs's major mode for editing GNU gettext PO (Portable Object) "
@@ -4990,7 +4964,7 @@ msgstr ""
 "ジャーモードです。POファイルはソフトウェアの 国際化のための翻訳を格納します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:598
+#: modules/features/editor/emacs/init.org:583
 msgid ""
 "Editing PO files as plain text is error-prone because the format has strict "
 "requirements for escaping and structure.  po-mode provides structured "
@@ -5002,13 +4976,13 @@ msgstr ""
 "ション、 自動バリデーション、よくあるフォーマットエラーの防止を 提供します。"
 
 #. type: heading ***
-#: modules/features/editor/emacs/init.org:603
+#: modules/features/editor/emacs/init.org:588
 #, no-wrap
 msgid "Common Operations"
 msgstr "共通の操作"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:605
+#: modules/features/editor/emacs/init.org:590
 msgid ""
 "PO mode is not derived from text mode.  The buffer is read-only and has its "
 "own keymap, so standard text editing commands do not work directly.  "
@@ -5019,97 +4993,97 @@ msgstr ""
 "ディットバッファ（=RET=）を 通じて編集する必要があります。"
 
 #. type: heading ****
-#: modules/features/editor/emacs/init.org:610
+#: modules/features/editor/emacs/init.org:595
 #, no-wrap
 msgid "Main Commands"
 msgstr "主要なコマンド"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:612
+#: modules/features/editor/emacs/init.org:597
 msgid ""
 "Commands for file operations, validation, and general PO mode management."
 msgstr "ファイル操作、バリデーション、PO mode全般の管理に使う コマンドです。"
 
 #. type: cell column 0
+#: modules/features/editor/emacs/init.org:599
 #: modules/features/editor/emacs/init.org:614
-#: modules/features/editor/emacs/init.org:629
-#: modules/features/editor/emacs/init.org:643
+#: modules/features/editor/emacs/init.org:628
 #, no-wrap
 msgid "Key"
 msgstr "キー"
 
 #. type: cell column 1
+#: modules/features/editor/emacs/init.org:599
 #: modules/features/editor/emacs/init.org:614
-#: modules/features/editor/emacs/init.org:629
-#: modules/features/editor/emacs/init.org:643
+#: modules/features/editor/emacs/init.org:628
 #, no-wrap
 msgid "Function"
 msgstr "関数"
 
 #. type: cell column 2
+#: modules/features/editor/emacs/init.org:599
 #: modules/features/editor/emacs/init.org:614
-#: modules/features/editor/emacs/init.org:629
-#: modules/features/editor/emacs/init.org:643
+#: modules/features/editor/emacs/init.org:628
 #, no-wrap
 msgid "Description"
 msgstr "説明"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:616
+#: modules/features/editor/emacs/init.org:601
 #, no-wrap
 msgid "=_="
 msgstr "=_="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:616
+#: modules/features/editor/emacs/init.org:601
 #, no-wrap
 msgid "=po-undo="
 msgstr "=po-undo="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:616
+#: modules/features/editor/emacs/init.org:601
 #, no-wrap
 msgid "Undo last modification"
 msgstr "最後の変更を取り消す"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:617
+#: modules/features/editor/emacs/init.org:602
 #, no-wrap
 msgid "=q="
 msgstr "=q="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:617
+#: modules/features/editor/emacs/init.org:602
 #, no-wrap
 msgid "=po-confirm-and-quit="
 msgstr "=po-confirm-and-quit="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:617
+#: modules/features/editor/emacs/init.org:602
 #, no-wrap
 msgid "Quit with confirmation"
 msgstr "確認して終了する"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:618
+#: modules/features/editor/emacs/init.org:603
 #, no-wrap
 msgid "=?= =h="
 msgstr "=?= =h="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:618
+#: modules/features/editor/emacs/init.org:603
 #, no-wrap
 msgid "=po-help="
 msgstr "=po-help="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:618
+#: modules/features/editor/emacs/init.org:603
 #, no-wrap
 msgid "Show help about PO mode"
 msgstr "PO modeのヘルプを表示する"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:620
+#: modules/features/editor/emacs/init.org:605
 msgid ""
 "Use or =q= to quit instead of =C-x k= (=kill-buffer=), as they properly "
 "handle unsaved changes and warn about untranslated entries."
@@ -5118,7 +5092,7 @@ msgstr ""
 "訳のエントリについて適切に警告してくれます。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:623
+#: modules/features/editor/emacs/init.org:608
 msgid ""
 "See [[https://www.gnu.org/software/gettext/manual/html_node/Main-PO-"
 "Commands.html][Main PO mode Commands]] for more details."
@@ -5127,90 +5101,90 @@ msgstr ""
 "Commands.html][Main PO mode Commands]]を 参照してください。"
 
 #. type: heading ****
-#: modules/features/editor/emacs/init.org:625
+#: modules/features/editor/emacs/init.org:610
 #, no-wrap
 msgid "Entry Positioning"
 msgstr "エントリの移動"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:627
+#: modules/features/editor/emacs/init.org:612
 msgid "Commands for navigating between entries in the PO file."
 msgstr "POファイル内のエントリ間を移動するコマンドです。"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:631
+#: modules/features/editor/emacs/init.org:616
 #, no-wrap
 msgid "=n="
 msgstr "=n="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:631
+#: modules/features/editor/emacs/init.org:616
 #, no-wrap
 msgid "=po-next-entry="
 msgstr "=po-next-entry="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:631
+#: modules/features/editor/emacs/init.org:616
 #, no-wrap
 msgid "Move to next entry"
 msgstr "次のエントリに移動する"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:632
+#: modules/features/editor/emacs/init.org:617
 #, no-wrap
 msgid "=p="
 msgstr "=p="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:632
+#: modules/features/editor/emacs/init.org:617
 #, no-wrap
 msgid "=po-previous-entry="
 msgstr "=po-previous-entry="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:632
+#: modules/features/editor/emacs/init.org:617
 #, no-wrap
 msgid "Move to previous entry"
 msgstr "前のエントリに移動する"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:633
+#: modules/features/editor/emacs/init.org:618
 #, no-wrap
 msgid "=<="
 msgstr "=<="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:633
+#: modules/features/editor/emacs/init.org:618
 #, no-wrap
 msgid "=po-first-entry="
 msgstr "=po-first-entry="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:633
+#: modules/features/editor/emacs/init.org:618
 #, no-wrap
 msgid "Move to first entry"
 msgstr "最初のエントリに移動する"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:634
+#: modules/features/editor/emacs/init.org:619
 #, no-wrap
 msgid "=>="
 msgstr "=>="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:634
+#: modules/features/editor/emacs/init.org:619
 #, no-wrap
 msgid "=po-last-entry="
 msgstr "=po-last-entry="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:634
+#: modules/features/editor/emacs/init.org:619
 #, no-wrap
 msgid "Move to last entry"
 msgstr "最後のエントリに移動する"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:636
+#: modules/features/editor/emacs/init.org:621
 msgid ""
 "See [[https://www.gnu.org/software/gettext/manual/html_node/Entry-"
 "Positioning.html][Entry Positioning]] for more details."
@@ -5219,13 +5193,13 @@ msgstr ""
 "Positioning.html][Entry Positioning]]を 参照してください。"
 
 #. type: heading ****
-#: modules/features/editor/emacs/init.org:638
+#: modules/features/editor/emacs/init.org:623
 #, no-wrap
 msgid "Modifying Translations"
 msgstr "翻訳を修正する"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:640
+#: modules/features/editor/emacs/init.org:625
 msgid ""
 "Commands for editing translation strings.  Press =RET= to open a subedit "
 "buffer where standard Emacs editing works normally."
@@ -5234,79 +5208,79 @@ msgstr ""
 "エディットバッファが開きます。"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:645
+#: modules/features/editor/emacs/init.org:630
 #, no-wrap
 msgid "=RET="
 msgstr "=RET="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:645
+#: modules/features/editor/emacs/init.org:630
 #, no-wrap
 msgid "=po-edit-msgstr="
 msgstr "=po-edit-msgstr="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:645
+#: modules/features/editor/emacs/init.org:630
 #, no-wrap
 msgid "Open subedit buffer for editing"
 msgstr "編集用のサブエディットバッファを開く"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:646
+#: modules/features/editor/emacs/init.org:631
 #, no-wrap
 msgid "=C-c C-c="
 msgstr "=C-c C-c="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:646
+#: modules/features/editor/emacs/init.org:631
 #, no-wrap
 msgid "=po-subedit-exit="
 msgstr "=po-subedit-exit="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:646
+#: modules/features/editor/emacs/init.org:631
 #, no-wrap
 msgid "Finish editing and apply changes"
 msgstr "編集を完了して変更を適用する"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:647
+#: modules/features/editor/emacs/init.org:632
 #, no-wrap
 msgid "=C-c C-k="
 msgstr "=C-c C-k="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:647
+#: modules/features/editor/emacs/init.org:632
 #, no-wrap
 msgid "=po-subedit-abort="
 msgstr "=po-subedit-abort="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:647
+#: modules/features/editor/emacs/init.org:632
 #, no-wrap
 msgid "Abort editing and discard changes"
 msgstr "編集を中止して変更を破棄する"
 
 #. type: cell column 0
-#: modules/features/editor/emacs/init.org:648
+#: modules/features/editor/emacs/init.org:633
 #, no-wrap
 msgid "=DEL="
 msgstr "=DEL="
 
 #. type: cell column 1
-#: modules/features/editor/emacs/init.org:648
+#: modules/features/editor/emacs/init.org:633
 #, no-wrap
 msgid "=po-fade-out-entry="
 msgstr "=po-fade-out-entry="
 
 #. type: cell column 2
-#: modules/features/editor/emacs/init.org:648
+#: modules/features/editor/emacs/init.org:633
 #, no-wrap
 msgid "Delete the translation"
 msgstr "翻訳を削除する"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:650
+#: modules/features/editor/emacs/init.org:635
 msgid ""
 "See [[https://www.gnu.org/software/gettext/manual/html_node/Modifying-"
 "Translations.html][Modifying Translations]] for more details."
@@ -5315,7 +5289,7 @@ msgstr ""
 "Translations.html][Modifying Translations]]を 参照してください。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:655
+#: modules/features/editor/emacs/init.org:640
 #, no-wrap
 msgid ""
 "(use-package po-mode\n"
@@ -5323,13 +5297,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:659
+#: modules/features/editor/emacs/init.org:644
 #, no-wrap
 msgid "Protocol Buffers"
 msgstr "Protocol Buffers"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:661
+#: modules/features/editor/emacs/init.org:646
 msgid ""
 "[[https://github.com/emacsattic/protobuf-ts-mode][protobuf-ts-mode]] is a "
 "tree-sitter-based major mode for editing proto3 files."
@@ -5338,7 +5312,7 @@ msgstr ""
 "ファイルを編集するためのtree-sitterベースの メジャーモードです。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:663
+#: modules/features/editor/emacs/init.org:648
 msgid ""
 "The mode auto-registers =.proto= files when the =proto= grammar is available."
 msgstr ""
@@ -5346,7 +5320,7 @@ msgstr ""
 "ます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:666
+#: modules/features/editor/emacs/init.org:651
 #, no-wrap
 msgid ""
 "(use-package protobuf-ts-mode\n"
@@ -5354,13 +5328,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:670
+#: modules/features/editor/emacs/init.org:655
 #, no-wrap
 msgid "Justfile"
 msgstr "Justfile"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:672
+#: modules/features/editor/emacs/init.org:657
 msgid ""
 "[[https://github.com/leon-barrett/just-ts-mode.el][just-ts-mode]] is a tree-"
 "sitter-based major mode for editing [[https://github.com/casey/just][just]] "
@@ -5373,7 +5347,7 @@ msgstr ""
 "文用の専用編集バッファが開き、 shebangに基づく自動言語検出が行われます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:677
+#: modules/features/editor/emacs/init.org:662
 #, no-wrap
 msgid ""
 "(use-package just-ts-mode\n"
@@ -5381,13 +5355,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:681
+#: modules/features/editor/emacs/init.org:666
 #, no-wrap
 msgid "YAML"
 msgstr "YAML"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:683
+#: modules/features/editor/emacs/init.org:668
 msgid ""
 "=yaml-ts-mode= is a built-in tree-sitter-based major mode for YAML files.  "
 "The tree-sitter grammar is already available via =treesit-grammars.with-all-"
@@ -5398,7 +5372,7 @@ msgstr ""
 "なため、 グラマーが存在すればモードは自動で有効になります。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:687
+#: modules/features/editor/emacs/init.org:672
 msgid ""
 "yaml-language-server (configured via lsp-mode) provides schema validation "
 "using [[https://www.schemastore.org/][SchemaStore]].  For example, files "
@@ -5412,7 +5386,7 @@ msgstr ""
 "し、 ワークフロー定義の補完と診断が有効になります。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:694
+#: modules/features/editor/emacs/init.org:679
 #, no-wrap
 msgid ""
 "(use-package yaml-ts-mode\n"
@@ -5422,19 +5396,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:700
+#: modules/features/editor/emacs/init.org:685
 #, no-wrap
 msgid "org"
 msgstr "Org"
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:702
+#: modules/features/editor/emacs/init.org:687
 #, no-wrap
 msgid "Semantic Line Breaks"
 msgstr "Semantic Line Breaks"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:704
+#: modules/features/editor/emacs/init.org:689
 msgid ""
 "[[https://sembr.org/][Semantic Line Breaks (SemBr)]] is a writing convention "
 "where line breaks are placed at logical boundaries in sentences, such as "
@@ -5448,7 +5422,7 @@ msgstr ""
 "に可読性が向上します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:710
+#: modules/features/editor/emacs/init.org:695
 msgid ""
 "The recommended line length is around 80 characters.  I set this as an upper "
 "limit in the editor to prevent lines from becoming unnecessarily long."
@@ -5457,7 +5431,7 @@ msgstr ""
 "で上限として設定しています。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:715
+#: modules/features/editor/emacs/init.org:700
 #, no-wrap
 msgid ""
 "(add-hook 'text-mode-hook\n"
@@ -5467,13 +5441,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:721
+#: modules/features/editor/emacs/init.org:706
 #, no-wrap
 msgid "org-capture"
 msgstr "org-capture"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:723
+#: modules/features/editor/emacs/init.org:708
 #, no-wrap
 msgid ""
 "(global-set-key (kbd \"C-c c\") 'org-capture)\n"
@@ -5481,13 +5455,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:726
+#: modules/features/editor/emacs/init.org:711
 #, no-wrap
 msgid "(setq org-root \"~/dropbox/org/\")"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:728
+#: modules/features/editor/emacs/init.org:713
 #, no-wrap
 msgid ""
 "(setq org-capture-templates\n"
@@ -5503,32 +5477,32 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:740
+#: modules/features/editor/emacs/init.org:725
 #, no-wrap
 msgid "org-agenda"
 msgstr "org-agenda"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:742
+#: modules/features/editor/emacs/init.org:727
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c a\") 'org-agenda)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:744
+#: modules/features/editor/emacs/init.org:729
 #, no-wrap
 msgid "(setq org-agenda-files '(\"~/dropbox/org\"))"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:747
+#: modules/features/editor/emacs/init.org:732
 #, fuzzy, no-wrap
 #| msgid "org-capture"
 msgid "org-habit"
 msgstr "org-capture"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:749
+#: modules/features/editor/emacs/init.org:734
 msgid ""
 "Some of my todos are things I want to keep doing rather than finish once.  "
 "=org-habit= draws a consistency graph next to those entries in the agenda, "
@@ -5538,7 +5512,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:756
+#: modules/features/editor/emacs/init.org:741
 msgid ""
 "Org ships the module but does not load it by default.  I require the feature "
 "after Org loads rather than adding it to =org-modules=, because that option "
@@ -5546,7 +5520,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:762
+#: modules/features/editor/emacs/init.org:747
 #, no-wrap
 msgid ""
 "(with-eval-after-load 'org\n"
@@ -5554,14 +5528,14 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:766
+#: modules/features/editor/emacs/init.org:751
 #, fuzzy, no-wrap
 #| msgid "org-agenda"
 msgid "org-gcal"
 msgstr "org-agenda"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:768
+#: modules/features/editor/emacs/init.org:753
 msgid ""
 "[[https://github.com/kidd/org-gcal.el][org-gcal]] provides bidirectional "
 "sync between Google Calendar and Org files via the native Google Calendar "
@@ -5569,7 +5543,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:772
+#: modules/features/editor/emacs/init.org:757
 #, no-wrap
 msgid ""
 "(use-package org-gcal\n"
@@ -5578,12 +5552,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:777
+#: modules/features/editor/emacs/init.org:762
 msgid "Prerequisites for this configuration to function:"
 msgstr ""
 
 #. type: plain list 1.
-#: modules/features/editor/emacs/init.org:782
+#: modules/features/editor/emacs/init.org:767
 #, no-wrap
 msgid ""
 "On the personal Cloud Project, the Google Calendar API is enabled\n"
@@ -5592,7 +5566,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/features/editor/emacs/init.org:787
+#: modules/features/editor/emacs/init.org:772
 #, no-wrap
 msgid ""
 "=~/.authinfo.age= contains entries:\n"
@@ -5603,7 +5577,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:788
+#: modules/features/editor/emacs/init.org:773
 msgid ""
 "org-gcal registers an =oauth2-auto= provider entry at package load time only "
 "when both =org-gcal-client-id= and =org-gcal-client-secret= are already set; "
@@ -5613,7 +5587,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:796
+#: modules/features/editor/emacs/init.org:781
 #, no-wrap
 msgid ""
 "(with-eval-after-load 'org-gcal\n"
@@ -5625,7 +5599,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:804
+#: modules/features/editor/emacs/init.org:789
 msgid ""
 "org-gcal supports only one global OAuth client.  To sync calendars from "
 "multiple accounts, share the secondary calendars to the authorized account "
@@ -5633,7 +5607,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:810
+#: modules/features/editor/emacs/init.org:795
 #, no-wrap
 msgid ""
 "(with-eval-after-load 'org-gcal\n"
@@ -5643,14 +5617,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:816
+#: modules/features/editor/emacs/init.org:801
 msgid ""
 "I have no use for cancelled events, so I let org-gcal drop their headlines "
 "without asking."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:820
+#: modules/features/editor/emacs/init.org:805
 #, no-wrap
 msgid ""
 "(with-eval-after-load 'org-gcal\n"
@@ -5658,7 +5632,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:824
+#: modules/features/editor/emacs/init.org:809
 msgid ""
 "The empty-file pre-creation works around [[https://github.com/telotortium/"
 "emacs-oauth2-auto/issues/6][emacs-oauth2-auto issue #6]]: when =~/.config/"
@@ -5669,7 +5643,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:832
+#: modules/features/editor/emacs/init.org:817
 #, no-wrap
 msgid ""
 "(with-eval-after-load 'oauth2-auto\n"
@@ -5678,7 +5652,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:837
+#: modules/features/editor/emacs/init.org:822
 msgid ""
 "The plstore holding the OAuth tokens is encrypted symmetrically, so pinentry "
 "pops several times per sync unless something caches the passphrase.  "
@@ -5689,7 +5663,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:846
+#: modules/features/editor/emacs/init.org:831
 msgid ""
 "Caching in gpg-agent rather than in Emacs would survive Emacs restarts, "
 "which loopback does not.  It also means dropping =no-symkey-cache= from home-"
@@ -5701,7 +5675,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:857
+#: modules/features/editor/emacs/init.org:842
 msgid ""
 "Loopback keeps the change inside Emacs, and although the mode is global to "
 "epg, plstore is the only epg caller left here now that authinfo is decrypted "
@@ -5712,7 +5686,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:868
+#: modules/features/editor/emacs/init.org:853
 #, no-wrap
 msgid ""
 "(setq epg-pinentry-mode 'loopback)\n"
@@ -5720,7 +5694,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:874
+#: modules/features/editor/emacs/init.org:859
 msgid ""
 "[[https://git.natsukium.com/natsukium/org-clickup][org-clickup]] is a "
 "personal package that bidirectionally syncs ClickUp tasks with org-mode TODO "
@@ -5730,21 +5704,21 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:879
+#: modules/features/editor/emacs/init.org:864
 #, fuzzy
 #| msgid "Credentials are stored in =~/.authinfo.age=."
 msgid "The API token must live in =~/.authinfo.age= as:"
 msgstr "認証情報は =~/.authinfo.age= に格納しています。"
 
 #. type: paragraph in example
-#: modules/features/editor/emacs/init.org:882
+#: modules/features/editor/emacs/init.org:867
 #, fuzzy, no-wrap
 #| msgid "machine api.github.com login <username>^forge password <token>"
 msgid "machine api.clickup.com login <workspace-id> password <token>"
 msgstr "machine api.github.com login <username>^forge password <token>"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:886
+#: modules/features/editor/emacs/init.org:871
 #, no-wrap
 msgid ""
 "(use-package org-clickup\n"
@@ -5753,13 +5727,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:891
+#: modules/features/editor/emacs/init.org:876
 #, no-wrap
 msgid "org-roam"
 msgstr "org-roam"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:893
+#: modules/features/editor/emacs/init.org:878
 #, no-wrap
 msgid ""
 "(use-package org-roam\n"
@@ -5791,13 +5765,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:922
+#: modules/features/editor/emacs/init.org:907
 #, no-wrap
 msgid "htmlize"
 msgstr "htmlize"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:924
+#: modules/features/editor/emacs/init.org:909
 msgid ""
 "Used when converting Org files to HTML with syntax highlighting for code "
 "blocks."
@@ -5805,12 +5779,12 @@ msgstr ""
 "Orgをコードブロックのシンタックスハイライトを保ったままHTMLに変換する。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:926
+#: modules/features/editor/emacs/init.org:911
 msgid "=C-c C-e h h= exports the current Org buffer to HTML."
 msgstr "カレントバッファーをHTMLに変換するには =C-c C-e h h= を押すとよい。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:929
+#: modules/features/editor/emacs/init.org:914
 #, no-wrap
 msgid ""
 "(use-package htmlize\n"
@@ -5818,19 +5792,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:933
+#: modules/features/editor/emacs/init.org:918
 #, no-wrap
 msgid "document"
 msgstr "ドキュメント"
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:935
+#: modules/features/editor/emacs/init.org:920
 #, no-wrap
 msgid "pdf-tools"
 msgstr "pdf-tools"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:937
+#: modules/features/editor/emacs/init.org:922
 msgid ""
 "Emacs's built-in DocView mode renders PDFs as rasterized images page-by-"
 "page, resulting in blurry text at most zoom levels and lacking interactive "
@@ -5841,7 +5815,7 @@ msgstr ""
 "タルサーチ、注釈といった インタラクティブな機能がありません。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:941
+#: modules/features/editor/emacs/init.org:926
 msgid ""
 "[[https://github.com/vedang/pdf-tools][pdf-tools]] replaces DocView with a "
 "viewer powered by =poppler=, providing sharp rendering, isearch integration, "
@@ -5852,7 +5826,7 @@ msgstr ""
 "ワークフロー向けの SyncTeXを提供します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:945
+#: modules/features/editor/emacs/init.org:930
 msgid ""
 "Using =pdf-loader-install= instead of =pdf-tools-install= to defer "
 "initialization until a PDF is actually opened.  With Nix's pre-built "
@@ -5864,7 +5838,7 @@ msgstr ""
 "両関数の動作は同じですが、 loader版は起動時の不要な処理を回避できます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:951
+#: modules/features/editor/emacs/init.org:936
 #, no-wrap
 msgid ""
 "(use-package pdf-tools\n"
@@ -5875,13 +5849,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:958
+#: modules/features/editor/emacs/init.org:943
 #, no-wrap
 msgid "RSS"
 msgstr "RSS"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:960
+#: modules/features/editor/emacs/init.org:945
 msgid ""
 "[[https://github.com/skeeto/elfeed][elfeed]] is a web feed reader for "
 "Emacs.  Using it with [[https://github.com/fasheng/elfeed-protocol][elfeed-"
@@ -5896,7 +5870,7 @@ msgstr ""
 "ます。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:966
+#: modules/features/editor/emacs/init.org:951
 msgid ""
 "The Fever API must be enabled in Miniflux (Settings -> Integrations -> Fever "
 "API)  before this configuration will work."
@@ -5905,18 +5879,18 @@ msgstr ""
 "（Settings -> Integrations -> Fever API）。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:970
+#: modules/features/editor/emacs/init.org:955
 msgid "Credentials are stored in =~/.authinfo.age=."
 msgstr "認証情報は =~/.authinfo.age= に格納しています。"
 
 #. type: paragraph in example
-#: modules/features/editor/emacs/init.org:973
+#: modules/features/editor/emacs/init.org:958
 #, no-wrap
 msgid "machine rss.home.natsukium.com login natsukium password <fever-password>\""
 msgstr "machine rss.home.natsukium.com login natsukium password <fever-password>\""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:977
+#: modules/features/editor/emacs/init.org:962
 #, no-wrap
 msgid ""
 "(use-package elfeed\n"
@@ -5925,7 +5899,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:981
+#: modules/features/editor/emacs/init.org:966
 #, no-wrap
 msgid ""
 "(use-package elfeed-protocol\n"
@@ -5942,13 +5916,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:994
+#: modules/features/editor/emacs/init.org:979
 #, no-wrap
 msgid "Catching up in one keystroke"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:996
+#: modules/features/editor/emacs/init.org:981
 msgid ""
 "A Fever update asks for a fixed window of article ids past the last one it "
 "saw, so a single fetch never brings in more than =elfeed-protocol-fever-"
@@ -5961,7 +5935,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1005
+#: modules/features/editor/emacs/init.org:990
 #, no-wrap
 msgid ""
 "(defvar my/elfeed-update-max-rounds 20\n"
@@ -5969,7 +5943,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1008
+#: modules/features/editor/emacs/init.org:993
 #, no-wrap
 msgid ""
 "(defvar my/elfeed--update-rounds (make-hash-table :test #'equal)\n"
@@ -5977,7 +5951,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1011
+#: modules/features/editor/emacs/init.org:996
 #, no-wrap
 msgid ""
 "(defun my/elfeed-update-until-done ()\n"
@@ -5988,7 +5962,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1017
+#: modules/features/editor/emacs/init.org:1002
 #, no-wrap
 msgid ""
 "(defun my/elfeed--update-round (feed-url rounds)\n"
@@ -6002,7 +5976,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1026
+#: modules/features/editor/emacs/init.org:1011
 #, no-wrap
 msgid ""
 "(defun my/elfeed--update-continue (feed-url entries)\n"
@@ -6031,7 +6005,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1050
+#: modules/features/editor/emacs/init.org:1035
 #, no-wrap
 msgid ""
 "(with-eval-after-load 'elfeed-search\n"
@@ -6039,13 +6013,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1054
+#: modules/features/editor/emacs/init.org:1039
 #, no-wrap
 msgid "Expiring news"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1056
+#: modules/features/editor/emacs/init.org:1041
 msgid ""
 "News articles arrive in volume and are worth reading the week they appear "
 "and never again, so keeping them around only bloats the local database. "
@@ -6054,7 +6028,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1062
+#: modules/features/editor/emacs/init.org:1047
 #, no-wrap
 msgid ""
 "(defvar my/elfeed-expire-tag 'news\n"
@@ -6062,7 +6036,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1065
+#: modules/features/editor/emacs/init.org:1050
 #, no-wrap
 msgid ""
 "(defvar my/elfeed-expire-age \"1 month\"\n"
@@ -6070,7 +6044,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1068
+#: modules/features/editor/emacs/init.org:1053
 #, no-wrap
 msgid ""
 "(defun my/elfeed-expire-entries ()\n"
@@ -6097,13 +6071,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1091
+#: modules/features/editor/emacs/init.org:1076
 #, no-wrap
 msgid "mail"
 msgstr "メール"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1093
+#: modules/features/editor/emacs/init.org:1078
 msgid ""
 "[[https://notmuchmail.org/][notmuch]] is a tag-based email indexer and "
 "searcher.  [[https://notmuchmail.org/notmuch-emacs/][notmuch.el]] provides "
@@ -6116,7 +6090,7 @@ msgstr ""
 "ローカルのmaildirからメールを読み取ります。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1097
+#: modules/features/editor/emacs/init.org:1082
 msgid ""
 "notmuch was chosen over mu4e because the notmuch indexer is already "
 "configured for all email accounts.  Adding notmuch.el only requires the "
@@ -6127,7 +6101,7 @@ msgstr ""
 "みが必要で、 同じmaildirに対する2つ目のインデクサーを避けられます。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1102
+#: modules/features/editor/emacs/init.org:1087
 msgid ""
 "notmuch has no built-in delete operation; it manages metadata (tags)  rather "
 "than maildir folder placement.  Pressing =d= tags the message with "
@@ -6148,7 +6122,7 @@ msgstr ""
 "は GmailのTrashに入っています。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1112
+#: modules/features/editor/emacs/init.org:1097
 msgid ""
 "=shr-use-colors= is disabled so sender HTML colors don't clash with the dark "
 "theme. Inline CID images ship with the mail and are enabled, but =shr-"
@@ -6159,7 +6133,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1119
+#: modules/features/editor/emacs/init.org:1104
 msgid ""
 "=notmuch-show-part-button-default-action= defaults to saving an attachment "
 "to disk; I switch it to =notmuch-show-view-part= so the part opens with its "
@@ -6168,7 +6142,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1125
+#: modules/features/editor/emacs/init.org:1110
 #, no-wrap
 msgid ""
 "(use-package notmuch\n"
@@ -6215,7 +6189,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1168
+#: modules/features/editor/emacs/init.org:1153
 msgid ""
 "[[https://orgmode.org/manual/Protocols.html][ol-notmuch]] integrates notmuch "
 "with Org mode's link system.  Calling =org-store-link= (=C-c l=) in a "
@@ -6228,7 +6202,7 @@ msgstr ""
 "テンプレートに =%a= で挿入できます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1174
+#: modules/features/editor/emacs/init.org:1159
 #, no-wrap
 msgid ""
 "(use-package ol-notmuch\n"
@@ -6237,19 +6211,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1179
+#: modules/features/editor/emacs/init.org:1164
 #, no-wrap
 msgid "terminal"
 msgstr "ターミナル"
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1180
+#: modules/features/editor/emacs/init.org:1165
 #, no-wrap
 msgid "vterm"
 msgstr "vterm"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1182
+#: modules/features/editor/emacs/init.org:1167
 msgid ""
 "[[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] is a fully-"
 "fledged terminal emulator based on libvterm.  It provides better performance "
@@ -6262,7 +6236,7 @@ msgstr ""
 "います。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1187
+#: modules/features/editor/emacs/init.org:1172
 #, no-wrap
 msgid ""
 "(use-package vterm\n"
@@ -6270,13 +6244,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1191
+#: modules/features/editor/emacs/init.org:1176
 #, no-wrap
 msgid "encryption"
 msgstr "暗号化"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1193
+#: modules/features/editor/emacs/init.org:1178
 msgid ""
 "[[https://github.com/anticomputer/age.el][age.el]] provides transparent "
 "encryption and decryption of =.age= files in Emacs using the [[https://age-"
@@ -6287,7 +6261,7 @@ msgstr ""
 "暗号化・復号を提供します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1196
+#: modules/features/editor/emacs/init.org:1181
 msgid ""
 "Using SSH keys as identity/recipient so that no separate age keypair is "
 "needed."
@@ -6296,7 +6270,7 @@ msgstr ""
 "ありません。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1200
+#: modules/features/editor/emacs/init.org:1185
 #, no-wrap
 msgid ""
 "(use-package age\n"
@@ -6310,26 +6284,26 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1210
+#: modules/features/editor/emacs/init.org:1195
 #, no-wrap
 msgid "AI"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1212
+#: modules/features/editor/emacs/init.org:1197
 #, no-wrap
 msgid "gptel"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1214
+#: modules/features/editor/emacs/init.org:1199
 msgid ""
 "[[https://github.com/karthink/gptel][gptel]] turns any buffer into a chat "
 "with an LLM backend."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1217
+#: modules/features/editor/emacs/init.org:1202
 msgid ""
 "Authenticate once with =gptel-openai-oauth-login= (ChatGPT device flow); the "
 "token is cached under =.cache/gptel-openai/= in =user-emacs-directory=."
@@ -6339,7 +6313,7 @@ msgstr ""
 "ます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1221
+#: modules/features/editor/emacs/init.org:1206
 #, no-wrap
 msgid ""
 "(use-package gptel\n"
@@ -6350,19 +6324,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1228
+#: modules/features/editor/emacs/init.org:1213
 #, no-wrap
 msgid "misc"
 msgstr "その他"
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1229
+#: modules/features/editor/emacs/init.org:1214
 #, no-wrap
 msgid "vundo"
 msgstr "vundo"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1231
+#: modules/features/editor/emacs/init.org:1216
 #, no-wrap
 msgid ""
 "(use-package vundo\n"
@@ -6373,13 +6347,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1238
+#: modules/features/editor/emacs/init.org:1223
 #, no-wrap
 msgid "consult"
 msgstr "consult"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1240
+#: modules/features/editor/emacs/init.org:1225
 #, no-wrap
 msgid ""
 ";; Example configuration for Consult\n"
@@ -6441,7 +6415,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1297
+#: modules/features/editor/emacs/init.org:1282
 #, no-wrap
 msgid ""
 ";; The :init configuration is always executed (Not lazy)\n"
@@ -6449,7 +6423,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1300
+#: modules/features/editor/emacs/init.org:1285
 #, no-wrap
 msgid ""
 ";; Tweak the register preview for `consult-register-load',\n"
@@ -6461,7 +6435,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1307
+#: modules/features/editor/emacs/init.org:1292
 #, no-wrap
 msgid ""
 ";; Use Consult to select xref locations with preview\n"
@@ -6470,7 +6444,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1311
+#: modules/features/editor/emacs/init.org:1296
 #, no-wrap
 msgid ""
 ";; Configure other variables and modes in the :config section,\n"
@@ -6479,7 +6453,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1315
+#: modules/features/editor/emacs/init.org:1300
 #, no-wrap
 msgid ""
 ";; Optionally configure preview. The default value\n"
@@ -6500,7 +6474,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1331
+#: modules/features/editor/emacs/init.org:1316
 #, no-wrap
 msgid ""
 ";; Optionally configure the narrowing key.\n"
@@ -6509,7 +6483,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1335
+#: modules/features/editor/emacs/init.org:1320
 #, no-wrap
 msgid ""
 "  ;; Optionally make narrowing help available in the minibuffer.\n"
@@ -6519,7 +6493,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1342
+#: modules/features/editor/emacs/init.org:1327
 #, no-wrap
 msgid ""
 "(use-package embark-consult\n"
@@ -6528,13 +6502,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1347
+#: modules/features/editor/emacs/init.org:1332
 #, no-wrap
 msgid "compilation"
 msgstr "compilation"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1349
+#: modules/features/editor/emacs/init.org:1334
 msgid ""
 "The compilation buffer does not inherit from comint-mode, so ANSI escape "
 "sequences are displayed as raw text by default.  Adding =ansi-color-"
@@ -6547,19 +6521,19 @@ msgstr ""
 "色として描画されます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1355
+#: modules/features/editor/emacs/init.org:1340
 #, no-wrap
 msgid "(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1358
+#: modules/features/editor/emacs/init.org:1343
 #, no-wrap
 msgid "copy-region-reference"
 msgstr "copy-region-reference"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1360
+#: modules/features/editor/emacs/init.org:1345
 msgid ""
 "Copy the absolute path and line range of the selected region in =file:start-"
 "end= format (e.g. =/path/to/file.el:10-20=).  Pasting the result into a "
@@ -6570,7 +6544,7 @@ msgstr ""
 "けると、曖昧さのないファイル参照として利用できます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1366
+#: modules/features/editor/emacs/init.org:1351
 #, no-wrap
 msgid ""
 "(defun my/copy-region-reference (start end)\n"
@@ -6586,31 +6560,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1377
+#: modules/features/editor/emacs/init.org:1362
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c r\") #'my/copy-region-reference)"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1380
+#: modules/features/editor/emacs/init.org:1365
 #, no-wrap
 msgid "Others"
 msgstr "その他"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1382
+#: modules/features/editor/emacs/init.org:1367
 #, no-wrap
 msgid "(which-key-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1384
+#: modules/features/editor/emacs/init.org:1369
 #, no-wrap
 msgid "(setq-default indent-tabs-mode nil)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1386
+#: modules/features/editor/emacs/init.org:1371
 #, no-wrap
 msgid ""
 ";; org-tempo provides the \"<s TAB\" snippet expansion.  At top level, both this\n"
@@ -6624,19 +6598,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1395
+#: modules/features/editor/emacs/init.org:1380
 #, no-wrap
 msgid "(setq org-src-preserve-indentation t)"
 msgstr ""
 
 #. type: heading ***
-#: modules/features/editor/emacs/init.org:1398
+#: modules/features/editor/emacs/init.org:1383
 #, no-wrap
 msgid "project.el"
 msgstr "project.el"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1400
+#: modules/features/editor/emacs/init.org:1385
 msgid ""
 "Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) "
 "as projects."
@@ -6645,7 +6619,7 @@ msgstr ""
 "ジェクトとして登録します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1402
+#: modules/features/editor/emacs/init.org:1387
 msgid ""
 "Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=."
 msgstr ""
@@ -6653,7 +6627,7 @@ msgstr ""
 "です。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1405
+#: modules/features/editor/emacs/init.org:1390
 #, no-wrap
 msgid ""
 "(defun my/sync-project-list ()\n"
@@ -6668,7 +6642,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1415
+#: modules/features/editor/emacs/init.org:1400
 #, no-wrap
 msgid ""
 ";; 3. Build file contents in a temporary buffer\n"
@@ -6681,7 +6655,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1423
+#: modules/features/editor/emacs/init.org:1408
 #, no-wrap
 msgid ""
 ";; 4. Write the built contents to file\n"
@@ -6689,13 +6663,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1426
+#: modules/features/editor/emacs/init.org:1411
 #, no-wrap
 msgid "(my/sync-project-list)"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1429
+#: modules/features/editor/emacs/init.org:1414
 msgid ""
 "Sort the project list by modification time, placing recently updated "
 "projects first."
@@ -6704,7 +6678,7 @@ msgstr ""
 "示します。"
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1431
+#: modules/features/editor/emacs/init.org:1416
 msgid ""
 "Using advice instead of sorting in =my/sync-project-list= ensures that "
 "projects are sorted by their current mtime at selection time, not at file "
@@ -6715,7 +6689,7 @@ msgstr ""
 "セッション中でも常に最新の順序が維持されます。"
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1436
+#: modules/features/editor/emacs/init.org:1421
 #, no-wrap
 msgid ""
 "(defun my/sort-projects-by-mtime (projects)\n"
@@ -6730,7 +6704,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1446
+#: modules/features/editor/emacs/init.org:1431
 #, no-wrap
 msgid "(advice-add 'project-known-project-roots :filter-return"
 msgstr ""
@@ -15043,6 +15017,10 @@ msgid ""
 "      '';\n"
 "};"
 msgstr ""
+
+#~ msgid "markdown-mode is a major mode for editing Markdown-formatted text."
+#~ msgstr ""
+#~ "markdown-modeはMarkdown形式のテキストを編集するためのメジャーモードです。"
 
 #~ msgid ""
 #~ "A reverse proxy that exposes services on your tailnet (as their own "
