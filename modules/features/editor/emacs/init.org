@@ -433,10 +433,15 @@ to avoid conflict with the existing =breadcrumb= package in the header line.
 
 ** tree-sitter
 
-Use maximum font-lock level for tree-sitter modes.
+Emacs 31 can remap files from traditional major modes to their tree-sitter
+counterparts. I enable all of the built-in remappings; modes supplied by
+packages are configured explicitly in their own sections.
+
+I also use the maximum font-lock level for tree-sitter modes.
 
 #+begin_src emacs-lisp
-(setq treesit-font-lock-level 4)
+(setopt treesit-enabled-modes t
+        treesit-font-lock-level 4)
 #+end_src
 
 ** treesit-fold
@@ -676,10 +681,7 @@ to the GitHub Actions workflow schema,
 enabling completion and diagnostics for workflow definitions.
 
 #+begin_src emacs-lisp
-(use-package yaml-ts-mode
-  :ensure nil
-  :mode ("\\.ya?ml\\'")
-  :hook (yaml-ts-mode . lsp-deferred))
+(add-hook 'yaml-ts-mode-hook #'lsp-deferred)
 #+end_src
 
 * org
