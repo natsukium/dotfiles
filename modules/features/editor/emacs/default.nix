@@ -8,7 +8,7 @@ let
     let
       epkgs = withEmacsOverlay pkgs;
     in
-    if pkgs.stdenv.hostPlatform.isDarwin then epkgs.emacs-plus else epkgs.emacs-pgtk;
+    if pkgs.stdenv.hostPlatform.isDarwin then epkgs.emacs31-plus else epkgs.emacs31-pgtk;
 
   # Pass target-file to org-babel-tangle-file so blocks without an explicit
   # :tangle header still get tangled; plain org-babel-tangle would tangle

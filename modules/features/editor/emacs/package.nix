@@ -4,8 +4,8 @@
   beancount,
   beancount-language-server,
   difftastic,
-  emacs-pgtk,
-  emacs-plus,
+  emacs31-pgtk,
+  emacs31-plus,
   emacsWithPackagesFromUsePackage,
   gettext,
   nixd,
@@ -15,7 +15,7 @@
   org-clickup-src,
 }:
 let
-  emacs-unwrapped = if stdenv.hostPlatform.isDarwin then emacs-plus else emacs-pgtk;
+  emacs-unwrapped = if stdenv.hostPlatform.isDarwin then emacs31-plus else emacs31-pgtk;
 in
 emacsWithPackagesFromUsePackage {
   package = emacs-unwrapped;
