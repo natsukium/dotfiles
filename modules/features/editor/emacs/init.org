@@ -508,12 +508,48 @@ so =.bean= is added explicitly here for the common short extension.
 Emacs 31 ships =markdown-ts-mode=, a tree-sitter major mode for Markdown.
 Both grammars it needs are provided by =treesit-grammars.with-all-grammars=.
 
+=markdown-ts-mode= rejects TRAMP paths after resolving relative image links.
+I keep the Markdown unchanged and fetch those images into memory during
+fontification. This uses a private function because the mode has no public
+hook for replacing its image source.
+
 #+begin_src emacs-lisp
 (use-package markdown-ts-mode
   :ensure nil
   :mode ("\\.md\\'" . markdown-ts-mode)
   :config
+  (setq-default markdown-ts-inline-images t)
   (setq markdown-ts-fontify-code-blocks-natively t)
+  (defvar my/markdown-ts-tramp-image nil)
+  (defun my/markdown-ts-file-remote-p (orig filename &rest args)
+    (if (and my/markdown-ts-tramp-image
+             (equal filename my/markdown-ts-tramp-image))
+        nil
+      (apply orig filename args)))
+  (defun my/markdown-ts-create-image
+      (orig source &optional type data-p &rest props)
+    (if (and my/markdown-ts-tramp-image
+             (not data-p)
+             (equal source my/markdown-ts-tramp-image))
+        (with-temp-buffer
+          (set-buffer-multibyte nil)
+          (let ((my/markdown-ts-tramp-image nil))
+            (insert-file-contents-literally source))
+          (apply orig (buffer-string) type t props))
+      (apply orig source type data-p props)))
+  (defun my/markdown-ts-fontify-image (orig node &rest args)
+    (let* ((destination
+            (treesit-search-subtree node "\\`link_destination\\'"))
+           (url (and destination (treesit-node-text destination t)))
+           (file (and url (expand-file-name url)))
+           (remote-file (and file (file-remote-p file))))
+      (let ((my/markdown-ts-tramp-image
+             (and remote-file file)))
+        (apply orig node args))))
+  (advice-add 'file-remote-p :around #'my/markdown-ts-file-remote-p)
+  (advice-add 'create-image :around #'my/markdown-ts-create-image)
+  (advice-add 'markdown-ts--fontify-image :around
+              #'my/markdown-ts-fontify-image)
   (dolist (face-height '((markdown-ts-heading-1 . 2.0)
                          (markdown-ts-heading-2 . 1.7)
                          (markdown-ts-heading-3 . 1.4)
