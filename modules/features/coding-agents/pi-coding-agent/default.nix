@@ -15,6 +15,10 @@
       settingsFile =
         (pkgs.formats.json { }).generate "pi-coding-agent-settings.json"
           config.programs.pi-coding-agent.settings;
+
+      piReviewSkillExtension = pkgs.replaceVars ./extensions/pi-review-skill.ts {
+        piReviewSkill = config.my.programs.coding-agents.skills.pi-review;
+      };
     in
     {
       options.my.programs.pi-coding-agent = {
@@ -22,6 +26,11 @@
       };
 
       config = lib.mkIf cfg.enable {
+        # A review worker still needs project skills, so --no-skills is too
+        # broad. pi-review is withheld from normal discovery and contributed by
+        # an extension only to processes that are not review workers.
+        my.programs.coding-agents.excludedSkills.pi-coding-agent = [ "pi-review" ];
+
         # jq runs in the activation script and is absent from its default PATH.
         home.extraActivationPath = [ pkgs.jq ];
 
@@ -36,10 +45,14 @@
           ];
         };
 
-        # Reuse repo-local Claude skills in pi instead of maintaining parallel
-        # .agents/skills copies.
-        home.file."${config.programs.pi-coding-agent.configDir}/extensions/claude-project-skills.ts".source =
-          ./extensions/claude-project-skills.ts;
+        home.file = {
+          # Reuse repo-local Claude skills in pi instead of maintaining parallel
+          # .agents/skills copies.
+          "${config.programs.pi-coding-agent.configDir}/extensions/claude-project-skills.ts".source =
+            ./extensions/claude-project-skills.ts;
+          "${config.programs.pi-coding-agent.configDir}/extensions/pi-review-skill.ts".source =
+            piReviewSkillExtension;
+        };
 
         # pi's /settings UI writes settings.json in place, which fails on the
         # read-only store symlink the upstream module installs. pi has no
