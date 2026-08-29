@@ -6,34 +6,40 @@
 
 # download-policy nil skips the remote #+SETUPFILE fetch (HTML-theme only, irrelevant
 # to tangle/export output) so exports don't hit the network on every run.
-EMACS := emacs --batch -l org --eval '(setq org-src-preserve-indentation t org-resource-download-policy nil)'
+#
+# noweb expansion prefixes every line of the referenced block with the
+# indentation of the <<reference>>, blank lines included. Stripping that from
+# the block body, rather than from the written file, is what lets org's own
+# content comparison match and skip the write. The hook runs per block, so
+# delete-trailing-lines has to be off or the newline ending each block goes too.
+EMACS := emacs --batch -l org \
+	--eval '(setq org-src-preserve-indentation t org-resource-download-policy nil)' \
+	--eval '(add-hook (quote org-babel-tangle-body-hook) (lambda () (let ((delete-trailing-lines nil)) (delete-trailing-whitespace))))'
+
+# Stamps stand in as the make targets. org leaves an unchanged file's mtime
+# alone, so touching the tangled files to satisfy make would bump flake.nix on
+# every run and invalidate the nix-direnv cache on every commit.
+STAMPS := .make
 
 define tangle-org
-	$(EMACS) --eval '(dolist (file (org-babel-tangle-file "$(1)")) (with-current-buffer (find-file-noselect file) (delete-trailing-whitespace) (save-buffer)))'
+	$(EMACS) --eval '(org-babel-tangle-file "$(1)")'
+	@mkdir -p $(@D)
+	@touch $@
 endef
-
-tangle-targets = $(shell grep -oE ':tangle [^ :]+' $(1) | sed 's/:tangle //' | grep -v '^no$$' | sort -u)
-
-CONF_TANGLE    := $(call tangle-targets,configuration.org)
-MODULES_TANGLE := $(addprefix modules/,$(call tangle-targets,modules/configuration.org))
-OVERLAYS_TANGLE := $(addprefix overlays/,$(call tangle-targets,overlays/configuration.org))
 
 # Each tangle/export target is an independent emacs process; recurse in parallel
 tangle:
 	@$(MAKE) --no-print-directory -j tangle-all
 
-tangle-all: $(CONF_TANGLE) $(MODULES_TANGLE) $(OVERLAYS_TANGLE) CLAUDE.md .github/README.org
+tangle-all: $(STAMPS)/configuration $(STAMPS)/modules $(STAMPS)/overlays CLAUDE.md .github/README.org
 
-# org-babel skips writing files whose content is unchanged, leaving their mtime
-# stale and causing make to re-tangle on every invocation.
-$(CONF_TANGLE) &: configuration.org
-	$(call tangle-org,$<)
-	@touch $(CONF_TANGLE)
-
-$(OVERLAYS_TANGLE) &: overlays/configuration.org
+$(STAMPS)/configuration: configuration.org
 	$(call tangle-org,$<)
 
-$(MODULES_TANGLE) &: modules/configuration.org
+$(STAMPS)/overlays: overlays/configuration.org
+	$(call tangle-org,$<)
+
+$(STAMPS)/modules: modules/configuration.org
 	$(call tangle-org,$<)
 
 CLAUDE.md: configuration.org scripts/export-claude-md.el
