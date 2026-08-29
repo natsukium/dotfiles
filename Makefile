@@ -83,7 +83,7 @@ attmcojp-claude-md-seal:
 # Nix build
 #──────────────────────────────────────────────
 
-NIX := nom
+NIX_FAST_BUILD := nix-fast-build --skip-cached
 
 OS   := $(shell uname -s)
 ARCH := $(shell uname -m)
@@ -100,31 +100,9 @@ endif
 
 build: $(SYSTEM)
 
-ATTRS_x86_64-linux := \
-	.\#nixosConfigurations.arusha.config.system.build.toplevel \
-	.\#nixosConfigurations.kilimanjaro.config.system.build.toplevel \
-	.\#nixosConfigurations.manyara.config.system.build.toplevel \
-	.\#devShells.x86_64-linux.default
-
-ATTRS_aarch64-linux := \
-	.\#nixosConfigurations.serengeti.config.system.build.toplevel \
-	.\#nixOnDroidConfigurations.default.config.environment.path \
-	.\#devShells.aarch64-linux.default
-
-ATTRS_aarch64-darwin := \
-	.\#darwinConfigurations.katavi.system \
-	.\#darwinConfigurations.mikumi.system \
-	.\#darwinConfigurations.work.system \
-	.\#devShells.aarch64-darwin.default
-
-# $(1) is the --eval-system value, left empty to evaluate as the host system.
-define nix-build
-	$(NIX) build --keep-going --no-link --show-trace --print-out-paths \
-		$(if $(1),--eval-system $(1)) $(2)
-endef
-
 x86_64-linux aarch64-linux aarch64-darwin:
-	$(call nix-build,$@,$(ATTRS_$@))
+	$(NIX_FAST_BUILD) --flake '.#checks.$@'
 
 build-all:
-	$(call nix-build,,$(ATTRS_x86_64-linux) $(ATTRS_aarch64-linux) $(ATTRS_aarch64-darwin))
+	$(NIX_FAST_BUILD) --flake '.#checks' \
+		--systems "x86_64-linux aarch64-linux aarch64-darwin"

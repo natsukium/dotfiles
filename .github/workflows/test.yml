@@ -105,6 +105,5 @@ jobs:
       - name: build
         if: needs.check.result == 'success'
         run: |
-          export MAKEFLAGS="NIX:=nix"
-          make build
+          nix shell nixpkgs#nix-fast-build --inputs-from . --command make build
           df -h

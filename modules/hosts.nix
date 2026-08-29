@@ -56,6 +56,11 @@ in
             nixosConfigurations // darwinConfigurations
           );
         in
-        builtins.mapAttrs (_: v: v.config.system.build.toplevel) current;
+        builtins.mapAttrs (_: v: v.config.system.build.toplevel) current
+        // lib.optionalAttrs (system == "aarch64-linux") {
+          # nix-on-droid has no toplevel, so the environment path stands in as the
+          # closest buildable equivalent.
+          android = nixOnDroidConfigurations.default.config.environment.path;
+        };
     };
 }
