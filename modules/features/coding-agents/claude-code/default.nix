@@ -67,56 +67,6 @@
             };
 
             permissions = {
-              allow = [
-                "Bash(ast-grep *)"
-                "Bash(cargo build *)"
-                "Bash(cargo check *)"
-                "Bash(cargo clippy *)"
-                "Bash(cargo fmt *)"
-                "Bash(cargo test *)"
-                "Bash(deno check *)"
-                "Bash(docker compose logs *)"
-                "Bash(find *)"
-                "Bash(gh api repos/attmcojp/*/comments *)"
-                "Bash(gh api repos/attmcojp/*/reviews *)"
-                "Bash(gh pr diff *)"
-                "Bash(gh pr list *)"
-                "Bash(gh pr view *)"
-                "Bash(gh run list *)"
-                "Bash(gh run view *)"
-                "Bash(ghq list *)"
-                "Bash(git * log *)"
-                "Bash(git * show *)"
-                "Bash(grep *)"
-                "Bash(just check)"
-                "Bash(ls *)"
-                "Bash(mkdir *)"
-                "Bash(nix build *)"
-                "Bash(nix flake check*)"
-                "Bash(nix log *)"
-                "Bash(nix-build *)"
-                "Bash(pnpm run check *)"
-                "Bash(pnpm run lint *)"
-                "Bash(playwright-cli *)"
-                "Bash(pnpm run test *)"
-                "Bash(rg *)"
-                "Bash(tree *)"
-                "WebFetch(domain:api.github.com)"
-                "WebFetch(domain:docs.anthropic.com)"
-                "WebFetch(domain:docs.github.com)"
-                "WebFetch(domain:docs.renovatebot.com)"
-                "WebFetch(domain:elpa.nongnu.org)"
-                "WebFetch(domain:mantine.dev)"
-                "WebFetch(domain:neomutt.org)"
-                "WebFetch(domain:notmuchmail.org)"
-                "WebFetch(domain:tailscale.com)"
-                "mcp__context7__get-library-docs"
-                "mcp__context7__resolve-library-id"
-                "mcp__nixos__*"
-              ];
-              # deny wins over allow and over the auto-mode classifier, so it is the
-              # only rule intent cannot talk past. Guard secret material here rather
-              # than trusting the allow-list to stay tight.
               deny = [
                 # ~/.ssh holds plaintext private keys and the agent never needs any
                 # of it, so block the whole tree (config included) instead of
