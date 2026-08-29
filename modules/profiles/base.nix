@@ -3,6 +3,7 @@ import ../../lib/mkProfile.nix { inherit lib; } {
   name = "base";
 
   system = {
+    my.services.comin.enable = lib.mkDefault true;
     my.nix.enable = lib.mkDefault true;
     my.nix.distributedBuilds.enable = lib.mkDefault true;
     my.nixpkgs.enable = lib.mkDefault true;

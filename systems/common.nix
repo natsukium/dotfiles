@@ -13,10 +13,6 @@ let
     ;
 in
 {
-  imports = [
-    ./shared/comin
-  ];
-
   nixpkgs.overlays = [
     brew-nix.overlays.default
     edgepkgs.overlays.default

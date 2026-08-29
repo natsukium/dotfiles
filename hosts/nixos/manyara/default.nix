@@ -6,7 +6,6 @@
 }:
 {
   imports = [
-    ../../../systems/shared/comin/metrics.nix
     ../../../systems/nixos/common.nix
     ../../../systems/nixos/services/adguardhome
     ../../../systems/nixos/services/atuin

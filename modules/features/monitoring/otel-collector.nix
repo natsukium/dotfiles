@@ -11,7 +11,7 @@ let
 
       hostname = config.networking.hostName;
       manyara = inputs.self.outputs.nixosConfigurations.manyara.config;
-      # Full tailnet FQDN, matching systems/shared/comin/alloy.nix: the short
+      # Full tailnet FQDN, matching modules/features/comin/alloy.nix: the short
       # name resolves inconsistently across Linux and macOS resolvers.
       host = "manyara.tail4108.ts.net";
       metricsEndpoint = "http://${host}:${toString manyara.my.services.victoriametrics.port}/api/v1/write";
