@@ -3,6 +3,31 @@
 
 { ... }:
 {
+  flake.modules.darwin.bash =
+    {
+      config,
+      lib,
+      ...
+    }:
+    {
+      options.my.programs.bash.enable = lib.mkEnableOption "bash";
+
+      config = lib.mkIf config.my.programs.bash.enable {
+        environment.etc."profile" = {
+          knownSha256Hashes = [ "a3fe9f414586c0d3cacbe3b6920a09d8718e503bca22e23fef882203bf765065" ];
+          text = ''
+            # /etc/profile: DO NOT EDIT -- this file has been generated automatically
+            # from https://github.com/natsukium/dotfiles.
+            # This file is read for sh(1) login shells.
+
+            if [ "''${BASH-no}" != "no" ]; then
+              [ -r /etc/bashrc ] && . /etc/bashrc
+            fi
+          '';
+        };
+      };
+    };
+
   flake.modules.homeManager.bash =
     {
       pkgs,

@@ -13,6 +13,10 @@ import ../../lib/mkProfile.nix { inherit lib; } {
     my.services.tailscale.enable = lib.mkDefault true;
   };
 
+  darwin = {
+    my.programs.bash.enable = lib.mkDefault true;
+  };
+
   home = {
     my.programs.fish.enable = lib.mkDefault true;
     my.programs.bash.enable = lib.mkDefault true;

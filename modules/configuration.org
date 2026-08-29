@@ -1137,6 +1137,20 @@ unconditionally to every home that imports the profile it used to live in.
 #+begin_src nix :tangle features/shell/bash.nix
 { ... }:
 {
+  flake.modules.darwin.bash =
+    {
+      config,
+      lib,
+      ...
+    }:
+    {
+      options.my.programs.bash.enable = lib.mkEnableOption "bash";
+
+      config = lib.mkIf config.my.programs.bash.enable {
+        <<bash-etc-profile>>
+      };
+    };
+
   flake.modules.homeManager.bash =
     {
       pkgs,
@@ -1166,6 +1180,38 @@ unconditionally to every home that imports the profile it used to live in.
       };
     };
 }
+#+end_src
+
+*** System Profile
+
+macOS builds the system =PATH= with =path_helper=, which Apple's shell profiles run
+at login. It reads =/etc/paths= and =/etc/paths.d=, puts those directories first,
+and appends whatever =PATH= it inherited. Under nix that ordering is backwards:
+=/usr/bin= lands ahead of the nix profiles.
+
+nix-darwin and nixpkgs already avoid it. The =/etc/zprofile= nix-darwin installs
+over Apple's has no =path_helper= call, and nixpkgs patches fish to skip
+=path_helper= when =__NIX_DARWIN_SET_ENVIRONMENT_DONE= is set, the flag nix-darwin
+exports once it has built =PATH= itself. Apple's =/etc/profile= is the one file
+neither of them owns. Nothing repairs the damage afterwards either, because the
+=/etc/bashrc= that =/etc/profile= goes on to source only runs =set-environment=
+while that same flag is unset. A login =sh= therefore ends up with =/usr/bin=
+first, and finds the Xcode command line tools stub instead of my =git=.
+
+#+NAME: bash-etc-profile
+#+begin_src nix
+environment.etc."profile" = {
+  knownSha256Hashes = [ "a3fe9f414586c0d3cacbe3b6920a09d8718e503bca22e23fef882203bf765065" ];
+  text = ''
+    # /etc/profile: DO NOT EDIT -- this file has been generated automatically
+    # from https://github.com/natsukium/dotfiles.
+    # This file is read for sh(1) login shells.
+
+    if [ "''${BASH-no}" != "no" ]; then
+      [ -r /etc/bashrc ] && . /etc/bashrc
+    fi
+  '';
+};
 #+end_src
 
 *** History
