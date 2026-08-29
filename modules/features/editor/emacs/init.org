@@ -161,6 +161,26 @@ inside direnv-managed buffers.
                     (delete-dups (append exec-path my/nix-exec-path)))))))
 #+end_src
 
+** TRAMP
+
+TRAMP opens files on remote machines over ssh. The commands those buffers trigger
+run there rather than locally: magit over TRAMP invokes the remote =git=.
+[[https://elpa.gnu.org/packages/doc/tramp.html#How-Tramp-finds-and-uses-programs-on-the-remote-host][How Tramp finds and uses programs on the remote host]]
+describes how it locates them.
+
+The search is limited to =tramp-remote-path=, which defaults to =getconf PATH= and
+a set of conventional directories. Nix installs into none of them, so magit finds
+either no =git= at all or the one macOS ships. I add =tramp-own-remote-path= to
+that list, which makes TRAMP read the remote login shell's =PATH= instead. That is
+the only place the nix profiles show up.
+
+#+begin_src emacs-lisp
+(use-package tramp
+  :defer t
+  :config
+  (add-to-list 'tramp-remote-path 'tramp-own-remote-path))
+#+end_src
+
 * UI
 ** mode-line
 #+begin_src emacs-lisp
