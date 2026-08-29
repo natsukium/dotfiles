@@ -1,8 +1,8 @@
 { inputs, lib, ... }:
 let
   # Every machine follows the same repository, so the two classes share this and
-  # the option that gates it. They diverge only in how comin's own log reaches
-  # Loki.
+  # the option that gates it. They diverge only where a deployed generation has
+  # to survive a reboot, and in how comin's own log reaches Loki.
   remotes = [
     {
       name = "origin";
@@ -34,51 +34,80 @@ in
   imports = [ ./monitoring.nix ];
 
   flake.modules.nixos.comin =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.my.services.comin;
     in
     {
       options.my.services.comin.enable = enableOption;
 
-      config = lib.mkIf cfg.enable {
-        services.comin = {
-          enable = true;
-          inherit remotes;
-        };
+      config = lib.mkMerge [
+        (lib.mkIf cfg.enable {
+          services.comin = {
+            enable = true;
+            inherit remotes;
+          };
 
-        my.services.alloy = {
-          enable = true;
-          # Filter on _SYSTEMD_UNIT at the journal level rather than via a relabel
-          # rule so non-comin entries are never read into memory.
-          configs.comin = ''
-            loki.relabel "comin" {
-              forward_to = [loki.write.default.receiver]
+          my.services.alloy = {
+            enable = true;
+            # Filter on _SYSTEMD_UNIT at the journal level rather than via a relabel
+            # rule so non-comin entries are never read into memory.
+            configs.comin = ''
+              loki.relabel "comin" {
+                forward_to = [loki.write.default.receiver]
 
-              rule {
-                source_labels = ["__journal__systemd_unit"]
-                target_label  = "unit"
+                rule {
+                  source_labels = ["__journal__systemd_unit"]
+                  target_label  = "unit"
+                }
+                rule {
+                  source_labels = ["__journal_priority_keyword"]
+                  target_label  = "level"
+                }
               }
-              rule {
-                source_labels = ["__journal_priority_keyword"]
-                target_label  = "level"
-              }
-            }
 
-            loki.source.journal "comin" {
-              forward_to = [loki.relabel.comin.receiver]
-              matches    = "_SYSTEMD_UNIT=comin.service"
-              labels     = {
-                job  = "comin",
-                host = "${config.networking.hostName}",
-                os   = "linux",
+              loki.source.journal "comin" {
+                forward_to = [loki.relabel.comin.receiver]
+                matches    = "_SYSTEMD_UNIT=comin.service"
+                labels     = {
+                  job  = "comin",
+                  host = "${config.networking.hostName}",
+                  os   = "linux",
+                }
               }
-            }
 
-            ${writeBlock}
+              ${writeBlock}
+            '';
+          };
+        })
+
+        # comin deploys into /nix/var/nix/profiles/system-profiles/comin and never
+        # touches the default system profile. systemd-boot scans both, but lanzaboote
+        # takes its generation list from /nix/var/nix/profiles/system-*-link alone, so
+        # a comin generation never gets a boot entry and a reboot silently rolls back
+        # to the last generation I built by hand. I promote comin's profile to the
+        # default one after each deploy and reinstall the entries from it.
+        # https://github.com/nlewo/comin/issues/86
+        (lib.mkIf (cfg.enable && config.boot.lanzaboote.enable) {
+          services.comin.postDeploymentCommand = pkgs.writeShellScript "comin-promote-system-profile" ''
+            set -eu
+            [ "$COMIN_STATUS" = "done" ] || exit 0
+
+            toplevel=$(readlink -f /nix/var/nix/profiles/system-profiles/comin)
+            # A testing branch deploy leaves this profile behind, so promote it only
+            # when it is what actually runs.
+            [ "$toplevel" = "$(readlink -f /run/current-system)" ] || exit 0
+
+            ${config.nix.package}/bin/nix-env -p /nix/var/nix/profiles/system --set "$toplevel"
+            "$toplevel/bin/switch-to-configuration" boot
           '';
-        };
-      };
+        })
+      ];
     };
 
   flake.modules.darwin.comin =
@@ -95,6 +124,12 @@ in
           enable = true;
           inherit remotes;
         };
+
+        # The activate-system daemon reactivates system.profile at boot, and comin
+        # never touches the default one, so without this a reboot rolls back to the
+        # last generation I built by hand. A manual rebuild now needs
+        # `darwin-rebuild switch -p comin` to survive a reboot in turn.
+        system.profile = "/nix/var/nix/profiles/system-profiles/comin";
 
         my.services.alloy = {
           enable = true;
