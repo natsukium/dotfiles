@@ -1669,12 +1669,12 @@ Registered behind =my.programs.git.enable=. The [[*Scalar][Scalar]] performance 
 a second, independent toggle on the same module rather than a separate file, since
 scalar has no meaning without the git module it extends.
 
-#+begin_src nix :tangle features/git.nix :exports none
+#+begin_src nix :tangle features/git/git.nix :mkdirp yes :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/git.nix
+#+begin_src nix :tangle features/git/git.nix :mkdirp yes
 { ... }:
 {
   flake.modules.homeManager.git =
@@ -1711,8 +1711,6 @@ scalar has no meaning without the git module it extends.
           <<git-delta>>
 
           <<git-difftastic>>
-
-          <<git-lazygit>>
 
           <<git-fish-abbreviations>>
         })
@@ -2064,22 +2062,40 @@ programs.difftastic = {
 [[https://github.com/jesseduffield/lazygit][Lazygit]] is a terminal UI for git. A TUI was chosen over raw git commands for interactive
 operations like staging individual hunks, interactive rebase, and conflict resolution,
 where the visual feedback loop significantly reduces errors. Previously used gitui, but
-switched to lazygit for its broader feature set — gitui's performance advantage did not
+switched to lazygit for its broader feature set. gitui's performance advantage did not
 materialize in practice, and it lacked several workflow-critical operations.
 
 Performance degrades noticeably on large repositories like nixpkgs, but the ergonomics
 and active development make it a trusted part of the workflow despite this tradeoff.
 
-#+NAME: git-lazygit
-#+begin_src nix
-programs.lazygit = {
-  enable = true;
-  settings = {
-    <<lazygit-gui>>
+Lazygit is a front end for the [[*Git][git]] configuration above and has no meaning without
+it, so it rides =my.programs.git.enable= rather than carrying a toggle of its own.
 
-    <<lazygit-git>>
-  };
-};
+#+begin_src nix :tangle features/git/lazygit.nix :mkdirp yes :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/git/lazygit.nix :mkdirp yes
+{ self, ... }:
+{
+  flake.modules.homeManager.lazygit =
+    { config, lib, ... }:
+    {
+      config = lib.mkIf config.my.programs.git.enable {
+        programs.lazygit = {
+          enable = true;
+          settings = {
+            <<lazygit-gui>>
+
+            <<lazygit-git>>
+          };
+        };
+      };
+    };
+
+  <<lazygit-check>>
+}
 #+end_src
 
 **** GUI
@@ -2098,31 +2114,80 @@ gui = {
 =overrideGpg = true= tells lazygit to run git commands inline instead of spawning a
 subprocess for GPG/SSH signing. By default, lazygit defers to a subprocess so the user
 can type a passphrase interactively. However, this subprocess mode prevents lazygit from
-orchestrating interactive rebase internally — rewording, reordering, or editing any commit
+orchestrating interactive rebase internally. Rewording, reordering, or editing any commit
 other than HEAD is [[https://github.com/jesseduffield/lazygit/issues/1146][disabled entirely]] because the rebase would trigger multiple signing
 prompts that lazygit cannot handle mid-rebase. With =overrideGpg = true=, lazygit assumes
 the signing agent (ssh-agent, macOS Keychain) caches the passphrase, so no interactive
 prompt is needed and all rebase operations work normally.
 
-The pager configuration integrates both [[*Delta][delta]] and [[*Difftastic][difftastic]] into lazygit's diff views.
-Delta provides syntax-highlighted line diffs (=--dark --paging=never= since lazygit handles
-its own paging), and difftastic is available as the external diff command for
-[[*Difftastic][structural comparison]].
+=diffRenderers= registers both [[*Delta][delta]] and [[*Difftastic][difftastic]] as diff views, cycled with =|=.
+Delta post-processes git's own line diff (=--paging=never= because lazygit pages the
+output itself), while difftastic replaces diff generation entirely, so it is an
+=extDiff= entry rather than a filter.
 
 #+NAME: lazygit-git
 #+begin_src nix
 git = {
   overrideGpg = true;
-  pagers = [
+  diffRenderers = [
+    { command = "delta --dark --paging=never"; }
     {
-      colorArg = "always";
-      pager = "delta --dark --paging=never";
-    }
-    {
-      externalDiffCommand = "difft --color=always";
+      type = "extDiff";
+      command = "difft --color=always";
     }
   ];
 };
+#+end_src
+
+**** Schema Check
+
+=settings= is free-form YAML, so a key lazygit no longer accepts passes evaluation
+untouched. Lazygit then refuses to start, because it migrates renamed keys by
+rewriting the config file and the store copy is read-only.
+
+The schema ships in lazygit's own source, so the check reads it from the package the
+host installs. A version bump that renames a key fails the build rather than the next
+launch.
+
+#+NAME: lazygit-check
+#+begin_src nix
+perSystem =
+  { pkgs, ... }:
+  let
+    inherit (pkgs) lib;
+
+    onThisSystem = lib.filterAttrs (
+      _: host: host.pkgs.stdenv.hostPlatform.system == pkgs.stdenv.hostPlatform.system
+    ) (self.nixosConfigurations // self.darwinConfigurations);
+
+    # home-manager writes the file under XDG on Linux but under Library/Application
+    # Support on Darwin, so the entry is found by suffix rather than by a fixed key.
+    configsOf =
+      user:
+      lib.mapAttrsToList (_: file: {
+        inherit (file) source;
+        schema = "${user.programs.lazygit.package.src}/schema/config.json";
+      }) (lib.filterAttrs (name: _: lib.hasSuffix "lazygit/config.yml" name) user.home.file);
+
+    configs = lib.unique (
+      lib.concatMap (host: lib.concatMap configsOf (lib.attrValues host.config.home-manager.users)) (
+        lib.attrValues onThisSystem
+      )
+    );
+  in
+  {
+    checks = lib.optionalAttrs (configs != [ ]) {
+      lazygit-config =
+        pkgs.runCommand "lazygit-config-check" { nativeBuildInputs = [ pkgs.check-jsonschema ]; }
+          ''
+            ${lib.concatMapStringsSep "\n" (
+              # The generated file is named without a .yml suffix in the store.
+              config: "check-jsonschema --force-filetype yaml --schemafile ${config.schema} ${config.source}"
+            ) configs}
+            touch $out
+          '';
+    };
+  };
 #+end_src
 
 *** Fish Abbreviations
