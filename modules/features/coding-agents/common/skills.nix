@@ -21,6 +21,8 @@
     let
       cfg = config.my.programs.coding-agents;
 
+      marimoPair = pkgs.callPackage ./marimo-pair.nix { };
+
       skillsIn =
         dir:
         lib.genAttrs (lib.attrNames (
@@ -68,7 +70,9 @@
           ]
           ++ lib.optional pkgs.stdenv.hostPlatform.isDarwin ./skills-darwin
           ++ lib.optional pkgs.stdenv.hostPlatform.isLinux ./skills-linux;
-          skills = lib.mergeAttrsList (map skillsIn cfg.skillDirs);
+          skills = lib.mergeAttrsList (map skillsIn cfg.skillDirs) // {
+            marimo-pair = "${marimoPair}/skills/marimo-pair";
+          };
         };
 
         programs = lib.genAttrs [ "antigravity-cli" "claude-code" "codex" "opencode" ] (agent: {
