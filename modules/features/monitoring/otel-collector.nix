@@ -38,8 +38,30 @@ let
 
             output {
               metrics = [otelcol.exporter.prometheus.claude_code.input]
-              logs    = [otelcol.exporter.otlphttp.loki.input]
-              traces  = [otelcol.exporter.otlp.claude_code.input]
+              logs    = [otelcol.processor.transform.host.input]
+              traces  = [otelcol.processor.transform.host.input]
+            }
+          }
+
+          // Only the metrics path picks up a hostname, from remote_write's
+          // external_labels below. Stamp the same name onto logs and traces so
+          // one dashboard variable can filter all three signals.
+          otelcol.processor.transform "host" {
+            error_mode = "ignore"
+
+            log_statements {
+              context    = "resource"
+              statements = [`set(attributes["host.name"], "${hostname}")`]
+            }
+
+            trace_statements {
+              context    = "resource"
+              statements = [`set(attributes["host.name"], "${hostname}")`]
+            }
+
+            output {
+              logs   = [otelcol.exporter.otlphttp.loki.input]
+              traces = [otelcol.exporter.otlp.claude_code.input]
             }
           }
 
