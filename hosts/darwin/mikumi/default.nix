@@ -26,6 +26,8 @@
     max-jobs = 4;
   };
 
+  my.services.hydra.builder.enable = true;
+
   programs.zsh.enable = true;
 
   my.services.forgejo-runner = {

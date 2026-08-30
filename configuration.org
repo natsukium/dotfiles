@@ -104,6 +104,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<nixos-facter-modules>>
     # Infrastructure
     <<comin>>
+    <<hydra>>
     <<microvm>>
     <<niks3>>
     <<sops-nix>>
@@ -407,6 +408,22 @@ enabling continuous deployment for servers without manual =nixos-rebuild switch=
 comin = {
   url = "github:nlewo/comin";
   inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** hydra
+
+https://github.com/NixOS/hydra
+
+Hydra's Rust queue runner and builder are developed in the Hydra repository, while
+nixpkgs only exposes the legacy service module.
+
+#+NAME: hydra
+#+begin_src nix
+hydra = {
+  url = "github:NixOS/hydra";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.treefmt-nix.follows = "treefmt-nix";
 };
 #+end_src
 

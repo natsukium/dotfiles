@@ -61,4 +61,6 @@
   nix.settings = {
     max-jobs = 2;
   };
+
+  my.services.hydra.builder.enable = true;
 }

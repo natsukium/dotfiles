@@ -1,24 +1,25 @@
 { config, pkgs, ... }:
 {
-  services.hydra = {
+  services.hydra-dev = {
     enable = true;
-    package = pkgs.hydra.overrideAttrs (_: {
-      doCheck = false;
-    });
-    hydraURL = "http://127.0.0.1";
+    hydraURL = "http://hydra.home.natsukium.com";
     port = 3000;
     notificationSender = "";
-    buildMachinesFiles = [
-      "/etc/nix/machines"
-      "/var/lib/hydra/provisioner/machines"
-    ];
     useSubstitutes = true;
+  };
+
+  my.services.hydra = {
+    queueRunner.enable = true;
+    builder = {
+      enable = true;
+      systems = [ pkgs.stdenv.hostPlatform.system ];
+    };
   };
 
   services.caddy = {
     enable = true;
     virtualHosts."http://hydra.home.natsukium.com".extraConfig = ''
-      reverse_proxy localhost:${toString config.services.hydra.port}
+      reverse_proxy localhost:${toString config.services.hydra-dev.port}
     '';
   };
 
@@ -57,10 +58,10 @@
     after = [ "hydra-server.service" ];
     requires = [ "hydra-server.service" ];
     environment = {
-      inherit (config.systemd.services.hydra-init.environment) HYDRA_DBI;
+      inherit (config.systemd.services.hydra-init.environment) HYDRA_DATABASE_URL;
     };
     path = [
-      config.services.hydra.package
+      config.services.hydra-dev.package
       pkgs.netcat
     ];
     script = ''
@@ -76,14 +77,12 @@
         hydra-create-user "''${opts[@]}"
       done < ${config.sops.secrets.hydra-users.path}
 
-      while ! nc -z localhost ${toString config.services.hydra.port}; do
+      while ! nc -z localhost ${toString config.services.hydra-dev.port}; do
         sleep 1
       done
 
       export HYDRA_ADMIN_PASSWORD=$(cat ${config.sops.secrets.hydra-admin-password.path})
-      export URL=http://localhost:${toString config.services.hydra.port}
+      export URL=http://localhost:${toString config.services.hydra-dev.port}
     '';
   };
-
-  ext.hydra.localBuilder.enable = true;
 }

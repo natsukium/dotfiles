@@ -1,4 +1,4 @@
-{ inputs, config, ... }:
+{ inputs, ... }:
 {
   imports = [
     ../../../systems/shared/hercules-ci/agent.nix
@@ -41,5 +41,10 @@
 
   nix.settings = {
     max-jobs = 12;
+  };
+
+  my.services.hydra.builder = {
+    enable = true;
+    speedFactor = 5;
   };
 }

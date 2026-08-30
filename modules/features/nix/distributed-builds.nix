@@ -12,7 +12,6 @@ let
     }:
     let
       cfg = config.my.nix.distributedBuilds;
-      protocol = if (config.services ? hydra && config.services.hydra.enable) then "ssh" else "ssh-ng";
       inherit (inputs.self.outputs.nixosConfigurations) kilimanjaro serengeti tarangire;
       inherit (inputs.self.outputs.darwinConfigurations) mikumi;
     in
@@ -109,7 +108,8 @@ let
             ))
             (lib.mapAttrsToList (
               hostName: machine: {
-                inherit hostName protocol;
+                inherit hostName;
+                protocol = "ssh-ng";
                 inherit (machine)
                   systems
                   maxJobs
