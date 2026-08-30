@@ -1045,26 +1045,6 @@ with an override would only add noise.
 }
 #+end_src
 
-**** Checks
-
-Re-exports the NixOS VM tests under =./tests= as flake checks for the current
-system. Kept in its own module so the test wiring is easy to find independent
-of the per-system =pkgs= construction.
-
-#+begin_src nix :tangle modules/per-system/checks.nix
-{ inputs, self, ... }:
-{
-  perSystem =
-    { pkgs, ... }:
-    {
-      checks = import ../../tests {
-        inherit (inputs) nixpkgs;
-        inherit pkgs self;
-      };
-    };
-}
-#+end_src
-
 **** Packages
 
 Per-system packages exposed as flake outputs.

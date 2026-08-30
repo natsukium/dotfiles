@@ -247,4 +247,13 @@
         };
       };
     };
+
+  perSystem =
+    { pkgs, ... }:
+    {
+      # Renovate's hash updater parses Nix expressions with regular expressions,
+      # so its unit tests are what stands between a parsing regression and a
+      # wrong hash committed to a pull request.
+      checks.update-nix-hash = (pkgs.callPackage ./update-nix-hash.nix { }).tests.pytest;
+    };
 }

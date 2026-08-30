@@ -19,7 +19,6 @@ on:
       - "overlays/**"
       - "pkgs/**"
       - "systems/**"
-      - "tests/**"
 jobs:
   changes:
     if: github.event_name == 'pull_request'
@@ -48,7 +47,6 @@ jobs:
               - 'overlays/**'
               - 'pkgs/**'
               - 'systems/**'
-              - 'tests/**'
   check:
     needs: changes
     if: ${{ !cancelled() && (needs.changes.outputs.nix == 'true' || github.event_name == 'push') }}

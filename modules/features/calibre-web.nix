@@ -1,4 +1,4 @@
-{ ... }:
+{ self, withSystem, ... }:
 {
   flake.modules.nixos."calibre-web" =
     {
@@ -75,4 +75,47 @@
         })
       ]);
     };
+
+  # The two init units are the part of this module that could silently stop
+  # working: both run once at boot, and a failure leaves calibre-web serving an
+  # empty library or an unusable admin account. Only a booted machine shows
+  # that, hence a VM test rather than an evaluation check. It is named for one
+  # system instead of coming out of `perSystem`, because the guest is what
+  # manyara -- the only host serving calibre-web -- runs, not whatever machine
+  # happens to evaluate the flake.
+  flake.checks.x86_64-linux.calibre-web = withSystem "x86_64-linux" (
+    { pkgs, ... }:
+    pkgs.testers.runNixOSTest {
+      name = "calibre-web";
+
+      nodes.machine = {
+        imports = [ self.modules.nixos.calibre-web ];
+
+        services.calibre-web = {
+          enable = true;
+          options = {
+            calibreLibrary = "/data/books";
+          };
+        };
+
+        my.services.calibre-web = {
+          adminPasswordFile = pkgs.runCommand "admin-password" { } ''
+            echo "dummy-HDat1@WLJ&9AdSfc!MEH" > $out
+          '';
+        };
+      };
+
+      testScript = ''
+        machine.wait_for_unit("calibre-web.service")
+
+        # database should exist and be owned by calibre-web user
+        machine.succeed("[ -f /data/books/metadata.db ]")
+        machine.succeed("ls -l /data/books/metadata.db | grep \"calibre-web calibre-web\"")
+
+        # admin password should be changed declaratively
+        machine.wait_for_open_port(8083)
+        machine.succeed("journalctl -u calibre-web-init-admin-password | grep \"Password for user 'admin' changed\"")
+      '';
+    }
+  );
 }
