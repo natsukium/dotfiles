@@ -22,13 +22,13 @@
           if cfg.enableIndex then
             ''
               echo "enabling spotlight indexing..."
-              mdutil -i on -a &> /dev/null
+              mdutil -i on -a > /dev/null || true
             ''
           else
             ''
               echo "disabling spotlight indexing..."
-              mdutil -i off -d -a &> /dev/null
-              mdutil -E -a &> /dev/null
+              mdutil -i off -d -a > /dev/null || true
+              mdutil -E -a > /dev/null || true
             '';
       };
     };
