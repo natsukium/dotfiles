@@ -27,15 +27,6 @@
       storageDataPath = "/var/lib/${config.services.victoriametrics.stateDir}";
       backupStage = "/var/backup/victoriametrics";
 
-      # Not derived from exporter enablement: every host enables it, and
-      # scraping the mostly-off laptops would only record failures.
-      nodeMetricsHosts = [
-        "manyara"
-        "serengeti"
-        "mikumi"
-        "kilimanjaro"
-      ];
-
       nodeTarget =
         name: value:
         let
@@ -43,7 +34,7 @@
         in
         "${if name == config.networking.hostName then listenAddress else name}:${toString port}";
 
-      nodeMachines = lib.filterAttrs (n: _: builtins.elem n nodeMetricsHosts) (
+      nodeMachines = lib.filterAttrs (n: _: builtins.elem n cfg.nodeMetricsHosts) (
         linux-machines // darwin-machines
       );
       isAlwaysOn = name: _: builtins.elem name cfg.alwaysOnHosts;
@@ -98,6 +89,20 @@
             "mikumi"
           ];
           description = "Hosts whose silence should raise a critical alert.";
+        };
+
+        # Not derived from exporter enablement: every host enables it, and
+        # scraping the mostly-off laptops would only record failures. An
+        # option because the GPU scrape config narrows the same set.
+        nodeMetricsHosts = mkOption {
+          type = types.listOf types.str;
+          default = [
+            "manyara"
+            "serengeti"
+            "mikumi"
+            "kilimanjaro"
+          ];
+          description = "Hosts whose node exporter is scraped.";
         };
       };
 
