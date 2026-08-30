@@ -43,5 +43,7 @@
           packages = [ terraform' ];
         };
       };
+
+      checks.devShell = config.devShells.default;
     };
 }

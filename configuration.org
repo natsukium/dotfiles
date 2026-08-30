@@ -1676,6 +1676,10 @@ translation tools (po4a, gettext), and build utilities (nix-fast-build).
 On entry, it automatically sets up pre-commit hooks, configures MCP servers,
 and syncs =CLAUDE.md= from the literate source.
 
+The shell is exposed as a check as well. The build target walks the flake's
+checks, so a tool that stops building fails there instead of on the next
+=nix develop=.
+
 #+begin_src nix :tangle modules/per-system/dev-shell.nix
 { ... }:
 {
@@ -1721,6 +1725,8 @@ and syncs =CLAUDE.md= from the literate source.
           packages = [ terraform' ];
         };
       };
+
+      checks.devShell = config.devShells.default;
     };
 }
 #+end_src
