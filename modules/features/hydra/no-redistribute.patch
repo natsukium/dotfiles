@@ -1,0 +1,19 @@
+diff --git a/subprojects/hydra-builder/src/state.rs b/subprojects/hydra-builder/src/state.rs
+index c2ecf303..981d19a5 100644
+--- a/subprojects/hydra-builder/src/state.rs
++++ b/subprojects/hydra-builder/src/state.rs
+@@ -1446,6 +1446,14 @@ fn build_client_options(
+     options
+         .other_settings
+         .insert("timeout".to_string(), build_timeout.to_string().into());
++    // The daemon this agent builds through may have `builders` of its own. Left
++    // set, the queue runner assigns a step here, the daemon hands it straight
++    // back out over ssh, hydra credits the build to the wrong machine, and both
++    // agents still count the slot as free. The legacy queue runner passed
++    // `nix-store --serve --builders ''` for the same reason (NixOS/hydra#749).
++    options
++        .other_settings
++        .insert("builders".to_string(), String::new().into());
+     if presigned {
+         // With presigned uploads, inputs are substituted from a binary cache
+         // that other builders write to continuously; a cached negative narinfo

@@ -510,19 +510,46 @@ The upstream REST and gRPC ports, 8080 and 50051, are common development-server
 choices. I use 24050 and 24051 instead; neither is used elsewhere in this repository,
 and both sit outside the default ephemeral ranges on Linux and macOS.
 
-#+begin_src nix :tangle features/hydra.nix :exports none
+Each builder agent runs its builds through the local Nix daemon. On a host that
+also sets =nix.buildMachines=, that daemon hands the step straight back out over
+ssh. Hydra then credits the build to the machine that only relayed it, and both
+agents go on counting the slot as free. The legacy queue runner avoided this by
+passing =nix-store --serve --builders ''= for localhost builds
+([[https://github.com/NixOS/hydra/pull/749][NixOS/hydra#749]]). The Rust rewrite dropped that guard, so I patch it back in.
+Nix lets any client clear =builders=, even an untrusted one, so the agent only
+has to send the setting.
+
+#+begin_src nix :tangle features/hydra/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 #+end_src
 
-#+begin_src nix :tangle features/hydra.nix
+#+begin_src nix :tangle features/hydra/default.nix
 { inputs, ... }:
 let
+  # Cleared so the daemon builds the step here instead of relaying it to
+  # nix.buildMachines.
+  builderPackage =
+    pkgs:
+    let
+      src = pkgs.applyPatches {
+        name = "hydra-source";
+        src = inputs.hydra;
+        patches = [ ./no-redistribute.patch ];
+      };
+      workspace = pkgs.callPackage "${src}/packaging/rust-workspace.nix" {
+        craneLib = inputs.hydra.inputs.crane.mkLib pkgs;
+        version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
+      };
+    in
+    workspace.hydra-builder;
+
   mkBuilderModule =
     upstreamModule:
     {
       config,
       lib,
+      pkgs,
       ...
     }:
     let
@@ -614,6 +641,7 @@ let
       config = lib.mkIf cfg.builder.enable {
         services.hydra-queue-builder-dev = {
           enable = true;
+          package = builderPackage pkgs;
           queueRunnerAddr = cfg.builder.queueRunnerAddress;
           settings = {
             inherit (cfg.builder)
