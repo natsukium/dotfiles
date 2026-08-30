@@ -7,6 +7,9 @@
       cfg = config.my.services.tempo;
       otlpGrpcPort = 4317;
       stateDir = "/var/lib/tempo";
+      # Match Loki's 30-day window so traces and their correlated logs age out
+      # together.
+      blockRetention = "720h";
     in
     {
       options.my.services.tempo.enable = mkEnableOption "Grafana Tempo trace backend";
@@ -37,10 +40,11 @@
             distributor.receivers.otlp.protocols.grpc.endpoint = "0.0.0.0:${toString otlpGrpcPort}";
 
             # TraceQL metrics queries cap at 24h, unlike the 168h plain search
-            # gets. The Claude Code dashboard opens on a 7-day range, and the cap
-            # rejects the request outright instead of narrowing it, so the panels
-            # would show an error rather than a shorter window.
-            query_frontend.metrics.max_duration = "168h";
+            # gets, and the cap rejects the request outright instead of narrowing
+            # it. The Claude Code dashboard opens on a 7-day range, so 168h would
+            # sit exactly on the boundary and still fail. Follow the retention
+            # window instead, which is the real limit on what can be asked for.
+            query_frontend.metrics.max_duration = blockRetention;
 
             storage.trace = {
               backend = "local";
@@ -55,10 +59,8 @@
 
             backend_scheduler.local_work_path = "${stateDir}/scheduler";
 
-            # Retention moved out of the removed compactor into overrides. Match
-            # Loki's 30-day window so traces and their correlated logs age out
-            # together.
-            overrides.defaults.compaction.block_retention = "720h";
+            # Retention moved out of the removed compactor into overrides.
+            overrides.defaults.compaction.block_retention = blockRetention;
           };
         };
 
