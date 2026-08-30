@@ -519,6 +519,13 @@ passing =nix-store --serve --builders ''= for localhost builds
 Nix lets any client clear =builders=, even an untrusted one, so the agent only
 has to send the setting.
 
+The patch goes on the workspace derivation, not on the source tree. Patching the
+tree first would mean reading the workspace expression out of a built copy, and
+that import from derivation fails under =nix flake check --no-build=, which
+refuses to realise anything. Upstream's per-crate wrapper copies its binary out
+of the unpatched workspace, so the feature lifts =hydra-builder= out of the
+patched one itself.
+
 #+begin_src nix :tangle features/hydra/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -532,17 +539,19 @@ let
   builderPackage =
     pkgs:
     let
-      src = pkgs.applyPatches {
-        name = "hydra-source";
-        src = inputs.hydra;
-        patches = [ ./no-redistribute.patch ];
-      };
-      workspace = pkgs.callPackage "${src}/packaging/rust-workspace.nix" {
+      version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
+      workspace = pkgs.callPackage "${inputs.hydra}/packaging/rust-workspace.nix" {
         craneLib = inputs.hydra.inputs.crane.mkLib pkgs;
-        version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
+        inherit version;
       };
+      patched = workspace.workspace.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./no-redistribute.patch ];
+      });
     in
-    workspace.hydra-builder;
+    pkgs.runCommand "hydra-builder-${version}" { meta.mainProgram = "hydra-builder"; } ''
+      mkdir -p "$out/bin"
+      cp "${patched}/bin/hydra-builder" "$out/bin/hydra-builder"
+    '';
 
   mkBuilderModule =
     upstreamModule:

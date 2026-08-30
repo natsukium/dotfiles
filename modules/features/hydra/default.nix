@@ -8,17 +8,19 @@ let
   builderPackage =
     pkgs:
     let
-      src = pkgs.applyPatches {
-        name = "hydra-source";
-        src = inputs.hydra;
-        patches = [ ./no-redistribute.patch ];
-      };
-      workspace = pkgs.callPackage "${src}/packaging/rust-workspace.nix" {
+      version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
+      workspace = pkgs.callPackage "${inputs.hydra}/packaging/rust-workspace.nix" {
         craneLib = inputs.hydra.inputs.crane.mkLib pkgs;
-        version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
+        inherit version;
       };
+      patched = workspace.workspace.overrideAttrs (old: {
+        patches = (old.patches or [ ]) ++ [ ./no-redistribute.patch ];
+      });
     in
-    workspace.hydra-builder;
+    pkgs.runCommand "hydra-builder-${version}" { meta.mainProgram = "hydra-builder"; } ''
+      mkdir -p "$out/bin"
+      cp "${patched}/bin/hydra-builder" "$out/bin/hydra-builder"
+    '';
 
   mkBuilderModule =
     upstreamModule:
