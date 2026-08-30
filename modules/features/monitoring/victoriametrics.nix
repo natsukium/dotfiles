@@ -47,6 +47,22 @@
         linux-machines // darwin-machines
       );
       isAlwaysOn = name: _: builtins.elem name cfg.alwaysOnHosts;
+
+      # node_exporter emits a series per mount, but btrfs subvolumes and the
+      # APFS volumes of one container all report the free space of the pool
+      # behind them. Collapsing to the pool keeps a full disk to one alert
+      # instead of one per mount, which on macOS meant eight. The APFS slice
+      # suffix is stripped because /dev/disk3s5 and /dev/disk3s1s1 are the
+      # same disk. I take the minimum rather than the maximum: manyara's
+      # node_exporter measures /home inside its own mount namespace and
+      # always reports it near 100% free, which under max hid a full root.
+      filesystemFreeByPool =
+        selector:
+        let
+          free = "100 * node_filesystem_avail_bytes{${selector}} / node_filesystem_size_bytes{${selector}}";
+          pool = ''label_replace(label_replace(${free}, "pool", "$1", "device", "(.*)"), "pool", "$1", "device", "(/dev/disk[0-9]+)s[0-9]+.*")'';
+        in
+        "min by (instance, pool, fstype) (${pool})";
     in
     {
       options.my.services.victoriametrics = {
@@ -185,14 +201,12 @@
                   annotations.summary = "systemd unit {{ $labels.name }} failed on {{ $labels.instance }}";
                 }
                 {
-                  # Aggregated by device: btrfs subvolumes draw on one pool,
-                  # so a full disk would otherwise alert once per subvolume.
-                  # The device is named because that is what has to be freed.
+                  # The pool is named because that is what has to be freed.
                   alert = "FilesystemSpaceLow";
-                  expr = ''max by (instance, device, fstype) (100 * node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay",mountpoint!~"/boot.*"} / node_filesystem_size_bytes{fstype!~"tmpfs|ramfs|overlay",mountpoint!~"/boot.*"}) < 15'';
+                  expr = "${filesystemFreeByPool ''fstype!~"tmpfs|ramfs|overlay",mountpoint!~"/boot.*"''} < 15";
                   for = "30m";
                   labels.severity = "warning";
-                  annotations.summary = ''{{ $labels.device }} on {{ $labels.instance }} below 15% free ({{ printf "%.1f" $value }}%)'';
+                  annotations.summary = ''{{ $labels.pool }} on {{ $labels.instance }} below 15% free ({{ printf "%.1f" $value }}%)'';
                 }
                 {
                   # Watches /boot, which the 15% rule skips: manyara's 128MiB
@@ -200,10 +214,10 @@
                   # longer fits and deploys fail at the bootloader step, which
                   # once went unnoticed for a week.
                   alert = "FilesystemSpaceCritical";
-                  expr = ''max by (instance, device, fstype) (100 * node_filesystem_avail_bytes{fstype!~"tmpfs|ramfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|ramfs|overlay"}) < 5'';
+                  expr = "${filesystemFreeByPool ''fstype!~"tmpfs|ramfs|overlay"''} < 5";
                   for = "10m";
                   labels.severity = "critical";
-                  annotations.summary = ''{{ $labels.device }} on {{ $labels.instance }} below 5% free ({{ printf "%.1f" $value }}%)'';
+                  annotations.summary = ''{{ $labels.pool }} on {{ $labels.instance }} below 5% free ({{ printf "%.1f" $value }}%)'';
                 }
                 {
                   # apfs is sealed read-only by design and readOnlyNixStore

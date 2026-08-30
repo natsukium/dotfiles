@@ -489,7 +489,7 @@
     {
       "type": "timeseries",
       "title": "Filesystem Free",
-      "description": "Percentage free per mount. The FilesystemSpaceLow alert trips below 15%.",
+      "description": "Percentage free per storage pool, worst mount on each. Btrfs subvolumes and APFS volumes share a pool, so a per-mount line only repeats the same number. /boot is excluded, as in FilesystemSpaceLow; FilesystemSpaceCritical watches it at 5%.",
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 21 },
       "id": 10,
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
@@ -498,8 +498,8 @@
           "refId": "A",
           "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
           "editorMode": "code",
-          "expr": "100 * node_filesystem_avail_bytes{fstype!~\"tmpfs|ramfs|overlay\",instance=~\"$instance\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|ramfs|overlay\",instance=~\"$instance\"}",
-          "legendFormat": "{{instance}} {{mountpoint}}",
+          "expr": "min by (instance, pool) (label_replace(label_replace(100 * node_filesystem_avail_bytes{fstype!~\"tmpfs|ramfs|overlay|autofs\",mountpoint!~\"/boot.*|/System/Volumes/(iSCPreboot|xarts|Hardware|Update/SFR/.*)|/private/var/run/secrets.d\",instance=~\"$instance\"} / node_filesystem_size_bytes{fstype!~\"tmpfs|ramfs|overlay|autofs\",mountpoint!~\"/boot.*|/System/Volumes/(iSCPreboot|xarts|Hardware|Update/SFR/.*)|/private/var/run/secrets.d\",instance=~\"$instance\"}, \"pool\", \"$1\", \"device\", \"(.*)\"), \"pool\", \"$1\", \"device\", \"(/dev/disk[0-9]+)s[0-9]+.*\"))",
+          "legendFormat": "{{instance}} {{pool}}",
           "range": true
         }
       ],
