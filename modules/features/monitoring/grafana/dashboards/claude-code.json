@@ -471,7 +471,7 @@
       },
       "id": 11,
       "title": "Cost by query source",
-      "type": "piechart",
+      "type": "bargauge",
       "gridPos": {
         "x": 12,
         "y": 6,
@@ -481,28 +481,31 @@
       "fieldConfig": {
         "defaults": {
           "unit": "currencyUSD",
+          "decimals": 0,
           "color": {
-            "mode": "palette-classic"
+            "mode": "fixed",
+            "fixedColor": "#5794F2"
           }
         },
         "overrides": []
       },
       "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "minVizWidth": 8,
+        "minVizHeight": 12,
+        "maxVizHeight": 18,
+        "namePlacement": "left",
+        "sizing": "auto",
+        "legend": {
+          "showLegend": false
+        },
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
-        },
-        "pieType": "donut",
-        "tooltip": {
-          "mode": "single",
-          "sort": "desc"
-        },
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": ["value", "percent"],
-          "showLegend": true
         }
       },
       "pluginVersion": "12.0.0",
@@ -514,8 +517,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "sum by (query_source) (sum_over_time({service_name=\"claude-code\"} | event_name=`api_request` | unwrap cost_usd [$__range]))",
-          "queryType": "instant",
+          "expr": "sum by (query_source) (sum_over_time({service_name=\"claude-code\"} | event_name=`api_request` | unwrap cost_usd [$__auto]))",
+          "queryType": "range",
           "legendFormat": "{{query_source}}"
         }
       ],
@@ -749,7 +752,8 @@
           "unit": "short",
           "decimals": 0,
           "color": {
-            "mode": "continuous-BlPu"
+            "mode": "fixed",
+            "fixedColor": "#5794F2"
           }
         },
         "overrides": []
@@ -768,7 +772,7 @@
           "showLegend": false
         },
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         }
@@ -782,12 +786,12 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(15, sum by (tool_name) (count_over_time({service_name=\"claude-code\"} | event_name=`tool_result` [$__range])))",
-          "queryType": "instant",
+          "expr": "sum by (tool_name) (count_over_time({service_name=\"claude-code\"} | event_name=`tool_result` [$__auto]))",
+          "queryType": "range",
           "legendFormat": "{{tool_name}}"
         }
       ],
-      "description": "Fleet-wide: the $host variable filters metric panels only, since the OTLP log path carries no host label yet."
+      "description": "Totalled over the selected range, one bar per tool. Fleet-wide: the $host variable filters metric panels only, since the OTLP log path carries no host label yet."
     },
     {
       "datasource": {
@@ -808,7 +812,8 @@
           "unit": "short",
           "decimals": 0,
           "color": {
-            "mode": "continuous-BlPu"
+            "mode": "fixed",
+            "fixedColor": "#F2495C"
           }
         },
         "overrides": []
@@ -827,7 +832,7 @@
           "showLegend": false
         },
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         }
@@ -841,8 +846,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(15, sum by (tool_name) (count_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | success=`false` [$__range])))",
-          "queryType": "instant",
+          "expr": "sum by (tool_name) (count_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | success=`false` [$__auto]))",
+          "queryType": "range",
           "legendFormat": "{{tool_name}}"
         }
       ],
@@ -867,7 +872,8 @@
           "unit": "bytes",
           "decimals": 0,
           "color": {
-            "mode": "continuous-BlPu"
+            "mode": "fixed",
+            "fixedColor": "#5794F2"
           }
         },
         "overrides": []
@@ -886,7 +892,7 @@
           "showLegend": false
         },
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         }
@@ -900,8 +906,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(15, sum by (tool_name) (sum_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | unwrap tool_result_size_bytes [$__range])))",
-          "queryType": "instant",
+          "expr": "sum by (tool_name) (sum_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | unwrap tool_result_size_bytes [$__auto]))",
+          "queryType": "range",
           "legendFormat": "{{tool_name}}"
         }
       ],
@@ -991,7 +997,8 @@
           "unit": "short",
           "decimals": 0,
           "color": {
-            "mode": "continuous-BlPu"
+            "mode": "fixed",
+            "fixedColor": "#FF9830"
           }
         },
         "overrides": []
@@ -1010,7 +1017,7 @@
           "showLegend": false
         },
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
         }
@@ -1024,8 +1031,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(10, sum by (server_name) (count_over_time({service_name=\"claude-code\"} | event_name=`mcp_server_connection` | status=`failed` [$__range])))",
-          "queryType": "instant",
+          "expr": "sum by (server_name) (count_over_time({service_name=\"claude-code\"} | event_name=`mcp_server_connection` | status=`failed` [$__auto]))",
+          "queryType": "range",
           "legendFormat": "{{server_name}}"
         }
       ],
@@ -1038,7 +1045,7 @@
       },
       "id": 21,
       "title": "Skill activations",
-      "type": "piechart",
+      "type": "bargauge",
       "gridPos": {
         "x": 16,
         "y": 30,
@@ -1048,28 +1055,31 @@
       "fieldConfig": {
         "defaults": {
           "unit": "short",
+          "decimals": 0,
           "color": {
-            "mode": "palette-classic"
+            "mode": "fixed",
+            "fixedColor": "#5794F2"
           }
         },
         "overrides": []
       },
       "options": {
+        "displayMode": "gradient",
+        "orientation": "horizontal",
+        "showUnfilled": true,
+        "valueMode": "color",
+        "minVizWidth": 8,
+        "minVizHeight": 12,
+        "maxVizHeight": 18,
+        "namePlacement": "left",
+        "sizing": "auto",
+        "legend": {
+          "showLegend": false
+        },
         "reduceOptions": {
-          "calcs": ["lastNotNull"],
+          "calcs": ["sum"],
           "fields": "",
           "values": false
-        },
-        "pieType": "donut",
-        "tooltip": {
-          "mode": "single",
-          "sort": "desc"
-        },
-        "legend": {
-          "displayMode": "table",
-          "placement": "right",
-          "values": ["value", "percent"],
-          "showLegend": true
         }
       },
       "pluginVersion": "12.0.0",
@@ -1081,8 +1091,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "sum by (skill_name) (count_over_time({service_name=\"claude-code\"} | event_name=`skill_activated` [$__range]))",
-          "queryType": "instant",
+          "expr": "sum by (skill_name) (count_over_time({service_name=\"claude-code\"} | event_name=`skill_activated` [$__auto]))",
+          "queryType": "range",
           "legendFormat": "{{skill_name}}"
         }
       ],
@@ -1108,7 +1118,7 @@
       },
       "id": 23,
       "title": "Bash calls by command",
-      "type": "bargauge",
+      "type": "table",
       "gridPos": {
         "x": 0,
         "y": 38,
@@ -1119,30 +1129,30 @@
         "defaults": {
           "unit": "short",
           "decimals": 0,
-          "color": {
-            "mode": "continuous-BlPu"
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
           }
         },
         "overrides": []
       },
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "minVizWidth": 8,
-        "minVizHeight": 12,
-        "maxVizHeight": 18,
-        "namePlacement": "left",
-        "sizing": "auto",
-        "legend": {
-          "showLegend": false
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "countRows": false,
+          "fields": ""
         },
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        }
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
       },
       "pluginVersion": "12.0.0",
       "targets": [
@@ -1153,12 +1163,11 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(15, sum by (c) (count_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | tool_name=`Bash` | line_format `{{.tool_parameters}}` | json full_command=\"full_command\" | label_format c=`{{ regexReplaceAll \"(?s)^(([A-Za-z_][A-Za-z0-9_]*=[^[:space:];&]*|cd [$][(][^)]*[)][^;&[:space:]]*|cd [^;&[:space:]]+)[;&[:space:]]*)+\" .full_command \"\" }}` | label_format c=`{{ regexReplaceAll \"(?s)^[[:space:]]*([^[:space:];|&]+).*$\" .c \"$1\" }}` [$__range])))",
-          "queryType": "instant",
-          "legendFormat": "{{c}}"
+          "expr": "topk(20, sum by (c) (count_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | tool_name=`Bash` | line_format `{{.tool_parameters}}` | json full_command=\"full_command\" | label_format c=`{{ regexReplaceAll \"(?s)^(([A-Za-z_][A-Za-z0-9_]*=[^[:space:];&]*|cd [$][(][^)]*[)][^;&[:space:]]*|cd [^;&[:space:]]+)[;&[:space:]]*)+\" .full_command \"\" }}` | label_format c=`{{ regexReplaceAll \"(?s)^[[:space:]]*([^[:space:];|&]+).*$\" .c \"$1\" }}` [$__range])))",
+          "queryType": "instant"
         }
       ],
-      "description": "Grouped on Claude Code's own bash_command prefix, with leading variable assignments and cd hops stripped so the real binary surfaces."
+      "description": "Grouped on Claude Code's own bash_command prefix, with leading variable assignments and cd hops stripped so the real binary surfaces. The c column is that prefix. 126 distinct commands run over a week, too many to chart, so this is the top slice."
     },
     {
       "datasource": {
@@ -1167,7 +1176,7 @@
       },
       "id": 24,
       "title": "Bash output by command",
-      "type": "bargauge",
+      "type": "table",
       "gridPos": {
         "x": 8,
         "y": 38,
@@ -1178,30 +1187,30 @@
         "defaults": {
           "unit": "bytes",
           "decimals": 0,
-          "color": {
-            "mode": "continuous-BlPu"
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
           }
         },
         "overrides": []
       },
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "minVizWidth": 8,
-        "minVizHeight": 12,
-        "maxVizHeight": 18,
-        "namePlacement": "left",
-        "sizing": "auto",
-        "legend": {
-          "showLegend": false
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "countRows": false,
+          "fields": ""
         },
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        }
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
       },
       "pluginVersion": "12.0.0",
       "targets": [
@@ -1212,9 +1221,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(15, sum by (c) (sum_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | tool_name=`Bash` | line_format `{{.tool_parameters}}` | json full_command=\"full_command\" | label_format c=`{{ regexReplaceAll \"(?s)^(([A-Za-z_][A-Za-z0-9_]*=[^[:space:];&]*|cd [$][(][^)]*[)][^;&[:space:]]*|cd [^;&[:space:]]+)[;&[:space:]]*)+\" .full_command \"\" }}` | label_format c=`{{ regexReplaceAll \"(?s)^[[:space:]]*([^[:space:];|&]+).*$\" .c \"$1\" }}` | unwrap tool_result_size_bytes [$__range])))",
-          "queryType": "instant",
-          "legendFormat": "{{c}}"
+          "expr": "topk(20, sum by (c) (sum_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | tool_name=`Bash` | line_format `{{.tool_parameters}}` | json full_command=\"full_command\" | label_format c=`{{ regexReplaceAll \"(?s)^(([A-Za-z_][A-Za-z0-9_]*=[^[:space:];&]*|cd [$][(][^)]*[)][^;&[:space:]]*|cd [^;&[:space:]]+)[;&[:space:]]*)+\" .full_command \"\" }}` | label_format c=`{{ regexReplaceAll \"(?s)^[[:space:]]*([^[:space:];|&]+).*$\" .c \"$1\" }}` | unwrap tool_result_size_bytes [$__range])))",
+          "queryType": "instant"
         }
       ],
       "description": "Which commands fill the context window."
@@ -1226,7 +1234,7 @@
       },
       "id": 25,
       "title": "Bash time by command",
-      "type": "bargauge",
+      "type": "table",
       "gridPos": {
         "x": 16,
         "y": 38,
@@ -1237,30 +1245,30 @@
         "defaults": {
           "unit": "ms",
           "decimals": 0,
-          "color": {
-            "mode": "continuous-BlPu"
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            }
           }
         },
         "overrides": []
       },
       "options": {
-        "displayMode": "gradient",
-        "orientation": "horizontal",
-        "showUnfilled": true,
-        "valueMode": "color",
-        "minVizWidth": 8,
-        "minVizHeight": 12,
-        "maxVizHeight": 18,
-        "namePlacement": "left",
-        "sizing": "auto",
-        "legend": {
-          "showLegend": false
+        "showHeader": true,
+        "cellHeight": "sm",
+        "footer": {
+          "show": false,
+          "reducer": ["sum"],
+          "countRows": false,
+          "fields": ""
         },
-        "reduceOptions": {
-          "calcs": ["lastNotNull"],
-          "fields": "",
-          "values": false
-        }
+        "sortBy": [
+          {
+            "displayName": "Value",
+            "desc": true
+          }
+        ]
       },
       "pluginVersion": "12.0.0",
       "targets": [
@@ -1271,9 +1279,8 @@
           },
           "editorMode": "code",
           "refId": "A",
-          "expr": "topk(15, sum by (c) (sum_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | tool_name=`Bash` | line_format `{{.tool_parameters}}` | json full_command=\"full_command\" | label_format c=`{{ regexReplaceAll \"(?s)^(([A-Za-z_][A-Za-z0-9_]*=[^[:space:];&]*|cd [$][(][^)]*[)][^;&[:space:]]*|cd [^;&[:space:]]+)[;&[:space:]]*)+\" .full_command \"\" }}` | label_format c=`{{ regexReplaceAll \"(?s)^[[:space:]]*([^[:space:];|&]+).*$\" .c \"$1\" }}` | unwrap duration_ms [$__range])))",
-          "queryType": "instant",
-          "legendFormat": "{{c}}"
+          "expr": "topk(20, sum by (c) (sum_over_time({service_name=\"claude-code\"} | event_name=`tool_result` | tool_name=`Bash` | line_format `{{.tool_parameters}}` | json full_command=\"full_command\" | label_format c=`{{ regexReplaceAll \"(?s)^(([A-Za-z_][A-Za-z0-9_]*=[^[:space:];&]*|cd [$][(][^)]*[)][^;&[:space:]]*|cd [^;&[:space:]]+)[;&[:space:]]*)+\" .full_command \"\" }}` | label_format c=`{{ regexReplaceAll \"(?s)^[[:space:]]*([^[:space:];|&]+).*$\" .c \"$1\" }}` | unwrap duration_ms [$__range])))",
+          "queryType": "instant"
         }
       ],
       "description": "Which commands you wait on."
