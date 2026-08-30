@@ -36,6 +36,12 @@
             # hosts (reachable over Tailscale), not localhost.
             distributor.receivers.otlp.protocols.grpc.endpoint = "0.0.0.0:${toString otlpGrpcPort}";
 
+            # TraceQL metrics queries cap at 24h, unlike the 168h plain search
+            # gets. The Claude Code dashboard opens on a 7-day range, and the cap
+            # rejects the request outright instead of narrowing it, so the panels
+            # would show an error rather than a shorter window.
+            query_frontend.metrics.max_duration = "168h";
+
             storage.trace = {
               backend = "local";
               local.path = "${stateDir}/blocks";
