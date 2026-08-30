@@ -41,7 +41,6 @@
           settings.enabledModels = [
             "openai-codex/gpt-5.6-luna"
             "openai-codex/gpt-5.6-sol"
-            "opencode/x-preview-f-free"
           ];
         };
 

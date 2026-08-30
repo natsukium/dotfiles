@@ -5,7 +5,6 @@ import subprocess
 import sys
 
 MODEL_OVERRIDES = {
-    "x-preview-f-free": "Ox Alpha Free",
     "gpt-5.6-luna": "GPT 5.6 Luna",
     "gpt-5.6-sol": "GPT 5.6 Sol",
 }
