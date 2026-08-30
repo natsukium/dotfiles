@@ -67,6 +67,7 @@
                 targets = lib.mapAttrsToList cominTarget (lib.filterAttrs isAlwaysOn machines);
               }
               {
+                labels.always_on = "false";
                 targets = lib.mapAttrsToList cominTarget (lib.filterAttrs (name: v: !(isAlwaysOn name v)) machines);
               }
             ];

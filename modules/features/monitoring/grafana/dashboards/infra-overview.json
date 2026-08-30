@@ -155,6 +155,7 @@
     {
       "type": "stat",
       "title": "Scrape Targets Down",
+      "description": "Targets whose silence is a fault. The on-demand hosts are excluded: they are off more often than not, and a count that is permanently non-zero says nothing.",
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 0 },
       "id": 4,
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
@@ -163,7 +164,7 @@
           "refId": "A",
           "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
           "editorMode": "code",
-          "expr": "count(up == 0) or vector(0)",
+          "expr": "count(up{always_on!=\"false\"} == 0) or vector(0)",
           "instant": true,
           "range": false,
           "legendFormat": "down"
@@ -599,7 +600,7 @@
     {
       "type": "timeseries",
       "title": "Scrape Target Availability",
-      "description": "up per target. Gaps and zeroes are what InstanceDown watches.",
+      "description": "up per target, on-demand hosts included. Only the gaps on the always-on hosts are what InstanceDown watches.",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 29 },
       "id": 12,
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },

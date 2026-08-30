@@ -91,9 +91,13 @@
           description = "Hosts whose silence should raise a critical alert.";
         };
 
-        # Not derived from exporter enablement: every host enables it, and
-        # scraping the mostly-off laptops would only record failures. An
-        # option because the GPU scrape config narrows the same set.
+        # A laptop that is asleep is not a fault, but its disk still fills and
+        # its units still fail, and only InstanceDown cares whether a host is
+        # expected to answer. So this is every host I want CPU, memory and
+        # filesystem history for, not only the always-on ones. arusha is left
+        # out because under WSL the exporter measures the WSL VM, whose disk
+        # and memory Windows manages, so its numbers describe nothing I can
+        # act on. An option because the GPU scrape config narrows the same set.
         nodeMetricsHosts = mkOption {
           type = types.listOf types.str;
           default = [
@@ -101,6 +105,9 @@
             "serengeti"
             "mikumi"
             "kilimanjaro"
+            "katavi"
+            "tarangire"
+            "work"
           ];
           description = "Hosts whose node exporter is scraped.";
         };
@@ -138,13 +145,16 @@
                 job_name = "node";
                 # Two groups so InstanceDown can tell the always-on hosts
                 # apart; kept disjoint because a host in both would be scraped
-                # twice.
+                # twice. The second group carries always_on="false" rather than
+                # no label, so a dashboard can exclude the hosts that are
+                # allowed to be down without naming them one by one.
                 static_configs = [
                   {
                     labels.always_on = "true";
                     targets = lib.mapAttrsToList nodeTarget (lib.filterAttrs isAlwaysOn nodeMachines);
                   }
                   {
+                    labels.always_on = "false";
                     targets = lib.mapAttrsToList nodeTarget (lib.filterAttrs (n: v: !(isAlwaysOn n v)) nodeMachines);
                   }
                 ];

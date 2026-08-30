@@ -21,8 +21,8 @@
         in
         "${if name == config.networking.hostName then listenAddress else name}:${toString port}";
 
-      # Narrowed to the hosts already scraped for node metrics: a GPU laptop
-      # that is usually asleep would otherwise only contribute a down target.
+      # Tied to the node scrape set: a GPU temperature I cannot line up against
+      # the same host's CPU and fan story is not something I can act on.
       gpuMachines = lib.filterAttrs (
         name: value:
         builtins.elem name vm.nodeMetricsHosts && value.config.my.services.nvidia-gpu-metrics.enable
