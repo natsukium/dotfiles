@@ -839,19 +839,6 @@ without asking.
   (setq org-gcal-remove-api-cancelled-events t))
 #+end_src
 
-The empty-file pre-creation works around
-[[https://github.com/telotortium/emacs-oauth2-auto/issues/6][emacs-oauth2-auto issue #6]]:
-when =~/.config/emacs/= contains symlinks (here from home-manager
-managing other emacs config files), oauth2-auto's first write to the
-plstore fails an internal file/buffer identity check.
-Pre-creating the file before the first sync lets that check succeed.
-
-#+begin_src emacs-lisp
-(with-eval-after-load 'oauth2-auto
-  (unless (file-exists-p oauth2-auto-plstore)
-    (write-region "" nil oauth2-auto-plstore)))
-#+end_src
-
 The plstore holding the OAuth tokens is encrypted symmetrically,
 so pinentry pops several times per sync
 unless something caches the passphrase.
