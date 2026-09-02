@@ -113,6 +113,8 @@ let
     };
 in
 {
+  imports = [ ./windows ];
+
   flake.modules.darwin.forgejo-runner = darwinWrapper;
   flake.modules.nixos.forgejo-runner = nixosWrapper;
 }

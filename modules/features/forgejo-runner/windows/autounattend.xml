@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Element order is not free here. Setup validates this against a schema whose
+  sequences are alphabetical, and a file it cannot validate is discarded in
+  silence: setup simply asks every question itself. So keep every list below
+  in order when editing.
+
+  No disk is named. The answer file can only name one by number, and Windows
+  numbers this guest's two disks in an order I could not predict, so a wrong
+  guess would wipe the state disk.
+
+  The password is not a secret. The guest sits on a NAT network with no inbound
+  path, and the account exists so first logon has somewhere to land.
+-->
+<unattend xmlns="urn:schemas-microsoft-com:unattend"
+          xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State">
+
+  <settings pass="windowsPE">
+    <component name="Microsoft-Windows-International-Core-WinPE"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <InputLocale>0409:00000409</InputLocale>
+      <SetupUILanguage>
+        <UILanguage>en-US</UILanguage>
+      </SetupUILanguage>
+      <SystemLocale>en-US</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UserLocale>en-US</UserLocale>
+    </component>
+
+    <!--
+      The driver paths belong to this component, not to Microsoft-Windows-Setup,
+      where they invalidate the whole file. The virtio disc gets whichever
+      letter WinPE hands it, so every plausible one is listed.
+    -->
+    <component name="Microsoft-Windows-PnpCustomizationsWinPE"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <DriverPaths>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="1">
+          <Path>C:\viostor\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="2">
+          <Path>D:\viostor\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="3">
+          <Path>E:\viostor\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="4">
+          <Path>F:\viostor\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="5">
+          <Path>G:\viostor\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="6">
+          <Path>C:\NetKVM\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="7">
+          <Path>D:\NetKVM\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="8">
+          <Path>E:\NetKVM\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="9">
+          <Path>F:\NetKVM\w11\amd64</Path>
+        </PathAndCredentials>
+        <PathAndCredentials wcm:action="add" wcm:keyValue="10">
+          <Path>G:\NetKVM\w11\amd64</Path>
+        </PathAndCredentials>
+      </DriverPaths>
+    </component>
+
+    <component name="Microsoft-Windows-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <UserData>
+        <AcceptEula>true</AcceptEula>
+        <!-- Microsoft's public key for installing Pro. It does not activate. -->
+        <ProductKey>
+          <Key>VK7JG-NPHTM-C97JM-9MPGT-3V66T</Key>
+        </ProductKey>
+      </UserData>
+    </component>
+  </settings>
+
+  <settings pass="specialize">
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <ComputerName>WINDOWS-CI</ComputerName>
+      <TimeZone>Tokyo Standard Time</TimeZone>
+    </component>
+  </settings>
+
+  <settings pass="oobeSystem">
+    <component name="Microsoft-Windows-International-Core"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <InputLocale>0409:00000409</InputLocale>
+      <SystemLocale>en-US</SystemLocale>
+      <UILanguage>en-US</UILanguage>
+      <UserLocale>en-US</UserLocale>
+    </component>
+
+    <component name="Microsoft-Windows-Shell-Setup"
+               processorArchitecture="amd64"
+               publicKeyToken="31bf3856ad364e35"
+               language="neutral"
+               versionScope="nonSxS">
+      <!--
+        Only to reach the first logon commands. The runner itself runs as
+        SYSTEM from a scheduled task and needs nobody logged in.
+      -->
+      <AutoLogon>
+        <Password>
+          <Value>windows-ci</Value>
+          <PlainText>true</PlainText>
+        </Password>
+        <Enabled>true</Enabled>
+        <LogonCount>1</LogonCount>
+        <Username>ci</Username>
+      </AutoLogon>
+
+      <FirstLogonCommands>
+        <SynchronousCommand wcm:action="add">
+          <CommandLine>powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "&amp; ((Get-Volume -FileSystemLabel 'WINCI').DriveLetter + ':\provision.ps1')"</CommandLine>
+          <Description>Provision the CI runner</Description>
+          <Order>1</Order>
+          <RequiresUserInput>false</RequiresUserInput>
+        </SynchronousCommand>
+      </FirstLogonCommands>
+
+      <OOBE>
+        <HideEULAPage>true</HideEULAPage>
+        <HideLocalAccountScreen>true</HideLocalAccountScreen>
+        <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+        <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+        <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+        <ProtectYourPC>3</ProtectYourPC>
+      </OOBE>
+
+      <UserAccounts>
+        <LocalAccounts>
+          <LocalAccount wcm:action="add">
+            <Password>
+              <Value>windows-ci</Value>
+              <PlainText>true</PlainText>
+            </Password>
+            <DisplayName>ci</DisplayName>
+            <Group>Administrators</Group>
+            <Name>ci</Name>
+          </LocalAccount>
+        </LocalAccounts>
+      </UserAccounts>
+    </component>
+  </settings>
+</unattend>

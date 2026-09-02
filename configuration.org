@@ -107,6 +107,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<hydra>>
     <<microvm>>
     <<niks3>>
+    <<nixvirt>>
     <<sops-nix>>
     # Development Tools
     <<git-hooks>>
@@ -491,6 +492,31 @@ niks3 = {
   url = "github:Mic92/niks3";
   inputs.nixpkgs.follows = "nixpkgs";
   inputs.treefmt-nix.follows = "treefmt-nix";
+};
+#+end_src
+
+***** nixvirt
+
+https://github.com/AshleyYakeley/NixVirt
+
+#+BEGIN_QUOTE
+Declarative definitions for libvirt
+#+END_QUOTE
+
+NixVirt renders libvirt domain XML from Nix and reconciles the definition on
+activation, so a guest whose disk image this flake cannot build is still
+described by it. microvm.nix covers the other case, where the guest is a NixOS
+system built here.
+
+I take the flake from FlakeHub rather than GitHub because upstream warns that
+the master branch is frequently broken. The wildcard resolves to the latest
+release.
+
+#+NAME: nixvirt
+#+begin_src nix
+nixvirt = {
+  url = "https://flakehub.com/f/AshleyYakeley/NixVirt/*.tar.gz";
+  inputs.nixpkgs.follows = "nixpkgs";
 };
 #+end_src
 
@@ -920,6 +946,14 @@ Main desktop (Intel Core i5-12400F).
 
 Wake-on-LAN (WoL) is enabled via the following BIOS setting:
 =Advanced > APM Configuration > Power On By PCI-E > Enabled=
+
+***** Windows CI guest
+
+kilimanjaro is the host with the cores to spare, so it runs the
+[[file:modules/configuration.org::*Windows guest][Windows guest]]. It hands the guest the token the Linux runner here already
+uses, and the installation ISO off the NTFS partition it shares with the dual
+boot. [[file:modules/configuration.org::*Installing Windows][Installing Windows]] is the one-time procedure. I have not run it end to end
+yet.
 
 **** arusha
 
