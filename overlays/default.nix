@@ -24,16 +24,6 @@
     );
 
   temporary-fix = final: prev: {
-    python313 = prev.python313.override {
-      packageOverrides = pyfinal: pyprev: {
-        rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {
-          doCheck = false;
-        });
-        lxml-html-clean = pyprev.lxml-html-clean.overridePythonAttrs (_: {
-          doCheck = false;
-        });
-      };
-    };
     handy = prev.handy.overrideAttrs (oldAttrs: {
       patches = (oldAttrs.patches or [ ]) ++ [ ./handy-retry-without-reasoning.patch ];
     });
