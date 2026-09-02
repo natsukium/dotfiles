@@ -39,6 +39,13 @@ Write every message so it stands on its own in that world.
   `git show --stat` already prints.
 - **Process narration.** "Ran formatter", "fix tests" — say why the tests were wrong
   or what the formatting rule is, or say nothing.
+- **Links and issue references that GitHub turns into backlinks.** A pasted
+  `https://github.com/...` URL, a bare `#123`, or an `owner/repo#123` reference posts a
+  cross-reference comment on the linked issue or PR once the commit is pushed, adding
+  noise to a thread that has nothing to do with this repository's history. Carry the
+  content the link would have carried instead: name the upstream project and the
+  problem in prose. If the exact identifier is genuinely needed, write it in a form
+  GitHub does not linkify, such as `NixOS/nixpkgs issue 12345`.
 
 <examples>
   <example type="bad">
@@ -48,6 +55,10 @@ Write every message so it stands on its own in that world.
   <example type="bad">
     <bad>fix: address review feedback on task 3</bad>
     <good>fix(api): reject empty page tokens instead of returning the first page, which silently duplicated results for paginating clients</good>
+  </example>
+  <example type="bad">
+    <bad>fix: work around https://github.com/NixOS/nixpkgs/issues/12345</bad>
+    <good>fix: pin foo to 1.2 because 1.3 drops the static output nixpkgs' wrapper still expects (nixpkgs issue 12345)</good>
   </example>
   <example type="bad">
     <bad>feat: add result caching (started with Redis, switched to in-memory mid-implementation)</bad>
