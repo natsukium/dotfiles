@@ -29,8 +29,6 @@
       meetingbar
     ];
 
-    my.programs.just.enableEnhancedCompletion = true;
-
     services.colima.profiles.default = {
       # Docker Desktop is installed on the work machine
       isActive = false;
