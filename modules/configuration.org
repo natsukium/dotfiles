@@ -135,14 +135,16 @@ Two complementary deduplication mechanisms are enabled:
   files already in the store.
 - =nix.settings.auto-optimise-store= deduplicates at build time as new paths are added.
 
-=auto-optimise-store= is Linux-only because enabling it on macOS corrupts the store —
-the build fails with =error: cannot link '/nix/store/.tmp-link' to '/nix/store/.links/...':
-File exists=. See [[https://github.com/NixOS/nix/issues/7273][NixOS/nix#7273]].
+=auto-optimise-store= used to be Linux-only. The optimiser picked its temporary link name
+with an unguarded ~rand()~, which on macOS collided between concurrent builders and failed
+them with =error: cannot link '/nix/store/.tmp-link' to '/nix/store/.links/...': File
+exists= ([[https://github.com/NixOS/nix/issues/7273][NixOS/nix#7273]]). Nix 2.34 draws that name from =makeTempPath= instead, so both
+mechanisms now run everywhere.
 
 #+NAME: nix-store-optimisation
 #+begin_src nix
 nix.optimise.automatic = true;
-nix.settings.auto-optimise-store = pkgs.stdenv.hostPlatform.isLinux;
+nix.settings.auto-optimise-store = true;
 #+end_src
 
 **** Garbage Collection

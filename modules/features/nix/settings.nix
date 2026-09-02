@@ -38,7 +38,7 @@ let
           })
           {
             nix.optimise.automatic = true;
-            nix.settings.auto-optimise-store = pkgs.stdenv.hostPlatform.isLinux;
+            nix.settings.auto-optimise-store = true;
 
             nix.settings.warn-dirty = false;
 
