@@ -13,10 +13,12 @@ let
   };
 in
 {
-  imports = [
-    ../desktop.nix
-    ./gui-apps-utils
-  ];
+  imports = [ ../desktop.nix ];
+
+  targets.darwin = {
+    linkApps.enable = false;
+    copyApps.enable = true;
+  };
 
   my.programs.paneru.enable = true;
 
