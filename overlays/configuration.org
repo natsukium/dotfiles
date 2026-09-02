@@ -43,7 +43,7 @@ Overlays are organized into five categories based on their purpose and expected 
 }
 #+end_src
 
-** stable
+* stable
 
 Fetch packages from nixpkgs-stable when broken in unstable. This includes cases where
 the upstream fix would trigger excessive rebuilds, or where the issue is too complex
@@ -55,7 +55,7 @@ stable = final: prev: {
 };
 #+end_src
 
-** cuda
+* cuda
 
 [[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the head of =nixos-unstable-cuda=, so kilimanjaro takes
 its CUDA packages from =nixpkgs-cuda=. Naming =ollama= and =onnxruntime= is enough:
@@ -85,7 +85,7 @@ cuda =
   );
 #+end_src
 
-** temporary-fix
+* temporary-fix
 
 Local overrides for packages that build but have failing tests or minor issues.
 Unlike the =stable= overlay, these don't require fetching packages from a different
@@ -100,7 +100,7 @@ temporary-fix = final: prev: {
 };
 #+end_src
 
-*** Python313 package set
+** Python313 package set
 
 Override problematic Python packages using =packageOverrides=.
 
@@ -122,7 +122,7 @@ python313 = prev.python313.override {
 };
 #+end_src
 
-**** rapidocr-onnxruntime
+*** rapidocr-onnxruntime
 
 The test suite causes a segmentation fault during execution. The root cause is still
 under investigation.
@@ -137,7 +137,7 @@ rapidocr-onnxruntime = pyprev.rapidocr-onnxruntime.overridePythonAttrs (_: {
 });
 #+end_src
 
-**** lxml-html-clean
+*** lxml-html-clean
 
 Tests fail due to breaking changes in libxml2 2.14, which modified how certain DOM
 operations handle whitespace and entity encoding. These changes cause test assertions
@@ -171,7 +171,7 @@ handy = prev.handy.overrideAttrs (oldAttrs: {
 });
 #+end_src
 
-** pre-release
+* pre-release
 
 Overlay for testing alpha, beta, or pre-release versions of packages before they land in
 nixpkgs. Useful for evaluating release candidates, nightly builds, or packages pending
@@ -182,7 +182,7 @@ upstream review. Once a package is available in nixpkgs, remove it from this ove
 pre-release = final: prev: { };
 #+end_src
 
-** patches
+* patches
 
 Workarounds that are not suitable for upstream contribution.
 
@@ -199,7 +199,7 @@ patches = final: prev: {
 };
 #+end_src
 
-*** gh-dash
+** gh-dash
 
 The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The issue stems from
 gh-dash's terminal width calculation, which miscounts the display width of certain UTF-8
@@ -224,7 +224,7 @@ gh-dash =
     { pname = "gh-dash"; };
 #+end_src
 
-*** mkShim
+** mkShim
 
 Shim utility for providing stub implementations of macOS Command Line Tools.
 
