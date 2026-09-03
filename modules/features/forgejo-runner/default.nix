@@ -99,6 +99,7 @@ let
             [
               bash
               busybox
+              (hiPrio gnutar)
               curl
               git
               nix
