@@ -42,6 +42,7 @@
                   data=$(cat)
 
                   model=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.model.display_name // "?"')
+                  effort=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.effort.level // empty')
                   used=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.context_window.used_percentage // empty')
                   exceeds=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.exceeds_200k_tokens // false')
                   version=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.version // "?"')
@@ -54,6 +55,10 @@
                     fi
                   else
                     used_fmt="--"
+                  fi
+
+                  if [ -n "$effort" ]; then
+                    model="''${model}/''${effort}"
                   fi
 
                   branch_fmt=""
