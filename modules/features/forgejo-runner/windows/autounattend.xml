@@ -118,8 +118,10 @@
                language="neutral"
                versionScope="nonSxS">
       <!--
-        Only to reach the first logon commands. The runner itself runs as
-        SYSTEM from a scheduled task and needs nobody logged in.
+        Permanent, not just for the first logon commands: the runner runs
+        in this account's interactive session, because a job that opens a
+        window and a GPU swapchain has neither in session 0. No LogonCount,
+        so every boot logs back in.
       -->
       <AutoLogon>
         <Password>
@@ -127,7 +129,6 @@
           <PlainText>true</PlainText>
         </Password>
         <Enabled>true</Enabled>
-        <LogonCount>1</LogonCount>
         <Username>ci</Username>
       </AutoLogon>
 

@@ -3521,6 +3521,9 @@ domain = template // {
         dev = "sda";
         bus = "usb";
       };
+      # The image sits in the store, and qemu opens a writable disk for writing,
+      # which the store refuses. Setup only ever reads the answer file.
+      readonly = true;
     };
   };
 };
@@ -3715,10 +3718,17 @@ reporting =info: using existing install= stopped provisioning halfway through,
 twice, and left no error behind to explain it.
 
 So the whole of it lives in =provision.ps1=: the state disk, the machine-scoped
-=RUSTUP_HOME= and =CARGO_HOME= that keep the caches on D:, git, rustup with the
-nightly toolchain, the MSVC build tools, cargo-nextest, and the runner itself. A
-task registered at startup copies the runner across to =D:\runner= and runs the
-daemon as SYSTEM. Copying on every boot keeps the version the flake pins as the
+=RUSTUP_HOME= and =CARGO_HOME= that keep the caches on D:, git, Node.js, rustup
+with the nightly toolchain, the MSVC build tools, cargo-nextest, and the runner
+itself. Node is not for any project: the runner executes JS actions —
+=actions/checkout= before anything else — with a node from the host PATH, and
+its first job without one died at step one with "Cannot find: node in PATH". A
+task registered at logon copies the runner across to =D:\runner= and runs the
+daemon as the =ci= user in its own interactive session — session 0, where a
+SYSTEM task runs, has no desktop, and a job that opens a window and a wgpu
+swapchain fails there with "Invalid surface" before its first frame, so the
+account autologs on permanently and the runner rides that session. Copying on
+every boot keeps the version the flake pins as the
 version that runs, even though D: outlives the resets that would otherwise carry
 the update. Registration writes =.runner= beside the working directory, so the
 daemon runs from D: for the credential to survive a reset.

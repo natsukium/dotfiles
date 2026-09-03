@@ -191,6 +191,9 @@
               dev = "sda";
               bus = "usb";
             };
+            # The image sits in the store, and qemu opens a writable disk for writing,
+            # which the store refuses. Setup only ever reads the answer file.
+            readonly = true;
           };
         };
       };

@@ -150,6 +150,19 @@ if (-not (Test-Path "C:\Program Files\Git\cmd\git.exe")) {
 }
 $env:Path = "$env:Path;C:\Program Files\Git\cmd"
 
+# The runner executes JS actions (actions/checkout above all) with a node it
+# finds on the host PATH; without one every job dies at its first step with
+# "Cannot find: node in PATH" before any tool of ours runs.
+if (-not (Test-Path "C:\Program Files\nodejs\node.exe")) {
+    Step "Installing Node.js for the runner's JS actions"
+    $lts = (Invoke-RestMethod "https://nodejs.org/dist/index.json") |
+        Where-Object lts |
+        Select-Object -First 1
+    $installer = Get-Installer "https://nodejs.org/dist/$($lts.version)/node-$($lts.version)-x64.msi" "node-$($lts.version)-x64.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList @("/i", $installer, "/qn", "/norestart")
+}
+$env:Path = "$env:Path;C:\Program Files\nodejs"
+
 if (-not (Test-Path "D:\cargo\bin\rustup.exe")) {
     Step "Installing rustup with the nightly toolchain"
     $installer = Get-Installer "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe" "rustup-init.exe"
@@ -214,11 +227,15 @@ Set-Location "D:\runner"
 & "D:\runner\forgejo-runner.exe" daemon
 '@ | Set-Content -Path "C:\windows-ci\start-runner.ps1" -Encoding UTF8
 
+# At logon as the interactive user, not at startup as SYSTEM: a job that
+# opens a real window and a wgpu swapchain needs a desktop, and session 0
+# has none — wgpu fails there with "Invalid surface" before the first
+# frame. The account autologs on, so this fires on every boot anyway.
 Register-ScheduledTask -TaskName "forgejo-runner" -Force `
     -Action (New-ScheduledTaskAction -Execute "powershell.exe" `
         -Argument "-NoProfile -ExecutionPolicy Bypass -File C:\windows-ci\start-runner.ps1") `
-    -Trigger (New-ScheduledTaskTrigger -AtStartup) `
-    -Principal (New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest) `
+    -Trigger (New-ScheduledTaskTrigger -AtLogOn -User "ci") `
+    -Principal (New-ScheduledTaskPrincipal -UserId "ci" -LogonType Interactive -RunLevel Highest) `
     -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit 0 -RestartCount 3 `
         -RestartInterval (New-TimeSpan -Minutes 1)) |
     Out-Null
