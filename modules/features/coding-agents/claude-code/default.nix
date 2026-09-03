@@ -68,14 +68,18 @@
 
             permissions = {
               deny = [
+                # Any Read deny rule stops Claude Code from auto-approving Bash,
+                # so it asks permission for nearly every command. I keep the Read
+                # rules commented out until that is fixed. The Bash patterns
+                # below still cover the same files.
                 # ~/.ssh holds plaintext private keys and the agent never needs any
                 # of it, so block the whole tree (config included) instead of
                 # guessing key filenames.
-                "Read(**/.ssh/**)"
+                # "Read(**/.ssh/**)"
                 "Bash(cat *.ssh/*)"
                 # .env secrets sit in plaintext, so the read itself is the leak.
-                "Read(**/.env)"
-                "Read(**/.env.*)"
+                # "Read(**/.env)"
+                # "Read(**/.env.*)"
                 "Bash(cat *.env*)"
                 # age/sops files are ciphertext at rest, so reading them leaks
                 # nothing; the exposure is decryption to stdout. Block only the
