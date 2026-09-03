@@ -98,8 +98,8 @@ let
             with pkgs;
             [
               bash
+              (lib.hiPrio gnutar)
               busybox
-              (hiPrio gnutar)
               curl
               git
               nix
