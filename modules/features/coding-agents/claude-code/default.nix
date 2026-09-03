@@ -175,6 +175,24 @@
           };
         };
 
+        # home-manager's claude-code module has no keybindings option yet, so the
+        # file is written directly. Only the overrides are listed: user bindings
+        # are appended to the defaults, and pinning the full default set here
+        # would silently freeze it as upstream adds actions.
+        home.file."${config.programs.claude-code.configDir}/keybindings.json".source =
+          (pkgs.formats.json { }).generate "claude-code-keybindings.json"
+            {
+              "$schema" = "https://www.schemastore.org/claude-code-keybindings.json";
+              bindings = [
+                {
+                  context = "Chat";
+                  bindings = {
+                    "ctrl+p" = "chat:modelPicker";
+                  };
+                }
+              ];
+            };
+
         programs.git.ignores = [
           "**/.claude/settings.local.json"
         ];
