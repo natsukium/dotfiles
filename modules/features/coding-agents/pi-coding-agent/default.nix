@@ -41,6 +41,8 @@
           settings.enabledModels = [
             "openai-codex/gpt-5.6-luna"
             "openai-codex/gpt-5.6-sol"
+            "opencode/muse-spark-1.2-contributor-free"
+            "opencode/muse-spark-1.3-contributor-free"
           ];
         };
 
