@@ -74,7 +74,7 @@
       settings = {
         platform = "forgejo";
         endpoint = "https://${config.services.forgejo.settings.server.DOMAIN}/";
-        repositories = [ ];
+        repositories = [ "natsukium/felis" ];
         onboarding = false;
       };
     };
