@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, pkgs, ... }:
 {
   # I self-host Renovate rather than staying on the Mend-hosted app for the one
   # thing the hosted version cannot offer: postUpgradeTasks. A regex manager can
@@ -70,6 +70,8 @@
         # changelogs from github.com; no permissions are needed on it.
         GITHUB_COM_TOKEN = config.sops.secrets.renovate-github-com-token.path;
       };
+
+      runtimePackages = with pkgs; [ cargo ];
 
       settings = {
         platform = "forgejo";
