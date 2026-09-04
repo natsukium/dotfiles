@@ -76,6 +76,8 @@
         endpoint = "https://${config.services.forgejo.settings.server.DOMAIN}/";
         repositories = [ "natsukium/felis" ];
         onboarding = false;
+        configFileNames = [ ".forgejo/renovate.json5" ];
+        onboardingConfigFileName = ".forgejo/renovate.json5";
       };
     };
   };
