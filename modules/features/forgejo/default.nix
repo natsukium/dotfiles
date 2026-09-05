@@ -69,6 +69,34 @@
         services.openssh.ports = [ 2022 ];
         services.forgejo.settings.server.SSH_PORT = 22;
 
+        sops.secrets.forgejo-signing-key = {
+          sopsFile = ./secrets.yaml;
+          owner = "forgejo";
+          path = "/var/lib/forgejo-signing/key";
+        };
+
+        systemd.tmpfiles.settings."10-forgejo-signing" = {
+          "/var/lib/forgejo-signing".d = {
+            user = "forgejo";
+            group = "forgejo";
+            mode = "0750";
+          };
+          "${config.sops.secrets.forgejo-signing-key.path}.pub"."L+".argument = toString (
+            pkgs.writeText "forgejo-signing-key.pub" "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIAWHoqNuRjeO1o4x6pdrF3ZCZRluh80HWVP6X8j4k8pn forgejo@natsukium.com\n"
+          );
+        };
+
+        services.forgejo.settings."repository.signing" = {
+          FORMAT = "ssh";
+          SIGNING_KEY = "${config.sops.secrets.forgejo-signing-key.path}.pub";
+          SIGNING_NAME = "Forgejo";
+          SIGNING_EMAIL = "forgejo@natsukium.com";
+          MERGES = "always";
+          CRUD_ACTIONS = "always";
+        };
+
+        systemd.services.forgejo.path = [ pkgs.openssh ];
+
         services.postgresqlBackup = {
           enable = true;
           databases = [ config.services.forgejo.database.name ];
