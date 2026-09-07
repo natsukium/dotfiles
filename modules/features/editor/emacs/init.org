@@ -751,6 +751,21 @@ to prevent lines from becoming unnecessarily long.
 (setq org-agenda-files '("~/dropbox/org"))
 #+end_src
 
+A todo captured with =C-c c t= carries no date,
+so it never surfaces in the daily agenda
+and I rediscover it only by scrolling through =todo.org=.
+The =u= view lists exactly those entries:
+TODOs with no SCHEDULED, no DEADLINE, and no active timestamp.
+It is the queue I work through when I sit down to plan the week.
+
+#+begin_src emacs-lisp
+(setq org-agenda-custom-commands
+      '(("u" "Unscheduled tasks" alltodo ""
+         ((org-agenda-overriding-header "Unscheduled")
+          (org-agenda-skip-function
+           '(org-agenda-skip-entry-if 'scheduled 'deadline 'timestamp))))))
+#+end_src
+
 ** org-super-agenda
 
 [[https://github.com/alphapapa/org-super-agenda][org-super-agenda]] puts agenda
@@ -760,6 +775,21 @@ items under named headers instead of listing them flat.
 (use-package org-super-agenda
   :ensure t
   :hook (org-agenda-mode . org-super-agenda-mode))
+#+end_src
+
+=g= asks the same question as =u= from the other side.
+Every TODO stays in the view, grouped by whether it carries a date,
+so the undated pile sits above the planned work instead of replacing it.
+=u= tells me what still needs a date.
+=g= tells me whether there is room for any of it.
+
+#+begin_src emacs-lisp
+(add-to-list 'org-agenda-custom-commands
+             '("g" "TODOs grouped by schedule" alltodo ""
+               ((org-super-agenda-groups
+                 '((:name "No date" :and (:scheduled nil :deadline nil))
+                   (:name "Deadline" :deadline t)
+                   (:name "Scheduled" :scheduled t))))))
 #+end_src
 
 ** org-habit
