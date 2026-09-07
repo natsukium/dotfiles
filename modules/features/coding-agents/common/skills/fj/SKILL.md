@@ -24,7 +24,7 @@ Repository syntax depends on the command:
 - Repository commands generally take `owner/repo` as a positional argument. Releases, tags, Actions, and wikis expose their own global `--repo`; check the relevant `--help` before composing less common commands.
 - Convert a URL such as `https://git.natsukium.com/owner/repo/issues/42` or `/pulls/42` to `'owner/repo#42'`.
 
-`-C`, `-R`, and the current directory infer the instance and repository from a Git remote. Some checkouts point at the internal host `manyara.tail4108.ts.net`, which requires Tailscale. Do not combine `-H` with `-R` when the public API endpoint is required: an explicitly selected remote can take precedence over `-H`. If a command fails against the internal host, connect Tailscale or retry with `-H https://git.natsukium.com` and an explicit repository or qualified reference.
+`-C`, `-R`, and the current directory infer the instance and repository from a Git remote. Prefer `-H` with `--repo` (or a qualified reference) over `-R` for unattended commands: `-R` resolves the named remote and takes precedence over `-H`, and an SSH remote host is resolved through OpenSSH config, so a `HostName` rewrite to the internal host makes `fj` dial `https://` on a host that does not serve it. If a command fails against the internal host, retry with `-H https://git.natsukium.com` and an explicit repository or qualified reference instead of connecting Tailscale; reserve `-R` for deliberate checkout inference.
 
 ## Authentication
 
@@ -41,11 +41,14 @@ fj auth logout -H https://git.natsukium.com
 ## Issues
 
 ```bash
-# Search and create use --repo
+# Search and create use --repo (short -r); create needs no checkout inference
 fj -H https://git.natsukium.com issue search --repo owner/repo
 fj -H https://git.natsukium.com issue search --repo owner/repo --state all "keyword"
 fj -H https://git.natsukium.com issue search --repo owner/repo --labels bug --state open
 fj -H https://git.natsukium.com issue create "Title" --repo owner/repo --body-file /tmp/issue.md
+
+# create accepts no labels; set them after creation
+fj -H https://git.natsukium.com issue edit 'owner/repo#42' labels -a bug
 
 # Existing issues use a qualified reference
 fj -H https://git.natsukium.com issue view 'owner/repo#42'
