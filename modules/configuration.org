@@ -2534,7 +2534,8 @@ flake.modules.nixos.forgejo =
         ${lib.getExe config.services.forgejo.package} admin user create \
           --username natsukium \
           --email "tomoya.otabi@gmail.com" \
-          --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})" || true
+          --password "$(tr -d '\n' < ${config.sops.secrets.forgejo-admin-password.path})" \
+          --admin || true
 
         ${lib.getExe config.services.forgejo.package} admin user create \
           --username renovate \

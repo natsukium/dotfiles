@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-07 11:30+0900\n"
+"POT-Creation-Date: 2026-09-08 23:35+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -429,8 +429,8 @@ msgstr ""
 #. type: heading ***
 #: configuration.org:70 modules/features/editor/emacs/init.org:662
 #: modules/configuration.org:80 modules/configuration.org:457
-#: modules/configuration.org:811 modules/configuration.org:2906
-#: modules/configuration.org:5295
+#: modules/configuration.org:811 modules/configuration.org:2907
+#: modules/configuration.org:5296
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -4081,7 +4081,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:93 modules/configuration.org:5252
+#: modules/features/editor/emacs/init.org:93 modules/configuration.org:5253
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -7255,7 +7255,7 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:102 modules/configuration.org:4580
+#: overlays/configuration.org:102 modules/configuration.org:4581
 #, no-wrap
 msgid "Handy"
 msgstr ""
@@ -7559,8 +7559,8 @@ msgstr "home-manager"
 
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:357
-#: modules/configuration.org:770 modules/configuration.org:3240
-#: modules/configuration.org:5282
+#: modules/configuration.org:770 modules/configuration.org:3241
+#: modules/configuration.org:5283
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -11092,7 +11092,7 @@ msgid "github.user = \"natsukium\";"
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:1967 modules/configuration.org:4301
+#: modules/configuration.org:1967 modules/configuration.org:4302
 #, no-wrap
 msgid "Editor"
 msgstr "エディター"
@@ -12348,11 +12348,12 @@ msgid ""
 "  ${lib.getExe config.services.forgejo.package} admin user create \\\n"
 "    --username natsukium \\\n"
 "    --email \"tomoya.otabi@gmail.com\" \\\n"
-"    --password \"$(tr -d '\\n' < ${config.sops.secrets.forgejo-admin-password.path})\" || true"
+"    --password \"$(tr -d '\\n' < ${config.sops.secrets.forgejo-admin-password.path})\" \\\n"
+"    --admin || true"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2539
+#: modules/configuration.org:2540
 #, no-wrap
 msgid ""
 "  ${lib.getExe config.services.forgejo.package} admin user create \\\n"
@@ -12364,7 +12365,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2546
+#: modules/configuration.org:2547
 #, no-wrap
 msgid ""
 "sops.secrets.forgejo-admin-password = {\n"
@@ -12374,7 +12375,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2551
+#: modules/configuration.org:2552
 #, no-wrap
 msgid ""
 "sops.secrets.forgejo-renovate-password = {\n"
@@ -12384,7 +12385,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2556
+#: modules/configuration.org:2557
 #, no-wrap
 msgid ""
 "my.services.cloudflared-tunnel.ingress.${config.services.forgejo.settings.server.DOMAIN} =\n"
@@ -12397,19 +12398,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2564
+#: modules/configuration.org:2565
 #, no-wrap
 msgid "<<forgejo-ssh-port>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2566
+#: modules/configuration.org:2567
 #, no-wrap
 msgid "<<forgejo-signing>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2568
+#: modules/configuration.org:2569
 #, no-wrap
 msgid ""
 "    <<forgejo-backup>>\n"
@@ -12418,13 +12419,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2573
+#: modules/configuration.org:2574
 #, no-wrap
 msgid "SSH Port"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2575
+#: modules/configuration.org:2576
 msgid ""
 "Tailscale runs with [[*Service Settings][=--ssh=]], so on the tailnet "
 "tailscaled answers port 22 itself and hands out a plain shell as =forgejo=. "
@@ -12435,13 +12436,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2582
+#: modules/configuration.org:2583
 #, no-wrap
 msgid "forgejo-ssh-port"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2584
+#: modules/configuration.org:2585
 #, no-wrap
 msgid ""
 "services.openssh.ports = [ 2022 ];\n"
@@ -12449,14 +12450,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2588
+#: modules/configuration.org:2589
 #, fuzzy, no-wrap
 #| msgid "Extra Options"
 msgid "Instance Signing"
 msgstr "追加オプション"
 
 #. type: paragraph
-#: modules/configuration.org:2590
+#: modules/configuration.org:2591
 msgid ""
 "Forgejo authors the commit itself when I merge a pull request or edit a file "
 "in the web UI, so those commits carry no signature. An instance key signs "
@@ -12464,13 +12465,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2594
+#: modules/configuration.org:2595
 #, no-wrap
 msgid "forgejo-signing"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2596
+#: modules/configuration.org:2597
 #, no-wrap
 msgid ""
 "sops.secrets.forgejo-signing-key = {\n"
@@ -12481,7 +12482,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2602
+#: modules/configuration.org:2603
 #, no-wrap
 msgid ""
 "systemd.tmpfiles.settings.\"10-forgejo-signing\" = {\n"
@@ -12497,7 +12498,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2613
+#: modules/configuration.org:2614
 #, no-wrap
 msgid ""
 "services.forgejo.settings.\"repository.signing\" = {\n"
@@ -12511,19 +12512,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2622
+#: modules/configuration.org:2623
 #, no-wrap
 msgid "systemd.services.forgejo.path = [ pkgs.openssh ];"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2625
+#: modules/configuration.org:2626
 #, no-wrap
 msgid "Backup"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2627
+#: modules/configuration.org:2628
 msgid ""
 "The repositories under =stateDir= are only half the instance: issues, users "
 "and access tokens live in postgres, and restoring one without the other "
@@ -12534,14 +12535,14 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2634
+#: modules/configuration.org:2635
 #, fuzzy, no-wrap
 #| msgid "org-agenda"
 msgid "forgejo-backup"
 msgstr "org-agenda"
 
 #. type: paragraph in src
-#: modules/configuration.org:2636
+#: modules/configuration.org:2637
 #, no-wrap
 msgid ""
 "services.postgresqlBackup = {\n"
@@ -12551,7 +12552,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2641
+#: modules/configuration.org:2642
 #, no-wrap
 msgid ""
 "my.services.restic.backups.forgejo.paths = [\n"
@@ -12561,27 +12562,27 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2647
+#: modules/configuration.org:2648
 #, fuzzy, no-wrap
 #| msgid "Core Settings"
 msgid "Client Settings"
 msgstr "コア設定"
 
 #. type: paragraph
-#: modules/configuration.org:2649
+#: modules/configuration.org:2650
 msgid ""
 "What every machine of mine needs to talk to the instance: where ssh goes, "
 "and which remotes take that route."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2652
+#: modules/configuration.org:2653
 #, no-wrap
 msgid "forgejo-client"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2654
+#: modules/configuration.org:2655
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.forgejo =\n"
@@ -12591,7 +12592,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2659
+#: modules/configuration.org:2660
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.forgejo.enable {\n"
@@ -12599,7 +12600,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2662
+#: modules/configuration.org:2663
 #, no-wrap
 msgid ""
 "    <<forgejo-push-url>>\n"
@@ -12608,13 +12609,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2667
+#: modules/configuration.org:2668
 #, no-wrap
 msgid "SSH Route"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2669
+#: modules/configuration.org:2670
 msgid ""
 "=git.natsukium.com= resolves publicly to the cloudflared tunnel, which "
 "carries HTTP only, so ssh needs another path. Every machine of mine reaches "
@@ -12624,14 +12625,14 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2674
+#: modules/configuration.org:2675
 #, fuzzy, no-wrap
 #| msgid "org-agenda"
 msgid "forgejo-ssh-route"
 msgstr "org-agenda"
 
 #. type: paragraph in src
-#: modules/configuration.org:2676
+#: modules/configuration.org:2677
 #, no-wrap
 msgid ""
 "programs.ssh.settings.\"git.natsukium.com\" = {\n"
@@ -12641,47 +12642,47 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2682
+#: modules/configuration.org:2683
 #, fuzzy, no-wrap
 #| msgid "Push"
 msgid "Push URLs"
 msgstr "Push"
 
 #. type: paragraph
-#: modules/configuration.org:2684
+#: modules/configuration.org:2685
 msgid ""
 "Remotes cloned over https would push over https as well. This rewrite routes "
 "every push to the forge over ssh instead, leaving fetch on the tunnel."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2687
+#: modules/configuration.org:2688
 #, fuzzy, no-wrap
 #| msgid "org-agenda"
 msgid "forgejo-push-url"
 msgstr "org-agenda"
 
 #. type: paragraph in src
-#: modules/configuration.org:2689
+#: modules/configuration.org:2690
 #, no-wrap
 msgid "programs.git.settings.url.\"forgejo@git.natsukium.com:\".pushInsteadOf = \"https://git.natsukium.com/\";"
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:2692
+#: modules/configuration.org:2693
 #, fuzzy, no-wrap
 #| msgid "Git Integration"
 msgid "Continuous Integration"
 msgstr "Git連携"
 
 #. type: heading **
-#: modules/configuration.org:2694
+#: modules/configuration.org:2695
 #, no-wrap
 msgid "Forgejo Actions Runner"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2696
+#: modules/configuration.org:2697
 msgid ""
 "My Forgejo instance dispatches Actions jobs to registered runners. Linux "
 "hosts use nixpkgs' =services.gitea-actions-runner=; macOS has no such "
@@ -12690,7 +12691,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2701
+#: modules/configuration.org:2702
 msgid ""
 "I split this into three modules. The nix-darwin mechanism is neutral, so I "
 "publish it as =flake.darwinModules.forgejo-runner= via [[file:exports.nix]"
@@ -12703,7 +12704,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2715
+#: modules/configuration.org:2716
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -12712,7 +12713,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2719
+#: modules/configuration.org:2720
 #, no-wrap
 msgid ""
 "  <<forgejo-runner-wrappers>>\n"
@@ -12722,7 +12723,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2724
+#: modules/configuration.org:2725
 #, no-wrap
 msgid ""
 "  flake.modules.darwin.forgejo-runner = darwinWrapper;\n"
@@ -12731,13 +12732,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:2729
+#: modules/configuration.org:2730
 #, no-wrap
 msgid "nix-darwin module"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2731
+#: modules/configuration.org:2732
 msgid ""
 "This module carries nothing personal — just =services.forgejo-runner=, "
 "mirroring the instance schema of nixpkgs' =services.gitea-actions-runner= "
@@ -12748,7 +12749,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2744
+#: modules/configuration.org:2745
 #, no-wrap
 msgid ""
 "{\n"
@@ -12763,13 +12764,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2754
+#: modules/configuration.org:2755
 #, no-wrap
 msgid "<<forgejo-runner-instance-submodule>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2756
+#: modules/configuration.org:2757
 #, no-wrap
 msgid ""
 "  enabledInstances = lib.filterAttrs (_: i: i.enable) cfg.instances;\n"
@@ -12779,7 +12780,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2761
+#: modules/configuration.org:2762
 #, no-wrap
 msgid ""
 "  <<forgejo-runner-darwin-config>>\n"
@@ -12787,14 +12788,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2765
+#: modules/configuration.org:2766
 #, fuzzy, no-wrap
 #| msgid "Extra Options"
 msgid "Instance options"
 msgstr "追加オプション"
 
 #. type: paragraph
-#: modules/configuration.org:2767
+#: modules/configuration.org:2768
 msgid ""
 "An instance carries its registration details and the tools its jobs need on "
 "=PATH=. Exactly one of =token= or =tokenFile= supplies the token, matching "
@@ -12803,13 +12804,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2772
+#: modules/configuration.org:2773
 #, no-wrap
 msgid "forgejo-runner-instance-submodule"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2774
+#: modules/configuration.org:2775
 #, no-wrap
 msgid ""
 "instanceModule =\n"
@@ -12820,7 +12821,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2780
+#: modules/configuration.org:2781
 #, no-wrap
 msgid ""
 "name = lib.mkOption {\n"
@@ -12832,7 +12833,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2787
+#: modules/configuration.org:2788
 #, no-wrap
 msgid ""
 "url = lib.mkOption {\n"
@@ -12843,7 +12844,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2793
+#: modules/configuration.org:2794
 #, no-wrap
 msgid ""
 "token = lib.mkOption {\n"
@@ -12858,7 +12859,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2803
+#: modules/configuration.org:2804
 #, no-wrap
 msgid ""
 "tokenFile = lib.mkOption {\n"
@@ -12875,7 +12876,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2815
+#: modules/configuration.org:2816
 #, no-wrap
 msgid ""
 "labels = lib.mkOption {\n"
@@ -12886,7 +12887,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2821
+#: modules/configuration.org:2822
 #, no-wrap
 msgid ""
 "settings = lib.mkOption {\n"
@@ -12900,7 +12901,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2830
+#: modules/configuration.org:2831
 #, no-wrap
 msgid ""
 "hostPackages = lib.mkOption {\n"
@@ -12926,7 +12927,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2851
+#: modules/configuration.org:2852
 #, no-wrap
 msgid ""
 "    stateDir = lib.mkOption {\n"
@@ -12940,14 +12941,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:2861
+#: modules/configuration.org:2862
 #, fuzzy, no-wrap
 #| msgid "Modules"
 msgid "Module options"
 msgstr "モジュール"
 
 #. type: paragraph
-#: modules/configuration.org:2863
+#: modules/configuration.org:2864
 msgid ""
 "The daemons run as a dedicated unprivileged user, not root: a root daemon is "
 "a trusted-user client of the nix daemon, whose post-build-hook push path the "
@@ -12957,13 +12958,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2869
+#: modules/configuration.org:2870
 #, no-wrap
 msgid "forgejo-runner-darwin-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2871
+#: modules/configuration.org:2872
 #, no-wrap
 msgid ""
 "options.services.forgejo-runner = {\n"
@@ -12971,7 +12972,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2874
+#: modules/configuration.org:2875
 #, no-wrap
 msgid ""
 "user = lib.mkOption {\n"
@@ -12982,7 +12983,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2880
+#: modules/configuration.org:2881
 #, no-wrap
 msgid ""
 "group = lib.mkOption {\n"
@@ -12993,7 +12994,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2886
+#: modules/configuration.org:2887
 #, no-wrap
 msgid ""
 "uid = lib.mkOption {\n"
@@ -13004,7 +13005,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2892
+#: modules/configuration.org:2893
 #, no-wrap
 msgid ""
 "gid = lib.mkOption {\n"
@@ -13015,7 +13016,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2898
+#: modules/configuration.org:2899
 #, no-wrap
 msgid ""
 "  instances = lib.mkOption {\n"
@@ -13027,13 +13028,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2908
+#: modules/configuration.org:2909
 #, no-wrap
 msgid "forgejo-runner-darwin-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2910
+#: modules/configuration.org:2911
 #, no-wrap
 msgid ""
 "config = lib.mkIf (enabledInstances != { }) {\n"
@@ -13044,19 +13045,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2916
+#: modules/configuration.org:2917
 #, no-wrap
 msgid "<<forgejo-runner-daemons>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2918
+#: modules/configuration.org:2919
 #, no-wrap
 msgid "<<forgejo-runner-user>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2920
+#: modules/configuration.org:2921
 #, no-wrap
 msgid ""
 "  <<forgejo-runner-ownership>>\n"
@@ -13064,13 +13065,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *****
-#: modules/configuration.org:2924
+#: modules/configuration.org:2925
 #, no-wrap
 msgid "Launchd daemons"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2926
+#: modules/configuration.org:2927
 msgid ""
 "One launchd job per enabled instance. launchd has no =EnvironmentFile=, so a "
 "=tokenFile= instance sources it in-script while an inline =token= rides on "
@@ -13080,7 +13081,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: modules/configuration.org:2935
+#: modules/configuration.org:2936
 #, no-wrap
 msgid ""
 "=WorkingDirectory= cannot be the state directory: launchd chdir()s into it\n"
@@ -13089,7 +13090,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: modules/configuration.org:2939
+#: modules/configuration.org:2940
 #, no-wrap
 msgid ""
 "The logs live in the user-owned state directory, not =/var/log=: launchd\n"
@@ -13099,13 +13100,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:2940
+#: modules/configuration.org:2941
 #, no-wrap
 msgid "forgejo-runner-daemons"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2942
+#: modules/configuration.org:2943
 #, no-wrap
 msgid ""
 "launchd.daemons = lib.mapAttrs' (\n"
@@ -13128,7 +13129,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2960
+#: modules/configuration.org:2961
 #, no-wrap
 msgid ""
 "if [ ! -f .runner ] || [ \"$(cat .registration-state 2>/dev/null)\" != \"$state\" ]; then\n"
@@ -13145,7 +13146,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:2972
+#: modules/configuration.org:2973
 #, no-wrap
 msgid ""
 "      exec ${lib.getExe cfg.package} daemon --config ${configFile}\n"
@@ -13171,20 +13172,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *****
-#: modules/configuration.org:2994
+#: modules/configuration.org:2995
 #, no-wrap
 msgid "Runner user"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2996
+#: modules/configuration.org:2997
 msgid ""
 "nix-darwin only manages accounts listed in =users.knownUsers= / "
 "=users.knownGroups=, so I add the entries."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:2999
+#: modules/configuration.org:3000
 msgid ""
 "I leave =createHome= off: it runs =createhomedir=, which resolves the =/var= "
 "firmlink and records the home as =/private/var/…=, then nix-darwin string-"
@@ -13194,13 +13195,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3005
+#: modules/configuration.org:3006
 #, no-wrap
 msgid "forgejo-runner-user"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3007
+#: modules/configuration.org:3008
 #, no-wrap
 msgid ""
 "users.users.${cfg.user} = {\n"
@@ -13215,14 +13216,14 @@ msgid ""
 msgstr ""
 
 #. type: heading *****
-#: modules/configuration.org:3018
+#: modules/configuration.org:3019
 #, fuzzy, no-wrap
 #| msgid "Starship"
 msgid "State ownership"
 msgstr "Starship"
 
 #. type: paragraph
-#: modules/configuration.org:3020
+#: modules/configuration.org:3021
 msgid ""
 "Each state directory must exist and belong to the runner user before its "
 "daemon starts. With =createHome= off nothing else creates it, so activation "
@@ -13230,13 +13231,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3024
+#: modules/configuration.org:3025
 #, no-wrap
 msgid "forgejo-runner-ownership"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3026
+#: modules/configuration.org:3027
 #, no-wrap
 msgid ""
 "system.activationScripts.launchd.text = lib.mkBefore (\n"
@@ -13248,13 +13249,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3034
+#: modules/configuration.org:3035
 #, no-wrap
 msgid "Opinionated wrappers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3036
+#: modules/configuration.org:3037
 msgid ""
 "The two platforms drive different options — =services.forgejo-runner= on "
 "Darwin, =services.gitea-actions-runner= on NixOS — but since the nix-darwin "
@@ -13269,13 +13270,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3046
+#: modules/configuration.org:3047
 #, no-wrap
 msgid "forgejo-runner-wrapper-shared"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3048
+#: modules/configuration.org:3049
 #, no-wrap
 msgid ""
 "wrapperOptions =\n"
@@ -13286,7 +13287,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3054 modules/configuration.org:3276
+#: modules/configuration.org:3055 modules/configuration.org:3277
 #, no-wrap
 msgid ""
 "url = lib.mkOption {\n"
@@ -13297,7 +13298,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3060
+#: modules/configuration.org:3061
 #, no-wrap
 msgid ""
 "tokenFile = lib.mkOption {\n"
@@ -13311,7 +13312,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3069
+#: modules/configuration.org:3070
 #, no-wrap
 msgid ""
 "    labels = lib.mkOption {\n"
@@ -13323,7 +13324,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3076
+#: modules/configuration.org:3077
 #, no-wrap
 msgid ""
 "mkInstance = config: hostPackages: {\n"
@@ -13337,13 +13338,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3086
+#: modules/configuration.org:3087
 #, no-wrap
 msgid "forgejo-runner-wrappers"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3088
+#: modules/configuration.org:3089
 #, no-wrap
 msgid ""
 "darwinWrapper =\n"
@@ -13362,7 +13363,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3102
+#: modules/configuration.org:3103
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.services.forgejo-runner.enable {\n"
@@ -13373,7 +13374,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3108
+#: modules/configuration.org:3109
 #, no-wrap
 msgid ""
 "    services.forgejo-runner.instances.default = mkInstance config (\n"
@@ -13393,7 +13394,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3123
+#: modules/configuration.org:3124
 #, no-wrap
 msgid ""
 "nixosWrapper =\n"
@@ -13409,7 +13410,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3134
+#: modules/configuration.org:3135
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.services.forgejo-runner.enable {\n"
@@ -13420,7 +13421,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3140
+#: modules/configuration.org:3141
 #, no-wrap
 msgid ""
 "services.gitea-actions-runner = {\n"
@@ -13442,7 +13443,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3157
+#: modules/configuration.org:3158
 #, no-wrap
 msgid ""
 "    virtualisation.docker.enable = true;\n"
@@ -13451,13 +13452,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3162
+#: modules/configuration.org:3163
 #, no-wrap
 msgid "Windows guest"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3164
+#: modules/configuration.org:3165
 msgid ""
 "Software that has to keep working on Windows needs a Windows machine to "
 "build and test it on, so one runner is a Windows guest. This feature "
@@ -13468,7 +13469,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3170
+#: modules/configuration.org:3171
 msgid ""
 "The guest boots on a throwaway overlay of a golden image, and a libvirt hook "
 "recreates that overlay every time qemu starts. So nothing a job leaves "
@@ -13478,7 +13479,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3176
+#: modules/configuration.org:3177
 msgid ""
 "Windows cannot be built from this flake, so the golden image is installed "
 "once from an answer file. =installer= switches the domain over for that: the "
@@ -13488,7 +13489,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3187
+#: modules/configuration.org:3188
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -13506,25 +13507,25 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3200
+#: modules/configuration.org:3201
 #, no-wrap
 msgid "<<windows-ci-disks>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3202
+#: modules/configuration.org:3203
 #, no-wrap
 msgid "<<windows-ci-payload>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3204
+#: modules/configuration.org:3205
 #, no-wrap
 msgid "<<windows-ci-answer-image>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3206
+#: modules/configuration.org:3207
 #, no-wrap
 msgid ""
 "  <<windows-ci-domain>>\n"
@@ -13534,13 +13535,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3211
+#: modules/configuration.org:3212
 #, no-wrap
 msgid "<<windows-ci-options>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3213
+#: modules/configuration.org:3214
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -13553,31 +13554,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3221
+#: modules/configuration.org:3222
 #, no-wrap
 msgid "<<windows-ci-libvirt>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3223
+#: modules/configuration.org:3224
 #, no-wrap
 msgid "<<windows-ci-images>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3225
+#: modules/configuration.org:3226
 #, no-wrap
 msgid "<<windows-ci-seed>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3227
+#: modules/configuration.org:3228
 #, no-wrap
 msgid "<<windows-ci-reset>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3229
+#: modules/configuration.org:3230
 #, no-wrap
 msgid ""
 "environment.systemPackages = [\n"
@@ -13587,7 +13588,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3234
+#: modules/configuration.org:3235
 #, no-wrap
 msgid ""
 "        users.users.${config.my.username}.extraGroups = [ \"libvirtd\" ];\n"
@@ -13597,7 +13598,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3242
+#: modules/configuration.org:3243
 msgid ""
 "The host decides what it can afford and where its secrets are, and nothing "
 "else. Sizing is the interesting one: half the host threads and a quarter of "
@@ -13608,13 +13609,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3249
+#: modules/configuration.org:3250
 #, no-wrap
 msgid "windows-ci-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3251
+#: modules/configuration.org:3252
 #, no-wrap
 msgid ""
 "options.my.services.windows-ci = {\n"
@@ -13622,7 +13623,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3254
+#: modules/configuration.org:3255
 #, no-wrap
 msgid ""
 "installer = lib.mkEnableOption ''\n"
@@ -13631,7 +13632,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3258
+#: modules/configuration.org:3259
 #, no-wrap
 msgid ""
 "installerIso = lib.mkOption {\n"
@@ -13645,7 +13646,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3267
+#: modules/configuration.org:3268
 #, no-wrap
 msgid ""
 "tokenFile = lib.mkOption {\n"
@@ -13659,7 +13660,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3282
+#: modules/configuration.org:3283
 #, no-wrap
 msgid ""
 "name = lib.mkOption {\n"
@@ -13671,7 +13672,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3289
+#: modules/configuration.org:3290
 #, no-wrap
 msgid ""
 "labels = lib.mkOption {\n"
@@ -13686,7 +13687,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3299
+#: modules/configuration.org:3300
 #, no-wrap
 msgid ""
 "vcpu = lib.mkOption {\n"
@@ -13697,7 +13698,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3305
+#: modules/configuration.org:3306
 #, no-wrap
 msgid ""
 "memory = lib.mkOption {\n"
@@ -13708,7 +13709,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3311
+#: modules/configuration.org:3312
 #, no-wrap
 msgid ""
 "  stateDir = lib.mkOption {\n"
@@ -13720,13 +13721,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3319
+#: modules/configuration.org:3320
 #, no-wrap
 msgid "Disks"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3321
+#: modules/configuration.org:3322
 msgid ""
 "The state disk is the one that survives a reset. It carries the runner "
 "credential, because re-registering on every boot would leave a dead runner "
@@ -13734,13 +13735,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3325
+#: modules/configuration.org:3326
 #, no-wrap
 msgid "windows-ci-disks"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3327
+#: modules/configuration.org:3328
 #, no-wrap
 msgid ""
 "baseImage = \"${cfg.stateDir}/base.qcow2\";\n"
@@ -13751,19 +13752,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3335
+#: modules/configuration.org:3336
 #, no-wrap
 msgid "guestMac = \"52:54:00:c9:a0:e4\";"
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3338
+#: modules/configuration.org:3339
 #, no-wrap
 msgid "The payload disc"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3340
+#: modules/configuration.org:3341
 msgid ""
 "Windows owns its disk, but the flake still owns what runs on it. Handing the "
 "guest a disc is the one way in that needs nothing installed on either side, "
@@ -13772,7 +13773,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3345
+#: modules/configuration.org:3346
 msgid ""
 "Forgejo releases runner binaries for Linux only, so the Windows one is built "
 "here by pointing Go at another target. Dropping the git wrapper and the "
@@ -13783,7 +13784,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3351
+#: modules/configuration.org:3352
 msgid ""
 "The SPICE agent is fetched rather than built, and it stays on the disc "
 "because provisioning the console means pasting into it. Its version is "
@@ -13792,7 +13793,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3356
+#: modules/configuration.org:3357
 msgid ""
 "=provision.ps1= is documented with [[*Provisioning][the guest's own setup]] "
 "below, and its runner identity is substituted in here rather than written "
@@ -13800,13 +13801,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3359
+#: modules/configuration.org:3360
 #, no-wrap
 msgid "windows-ci-payload"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3361
+#: modules/configuration.org:3362
 #, no-wrap
 msgid ""
 "forgejoRunnerExe = pkgs.forgejo-runner.overrideAttrs (old: {\n"
@@ -13822,13 +13823,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3372
+#: modules/configuration.org:3373
 #, no-wrap
 msgid "spiceVdagent = pkgs.callPackage ./spice-vdagent.nix { };"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3374
+#: modules/configuration.org:3375
 #, no-wrap
 msgid ""
 "provisionScript = pkgs.replaceVars ./provision.ps1 {\n"
@@ -13839,7 +13840,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3380
+#: modules/configuration.org:3381
 #, no-wrap
 msgid ""
 "payloadIso = pkgs.runCommand \"windows-ci-payload.iso\" { nativeBuildInputs = [ pkgs.xorriso ]; } ''\n"
@@ -13852,13 +13853,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3389
+#: modules/configuration.org:3390
 #, no-wrap
 msgid "The answer disk"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3391
+#: modules/configuration.org:3392
 msgid ""
 "Setup would not read the answer file off a disc, and it cannot go on the "
 "install media either: that ISO keeps its real tree in UDF, which xorriso "
@@ -13868,7 +13869,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3397
+#: modules/configuration.org:3398
 msgid ""
 "The same answers go on twice under both names setup looks for. It reads "
 "=autounattend.xml= while WinPE is up and =unattend.xml= for every pass after "
@@ -13876,7 +13877,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3401
+#: modules/configuration.org:3402
 msgid ""
 "Two things about the file itself have to be right at once, and while either "
 "was wrong setup just asked every question itself, with no error anywhere. It "
@@ -13889,7 +13890,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3409
+#: modules/configuration.org:3410
 msgid ""
 "The file names no disk to install onto, so setup asks. It can only name a "
 "disk by number, and this guest's two disks came up in an order I could not "
@@ -13898,13 +13899,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3413
+#: modules/configuration.org:3414
 #, no-wrap
 msgid "windows-ci-answer-image"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3415
+#: modules/configuration.org:3416
 #, no-wrap
 msgid ""
 "answerImage =\n"
@@ -13928,13 +13929,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3435
+#: modules/configuration.org:3436
 #, no-wrap
 msgid "The domain"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3437
+#: modules/configuration.org:3438
 msgid ""
 "NixVirt's Windows template gives the machine type, the firmware, and the "
 "SPICE devices. What it does not give is anything about this guest in "
@@ -13942,13 +13943,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3441
+#: modules/configuration.org:3442
 #, no-wrap
 msgid "windows-ci-domain"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3443
+#: modules/configuration.org:3444
 #, no-wrap
 msgid ""
 "template = nixvirt.domain.templates.windows {\n"
@@ -13974,7 +13975,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3468
+#: modules/configuration.org:3469
 #, no-wrap
 msgid ""
 "domain = template // {\n"
@@ -13984,7 +13985,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3476
+#: modules/configuration.org:3477
 #, no-wrap
 msgid ""
 "devices = template.devices // {\n"
@@ -13995,7 +13996,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3484
+#: modules/configuration.org:3485
 #, no-wrap
 msgid ""
 "channel = template.devices.channel ++ [\n"
@@ -14010,7 +14011,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3494
+#: modules/configuration.org:3495
 #, no-wrap
 msgid ""
 "    disk = [\n"
@@ -14088,27 +14089,27 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3572
+#: modules/configuration.org:3573
 #, fuzzy, no-wrap
 #| msgid "Completion"
 msgid "Connection"
 msgstr "補完"
 
 #. type: paragraph
-#: modules/configuration.org:3574
+#: modules/configuration.org:3575
 msgid ""
 "The guest sits on its own NAT network with a fixed lease, so the host always "
 "knows where to find it."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3577
+#: modules/configuration.org:3578
 #, no-wrap
 msgid "windows-ci-libvirt"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3579
+#: modules/configuration.org:3580
 #, no-wrap
 msgid ""
 "virtualisation.libvirt = {\n"
@@ -14117,7 +14118,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3584
+#: modules/configuration.org:3585
 #, no-wrap
 msgid ""
 "  connections.\"qemu:///system\" = {\n"
@@ -14153,13 +14154,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3621
+#: modules/configuration.org:3622
 #, no-wrap
 msgid "Images"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3623
+#: modules/configuration.org:3624
 msgid ""
 "Both qcow2 images are created empty on first boot, and neither is ever "
 "recreated by this unit. The base image is what an install writes into, so "
@@ -14167,13 +14168,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3627
+#: modules/configuration.org:3628
 #, no-wrap
 msgid "windows-ci-images"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3629
+#: modules/configuration.org:3630
 #, no-wrap
 msgid ""
 "systemd.services.windows-ci-images = {\n"
@@ -14207,13 +14208,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3664
+#: modules/configuration.org:3665
 #, no-wrap
 msgid "Seed disc"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3666
+#: modules/configuration.org:3667
 msgid ""
 "The token is the one thing the guest cannot be handed at build time. "
 "Building the disc at activation keeps it out of the Nix store, and stripping "
@@ -14224,13 +14225,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3673
+#: modules/configuration.org:3674
 #, no-wrap
 msgid "windows-ci-seed"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3675
+#: modules/configuration.org:3676
 #, no-wrap
 msgid ""
 "systemd.services.windows-ci-seed = {\n"
@@ -14252,13 +14253,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3692
+#: modules/configuration.org:3693
 #, no-wrap
 msgid "sed -n 's/^TOKEN=//p' ${cfg.tokenFile} > \"$dir/token.txt\""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3694
+#: modules/configuration.org:3695
 #, no-wrap
 msgid ""
 "    xorriso -as mkisofs -J -r -V WINCISEED -o ${seedIso}.new \"$dir\"\n"
@@ -14269,13 +14270,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3701
+#: modules/configuration.org:3702
 #, no-wrap
 msgid "Reset"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3703
+#: modules/configuration.org:3704
 msgid ""
 "The system disk is an overlay over the base image, and a libvirt hook "
 "replaces it every time qemu starts. A hook rather than a boot-time unit, "
@@ -14286,7 +14287,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3710
+#: modules/configuration.org:3711
 msgid ""
 "Host shutdown stops the guest rather than saving it. A memory image restored "
 "onto a system disk that no longer exists is a guest that never comes back, "
@@ -14294,13 +14295,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:3714
+#: modules/configuration.org:3715
 #, no-wrap
 msgid "windows-ci-reset"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3716
+#: modules/configuration.org:3717
 #, no-wrap
 msgid ""
 "virtualisation.libvirtd = {\n"
@@ -14308,7 +14309,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3719
+#: modules/configuration.org:3720
 #, no-wrap
 msgid ""
 "hooks.qemu = lib.optionalAttrs (!cfg.installer) {\n"
@@ -14319,7 +14320,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3725
+#: modules/configuration.org:3726
 #, no-wrap
 msgid ""
 "      rm -f ${systemImage}\n"
@@ -14330,14 +14331,14 @@ msgid ""
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3732
+#: modules/configuration.org:3733
 #, fuzzy, no-wrap
 #| msgid "Entry Positioning"
 msgid "Provisioning"
 msgstr "エントリの移動"
 
 #. type: paragraph
-#: modules/configuration.org:3734
+#: modules/configuration.org:3735
 msgid ""
 "Setup injects only the two drivers it cannot boot without, so "
 "=provision.ps1= runs the virtio guest tools from the virtio disc first, and "
@@ -14348,7 +14349,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3740
+#: modules/configuration.org:3741
 msgid ""
 "That disc carries no Joliet names, so every hyphen in a filename arrives as "
 "an underscore, and the script matches its files with wildcards rather than "
@@ -14356,7 +14357,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3743
+#: modules/configuration.org:3744
 msgid ""
 "Everything else a job needs has to sit in the golden image, because C: "
 "returns to that image on every start. Actions cannot stand in for this. Both "
@@ -14366,7 +14367,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3749
+#: modules/configuration.org:3750
 msgid ""
 "None of it goes through winget. winget is an AppX package, so whether it "
 "exists at all depends on the account running it and on the Store having "
@@ -14375,7 +14376,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3754
+#: modules/configuration.org:3755
 msgid ""
 "Native tools are called through a wrapper that drops =ErrorActionPreference= "
 "for the call. Otherwise a single line on stderr ends the script, and these "
@@ -14385,7 +14386,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3760
+#: modules/configuration.org:3761
 msgid ""
 "So the whole of it lives in =provision.ps1=: the state disk, the machine-"
 "scoped =RUSTUP_HOME= and =CARGO_HOME= that keep the caches on D:, git, "
@@ -14406,7 +14407,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3776
+#: modules/configuration.org:3777
 msgid ""
 "The answer file runs it at first logon, so a fresh install needs no command "
 "from me. Every step checks for its own result first, so re-running it after "
@@ -14414,7 +14415,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3781
+#: modules/configuration.org:3782
 #, no-wrap
 msgid ""
 "$payload = (Get-Volume -FileSystemLabel WINCI).DriveLetter + \":\"\n"
@@ -14422,21 +14423,21 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3785
+#: modules/configuration.org:3786
 msgid ""
 "No token appears in that line. The script reads it off the [[*Seed disc]"
 "[seed disc]]."
 msgstr ""
 
 #. type: heading ****
-#: modules/configuration.org:3787
+#: modules/configuration.org:3788
 #, fuzzy, no-wrap
 #| msgid "Installing WSL"
 msgid "Installing Windows"
 msgstr "WSLのインストール"
 
 #. type: paragraph
-#: modules/configuration.org:3789
+#: modules/configuration.org:3790
 msgid ""
 "Microsoft hands out a download link per session rather than a stable URL.  "
 "quickget knows how to ask for one, but Microsoft refused the automated "
@@ -14446,13 +14447,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3795
+#: modules/configuration.org:3796
 msgid ""
 "Point =installerIso= at the result, turn =installer= on, and start the guest."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3798
+#: modules/configuration.org:3799
 #, no-wrap
 msgid ""
 "sudo nixos-rebuild switch --flake .\n"
@@ -14461,14 +14462,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3803
+#: modules/configuration.org:3804
 msgid ""
 "A NixOS rebuild redefines the domain, and NixVirt stops the guest to apply "
 "the new definition. So do not rebuild while setup is running."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3806
+#: modules/configuration.org:3807
 msgid ""
 "Setup reads the answer file at the start of each pass. It creates the local "
 "=ci= administrator, keeps OOBE from ever asking for a Microsoft account, and "
@@ -14479,7 +14480,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3813
+#: modules/configuration.org:3814
 msgid ""
 "Once a pass has begun it is too late to fix its answers. No amount of "
 "dropping files into =C:\\Windows\\Panther= or pointing =HKLM\\System\\Setup!"
@@ -14488,7 +14489,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3818
+#: modules/configuration.org:3819
 msgid ""
 "The interactive route is where I started, and it has a dead end. Windows 11 "
 "25H2 wants a Microsoft account before it will finish OOBE, and this guest "
@@ -14502,7 +14503,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3828
+#: modules/configuration.org:3829
 msgid ""
 "The firmware asks to press a key to boot from CD. Nothing else on the guest "
 "is bootable at that point, so it waits rather than falling through, and "
@@ -14511,7 +14512,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3834
+#: modules/configuration.org:3835
 #, no-wrap
 msgid ""
 "virsh -c qemu:///system send-key windows-ci --holdtime 150 KEY_SPACE\n"
@@ -14519,7 +14520,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3838
+#: modules/configuration.org:3839
 msgid ""
 "Turning =installer= back off and rebuilding gives the domain its overlay and "
 "its reset hook, and activation starts it. The copied ISO under the state "
@@ -14527,14 +14528,14 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3842
+#: modules/configuration.org:3843
 #, fuzzy, no-wrap
 #| msgid "Device"
 msgid "Devices"
 msgstr "デバイス"
 
 #. type: paragraph
-#: modules/configuration.org:3844
+#: modules/configuration.org:3845
 msgid ""
 "Peripherals that move between machines belong here, not in =hardware-"
 "configuration=, which describes a host's fixed internals. Each device is a "
@@ -14544,19 +14545,19 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:3850
+#: modules/configuration.org:3851
 #, no-wrap
 msgid "Audio"
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:3852
+#: modules/configuration.org:3853
 #, no-wrap
 msgid "AT2040 microphone"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3854
+#: modules/configuration.org:3855
 msgid ""
 "The AT2040 is a USB microphone that also exposes a headphone output. "
 "WirePlumber gives that output a higher default priority (1109) than the HDMI "
@@ -14567,7 +14568,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3861
+#: modules/configuration.org:3862
 msgid ""
 "The rule matches on =alsa.card_name= rather than the serial-bearing "
 "=node.name=, so it survives re-plugging and would apply to a replacement "
@@ -14575,7 +14576,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3870
+#: modules/configuration.org:3871
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -14595,7 +14596,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3886
+#: modules/configuration.org:3887
 #, no-wrap
 msgid ""
 "      config = lib.mkIf cfg.audio.at2040.enable {\n"
@@ -14621,20 +14622,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3908
+#: modules/configuration.org:3909
 #, fuzzy, no-wrap
 #| msgid "Documentation"
 msgid "Authentication"
 msgstr "ドキュメント"
 
 #. type: heading **
-#: modules/configuration.org:3910
+#: modules/configuration.org:3911
 #, no-wrap
 msgid "Ente Auth"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3912
+#: modules/configuration.org:3913
 msgid ""
 "[[https://ente.io/auth/][Ente Auth]] holds my TOTP secrets and syncs them "
 "with end-to-end encryption between Android and every machine here, so a lost "
@@ -14644,7 +14645,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3918
+#: modules/configuration.org:3919
 msgid ""
 "Before this I used Google Authenticator and then Microsoft Authenticator, "
 "out of inertia more than choice. Neither could hand its secrets to a new "
@@ -14653,7 +14654,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3922
+#: modules/configuration.org:3923
 msgid ""
 "A password manager would solve the sync problem too (Bitwarden sells TOTP on "
 "a paid plan, and a self-hosted Vaultwarden gives it away), but I keep the "
@@ -14663,7 +14664,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3928
+#: modules/configuration.org:3929
 msgid ""
 "nixpkgs builds =ente-auth= for Linux only. The app is written in Flutter, "
 "and the Flutter tooling in nixpkgs can only produce Linux desktop bundles; a "
@@ -14672,7 +14673,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3939
+#: modules/configuration.org:3940
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -14700,7 +14701,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:3964
+#: modules/configuration.org:3965
 #, no-wrap
 msgid ""
 "      config = lib.mkIf cfg.enable {\n"
@@ -14711,13 +14712,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:3971
+#: modules/configuration.org:3972
 #, no-wrap
 msgid "Browser"
 msgstr "ブラウザー"
 
 #. type: paragraph
-#: modules/configuration.org:3973
+#: modules/configuration.org:3974
 msgid ""
 "Compared with Chromium, Firefox lets me declare far more of its "
 "configuration (search engines and extensions, to name two), and that plays "
@@ -14728,7 +14729,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3979
+#: modules/configuration.org:3980
 msgid ""
 "For about a year and a half that Firefox was [[https://zen-browser.app/][Zen "
 "Browser]], a fork with better UI/UX, though I always had some reservations "
@@ -14737,7 +14738,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:3986
+#: modules/configuration.org:3987
 #, no-wrap
 msgid ""
 "Vertical tabs ([[https://www.firefox.com/en-US/firefox/136.0/releasenotes/][Firefox 136]]). I keep a hundred tabs open at all times, so a\n"
@@ -14745,7 +14746,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:3988
+#: modules/configuration.org:3989
 #, no-wrap
 msgid ""
 "Configurable keyboard shortcuts ([[https://www.firefox.com/en-US/firefox/147.0/releasenotes/][Firefox 147]]). Firefox finally lets me rebind\n"
@@ -14753,7 +14754,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 3.
-#: modules/configuration.org:3990
+#: modules/configuration.org:3991
 #, no-wrap
 msgid ""
 "Split view ([[https://www.firefox.com/en-US/firefox/149.0/releasenotes/][Firefox 149]]). Not an everyday feature, but comparing two pages\n"
@@ -14761,13 +14762,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:3991
+#: modules/configuration.org:3992
 msgid ""
 "What I liked about Zen beyond that turned out to need nothing more than CSS:"
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:3995
+#: modules/configuration.org:3996
 #, no-wrap
 msgid ""
 "[[https://docs.zen-browser.app/user-manual/compact-mode][Compact mode]]. A browser, like almost every program, has no need for bars;\n"
@@ -14775,7 +14776,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:4000
+#: modules/configuration.org:4001
 #, no-wrap
 msgid ""
 "[[https://docs.zen-browser.app/user-manual/urlbar][Floating URL bar]]. Zen's URL bar searches like any other, but the input\n"
@@ -14786,7 +14787,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4001
+#: modules/configuration.org:4002
 msgid ""
 "Neither needs a fork; a =userChrome.css= theme is enough. With [[https://"
 "github.com/reizumii/parfait][parfait]] I get everything I wanted from Zen on "
@@ -14796,7 +14797,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4005
+#: modules/configuration.org:4006
 msgid ""
 "With the UI gap closed, what remains are my reservations: Zen's stability, "
 "its prospects as a project, and how well it is maintained in nixpkgs. So I "
@@ -14804,7 +14805,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4015
+#: modules/configuration.org:4016
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -14818,13 +14819,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4025
+#: modules/configuration.org:4026
 #, no-wrap
 msgid "Firefox"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4027
+#: modules/configuration.org:4028
 msgid ""
 "Stock Firefox is dressed in parfait, a chrome theme written entirely in "
 "=userChrome.css= (no extension, no =userChrome.js= loader), so it lives "
@@ -14832,7 +14833,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4032
+#: modules/configuration.org:4033
 msgid ""
 "On Linux, home-manager still defaults the profile directory to =~/.mozilla/"
 "firefox= for =home.stateVersion= below 26.05 and warns on every evaluation "
@@ -14840,13 +14841,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4036
+#: modules/configuration.org:4037
 #, no-wrap
 msgid "firefox-module"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4038
+#: modules/configuration.org:4039
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.firefox =\n"
@@ -14867,7 +14868,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4054
+#: modules/configuration.org:4055
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -14880,7 +14881,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4062
+#: modules/configuration.org:4063
 #, no-wrap
 msgid ""
 "    <<firefox-settings>>\n"
@@ -14889,7 +14890,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4066
+#: modules/configuration.org:4067
 #, no-wrap
 msgid ""
 "    <<firefox-parfait-tree>>\n"
@@ -14898,13 +14899,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4071
+#: modules/configuration.org:4072
 #, no-wrap
 msgid "Settings"
 msgstr "設定"
 
 #. type: paragraph
-#: modules/configuration.org:4073
+#: modules/configuration.org:4074
 msgid ""
 "=extensions.autoDisableScopes= is 0 in both profiles: by default Firefox "
 "asks for confirmation of each extension the profile installs, so the first "
@@ -14912,13 +14913,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4077
+#: modules/configuration.org:4078
 msgid ""
 "I keep my passwords in Bitwarden, so I turn off =signon.rememberSignons=."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4079
+#: modules/configuration.org:4080
 msgid ""
 "parfait ships its defaults in a =user.js= that its install instructions tell "
 "you to copy into the profile. home-manager generates =user.js= itself from "
@@ -14929,7 +14930,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4085
+#: modules/configuration.org:4086
 msgid ""
 "Four values depart from that baseline. =sidebar.verticalTabs= and "
 "=sidebar.visibility= are Firefox's own preferences, and the =hide-sidebar= "
@@ -14941,14 +14942,14 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4092
+#: modules/configuration.org:4093
 #, fuzzy, no-wrap
 #| msgid "Core Settings"
 msgid "firefox-settings"
 msgstr "コア設定"
 
 #. type: paragraph in src
-#: modules/configuration.org:4094
+#: modules/configuration.org:4095
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -14956,7 +14957,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4099
+#: modules/configuration.org:4100
 #, no-wrap
 msgid ""
 "\"toolkit.legacyUserProfileCustomizations.stylesheets\" = true;\n"
@@ -14964,7 +14965,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4102
+#: modules/configuration.org:4103
 #, no-wrap
 msgid ""
 "\"sidebar.verticalTabs\" = true;\n"
@@ -14972,7 +14973,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4105
+#: modules/configuration.org:4106
 #, no-wrap
 msgid ""
 "\"browser.translations.automaticallyPopup\" = false;\n"
@@ -14981,7 +14982,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4109
+#: modules/configuration.org:4110
 #, no-wrap
 msgid ""
 "  \"parfait.animations.enabled\" = true;\n"
@@ -15008,13 +15009,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4132
+#: modules/configuration.org:4133
 #, no-wrap
 msgid "Theme files"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4134
+#: modules/configuration.org:4135
 msgid ""
 "parfait's repository is already shaped like a profile's =chrome/= directory, "
 "so the whole tree is linked in as-is. =profilesPath= is an internal option, "
@@ -15023,25 +15024,25 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4139
+#: modules/configuration.org:4140
 #, no-wrap
 msgid "firefox-parfait-tree"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4141
+#: modules/configuration.org:4142
 #, no-wrap
 msgid "home.file.\"${config.programs.firefox.profilesPath}/natsukium/chrome\".source = parfait;"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4144
+#: modules/configuration.org:4145
 #, no-wrap
 msgid "Search Engines"
 msgstr "検索エンジン"
 
 #. type: paragraph
-#: modules/configuration.org:4146
+#: modules/configuration.org:4147
 #, fuzzy
 #| msgid ""
 #| "Custom search engines for quick access to development-related package "
@@ -15058,7 +15059,7 @@ msgstr ""
 "おり、アドレスバーで使用でき、各サイトに手動で移動する必要がなくなります。"
 
 #. type: paragraph in src
-#: modules/configuration.org:4156
+#: modules/configuration.org:4157
 #, no-wrap
 msgid ""
 "{ pkgs }:\n"
@@ -15069,31 +15070,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4162
+#: modules/configuration.org:4163
 #, no-wrap
 msgid "<<browser-search-engine-nixos-wiki>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4164
+#: modules/configuration.org:4165
 #, no-wrap
 msgid "<<browser-search-engine-noogle>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4166
+#: modules/configuration.org:4167
 #, no-wrap
 msgid "<<browser-search-engine-crates-io>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4168
+#: modules/configuration.org:4169
 #, no-wrap
 msgid "<<browser-search-engine-npm>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4170
+#: modules/configuration.org:4171
 #, no-wrap
 msgid ""
 "    <<browser-search-engine-pypi>>\n"
@@ -15102,26 +15103,26 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4175
+#: modules/configuration.org:4176
 #, no-wrap
 msgid "Nix Packages"
 msgstr "Nixパッケージ"
 
 #. type: paragraph
-#: modules/configuration.org:4177
+#: modules/configuration.org:4178
 msgid ""
 "The icon comes from =nixos-icons= in nixpkgs rather than an external URL "
 "that could move or vanish."
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4180
+#: modules/configuration.org:4181
 #, no-wrap
 msgid "browser-search-engine-nix-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4182
+#: modules/configuration.org:4183
 #, no-wrap
 msgid ""
 "nix-packages = {\n"
@@ -15144,7 +15145,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4200
+#: modules/configuration.org:4201
 #, no-wrap
 msgid ""
 "  icon = \"${pkgs.nixos-icons}/share/icons/hicolor/scalable/apps/nix-snowflake.svg\";\n"
@@ -15153,19 +15154,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4205
+#: modules/configuration.org:4206
 #, no-wrap
 msgid "NixOS Wiki"
 msgstr "NixOS Wiki"
 
 #. type: keyword NAME
-#: modules/configuration.org:4207
+#: modules/configuration.org:4208
 #, no-wrap
 msgid "browser-search-engine-nixos-wiki"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4209
+#: modules/configuration.org:4210
 #, no-wrap
 msgid ""
 "nixos-wiki = {\n"
@@ -15177,13 +15178,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4217
+#: modules/configuration.org:4218
 #, no-wrap
 msgid "noogle"
 msgstr "noogle"
 
 #. type: paragraph
-#: modules/configuration.org:4219
+#: modules/configuration.org:4220
 #, fuzzy
 #| msgid ""
 #| "[[https://noogle.dev/][noogle]] is a Nix function search engine — the "
@@ -15198,13 +15199,13 @@ msgstr ""
 "るのに便利です。"
 
 #. type: keyword NAME
-#: modules/configuration.org:4221
+#: modules/configuration.org:4222
 #, no-wrap
 msgid "browser-search-engine-noogle"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4223
+#: modules/configuration.org:4224
 #, no-wrap
 msgid ""
 "noogle = {\n"
@@ -15216,19 +15217,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4231
+#: modules/configuration.org:4232
 #, no-wrap
 msgid "crates.io"
 msgstr "crates.io"
 
 #. type: keyword NAME
-#: modules/configuration.org:4233
+#: modules/configuration.org:4234
 #, no-wrap
 msgid "browser-search-engine-crates-io"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4235
+#: modules/configuration.org:4236
 #, no-wrap
 msgid ""
 "crates-io = {\n"
@@ -15240,19 +15241,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4243
+#: modules/configuration.org:4244
 #, no-wrap
 msgid "npm"
 msgstr "npm"
 
 #. type: keyword NAME
-#: modules/configuration.org:4245
+#: modules/configuration.org:4246
 #, no-wrap
 msgid "browser-search-engine-npm"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4247
+#: modules/configuration.org:4248
 #, no-wrap
 msgid ""
 "npm = {\n"
@@ -15264,19 +15265,19 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4255
+#: modules/configuration.org:4256
 #, no-wrap
 msgid "PyPI"
 msgstr "PyPI"
 
 #. type: keyword NAME
-#: modules/configuration.org:4257
+#: modules/configuration.org:4258
 #, no-wrap
 msgid "browser-search-engine-pypi"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4259
+#: modules/configuration.org:4260
 #, no-wrap
 msgid ""
 "pypi = {\n"
@@ -15288,13 +15289,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4267
+#: modules/configuration.org:4268
 #, no-wrap
 msgid "Extensions"
 msgstr "拡張機能"
 
 #. type: paragraph
-#: modules/configuration.org:4269
+#: modules/configuration.org:4270
 #, fuzzy
 #| msgid ""
 #| "Browser extensions managed declaratively. Extensions are sourced from two "
@@ -15311,7 +15312,7 @@ msgstr ""
 "と =my-firefox-addons=（アップストリームにないカスタムの追加）です。"
 
 #. type: paragraph in src
-#: modules/configuration.org:4279
+#: modules/configuration.org:4280
 #, no-wrap
 msgid ""
 "{ pkgs }:\n"
@@ -15337,20 +15338,20 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4303
+#: modules/configuration.org:4304
 #, no-wrap
 msgid "Neovim"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4305
+#: modules/configuration.org:4306
 msgid ""
 "Neovim is the editor I spend the most time in, primarily for coding — though "
 "the gravitational pull of =org-mode= is slowly dragging me over to Emacs."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4309
+#: modules/configuration.org:4310
 msgid ""
 "Everything Neovim-related lives under =features/editor/neovim/=: the wrapped "
 "derivation (=package.nix=) and the lua configuration. The flake-parts module "
@@ -15358,7 +15359,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:4315
+#: modules/configuration.org:4316
 #, no-wrap
 msgid ""
 "=perSystem.packages.neovim= makes =nix run .#neovim= work on every\n"
@@ -15366,7 +15367,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:4320
+#: modules/configuration.org:4321
 #, no-wrap
 msgid ""
 "=flake.modules.homeManager.neovim= registers the module in the\n"
@@ -15377,7 +15378,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4322
+#: modules/configuration.org:4323
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -15394,7 +15395,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4334
+#: modules/configuration.org:4335
 #, no-wrap
 msgid ""
 "  config = lib.mkIf config.my.programs.neovim.enable {\n"
@@ -15408,7 +15409,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4343
+#: modules/configuration.org:4344
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -15420,13 +15421,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4351
+#: modules/configuration.org:4352
 #, no-wrap
 msgid "Emacs"
 msgstr "Emacs"
 
 #. type: paragraph
-#: modules/configuration.org:4353
+#: modules/configuration.org:4354
 msgid ""
 "Emacs has been my second-most-used editor since early 2026. The draw is =org-"
 "mode= — the workflows built around =org-capture= and =org-agenda= are slowly "
@@ -15436,14 +15437,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4359
+#: modules/configuration.org:4360
 msgid ""
 "The feature lives alongside Neovim under =features/editor/emacs/= and pulls "
 "the same double duty:"
 msgstr ""
 
 #. type: plain list 1.
-#: modules/configuration.org:4368
+#: modules/configuration.org:4369
 #, no-wrap
 msgid ""
 "=perSystem.packages.emacs= exposes a wrapped emacs as a flake\n"
@@ -15455,7 +15456,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list 2.
-#: modules/configuration.org:4374
+#: modules/configuration.org:4375
 #, no-wrap
 msgid ""
 "=flake.modules.homeManager.emacs= registers the module in the internal\n"
@@ -15467,7 +15468,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4377
+#: modules/configuration.org:4378
 #, no-wrap
 msgid ""
 "{ lib, inputs, ... }:\n"
@@ -15476,7 +15477,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4381
+#: modules/configuration.org:4382
 #, no-wrap
 msgid ""
 "emacsUnwrapped =\n"
@@ -15488,7 +15489,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4394
+#: modules/configuration.org:4395
 #, no-wrap
 msgid ""
 "tangle =\n"
@@ -15511,7 +15512,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4412
+#: modules/configuration.org:4413
 #, no-wrap
 msgid ""
 "tangleEl =\n"
@@ -15526,7 +15527,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4422
+#: modules/configuration.org:4423
 #, no-wrap
 msgid ""
 "mkEmacs =\n"
@@ -15537,7 +15538,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4435
+#: modules/configuration.org:4436
 #, no-wrap
 msgid ""
 "  mkStandalone =\n"
@@ -15571,7 +15572,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4464
+#: modules/configuration.org:4465
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.emacs.enable {\n"
@@ -15582,7 +15583,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4470
+#: modules/configuration.org:4471
 #, no-wrap
 msgid ""
 "services.emacs = {\n"
@@ -15592,13 +15593,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4475
+#: modules/configuration.org:4476
 #, no-wrap
 msgid "<<emacs-daemon-path>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4477
+#: modules/configuration.org:4478
 #, no-wrap
 msgid ""
 "xdg.configFile.\"emacs/init.el\".source = tangleEl pkgs ./init.org;\n"
@@ -15607,7 +15608,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4481
+#: modules/configuration.org:4482
 #, no-wrap
 msgid ""
 "    home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -15618,7 +15619,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4487
+#: modules/configuration.org:4488
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -15630,7 +15631,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4496
+#: modules/configuration.org:4497
 #, no-wrap
 msgid ""
 "{\n"
@@ -15685,13 +15686,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4547
+#: modules/configuration.org:4548
 #, no-wrap
 msgid "Daemon PATH"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4549
+#: modules/configuration.org:4550
 msgid ""
 "launchd hands its agents only the system =PATH=, and =init.org= repairs "
 "=PATH= with =exec-path-from-shell= only when =window-system= is non-nil, "
@@ -15703,13 +15704,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:4558
+#: modules/configuration.org:4559
 #, no-wrap
 msgid "emacs-daemon-path"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4560
+#: modules/configuration.org:4561
 #, no-wrap
 msgid ""
 "launchd.agents = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -15726,39 +15727,39 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:4573
+#: modules/configuration.org:4574
 #, no-wrap
 msgid "early-init.org"
 msgstr "early-init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:4574
+#: modules/configuration.org:4575
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/early-init.org\""
 msgid "\"./features/editor/emacs/early-init.org\""
 msgstr "\"./applications/emacs/early-init.ja.org\""
 
 #. type: heading ***
-#: modules/configuration.org:4575
+#: modules/configuration.org:4576
 #, no-wrap
 msgid "init.org"
 msgstr "init.org"
 
 #. type: keyword INCLUDE
-#: modules/configuration.org:4576
+#: modules/configuration.org:4577
 #, fuzzy, no-wrap
 #| msgid "\"./applications/emacs/init.org\""
 msgid "\"./features/editor/emacs/init.org\""
 msgstr "\"./applications/emacs/init.ja.org\""
 
 #. type: heading *
-#: modules/configuration.org:4578
+#: modules/configuration.org:4579
 #, no-wrap
 msgid "Speech to Text"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4582
+#: modules/configuration.org:4583
 msgid ""
 "[[https://handy.computer][Handy]] is an offline speech-to-text app: press a "
 "hotkey, speak, and the transcription is typed into the focused field. The "
@@ -15769,7 +15770,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4588
+#: modules/configuration.org:4589
 msgid ""
 "Almost everything is per-user and cross-platform, so it lives in a home-"
 "manager module: the package plus an autostart agent, a systemd user service "
@@ -15779,7 +15780,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4594
+#: modules/configuration.org:4595
 msgid ""
 "The one piece home-manager cannot express is system-level. Handy reads its "
 "global hotkey straight from =/dev/input/event*= via evdev, which only the "
@@ -15793,7 +15794,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4604
+#: modules/configuration.org:4605
 msgid ""
 "The desktop profile enables it by default, setting the home switch on every "
 "desktop and, on NixOS only, adding the =input= group through its =nixos= "
@@ -15801,7 +15802,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4613
+#: modules/configuration.org:4614
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -15828,7 +15829,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4635
+#: modules/configuration.org:4636
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable (\n"
@@ -15837,7 +15838,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4639
+#: modules/configuration.org:4640
 #, no-wrap
 msgid ""
 "(lib.mkIf pkgs.stdenv.hostPlatform.isLinux {\n"
@@ -15858,7 +15859,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4655
+#: modules/configuration.org:4656
 #, no-wrap
 msgid ""
 "      (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {\n"
@@ -15879,7 +15880,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4673
+#: modules/configuration.org:4674
 #, no-wrap
 msgid ""
 "nixosModule =\n"
@@ -15893,7 +15894,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4682
+#: modules/configuration.org:4683
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.handy.enable {\n"
@@ -15908,19 +15909,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:4695
+#: modules/configuration.org:4696
 #, no-wrap
 msgid "Launcher"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:4697
+#: modules/configuration.org:4698
 #, no-wrap
 msgid "Vicinae"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4699
+#: modules/configuration.org:4700
 msgid ""
 "[[https://github.com/vicinae/vicinae][Vicinae]] is a cross-platform launcher "
 "for Linux and macOS, designed to run extensions from Raycast, the popular "
@@ -15929,14 +15930,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4704
+#: modules/configuration.org:4705
 msgid ""
 "On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as "
 "described later."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4713
+#: modules/configuration.org:4714
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -15953,13 +15954,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4725
+#: modules/configuration.org:4726
 #, no-wrap
 msgid "options.my.programs.vicinae.enable = lib.mkEnableOption \"vicinae launcher\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4727
+#: modules/configuration.org:4728
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.vicinae.enable {\n"
@@ -15999,20 +16000,20 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:4763
+#: modules/configuration.org:4764
 #, fuzzy, no-wrap
 #| msgid "terminal"
 msgid "Terminal"
 msgstr "ターミナル"
 
 #. type: heading **
-#: modules/configuration.org:4765
+#: modules/configuration.org:4766
 #, no-wrap
 msgid "Felis"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4767
+#: modules/configuration.org:4768
 msgid ""
 "[[https://git.natsukium.com/natsukium/felis][felis]] is a daemon/client "
 "terminal whose defining feature is session persistence across hosts. Apart "
@@ -16021,7 +16022,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4771
+#: modules/configuration.org:4772
 msgid ""
 "The client names a separate [[https://github.com/yuru7/moralerspace]"
 "[Moralerspace]] flavor per text style — Neon, Xenon, Radon, Krypton. felis "
@@ -16031,7 +16032,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4776
+#: modules/configuration.org:4777
 msgid ""
 "Two keymap entries work around problems outside felis. On a JIS keyboard the "
 "yen key still types =¥= though macOS is set to emit =\\=, because winit "
@@ -16043,7 +16044,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4784
+#: modules/configuration.org:4785
 msgid ""
 "The built-in =switch_{next,previous}_session= bindings only step one session "
 "at a time. =felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead "
@@ -16052,7 +16053,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4789
+#: modules/configuration.org:4790
 msgid ""
 "felis makes only OSC 8 hyperlinks clickable, not the plain-text URLs that "
 "fill real output, leaving that heuristic to an external tool as kitty does.  "
@@ -16067,7 +16068,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4799
+#: modules/configuration.org:4800
 msgid ""
 "=felis-nix-log= (=Ctrl+Shift+l=, ported from kitty) scans the grid for a "
 "=nix log <drv>= line and pages that build log. It uses grep + fzf rather "
@@ -16077,7 +16078,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4805
+#: modules/configuration.org:4806
 msgid ""
 "Desktop notifications now come from felis' own home-manager module, not a "
 "helper of mine: =notifications.enable= runs a relay that streams =felis "
@@ -16088,7 +16089,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4818
+#: modules/configuration.org:4819
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -16105,7 +16106,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4830
+#: modules/configuration.org:4831
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -16121,7 +16122,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4841
+#: modules/configuration.org:4842
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -16139,7 +16140,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4859
+#: modules/configuration.org:4860
 #, no-wrap
 msgid ""
 "inherit\n"
@@ -16162,7 +16163,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4879
+#: modules/configuration.org:4880
 #, no-wrap
 msgid ""
 "  moralerspace = flavor: \"Moralerspace ${flavor} HW\";\n"
@@ -16181,13 +16182,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4893
+#: modules/configuration.org:4894
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4895
+#: modules/configuration.org:4896
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -16195,7 +16196,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4898
+#: modules/configuration.org:4899
 #, no-wrap
 msgid ""
 "home.packages = [\n"
@@ -16206,7 +16207,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4904
+#: modules/configuration.org:4905
 #, no-wrap
 msgid ""
 "programs.felis = {\n"
@@ -16215,13 +16216,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4910
+#: modules/configuration.org:4911
 #, no-wrap
 msgid "notifications.enable = true;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4912
+#: modules/configuration.org:4913
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -16236,7 +16237,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4924
+#: modules/configuration.org:4925
 #, no-wrap
 msgid ""
 "theme = {\n"
@@ -16276,7 +16277,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4960
+#: modules/configuration.org:4961
 #, no-wrap
 msgid ""
 "keymap = {\n"
@@ -16330,7 +16331,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5019
+#: modules/configuration.org:5020
 #, no-wrap
 msgid ""
 "            mouse.wheel_scroll_multiplier = 5;\n"
@@ -16342,13 +16343,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:5027
+#: modules/configuration.org:5028
 #, no-wrap
 msgid "Session and hint helpers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:5029
+#: modules/configuration.org:5030
 msgid ""
 "The keymap points at six shell programs, none touching the module system; "
 "their =writeShellApplication= bodies would bury the configuration if they "
@@ -16361,7 +16362,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5044
+#: modules/configuration.org:5045
 #, no-wrap
 msgid ""
 "{\n"
@@ -16376,7 +16377,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5059
+#: modules/configuration.org:5060
 #, no-wrap
 msgid ""
 "felis-switch = pkgs.writeShellApplication {\n"
@@ -16395,19 +16396,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5077
+#: modules/configuration.org:5078
 #, no-wrap
 msgid "awk -v self=\"''${FELIS_SESSION_ID:-}\" '$1 != self' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5078 modules/configuration.org:5108
+#: modules/configuration.org:5079 modules/configuration.org:5109
 #, no-wrap
 msgid "fzf --ansi \\"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5075
+#: modules/configuration.org:5076
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -16419,7 +16420,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5084
+#: modules/configuration.org:5085
 #, no-wrap
 msgid ""
 "    id=''${selection%% *}\n"
@@ -16429,7 +16430,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5092
+#: modules/configuration.org:5093
 #, no-wrap
 msgid ""
 "felis-kill = pkgs.writeShellApplication {\n"
@@ -16448,7 +16449,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5106
+#: modules/configuration.org:5107
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -16461,19 +16462,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5116 modules/configuration.org:5137
+#: modules/configuration.org:5117 modules/configuration.org:5138
 #, no-wrap
 msgid "awk 'NF {print $1}' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5117 modules/configuration.org:5138
+#: modules/configuration.org:5118 modules/configuration.org:5139
 #, no-wrap
 msgid "while read -r id; do"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5115
+#: modules/configuration.org:5116
 #, no-wrap
 msgid ""
 "    printf '%s\\n' \"$selection\" \\\n"
@@ -16484,13 +16485,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5140
+#: modules/configuration.org:5141
 #, no-wrap
 msgid "awk -v id=\"$id\" 'NF {print id\"\\t\"$0}'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5127
+#: modules/configuration.org:5128
 #, no-wrap
 msgid ""
 "felis-grep = pkgs.writeShellApplication {\n"
@@ -16513,13 +16514,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5150
+#: modules/configuration.org:5151
 #, no-wrap
 msgid "fzf --delimiter='\\t' --with-nth=2.. --prompt='grep scrollback> '"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5148
+#: modules/configuration.org:5149
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -16528,7 +16529,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5153
+#: modules/configuration.org:5154
 #, no-wrap
 msgid ""
 "    id=$(printf '%s' \"$selection\" | awk -F'\\t' '{print $1; exit}')\n"
@@ -16538,7 +16539,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5163
+#: modules/configuration.org:5164
 #, no-wrap
 msgid ""
 "felis-scrollback = pkgs.writeShellApplication {\n"
@@ -16554,7 +16555,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5189
+#: modules/configuration.org:5190
 #, no-wrap
 msgid ""
 "felis-hints = pkgs.writeShellApplication {\n"
@@ -16578,19 +16579,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5228
+#: modules/configuration.org:5229
 #, no-wrap
 msgid "sed 's/^nix log //' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5229
+#: modules/configuration.org:5230
 #, no-wrap
 msgid "awk '!seen[$0]++'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5216
+#: modules/configuration.org:5217
 #, no-wrap
 msgid ""
 "  felis-nix-log = pkgs.writeShellApplication {\n"
@@ -16628,13 +16629,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:5254
+#: modules/configuration.org:5255
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:5256
+#: modules/configuration.org:5257
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -16644,7 +16645,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5267
+#: modules/configuration.org:5268
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -16659,7 +16660,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5277
+#: modules/configuration.org:5278
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -16668,13 +16669,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:5284
+#: modules/configuration.org:5285
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5286
+#: modules/configuration.org:5287
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -16687,7 +16688,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:5297
+#: modules/configuration.org:5298
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -16697,13 +16698,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:5302
+#: modules/configuration.org:5303
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5304
+#: modules/configuration.org:5305
 #, no-wrap
 msgid ""
 "config = {\n"
