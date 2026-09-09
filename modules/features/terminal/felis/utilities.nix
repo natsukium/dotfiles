@@ -11,37 +11,60 @@
 let
   opener = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
 
-  # Wraps list/switch in an fzf picker: the built-in
-  # switch_{next,previous}_session only steps in daemon order, so
-  # jumping to a known session otherwise means retyping a 32-hex id.
-  # The preview shows each session's live grid (capture --ansi), so
-  # the choice is by content.
+  # The roster every picker below works from. `--format json` is the
+  # only stable shape felis promises: the human table's columns are
+  # explicitly free to move, and they did. `list` is a point verb, so
+  # the whole roster arrives as one `.sessions` array rather than as
+  # JSON Lines. Each output row is a tab-separated id plus display
+  # columns, so fzf can hide the id in field 1 while the preview still
+  # addresses the session by it.
+  #
+  # An `exited` session is a corpse in the post-exit grace: attachable
+  # for a last look, but never a place to route work.
+  roster = ''
+    roster() {
+      felis sessions list --format json \
+        | jq -r '
+            .sessions[]
+            | select(.exited != true)
+            | [.id, .short_id, "\(.cols)x\(.rows)", (.foreground // "-"), (.title // "")]
+            | @tsv'
+    }
+  '';
+
+  # Wraps list/switch in an fzf picker: the built-in switch_session
+  # only steps in daemon order, so jumping to a known session
+  # otherwise means retyping a 32-hex id. The preview shows each
+  # session's live grid (capture --ansi), so the choice is by content.
   felis-switch = pkgs.writeShellApplication {
     name = "felis-switch";
     runtimeInputs = [
       package
       pkgs.fzf
-      pkgs.gawk
+      pkgs.jq
     ];
     text = ''
-      list=$(felis sessions list)
-      if [ -z "$list" ] || [ "$list" = "no sessions" ]; then
+      # A `run` chord hands the picker its own transient session, so
+      # FELIS_SESSION_ID names the picker, not the window's session;
+      # FELIS_ORIGIN_SESSION_ID names where the window came from and
+      # will return to. Both are dead ends as switch targets.
+      ${roster}
+      list=$(roster | grep -v -e "''${FELIS_ORIGIN_SESSION_ID:-none}" -e "''${FELIS_SESSION_ID:-none}" || true)
+      if [ -z "$list" ]; then
         echo "no sessions" >&2
         exit 0
       fi
 
-      # Drop this window's own session: switching to where you
-      # already are is a no-op, so it only clutters the list.
       selection=$(
         printf '%s\n' "$list" \
-          | awk -v self="''${FELIS_SESSION_ID:-}" '$1 != self' \
           | fzf --ansi \
+                --delimiter='\t' \
                 --with-nth=2.. \
                 --prompt='felis session> ' \
-                --preview='felis sessions capture {1} --ansi 2>/dev/null || echo "(attached — preview unavailable)"'
+                --preview='felis sessions capture {1} --ansi'
       ) || exit 0
 
-      id=''${selection%% *}
+      id=''${selection%%$'\t'*}
       [ -n "$id" ] && felis sessions switch "$id"
     '';
   };
@@ -55,10 +78,14 @@ let
       package
       pkgs.fzf
       pkgs.gawk
+      pkgs.jq
     ];
     text = ''
-      list=$(felis sessions list)
-      if [ -z "$list" ] || [ "$list" = "no sessions" ]; then
+      # Only the picker's own transient is filtered out; killing the
+      # session the window came from is a legitimate pick.
+      ${roster}
+      list=$(roster | grep -v "''${FELIS_SESSION_ID:-none}" || true)
+      if [ -z "$list" ]; then
         echo "no sessions" >&2
         exit 0
       fi
@@ -67,13 +94,14 @@ let
         printf '%s\n' "$list" \
           | fzf --ansi \
                 --multi \
+                --delimiter='\t' \
                 --with-nth=2.. \
                 --prompt='kill session(s)> ' \
-                --preview='felis sessions capture {1} --ansi 2>/dev/null || echo "(attached — preview unavailable)"'
+                --preview='felis sessions capture {1} --ansi'
       ) || exit 0
 
       printf '%s\n' "$selection" \
-        | awk 'NF {print $1}' \
+        | awk -F'\t' 'NF {print $1}' \
         | while read -r id; do
             felis sessions kill "$id"
           done
@@ -90,13 +118,15 @@ let
       package
       pkgs.fzf
       pkgs.gawk
+      pkgs.jq
     ];
     text = ''
+      ${roster}
       matches=$(
-        felis sessions list \
-          | awk 'NF {print $1}' \
+        roster \
+          | awk -F'\t' 'NF {print $1}' \
           | while read -r id; do
-              felis sessions capture "$id" --scrollback 2>/dev/null \
+              felis sessions capture "$id" --source scrollback 2>/dev/null \
                 | awk -v id="$id" 'NF {print id"\t"$0}'
             done
       )
@@ -143,9 +173,7 @@ let
   # because a ~-relative name needs a shell to expand it, and the
   # opener would receive it as a literal argument. A relative name
   # resolves against the focused session's OSC 7 cwd, which felis
-  # gives the transient session. Open-only: that session sees only its
-  # own FELIS_SESSION_ID, not the originating window's, so a pick
-  # can't be routed back to the prompt.
+  # gives the transient session.
   felis-hints = pkgs.writeShellApplication {
     name = "felis-hints";
     runtimeInputs = [

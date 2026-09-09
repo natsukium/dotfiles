@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-09 10:43+0900\n"
+"POT-Creation-Date: 2026-09-09 13:25+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -430,7 +430,7 @@ msgstr ""
 #: configuration.org:70 modules/features/editor/emacs/init.org:662
 #: modules/configuration.org:80 modules/configuration.org:457
 #: modules/configuration.org:811 modules/configuration.org:2907
-#: modules/configuration.org:5296
+#: modules/configuration.org:5329
 #, no-wrap
 msgid "Configuration"
 msgstr "設定"
@@ -4079,7 +4079,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:93 modules/configuration.org:5253
+#: modules/features/editor/emacs/init.org:93 modules/configuration.org:5286
 #, no-wrap
 msgid "Darwin"
 msgstr "Darwin"
@@ -7558,7 +7558,7 @@ msgstr "home-manager"
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:357
 #: modules/configuration.org:770 modules/configuration.org:3241
-#: modules/configuration.org:5283
+#: modules/configuration.org:5316
 #, no-wrap
 msgid "Options"
 msgstr "オプション"
@@ -16044,14 +16044,17 @@ msgstr ""
 #. type: paragraph
 #: modules/configuration.org:4785
 msgid ""
-"The built-in =switch_{next,previous}_session= bindings only step one session "
-"at a time. =felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead "
-"pipes =felis sessions list= through fzf, previewing each session's grid in "
-"colour, and switches to the pick."
+"The built-in =switch_session= binding only steps one session at a time.  "
+"=felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead pipes =felis "
+"sessions list= through fzf, previewing each session's grid in colour, and "
+"switches to the pick. It and its two siblings read the list as =--format "
+"json=: felis promises that shape and explicitly reserves the right to move "
+"the human table's columns, which is what broke them the last time the CLI "
+"changed."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4790
+#: modules/configuration.org:4792
 msgid ""
 "felis makes only OSC 8 hyperlinks clickable, not the plain-text URLs that "
 "fill real output, leaving that heuristic to an external tool as kitty does.  "
@@ -16060,13 +16063,13 @@ msgid ""
 "hint picker, which overlays single-key labels and opens the pick. I chose "
 "spoor over thumbs because it links felis' own VT parser and cell grid, so "
 "its labels land on exactly the columns felis drew; thumbs rebuilds the grid "
-"itself and drifts on a wide character or soft wrap. Open-only for now — "
-"routing a pick back to the prompt would need felis to pass the transient "
-"command its originating session id."
+"itself and drifts on a wide character or soft wrap. The pick opens rather "
+"than landing back at the prompt: felis now exports the originating session "
+"id, so typing it back is possible, but opening is what I reach for."
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4800
+#: modules/configuration.org:4802
 msgid ""
 "=felis-nix-log= (=Ctrl+Shift+l=, ported from kitty) scans the grid for a "
 "=nix log <drv>= line and pages that build log. It uses grep + fzf rather "
@@ -16076,7 +16079,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:4806
+#: modules/configuration.org:4808
 msgid ""
 "Desktop notifications now come from felis' own home-manager module, not a "
 "helper of mine: =notifications.enable= runs a relay that streams =felis "
@@ -16087,7 +16090,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4819
+#: modules/configuration.org:4821
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -16104,7 +16107,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4831
+#: modules/configuration.org:4833
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -16120,7 +16123,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4842
+#: modules/configuration.org:4844
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -16138,7 +16141,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4860
+#: modules/configuration.org:4862
 #, no-wrap
 msgid ""
 "inherit\n"
@@ -16161,7 +16164,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4880
+#: modules/configuration.org:4882
 #, no-wrap
 msgid ""
 "  moralerspace = flavor: \"Moralerspace ${flavor} HW\";\n"
@@ -16180,13 +16183,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4894
+#: modules/configuration.org:4896
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4896
+#: modules/configuration.org:4898
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -16194,7 +16197,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4899
+#: modules/configuration.org:4901
 #, no-wrap
 msgid ""
 "home.packages = [\n"
@@ -16205,7 +16208,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4905
+#: modules/configuration.org:4907
 #, no-wrap
 msgid ""
 "programs.felis = {\n"
@@ -16214,19 +16217,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4911
+#: modules/configuration.org:4913
 #, no-wrap
 msgid "notifications.enable = true;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4913
+#: modules/configuration.org:4915
 #, no-wrap
 msgid ""
 "settings = {\n"
 "  font = {\n"
 "    family = moralerspace \"Neon\";\n"
-"    size = 14.0;\n"
+"    size_px = 14.0;\n"
 "    features = font-features;\n"
 "    bold.family = moralerspace \"Xenon\";\n"
 "    italic.family = moralerspace \"Radon\";\n"
@@ -16235,13 +16238,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4925
+#: modules/configuration.org:4927
 #, no-wrap
 msgid ""
 "theme = {\n"
-"  fg = \"#${palette.base05}\";\n"
-"  bg = \"#${palette.base00}\";\n"
-"  cursor = \"#${palette.base05}\";\n"
+"  foreground = \"#${palette.base05}\";\n"
+"  background = \"#${palette.base00}\";\n"
 "  palette = {\n"
 "    black = \"#${palette.base00}\";\n"
 "    red = \"#${palette.base08}\";\n"
@@ -16269,13 +16271,20 @@ msgid ""
 "    };\n"
 "  };\n"
 "};\n"
+"cursor.color = \"#${palette.base05}\";"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:4960
+#, no-wrap
+msgid ""
 "window = {\n"
 "  decorations = false;\n"
 "};"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:4961
+#: modules/configuration.org:4964
 #, no-wrap
 msgid ""
 "keymap = {\n"
@@ -16287,13 +16296,15 @@ msgid ""
 "  \"shift+enter\" = {\n"
 "    kind = \"send_string\";\n"
 "    text = \"\\\\e\\\\r\";\n"
-"    escapes = \"cstyle\";\n"
+"    escapes = \"c_style\";\n"
 "  };\n"
 "  \"ctrl+]\" = {\n"
-"    kind = \"switch_next_session\";\n"
+"    kind = \"switch_session\";\n"
+"    to = \"next\";\n"
 "  };\n"
 "  \"ctrl+[\" = {\n"
-"    kind = \"switch_previous_session\";\n"
+"    kind = \"switch_session\";\n"
+"    to = \"previous\";\n"
 "  };\n"
 "  \"ctrl+shift+n\" = {\n"
 "    kind = \"new_session\";\n"
@@ -16313,26 +16324,26 @@ msgid ""
 "  \"ctrl+shift+e\" = {\n"
 "    kind = \"pipe\";\n"
 "    source = \"scrollback\";\n"
-"    command = [ \"${felis-scrollback}/bin/felis-scrollback\" ];\n"
+"    target.command = [ \"${felis-scrollback}/bin/felis-scrollback\" ];\n"
 "  };\n"
 "  \"ctrl+shift+o\" = {\n"
 "    kind = \"pipe\";\n"
 "    source = \"visible\";\n"
-"    command = [ \"${felis-hints}/bin/felis-hints\" ];\n"
+"    target.command = [ \"${felis-hints}/bin/felis-hints\" ];\n"
 "  };\n"
 "  \"ctrl+shift+l\" = {\n"
 "    kind = \"pipe\";\n"
 "    source = \"visible\";\n"
-"    command = [ \"${felis-nix-log}/bin/felis-nix-log\" ];\n"
+"    target.command = [ \"${felis-nix-log}/bin/felis-nix-log\" ];\n"
 "  };\n"
 "};"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5020
+#: modules/configuration.org:5025
 #, no-wrap
 msgid ""
-"            mouse.wheel_scroll_multiplier = 5;\n"
+"            mouse.scroll_multiplier = 5.0;\n"
 "          };\n"
 "        };\n"
 "      };\n"
@@ -16341,13 +16352,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:5028
+#: modules/configuration.org:5033
 #, no-wrap
 msgid "Session and hint helpers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:5030
+#: modules/configuration.org:5035
 msgid ""
 "The keymap points at six shell programs, none touching the module system; "
 "their =writeShellApplication= bodies would bury the configuration if they "
@@ -16360,7 +16371,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5045
+#: modules/configuration.org:5050
 #, no-wrap
 msgid ""
 "{\n"
@@ -16374,8 +16385,44 @@ msgid ""
 "  opener = if pkgs.stdenv.hostPlatform.isDarwin then \"open\" else \"xdg-open\";"
 msgstr ""
 
+#. type: cell column 0
+#: modules/configuration.org:5073
+#, no-wrap
+msgid "jq -r '"
+msgstr ""
+
+#. type: cell column 0
+#: modules/configuration.org:5075
+#, no-wrap
+msgid "select(.exited != true)"
+msgstr ""
+
+#. type: cell column 0
+#: modules/configuration.org:5076
+#, no-wrap
+msgid "[.id, .short_id, \"\\(.cols)x\\(.rows)\", (.foreground // \"-\"), (.title // \"\")]"
+msgstr ""
+
+#. type: cell column 0
+#: modules/configuration.org:5077
+#, no-wrap
+msgid "@tsv'"
+msgstr ""
+
 #. type: paragraph in src
-#: modules/configuration.org:5060
+#: modules/configuration.org:5070
+#, no-wrap
+msgid ""
+"roster = ''\n"
+"  roster() {\n"
+"    felis sessions list --format json \\\n"
+"          .sessions[]\n"
+"  }\n"
+"'';"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:5085
 #, no-wrap
 msgid ""
 "felis-switch = pkgs.writeShellApplication {\n"
@@ -16383,52 +16430,48 @@ msgid ""
 "  runtimeInputs = [\n"
 "    package\n"
 "    pkgs.fzf\n"
-"    pkgs.gawk\n"
+"    pkgs.jq\n"
 "  ];\n"
 "  text = ''\n"
-"    list=$(felis sessions list)\n"
-"    if [ -z \"$list\" ] || [ \"$list\" = \"no sessions\" ]; then\n"
+"    ${roster}\n"
+"    list=$(roster | grep -v -e \"''${FELIS_ORIGIN_SESSION_ID:-none}\" -e \"''${FELIS_SESSION_ID:-none}\" || true)\n"
+"    if [ -z \"$list\" ]; then\n"
 "      echo \"no sessions\" >&2\n"
 "      exit 0\n"
 "    fi"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5078
-#, no-wrap
-msgid "awk -v self=\"''${FELIS_SESSION_ID:-}\" '$1 != self' \\"
-msgstr ""
-
-#. type: cell column 0
-#: modules/configuration.org:5079 modules/configuration.org:5109
+#: modules/configuration.org:5106 modules/configuration.org:5141
 #, no-wrap
 msgid "fzf --ansi \\"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5076
+#: modules/configuration.org:5104
 #, no-wrap
 msgid ""
 "selection=$(\n"
 "  printf '%s\\n' \"$list\" \\\n"
+"          --delimiter='\\t' \\\n"
 "          --with-nth=2.. \\\n"
 "          --prompt='felis session> ' \\\n"
-"          --preview='felis sessions capture {1} --ansi 2>/dev/null || echo \"(attached — preview unavailable)\"'\n"
+"          --preview='felis sessions capture {1} --ansi'\n"
 ") || exit 0"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5085
+#: modules/configuration.org:5113
 #, no-wrap
 msgid ""
-"    id=''${selection%% *}\n"
+"    id=''${selection%%$'\\t'*}\n"
 "    [ -n \"$id\" ] && felis sessions switch \"$id\"\n"
 "  '';\n"
 "};"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5093
+#: modules/configuration.org:5121
 #, no-wrap
 msgid ""
 "felis-kill = pkgs.writeShellApplication {\n"
@@ -16437,42 +16480,45 @@ msgid ""
 "    package\n"
 "    pkgs.fzf\n"
 "    pkgs.gawk\n"
+"    pkgs.jq\n"
 "  ];\n"
 "  text = ''\n"
-"    list=$(felis sessions list)\n"
-"    if [ -z \"$list\" ] || [ \"$list\" = \"no sessions\" ]; then\n"
+"    ${roster}\n"
+"    list=$(roster | grep -v \"''${FELIS_SESSION_ID:-none}\" || true)\n"
+"    if [ -z \"$list\" ]; then\n"
 "      echo \"no sessions\" >&2\n"
 "      exit 0\n"
 "    fi"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5107
+#: modules/configuration.org:5139
 #, no-wrap
 msgid ""
 "selection=$(\n"
 "  printf '%s\\n' \"$list\" \\\n"
 "          --multi \\\n"
+"          --delimiter='\\t' \\\n"
 "          --with-nth=2.. \\\n"
 "          --prompt='kill session(s)> ' \\\n"
-"          --preview='felis sessions capture {1} --ansi 2>/dev/null || echo \"(attached — preview unavailable)\"'\n"
+"          --preview='felis sessions capture {1} --ansi'\n"
 ") || exit 0"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5117 modules/configuration.org:5138
+#: modules/configuration.org:5150 modules/configuration.org:5173
 #, no-wrap
-msgid "awk 'NF {print $1}' \\"
+msgid "awk -F'\\t' 'NF {print $1}' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5118 modules/configuration.org:5139
+#: modules/configuration.org:5151 modules/configuration.org:5174
 #, no-wrap
 msgid "while read -r id; do"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5116
+#: modules/configuration.org:5149
 #, no-wrap
 msgid ""
 "    printf '%s\\n' \"$selection\" \\\n"
@@ -16483,13 +16529,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5141
+#: modules/configuration.org:5176
 #, no-wrap
 msgid "awk -v id=\"$id\" 'NF {print id\"\\t\"$0}'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5128
+#: modules/configuration.org:5161
 #, no-wrap
 msgid ""
 "felis-grep = pkgs.writeShellApplication {\n"
@@ -16498,11 +16544,13 @@ msgid ""
 "    package\n"
 "    pkgs.fzf\n"
 "    pkgs.gawk\n"
+"    pkgs.jq\n"
 "  ];\n"
 "  text = ''\n"
+"    ${roster}\n"
 "    matches=$(\n"
-"      felis sessions list \\\n"
-"            felis sessions capture \"$id\" --scrollback 2>/dev/null \\\n"
+"      roster \\\n"
+"            felis sessions capture \"$id\" --source scrollback 2>/dev/null \\\n"
 "          done\n"
 "    )\n"
 "    if [ -z \"$matches\" ]; then\n"
@@ -16512,13 +16560,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5151
+#: modules/configuration.org:5186
 #, no-wrap
 msgid "fzf --delimiter='\\t' --with-nth=2.. --prompt='grep scrollback> '"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5149
+#: modules/configuration.org:5184
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -16527,7 +16575,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5154
+#: modules/configuration.org:5189
 #, no-wrap
 msgid ""
 "    id=$(printf '%s' \"$selection\" | awk -F'\\t' '{print $1; exit}')\n"
@@ -16537,7 +16585,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5164
+#: modules/configuration.org:5199
 #, no-wrap
 msgid ""
 "felis-scrollback = pkgs.writeShellApplication {\n"
@@ -16553,7 +16601,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5190
+#: modules/configuration.org:5223
 #, no-wrap
 msgid ""
 "felis-hints = pkgs.writeShellApplication {\n"
@@ -16577,19 +16625,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5229
+#: modules/configuration.org:5262
 #, no-wrap
 msgid "sed 's/^nix log //' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:5230
+#: modules/configuration.org:5263
 #, no-wrap
 msgid "awk '!seen[$0]++'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5217
+#: modules/configuration.org:5250
 #, no-wrap
 msgid ""
 "  felis-nix-log = pkgs.writeShellApplication {\n"
@@ -16627,13 +16675,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:5255
+#: modules/configuration.org:5288
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:5257
+#: modules/configuration.org:5290
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -16643,7 +16691,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5268
+#: modules/configuration.org:5301
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -16658,7 +16706,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5278
+#: modules/configuration.org:5311
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -16667,13 +16715,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:5285
+#: modules/configuration.org:5318
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5287
+#: modules/configuration.org:5320
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -16686,7 +16734,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:5298
+#: modules/configuration.org:5331
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -16696,13 +16744,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:5303
+#: modules/configuration.org:5336
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5305
+#: modules/configuration.org:5338
 #, no-wrap
 msgid ""
 "config = {\n"

@@ -4782,10 +4782,12 @@ the Kitty keyboard protocol, but Claude Code enables that protocol only for
 terminals on a hardcoded list, so I send the Option+Enter newline it does
 recognize instead. Both go away once upstream catches up.
 
-The built-in =switch_{next,previous}_session= bindings only step one session at
-a time. =felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead pipes
-=felis sessions list= through fzf, previewing each session's grid in colour, and
-switches to the pick.
+The built-in =switch_session= binding only steps one session at a time.
+=felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead pipes =felis
+sessions list= through fzf, previewing each session's grid in colour, and
+switches to the pick. It and its two siblings read the list as =--format json=:
+felis promises that shape and explicitly reserves the right to move the human
+table's columns, which is what broke them the last time the CLI changed.
 
 felis makes only OSC 8 hyperlinks clickable, not the plain-text URLs that fill
 real output, leaving that heuristic to an external tool as kitty does.
@@ -4793,9 +4795,9 @@ real output, leaving that heuristic to an external tool as kitty does.
 visible grid to [[https://git.natsukium.com/natsukium/spoor][spoor]], my own hint picker, which overlays single-key labels and
 opens the pick. I chose spoor over thumbs because it links felis' own VT parser
 and cell grid, so its labels land on exactly the columns felis drew; thumbs
-rebuilds the grid itself and drifts on a wide character or soft wrap. Open-only
-for now — routing a pick back to the prompt would need felis to pass the
-transient command its originating session id.
+rebuilds the grid itself and drifts on a wide character or soft wrap. The pick
+opens rather than landing back at the prompt: felis now exports the originating
+session id, so typing it back is possible, but opening is what I reach for.
 
 =felis-nix-log= (=Ctrl+Shift+l=, ported from kitty) scans the grid for a =nix
 log <drv>= line and pages that build log. It uses grep + fzf rather than a label
@@ -4913,7 +4915,7 @@ in
           settings = {
             font = {
               family = moralerspace "Neon";
-              size = 14.0;
+              size_px = 14.0;
               features = font-features;
               # Each flavor is a distinct family, so felis' bold/italic
               # derivation from the primary can't reach them; name them.
@@ -4923,9 +4925,8 @@ in
             };
 
             theme = {
-              fg = "#${palette.base05}";
-              bg = "#${palette.base00}";
-              cursor = "#${palette.base05}";
+              foreground = "#${palette.base05}";
+              background = "#${palette.base00}";
               palette = {
                 black = "#${palette.base00}";
                 red = "#${palette.base08}";
@@ -4954,6 +4955,8 @@ in
                 };
               };
             };
+            cursor.color = "#${palette.base05}";
+
             window = {
               decorations = false;
             };
@@ -4967,13 +4970,15 @@ in
               "shift+enter" = {
                 kind = "send_string";
                 text = "\\e\\r";
-                escapes = "cstyle";
+                escapes = "c_style";
               };
               "ctrl+]" = {
-                kind = "switch_next_session";
+                kind = "switch_session";
+                to = "next";
               };
               "ctrl+[" = {
-                kind = "switch_previous_session";
+                kind = "switch_session";
+                to = "previous";
               };
               "ctrl+shift+n" = {
                 kind = "new_session";
@@ -4998,7 +5003,7 @@ in
               "ctrl+shift+e" = {
                 kind = "pipe";
                 source = "scrollback";
-                command = [ "${felis-scrollback}/bin/felis-scrollback" ];
+                target.command = [ "${felis-scrollback}/bin/felis-scrollback" ];
               };
               # Hints over the visible grid. `ansi` defaults to false
               # (plain), which is exactly what spoor wants — embedded
@@ -5006,18 +5011,18 @@ in
               "ctrl+shift+o" = {
                 kind = "pipe";
                 source = "visible";
-                command = [ "${felis-hints}/bin/felis-hints" ];
+                target.command = [ "${felis-hints}/bin/felis-hints" ];
               };
               # The kitty Ctrl+Shift+l port: page the build log of a
               # `nix log <drv>` shown on screen.
               "ctrl+shift+l" = {
                 kind = "pipe";
                 source = "visible";
-                command = [ "${felis-nix-log}/bin/felis-nix-log" ];
+                target.command = [ "${felis-nix-log}/bin/felis-nix-log" ];
               };
             };
 
-            mouse.wheel_scroll_multiplier = 5;
+            mouse.scroll_multiplier = 5.0;
           };
         };
       };
@@ -5052,37 +5057,60 @@ read-only in Neovim so editor motions replace the pager.
 let
   opener = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
 
-  # Wraps list/switch in an fzf picker: the built-in
-  # switch_{next,previous}_session only steps in daemon order, so
-  # jumping to a known session otherwise means retyping a 32-hex id.
-  # The preview shows each session's live grid (capture --ansi), so
-  # the choice is by content.
+  # The roster every picker below works from. `--format json` is the
+  # only stable shape felis promises: the human table's columns are
+  # explicitly free to move, and they did. `list` is a point verb, so
+  # the whole roster arrives as one `.sessions` array rather than as
+  # JSON Lines. Each output row is a tab-separated id plus display
+  # columns, so fzf can hide the id in field 1 while the preview still
+  # addresses the session by it.
+  #
+  # An `exited` session is a corpse in the post-exit grace: attachable
+  # for a last look, but never a place to route work.
+  roster = ''
+    roster() {
+      felis sessions list --format json \
+        | jq -r '
+            .sessions[]
+            | select(.exited != true)
+            | [.id, .short_id, "\(.cols)x\(.rows)", (.foreground // "-"), (.title // "")]
+            | @tsv'
+    }
+  '';
+
+  # Wraps list/switch in an fzf picker: the built-in switch_session
+  # only steps in daemon order, so jumping to a known session
+  # otherwise means retyping a 32-hex id. The preview shows each
+  # session's live grid (capture --ansi), so the choice is by content.
   felis-switch = pkgs.writeShellApplication {
     name = "felis-switch";
     runtimeInputs = [
       package
       pkgs.fzf
-      pkgs.gawk
+      pkgs.jq
     ];
     text = ''
-      list=$(felis sessions list)
-      if [ -z "$list" ] || [ "$list" = "no sessions" ]; then
+      # A `run` chord hands the picker its own transient session, so
+      # FELIS_SESSION_ID names the picker, not the window's session;
+      # FELIS_ORIGIN_SESSION_ID names where the window came from and
+      # will return to. Both are dead ends as switch targets.
+      ${roster}
+      list=$(roster | grep -v -e "''${FELIS_ORIGIN_SESSION_ID:-none}" -e "''${FELIS_SESSION_ID:-none}" || true)
+      if [ -z "$list" ]; then
         echo "no sessions" >&2
         exit 0
       fi
 
-      # Drop this window's own session: switching to where you
-      # already are is a no-op, so it only clutters the list.
       selection=$(
         printf '%s\n' "$list" \
-          | awk -v self="''${FELIS_SESSION_ID:-}" '$1 != self' \
           | fzf --ansi \
+                --delimiter='\t' \
                 --with-nth=2.. \
                 --prompt='felis session> ' \
-                --preview='felis sessions capture {1} --ansi 2>/dev/null || echo "(attached — preview unavailable)"'
+                --preview='felis sessions capture {1} --ansi'
       ) || exit 0
 
-      id=''${selection%% *}
+      id=''${selection%%$'\t'*}
       [ -n "$id" ] && felis sessions switch "$id"
     '';
   };
@@ -5096,10 +5124,14 @@ let
       package
       pkgs.fzf
       pkgs.gawk
+      pkgs.jq
     ];
     text = ''
-      list=$(felis sessions list)
-      if [ -z "$list" ] || [ "$list" = "no sessions" ]; then
+      # Only the picker's own transient is filtered out; killing the
+      # session the window came from is a legitimate pick.
+      ${roster}
+      list=$(roster | grep -v "''${FELIS_SESSION_ID:-none}" || true)
+      if [ -z "$list" ]; then
         echo "no sessions" >&2
         exit 0
       fi
@@ -5108,13 +5140,14 @@ let
         printf '%s\n' "$list" \
           | fzf --ansi \
                 --multi \
+                --delimiter='\t' \
                 --with-nth=2.. \
                 --prompt='kill session(s)> ' \
-                --preview='felis sessions capture {1} --ansi 2>/dev/null || echo "(attached — preview unavailable)"'
+                --preview='felis sessions capture {1} --ansi'
       ) || exit 0
 
       printf '%s\n' "$selection" \
-        | awk 'NF {print $1}' \
+        | awk -F'\t' 'NF {print $1}' \
         | while read -r id; do
             felis sessions kill "$id"
           done
@@ -5131,13 +5164,15 @@ let
       package
       pkgs.fzf
       pkgs.gawk
+      pkgs.jq
     ];
     text = ''
+      ${roster}
       matches=$(
-        felis sessions list \
-          | awk 'NF {print $1}' \
+        roster \
+          | awk -F'\t' 'NF {print $1}' \
           | while read -r id; do
-              felis sessions capture "$id" --scrollback 2>/dev/null \
+              felis sessions capture "$id" --source scrollback 2>/dev/null \
                 | awk -v id="$id" 'NF {print id"\t"$0}'
             done
       )
@@ -5184,9 +5219,7 @@ let
   # because a ~-relative name needs a shell to expand it, and the
   # opener would receive it as a literal argument. A relative name
   # resolves against the focused session's OSC 7 cwd, which felis
-  # gives the transient session. Open-only: that session sees only its
-  # own FELIS_SESSION_ID, not the originating window's, so a pick
-  # can't be routed back to the prompt.
+  # gives the transient session.
   felis-hints = pkgs.writeShellApplication {
     name = "felis-hints";
     runtimeInputs = [

@@ -98,7 +98,7 @@ in
           settings = {
             font = {
               family = moralerspace "Neon";
-              size = 14.0;
+              size_px = 14.0;
               features = font-features;
               # Each flavor is a distinct family, so felis' bold/italic
               # derivation from the primary can't reach them; name them.
@@ -108,9 +108,8 @@ in
             };
 
             theme = {
-              fg = "#${palette.base05}";
-              bg = "#${palette.base00}";
-              cursor = "#${palette.base05}";
+              foreground = "#${palette.base05}";
+              background = "#${palette.base00}";
               palette = {
                 black = "#${palette.base00}";
                 red = "#${palette.base08}";
@@ -139,6 +138,8 @@ in
                 };
               };
             };
+            cursor.color = "#${palette.base05}";
+
             window = {
               decorations = false;
             };
@@ -152,13 +153,15 @@ in
               "shift+enter" = {
                 kind = "send_string";
                 text = "\\e\\r";
-                escapes = "cstyle";
+                escapes = "c_style";
               };
               "ctrl+]" = {
-                kind = "switch_next_session";
+                kind = "switch_session";
+                to = "next";
               };
               "ctrl+[" = {
-                kind = "switch_previous_session";
+                kind = "switch_session";
+                to = "previous";
               };
               "ctrl+shift+n" = {
                 kind = "new_session";
@@ -183,7 +186,7 @@ in
               "ctrl+shift+e" = {
                 kind = "pipe";
                 source = "scrollback";
-                command = [ "${felis-scrollback}/bin/felis-scrollback" ];
+                target.command = [ "${felis-scrollback}/bin/felis-scrollback" ];
               };
               # Hints over the visible grid. `ansi` defaults to false
               # (plain), which is exactly what spoor wants — embedded
@@ -191,18 +194,18 @@ in
               "ctrl+shift+o" = {
                 kind = "pipe";
                 source = "visible";
-                command = [ "${felis-hints}/bin/felis-hints" ];
+                target.command = [ "${felis-hints}/bin/felis-hints" ];
               };
               # The kitty Ctrl+Shift+l port: page the build log of a
               # `nix log <drv>` shown on screen.
               "ctrl+shift+l" = {
                 kind = "pipe";
                 source = "visible";
-                command = [ "${felis-nix-log}/bin/felis-nix-log" ];
+                target.command = [ "${felis-nix-log}/bin/felis-nix-log" ];
               };
             };
 
-            mouse.wheel_scroll_multiplier = 5;
+            mouse.scroll_multiplier = 5.0;
           };
         };
       };
