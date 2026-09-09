@@ -2668,6 +2668,11 @@ created at service start instead. Stars and forks are off for the same reason:
 both are social features, and with no second account they leave nothing but a
 button and a counter that never move.
 
+New repositories start out with the two settings I would otherwise pick by hand:
+squash merges, and rebase when a pull request branch needs updating. Deleting the
+branch after a merge is the third habit, but Forgejo has no instance-level default
+for it, so I still tick that box per repository.
+
 #+NAME: forgejo-instance
 #+begin_src nix
 flake.modules.nixos.forgejo =
@@ -2693,6 +2698,10 @@ flake.modules.nixos.forgejo =
           repository = {
             DISABLE_STARS = true;
             DISABLE_FORKS = true;
+          };
+          "repository.pull-request" = {
+            DEFAULT_MERGE_STYLE = "squash";
+            DEFAULT_UPDATE_STYLE = "rebase";
           };
           server = {
             HTTP_PORT = 3010;

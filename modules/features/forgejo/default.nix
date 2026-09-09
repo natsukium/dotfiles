@@ -27,6 +27,10 @@
               DISABLE_STARS = true;
               DISABLE_FORKS = true;
             };
+            "repository.pull-request" = {
+              DEFAULT_MERGE_STYLE = "squash";
+              DEFAULT_UPDATE_STYLE = "rebase";
+            };
             server = {
               HTTP_PORT = 3010;
               DOMAIN = "git.natsukium.com";
