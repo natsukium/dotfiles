@@ -2664,7 +2664,9 @@ module that routes git's ssh traffic to it.
 
 Registration is closed since I am the only human user. Forgejo has no
 declarative way to define users, so my admin account and the renovate bot's are
-created at service start instead.
+created at service start instead. Stars and forks are off for the same reason:
+both are social features, and with no second account they leave nothing but a
+button and a counter that never move.
 
 #+NAME: forgejo-instance
 #+begin_src nix
@@ -2688,6 +2690,10 @@ flake.modules.nixos.forgejo =
         database.type = "postgres";
         settings = {
           service.DISABLE_REGISTRATION = true;
+          repository = {
+            DISABLE_STARS = true;
+            DISABLE_FORKS = true;
+          };
           server = {
             HTTP_PORT = 3010;
             DOMAIN = "git.natsukium.com";
