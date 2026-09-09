@@ -23,6 +23,10 @@
           database.type = "postgres";
           settings = {
             service.DISABLE_REGISTRATION = true;
+            repository = {
+              DISABLE_STARS = true;
+              DISABLE_FORKS = true;
+            };
             server = {
               HTTP_PORT = 3010;
               DOMAIN = "git.natsukium.com";
