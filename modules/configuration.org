@@ -2470,6 +2470,176 @@ gsw = "git switch";
 gswc = "git switch -c";
 #+end_src
 
+** Jujutsu
+
+I am moving my data analysis work to [[https://jj-vcs.github.io/jj/][Jujutsu]], where the history has a shape git
+does not expect. Analysis is a long run of small experiments and most of them are
+abandoned, so git records only the states I remembered to commit. jj snapshots
+the working copy on every command, which means the state I had twenty minutes
+ago is still in the operation log whether or not I judged it worth keeping at
+the time. Rearranging the survivors into a sequence someone can read is then
+=jj squash= and =jj rebase=, instead of an interactive rebase I would have had
+to plan for while still exploring.
+
+jj keeps its commits in a git repository and colocates with =.git= by default,
+so the git tooling in the [[*Git][Git]] section keeps working inside a jj repo. The two are
+registered as separate features because jj is not a replacement here: git
+remains what I use everywhere else.
+
+#+begin_src nix :tangle features/jujutsu.nix :mkdirp yes :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/jujutsu.nix :mkdirp yes
+{ ... }:
+{
+  flake.modules.homeManager.jujutsu =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.programs.jujutsu;
+      gitCfg = config.programs.git;
+    in
+    {
+      options.my.programs.jujutsu.enable = lib.mkEnableOption "jujutsu";
+
+      config = lib.mkIf cfg.enable {
+        <<jj-git-assertion>>
+
+        programs.jujutsu = {
+          enable = true;
+
+          settings = {
+            <<jj-user-identity>>
+
+            <<jj-signing>>
+
+            <<jj-ui>>
+
+            <<jj-snapshot>>
+          };
+        };
+      };
+    };
+}
+#+end_src
+
+*** Shared Settings With Git
+
+jj reads none of git's configuration, so identity, signing, and editor would
+have to be written twice. Everything that is literally the same value is read
+back out of the [[*Git][Git]] feature instead, which means a key rotation or a change of
+address is one edit rather than two that can fall out of step.
+
+That makes jujutsu depend on git being enabled. Without the assertion the
+failure would be a missing-attribute error pointing into the module system,
+which says nothing about the actual cause.
+
+#+NAME: jj-git-assertion
+#+begin_src nix
+assertions = [
+  {
+    assertion = config.my.programs.git.enable;
+    message = "my.programs.jujutsu reuses git's identity, signing key and editor; enable my.programs.git too.";
+  }
+];
+#+end_src
+
+*** User Identity
+
+#+NAME: jj-user-identity
+#+begin_src nix
+user = {
+  inherit (gitCfg.settings.user) name email;
+};
+#+end_src
+
+*** Commit Signing
+
+The key is git's, and so is the decision to sign at all: =signByDefault= becomes
+jj's =own=, which signs the commits I author. Mapping git's =format= onto jj's
+=backend= covers the case where I move off ssh keys, since the two spell the
+same three backends differently.
+
+jj rewrites the working-copy commit on every snapshot, which calls the signing
+program far more often than git's per-commit signing does. I measured the
+difference at a few milliseconds per command, below the cost of the snapshot
+itself, so the frequency is not a reason to weaken this to =keep=.
+
+Signature status shows as unknown in =jj log= because I keep no allowed-signers
+file. That only affects local verification; GitHub and Forgejo check the
+signature against the key registered on my account.
+
+#+NAME: jj-signing
+#+begin_src nix
+signing = {
+  backend =
+    {
+      openpgp = "gpg";
+      ssh = "ssh";
+      x509 = "gpgsm";
+    }
+    .${gitCfg.signing.format};
+  behavior = if gitCfg.signing.signByDefault then "own" else "keep";
+  key = gitCfg.signing.key;
+};
+#+end_src
+
+*** UI
+
+A bare =jj= already falls back to =jj log=, but prints a hint naming this
+setting on every run until it is set. Setting it buys nothing except silence,
+which is reason enough.
+
+The editor is git's, set there because [[*Editor][some contexts do not inherit the session
+environment]]; jj falls back the same way and deserves the same answer.
+
+difftastic replaces the built-in colour-words diff. jj invokes a diff formatter
+on the two file versions directly, which is the interface difftastic wants, so
+no wrapper is needed. delta stays git-only because it reads a unified diff
+rather than a pair of files.
+
+#+NAME: jj-ui
+#+begin_src nix
+ui = {
+  default-command = [ "log" ];
+  editor = gitCfg.settings.core.editor;
+  diff-formatter = [
+    (lib.getExe pkgs.difftastic)
+    "--color=always"
+    "$left"
+    "$right"
+  ];
+};
+#+end_src
+
+*** Snapshot Size Limit
+
+Automatic snapshotting is what makes jj worth using for analysis, and it is also
+the thing that would put a parquet file into the store the moment I dropped one
+next to the notebook. jj has no equivalent of git-lfs, so the store would simply
+grow. =max-new-file-size= is the guard: a new file larger than the limit is not
+tracked at all.
+
+The value below is jj's own default, written out because it carries the rule
+that data lives outside the repository. Without that rule the automatic snapshot
+turns from the reason I chose jj into the reason I would have to abandon it.
+
+One catch is worth knowing before it bites. jj 0.44 skips an oversized file in
+silence: nothing is printed, and =jj status= does not list the file as
+untracked, so a file I assumed was committed can turn out not to be. When that
+happens the fix is to move the data out of the tree, not to raise the limit.
+
+#+NAME: jj-snapshot
+#+begin_src nix
+snapshot.max-new-file-size = "1MiB";
+#+end_src
+
 ** Forgejo
 
 I self-host [[https://forgejo.org/][Forgejo]] on manyara as my personal forge at =git.natsukium.com=. This
