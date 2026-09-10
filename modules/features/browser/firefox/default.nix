@@ -17,6 +17,7 @@ in
     let
       cfg = config.my.programs.firefox;
       parfait = pkgs.callPackage ./parfait.nix { };
+      workContainerId = 1;
     in
     {
       options.my.programs.firefox = {
@@ -29,7 +30,31 @@ in
           configPath = lib.mkIf pkgs.stdenv.hostPlatform.isLinux "${config.xdg.configHome}/mozilla/firefox";
           profiles.natsukium = {
             search = sharedSearch { inherit pkgs; };
-            extensions = sharedExtensions { inherit pkgs; };
+            extensions = sharedExtensions { inherit pkgs; } // {
+              settings."containerise@kinte.sh" = {
+                force = true;
+                settings =
+                  let
+                    work = host: {
+                      inherit host;
+                      cookieStoreId = "firefox-container-${toString workContainerId}";
+                      containerName = "work";
+                      enabled = true;
+                    };
+                  in
+                  {
+                    "map=github.com/orgs/attmcojp" = work "github.com/orgs/attmcojp";
+                    "map=github.com/attmcojp" = work "github.com/attmcojp";
+                  };
+              };
+            };
+
+            containers.work = {
+              id = workContainerId;
+              color = "red";
+              icon = "briefcase";
+            };
+            containersForce = true;
 
             settings = {
               "extensions.autoDisableScopes" = 0;

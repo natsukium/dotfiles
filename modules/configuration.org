@@ -4216,6 +4216,7 @@ flake.modules.homeManager.firefox =
   let
     cfg = config.my.programs.firefox;
     parfait = pkgs.callPackage ./parfait.nix { };
+    workContainerId = 1;
   in
   {
     options.my.programs.firefox = {
@@ -4228,7 +4229,11 @@ flake.modules.homeManager.firefox =
         configPath = lib.mkIf pkgs.stdenv.hostPlatform.isLinux "${config.xdg.configHome}/mozilla/firefox";
         profiles.natsukium = {
           search = sharedSearch { inherit pkgs; };
-          extensions = sharedExtensions { inherit pkgs; };
+          extensions = sharedExtensions { inherit pkgs; } // {
+            <<firefox-containerise-rules>>
+          };
+
+          <<firefox-containers>>
 
           <<firefox-settings>>
         };
@@ -4310,6 +4315,49 @@ darwin and Linux.
 #+NAME: firefox-parfait-tree
 #+begin_src nix
 home.file."${config.programs.firefox.profilesPath}/natsukium/chrome".source = parfait;
+#+end_src
+
+*** Containers
+
+Declaring the container pins its ID so routing rules can address it by
+=firefox-container-1=. =containersForce= allows home-manager to write
+=containers.json=, which Firefox overwrites on launch.
+
+#+NAME: firefox-containers
+#+begin_src nix
+containers.work = {
+  id = workContainerId;
+  color = "red";
+  icon = "briefcase";
+};
+containersForce = true;
+#+end_src
+
+Mozilla's Multi-Account Containers only matches on domain. [[https://github.com/kintesh/containerise][containerise]] matches
+paths, routing only =attmcojp= URLs into the work container.
+
+Rules only route inbound: routing non-work paths back out breaks sign-in, as
+container switches reopen tabs and drop POST bodies (such as SAML assertions
+and two-factor forms).
+
+#+NAME: firefox-containerise-rules
+#+begin_src nix
+settings."containerise@kinte.sh" = {
+  force = true;
+  settings =
+    let
+      work = host: {
+        inherit host;
+        cookieStoreId = "firefox-container-${toString workContainerId}";
+        containerName = "work";
+        enabled = true;
+      };
+    in
+    {
+      "map=github.com/orgs/attmcojp" = work "github.com/orgs/attmcojp";
+      "map=github.com/attmcojp" = work "github.com/attmcojp";
+    };
+};
 #+end_src
 
 ** Search Engines
@@ -4452,6 +4500,7 @@ sets: =firefox-addons= repackages the NUR firefox-addons repository, and
   packages =
     (with pkgs.firefox-addons; [
       bitwarden
+      containerise
       instapaper-official
       keepa
       onepassword-password-manager

@@ -6,6 +6,7 @@
   packages =
     (with pkgs.firefox-addons; [
       bitwarden
+      containerise
       instapaper-official
       keepa
       onepassword-password-manager
