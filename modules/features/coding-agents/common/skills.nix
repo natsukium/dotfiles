@@ -22,6 +22,7 @@
       cfg = config.my.programs.coding-agents;
 
       marimoPair = pkgs.callPackage ./marimo-pair.nix { };
+      japaneseTechWriting = pkgs.callPackage ./japanese-tech-writing.nix { };
 
       skillsIn =
         dir:
@@ -72,6 +73,7 @@
           ++ lib.optional pkgs.stdenv.hostPlatform.isLinux ./skills-linux;
           skills = lib.mergeAttrsList (map skillsIn cfg.skillDirs) // {
             marimo-pair = "${marimoPair}/skills/marimo-pair";
+            japanese-tech-writing = japaneseTechWriting;
           };
         };
 
