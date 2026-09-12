@@ -96,6 +96,12 @@
             gstp = "git stash pop";
             gsw = "git switch";
             gswc = "git switch -c";
+            ghq-get = {
+              command = "ghq";
+              regex = "get";
+              setCursor = true;
+              expansion = "get % | xargs -I{} zoxide add {}";
+            };
           };
         })
 

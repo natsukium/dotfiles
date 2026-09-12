@@ -2408,6 +2408,7 @@ programs.fish.shellAbbrs = {
   <<git-abbr-status>>
   <<git-abbr-stash>>
   <<git-abbr-switch>>
+  <<git-abbr-ghq>>
 };
 #+end_src
 
@@ -2468,6 +2469,28 @@ gstp = "git stash pop";
 #+begin_src nix
 gsw = "git switch";
 gswc = "git switch -c";
+#+end_src
+
+**** ghq
+
+A fresh =ghq get= clone is invisible to =z= until I cd into it once. Piping the path
+that =ghq get= prints on stdout since 1.10.0 into =zoxide add= registers it right away.
+
+I use an abbreviation rather than a function wrapping =ghq= so the pipe stays visible
+and I can delete it when I need =ghq get --look=, whose nested shell the pipe would
+swallow.
+
+=xargs -I{}= keeps a path with spaces whole and runs nothing when a failed clone leaves
+stdout empty.
+
+#+NAME: git-abbr-ghq
+#+begin_src nix
+ghq-get = {
+  command = "ghq";
+  regex = "get";
+  setCursor = true;
+  expansion = "get % | xargs -I{} zoxide add {}";
+};
 #+end_src
 
 ** Jujutsu
