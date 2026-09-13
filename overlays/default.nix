@@ -24,9 +24,6 @@
     );
 
   temporary-fix = final: prev: {
-    handy = prev.handy.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [ ./handy-retry-without-reasoning.patch ];
-    });
   };
 
   pre-release = final: prev: { };
