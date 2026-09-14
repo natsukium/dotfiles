@@ -5318,19 +5318,40 @@ let
   # only stable shape felis promises: the human table's columns are
   # explicitly free to move, and they did. `list` is a point verb, so
   # the whole roster arrives as one `.sessions` array rather than as
-  # JSON Lines. Each output row is a tab-separated id plus display
-  # columns, so fzf can hide the id in field 1 while the preview still
+  # JSON Lines. Each output row is an id and a display line separated by
+  # a tab, so fzf can hide the id in field 1 while the preview still
   # addresses the session by it.
   #
   # An `exited` session is a corpse in the post-exit grace: attachable
   # for a last look, but never a place to route work.
+  #
+  # Neither idle nor geometry: `idle_seconds` counts from the last read
+  # and the preview reads whatever it lands on, so that column would
+  # measure the picker; every window opens at the same size.
+  #
+  # Padding rather than further tab-separated fields: fzf renders tabs
+  # at a single `--tabstop`, so every column would round up to the
+  # widest one's stop. Only the title carries wide characters, and it is
+  # last, so padding by `length` holds.
   roster = ''
     roster() {
       felis sessions list --format json \
         | jq -r '
             .sessions[]
             | select(.exited != true)
-            | [.id, .short_id, "\(.cols)x\(.rows)", (.foreground // "-"), (.title // "")]
+            | [
+                .id,
+                ((.short_id + "         ")[:9]
+                 + (((.cwd // "" | sub("^file://[^/]*"; ""))
+                     | if . == "" then "-"
+                       else sub("^/(Users|home)/[^/]+"; "~")
+                         | split("/")
+                         | last
+                       end)
+                    + "               ")[:15]
+                 + ((.foreground // "-") + "                ")[:16]
+                 + (.title // ""))
+              ]
             | @tsv'
     }
   '';
@@ -5339,6 +5360,10 @@ let
   # only steps in daemon order, so jumping to a known session
   # otherwise means retyping a 32-hex id. The preview shows each
   # session's live grid (capture --ansi), so the choice is by content.
+  #
+  # Stacked rather than side by side: half a window cuts off both the
+  # grid and the title. fzf's `<N(…)` compares the preview's own width
+  # in the primary layout, not the terminal's.
   felis-switch = pkgs.writeShellApplication {
     name = "felis-switch";
     runtimeInputs = [
@@ -5364,7 +5389,8 @@ let
                 --delimiter='\t' \
                 --with-nth=2.. \
                 --prompt='felis session> ' \
-                --preview='felis sessions capture {1} --ansi'
+                --preview='felis sessions capture {1} --ansi' \
+                --preview-window='right,50%,<80(up,50%)'
       ) || exit 0
 
       id=''${selection%%$'\t'*}
@@ -5400,7 +5426,8 @@ let
                 --delimiter='\t' \
                 --with-nth=2.. \
                 --prompt='kill session(s)> ' \
-                --preview='felis sessions capture {1} --ansi'
+                --preview='felis sessions capture {1} --ansi' \
+                --preview-window='right,50%,<80(up,50%)'
       ) || exit 0
 
       printf '%s\n' "$selection" \
