@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-16 00:21+0900\n"
+"POT-Creation-Date: 2026-09-16 00:46+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -7375,32 +7375,34 @@ msgstr ""
 #: overlays/configuration.org:151
 #, no-wrap
 msgid ""
-"mcp-grafana = prev.mcp-grafana.overrideAttrs (finalAttrs: {\n"
-"  version = \"1.4.2\";\n"
-"  src = final.fetchFromGitHub {\n"
-"    owner = \"grafana\";\n"
-"    repo = \"mcp-grafana\";\n"
-"    tag = \"v${finalAttrs.version}\";\n"
-"    hash = \"sha256-MUqVsrfjlDLanWzXzMVGYhlXjF23ovGm/ocz7A4vrxw=\";\n"
-"  };\n"
-"  vendorHash = \"sha256-y/Hk1hDQ00wHqTOcaoKVvz2PgF0ZiwHartbuF7qEkXc=\";\n"
-"  checkFlags = [ \"-skip=TestFetchDashboardViaK8s_V2Refetch\" ];\n"
-"});"
+"mcp-grafana = prev.mcp-grafana.overrideAttrs (\n"
+"  finalAttrs: _: {\n"
+"    version = \"1.4.2\";\n"
+"    src = final.fetchFromGitHub {\n"
+"      owner = \"grafana\";\n"
+"      repo = \"mcp-grafana\";\n"
+"      tag = \"v${finalAttrs.version}\";\n"
+"      hash = \"sha256-MUqVsrfjlDLanWzXzMVGYhlXjF23ovGm/ocz7A4vrxw=\";\n"
+"    };\n"
+"    vendorHash = \"sha256-y/Hk1hDQ00wHqTOcaoKVvz2PgF0ZiwHartbuF7qEkXc=\";\n"
+"    checkFlags = [ \"-skip=TestFetchDashboardViaK8s_V2Refetch\" ];\n"
+"  }\n"
+");"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:164 overlays/configuration.org:173
+#: overlays/configuration.org:166 overlays/configuration.org:175
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:166
+#: overlays/configuration.org:168
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr "アップストリームへの貢献に適さない回避策です。"
 
 #. type: paragraph
-#: overlays/configuration.org:168
+#: overlays/configuration.org:170
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7413,7 +7415,7 @@ msgstr ""
 "久的に残る想定です。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:175
+#: overlays/configuration.org:177
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7423,13 +7425,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:181 overlays/configuration.org:194
+#: overlays/configuration.org:183 overlays/configuration.org:196
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:183
+#: overlays/configuration.org:185
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7442,7 +7444,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:188
+#: overlays/configuration.org:190
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7455,7 +7457,7 @@ msgstr ""
 "います。"
 
 #. type: paragraph
-#: overlays/configuration.org:192
+#: overlays/configuration.org:194
 msgid ""
 "Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/"
 "gh-dash#316]]."
@@ -7464,7 +7466,7 @@ msgstr ""
 "gh-dash#316]]で報告済みです。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:196
+#: overlays/configuration.org:198
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7478,19 +7480,19 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:206
+#: overlays/configuration.org:208
 #, no-wrap
 msgid "mkShim"
 msgstr "mkShim"
 
 #. type: paragraph
-#: overlays/configuration.org:208
+#: overlays/configuration.org:210
 msgid ""
 "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr "macOS Command Line Toolsのスタブ実装を提供するshimユーティリティです。"
 
 #. type: paragraph
-#: overlays/configuration.org:210
+#: overlays/configuration.org:212
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7505,7 +7507,7 @@ msgstr ""
 "制し不要なビルド失敗を防ぎます。"
 
 #. type: paragraph
-#: overlays/configuration.org:215
+#: overlays/configuration.org:217
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
@@ -7514,13 +7516,13 @@ msgstr ""
 "mkShim]]を参照してください。"
 
 #. type: keyword NAME
-#: overlays/configuration.org:217
+#: overlays/configuration.org:219
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:219
+#: overlays/configuration.org:221
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
