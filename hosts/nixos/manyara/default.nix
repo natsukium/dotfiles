@@ -27,6 +27,7 @@
   my.profiles.server.enable = true;
 
   my.services.grafana.enable = true;
+  my.services.mcp-grafana.enable = true;
   my.services.victoriametrics.enable = true;
   my.services.loki.enable = true;
   my.services.tempo.enable = true;

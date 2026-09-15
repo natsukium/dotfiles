@@ -10,17 +10,9 @@
         terraform.enable = true;
         grafana = {
           enable = true;
-          env = {
-            GRAFANA_URL = "http://monitor.home.natsukium.com";
-            GRAFANA_USERNAME = "admin";
-          };
-          passwordCommand = {
-            GRAFANA_PASSWORD = [
-              "rbw"
-              "get"
-              "grafana"
-            ];
-          };
+          type = "http";
+          url = "http://mcp.home.natsukium.com/mcp";
+          headers.Authorization = "Bearer \${MCP_GRAFANA_TOKEN}";
         };
       };
     };

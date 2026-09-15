@@ -3,6 +3,7 @@
   perSystem =
     {
       config,
+      lib,
       pkgs,
       ...
     }:
@@ -34,6 +35,10 @@
             config.pre-commit.installationScript
             + config.mcp-servers.shellHook
             + ''
+              if ${lib.getExe pkgs.rbw} unlocked >/dev/null 2>&1; then
+                export MCP_GRAFANA_TOKEN="$(${lib.getExe pkgs.rbw} get mcp-grafana)"
+              fi
+
               echo "Syncing CLAUDE.md..."
               make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
             '';

@@ -1704,7 +1704,7 @@ consistent output across platforms.
             (set-file-modes temporary (if (file-exists-p destination) (file-modes destination) #o644))
             (rename-file temporary destination t)
             (setq temporary nil)))
-      (when (file-exists-p temporary)
+      (when (and temporary (file-exists-p temporary))
         (delete-file temporary)))))
 
 (let ((org-export-select-tags (list "readme"))
@@ -1728,6 +1728,11 @@ translation tools (po4a, gettext), and build utilities (nix-fast-build).
 On entry, it automatically sets up pre-commit hooks, configures MCP servers,
 and syncs =CLAUDE.md= from the literate source.
 
+Entry also exports the bearer token for the Grafana MCP server, but only while
+=rbw= is already unlocked. Fetching it unconditionally would put a pinentry
+prompt in front of every =direnv= entry, which costs more than the occasional
+session that starts without the token.
+
 The shell is exposed as a check as well. The build target walks the flake's
 checks, so a tool that stops building fails there instead of on the next
 =nix develop=.
@@ -1738,6 +1743,7 @@ checks, so a tool that stops building fails there instead of on the next
   perSystem =
     {
       config,
+      lib,
       pkgs,
       ...
     }:
@@ -1768,6 +1774,10 @@ checks, so a tool that stops building fails there instead of on the next
             config.pre-commit.installationScript
             + config.mcp-servers.shellHook
             + ''
+              if ${lib.getExe pkgs.rbw} unlocked >/dev/null 2>&1; then
+                export MCP_GRAFANA_TOKEN="$(${lib.getExe pkgs.rbw} get mcp-grafana)"
+              fi
+
               echo "Syncing CLAUDE.md..."
               make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
             '';
@@ -1957,8 +1967,14 @@ Enabled servers:
 - =terraform=: Terraform registry lookup for providers, modules, and policies
 - =grafana=: Query dashboards, datasources, and metrics from the home server's Grafana instance
 
-The =passwordCommand= option retrieves secrets at runtime using =rbw= (Bitwarden CLI),
-avoiding plaintext credentials in the repository.
+The Grafana server runs on manyara rather than as a local subprocess, so the
+Grafana credentials stay on the host that already holds them and a client needs
+only a URL. This shell talks to the writable instance; the read-only one belongs
+to hermes, which runs unattended.
+
+The generated config lands in the world-readable store, so the =Authorization=
+header keeps a =${MCP_GRAFANA_TOKEN}= reference that the client expands from the
+environment, and the development shell exports the value from Bitwarden.
 
 #+begin_src nix :tangle modules/per-system/mcp-servers.nix
 { inputs, ... }:
@@ -1973,17 +1989,9 @@ avoiding plaintext credentials in the repository.
         terraform.enable = true;
         grafana = {
           enable = true;
-          env = {
-            GRAFANA_URL = "http://monitor.home.natsukium.com";
-            GRAFANA_USERNAME = "admin";
-          };
-          passwordCommand = {
-            GRAFANA_PASSWORD = [
-              "rbw"
-              "get"
-              "grafana"
-            ];
-          };
+          type = "http";
+          url = "http://mcp.home.natsukium.com/mcp";
+          headers.Authorization = "Bearer \${MCP_GRAFANA_TOKEN}";
         };
       };
     };

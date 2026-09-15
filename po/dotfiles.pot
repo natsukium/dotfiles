@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-15 02:02+0900\n"
+"POT-Creation-Date: 2026-09-15 23:50+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -3270,7 +3270,7 @@ msgid ""
 "(file-modes destination) #o644))\n"
 "            (rename-file temporary destination t)\n"
 "            (setq temporary nil)))\n"
-"      (when (file-exists-p temporary)\n"
+"      (when (and temporary (file-exists-p temporary))\n"
 "        (delete-file temporary)))))"
 msgstr ""
 
@@ -3316,13 +3316,22 @@ msgstr ""
 #. type: paragraph
 #: configuration.org:1731 .github/README.org:70
 msgid ""
+"Entry also exports the bearer token for the Grafana MCP server, but only "
+"while =rbw= is already unlocked. Fetching it unconditionally would put a "
+"pinentry prompt in front of every =direnv= entry, which costs more than the "
+"occasional session that starts without the token."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:1736 .github/README.org:75
+msgid ""
 "The shell is exposed as a check as well. The build target walks the flake's "
 "checks, so a tool that stops building fails there instead of on the next "
 "=nix develop=."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1736 .github/README.org:75
+#: configuration.org:1741 .github/README.org:80
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -3330,6 +3339,7 @@ msgid ""
 "  perSystem =\n"
 "    {\n"
 "      config,\n"
+"      lib,\n"
 "      pkgs,\n"
 "      ...\n"
 "    }:\n"
@@ -3360,15 +3370,25 @@ msgid ""
 "            config.pre-commit.installationScript\n"
 "            + config.mcp-servers.shellHook\n"
 "            + ''\n"
-"              echo \"Syncing CLAUDE.md...\"\n"
-"              make CLAUDE.md >/dev/null 2>&1 || echo \"Warning: Failed to "
-"generate CLAUDE.md\"\n"
-"            '';\n"
-"        };"
+"              if ${lib.getExe pkgs.rbw} unlocked >/dev/null 2>&1; then\n"
+"                export MCP_GRAFANA_TOKEN=\"$(${lib.getExe pkgs.rbw} get "
+"mcp-grafana)\"\n"
+"              fi"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1776 .github/README.org:115
+#: configuration.org:1781 .github/README.org:120
+#, no-wrap
+msgid ""
+"      echo \"Syncing CLAUDE.md...\"\n"
+"      make CLAUDE.md >/dev/null 2>&1 || echo \"Warning: Failed to generate "
+"CLAUDE.md\"\n"
+"    '';\n"
+"};"
+msgstr ""
+
+#. type: paragraph in src
+#: configuration.org:1786 .github/README.org:125
 #, no-wrap
 msgid ""
 "  terraform = pkgs.mkShell {\n"
@@ -3378,7 +3398,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1781 .github/README.org:120
+#: configuration.org:1791 .github/README.org:130
 #, no-wrap
 msgid ""
 "      checks.devShell = config.devShells.default;\n"
@@ -3387,13 +3407,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1786 .github/README.org:124
+#: configuration.org:1796 .github/README.org:134
 #, no-wrap
 msgid "Pre-commit hooks"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1788 .github/README.org:126
+#: configuration.org:1798 .github/README.org:136
 msgid ""
 "Hooks run by [[https://github.com/cachix/git-hooks.nix][git-hooks.nix]] on "
 "every commit. =prek= is used as the runner because it is the "
@@ -3402,7 +3422,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1792 .github/README.org:130
+#: configuration.org:1802 .github/README.org:140
 msgid ""
 "=check-org-tangle= is the only hook with =priority = 0= because it must run "
 "before everything else: if Org files are out of sync, formatters and linters "
@@ -3411,7 +3431,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1798 .github/README.org:136
+#: configuration.org:1808 .github/README.org:146
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3420,7 +3440,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1802 .github/README.org:140
+#: configuration.org:1812 .github/README.org:150
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -3542,13 +3562,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1916 .github/README.org:253
+#: configuration.org:1926 .github/README.org:263
 #, no-wrap
 msgid "Formatting"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1918 .github/README.org:255
+#: configuration.org:1928 .github/README.org:265
 msgid ""
 "Formatters are aggregated via "
 "[[https://github.com/numtide/treefmt-nix][treefmt-nix]] and invoked from the "
@@ -3557,7 +3577,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1923 .github/README.org:260
+#: configuration.org:1933 .github/README.org:270
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3566,7 +3586,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1927 .github/README.org:264
+#: configuration.org:1937 .github/README.org:274
 #, no-wrap
 msgid ""
 "  perSystem = _: {\n"
@@ -3591,13 +3611,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1949 .github/README.org:285
+#: configuration.org:1959 .github/README.org:295
 #, no-wrap
 msgid "MCP Servers"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1951 .github/README.org:287
+#: configuration.org:1961 .github/README.org:297
 msgid ""
 "Configuration for "
 "[[https://github.com/natsukium/mcp-servers-nix][mcp-servers-nix]], enabled "
@@ -3606,19 +3626,19 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1957 .github/README.org:293
+#: configuration.org:1967 .github/README.org:303
 #, no-wrap
 msgid "=nixos=: NixOS package/option search and Home Manager documentation"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1958 .github/README.org:294
+#: configuration.org:1968 .github/README.org:304
 #, no-wrap
 msgid "=terraform=: Terraform registry lookup for providers, modules, and policies"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:1959 .github/README.org:295
+#: configuration.org:1969 .github/README.org:305
 #, no-wrap
 msgid ""
 "=grafana=: Query dashboards, datasources, and metrics from the home server's "
@@ -3626,19 +3646,30 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1955 .github/README.org:291
+#: configuration.org:1965 .github/README.org:301
 msgid "Enabled servers:"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1960 .github/README.org:296
+#: configuration.org:1970 .github/README.org:306
 msgid ""
-"The =passwordCommand= option retrieves secrets at runtime using =rbw= "
-"(Bitwarden CLI), avoiding plaintext credentials in the repository."
+"The Grafana server runs on manyara rather than as a local subprocess, so the "
+"Grafana credentials stay on the host that already holds them and a client "
+"needs only a URL. This shell talks to the writable instance; the read-only "
+"one belongs to hermes, which runs unattended."
+msgstr ""
+
+#. type: paragraph
+#: configuration.org:1975 .github/README.org:311
+msgid ""
+"The generated config lands in the world-readable store, so the "
+"=Authorization= header keeps a =${MCP_GRAFANA_TOKEN}= reference that the "
+"client expands from the environment, and the development shell exports the "
+"value from Bitwarden."
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1964 .github/README.org:300
+#: configuration.org:1980 .github/README.org:316
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3647,7 +3678,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1968 .github/README.org:304
+#: configuration.org:1984 .github/README.org:320
 #, no-wrap
 msgid ""
 "  perSystem = _: {\n"
@@ -3658,17 +3689,9 @@ msgid ""
 "        terraform.enable = true;\n"
 "        grafana = {\n"
 "          enable = true;\n"
-"          env = {\n"
-"            GRAFANA_URL = \"http://monitor.home.natsukium.com\";\n"
-"            GRAFANA_USERNAME = \"admin\";\n"
-"          };\n"
-"          passwordCommand = {\n"
-"            GRAFANA_PASSWORD = [\n"
-"              \"rbw\"\n"
-"              \"get\"\n"
-"              \"grafana\"\n"
-"            ];\n"
-"          };\n"
+"          type = \"http\";\n"
+"          url = \"http://mcp.home.natsukium.com/mcp\";\n"
+"          headers.Authorization = \"Bearer \\${MCP_GRAFANA_TOKEN}\";\n"
 "        };\n"
 "      };\n"
 "    };\n"
@@ -3677,35 +3700,35 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1994 .github/README.org:329
+#: configuration.org:2002 .github/README.org:337
 #, no-wrap
 msgid "Translation"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1996 .github/README.org:331
+#: configuration.org:2004 .github/README.org:339
 msgid "This project uses po4a to manage translations."
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:1998 .github/README.org:332
+#: configuration.org:2006 .github/README.org:340
 #, no-wrap
 msgid "Requirements"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2000 .github/README.org:334
+#: configuration.org:2008 .github/README.org:342
 msgid "The required packages are included in the development shell."
 msgstr ""
 
 #. type: keyword name
-#: configuration.org:2002 .github/README.org:336
+#: configuration.org:2010 .github/README.org:344
 #, no-wrap
 msgid "translation-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:2004 .github/README.org:338
+#: configuration.org:2012 .github/README.org:346
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -3713,31 +3736,31 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:2009 .github/README.org:343
+#: configuration.org:2017 .github/README.org:351
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:2010 .github/README.org:344
+#: configuration.org:2018 .github/README.org:352
 #, no-wrap
 msgid "=po4a=: po4a >= 0.74 is required for Org mode support."
 msgstr ""
 
 #. type: heading ***
-#: configuration.org:2011 .github/README.org:344
+#: configuration.org:2019 .github/README.org:352
 #, no-wrap
 msgid "Translation workflow"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:2013 .github/README.org:346
+#: configuration.org:2021 .github/README.org:354
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2015 .github/README.org:348
+#: configuration.org:2023 .github/README.org:356
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -3746,7 +3769,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:2024 .github/README.org:357
+#: configuration.org:2032 .github/README.org:365
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -3764,18 +3787,18 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2034 .github/README.org:367
+#: configuration.org:2042 .github/README.org:375
 msgid "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:2036 .github/README.org:368
+#: configuration.org:2044 .github/README.org:376
 #, no-wrap
 msgid "Create/Update po"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2038 .github/README.org:370
+#: configuration.org:2046 .github/README.org:378
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -3783,32 +3806,32 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:2044 .github/README.org:376
+#: configuration.org:2052 .github/README.org:384
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:2047 .github/README.org:378
+#: configuration.org:2055 .github/README.org:386
 #, no-wrap
 msgid "Translate"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2049 .github/README.org:380
+#: configuration.org:2057 .github/README.org:388
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:2056 .github/README.org:386
+#: configuration.org:2064 .github/README.org:394
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2058 .github/README.org:388
+#: configuration.org:2066 .github/README.org:396
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -3816,7 +3839,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:2064 .github/README.org:394
+#: configuration.org:2072 .github/README.org:402
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""
