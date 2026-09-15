@@ -17,15 +17,25 @@
             allowUnfree = true;
           };
         };
+        pkgsWithoutCuda = import inputs.nixpkgs {
+          inherit (prev.stdenv.hostPlatform) system;
+          config.allowUnfree = true;
+        };
       in
       {
         inherit (pkgs) onnxruntime ollama;
+        firefox-unwrapped = prev.firefox-unwrapped.override {
+          inherit (pkgsWithoutCuda) onnxruntime;
+        };
       }
     );
 
   temporary-fix = final: prev: {
-    handy = prev.handy.overrideAttrs (oldAttrs: {
-      patches = (oldAttrs.patches or [ ]) ++ [ ./handy-retry-without-reasoning.patch ];
+    calibre-web = prev.calibre-web.overrideAttrs (old: {
+      postPatch = old.postPatch + ''
+        substituteInPlace pyproject.toml \
+          --replace-fail 'calibreweb.__main__:main' 'calibreweb:main'
+      '';
     });
   };
 
