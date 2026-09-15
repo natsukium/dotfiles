@@ -19,7 +19,7 @@
             (set-file-modes temporary (if (file-exists-p destination) (file-modes destination) #o644))
             (rename-file temporary destination t)
             (setq temporary nil)))
-      (when (file-exists-p temporary)
+      (when (and temporary (file-exists-p temporary))
         (delete-file temporary)))))
 
 (let ((org-export-select-tags (list "readme"))
