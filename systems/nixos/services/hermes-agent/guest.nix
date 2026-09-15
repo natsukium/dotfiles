@@ -98,6 +98,15 @@ in
       model.provider = "openai-codex";
       model.default = "gpt-5.6-terra";
       web.search_backend = "searxng";
+      # The endpoint and token come from the seeded .env (see the host module),
+      # which is also where hermes resolves these references from; the config
+      # itself lands in the world-readable store. It is manyara's read-only
+      # instance, so an unattended conversation can read dashboards and query
+      # metrics but never write back.
+      mcp_servers.grafana = {
+        url = "\${MCP_GRAFANA_URL}";
+        headers.Authorization = "Bearer \${MCP_GRAFANA_TOKEN}";
+      };
     };
     addToSystemPackages = true;
     extraPackages = [

@@ -30,6 +30,11 @@ in
     };
   };
 
+  # The Grafana MCP endpoint and its bearer token are composed here rather than
+  # in the guest: the guest has no view of the host's port choices, and the
+  # token has to come from the host's sops tree either way. hermes resolves the
+  # ${VAR} references in its mcp_servers entry from this same file.
+  #
   # MATRIX_ALLOWED_USERS pins DM authority to the operator so federation peers
   # cannot drive the bot. MATRIX_ENCRYPTION is required because Element DMs are
   # E2EE-by-default — without it the bot only sees undecryptable
@@ -45,6 +50,8 @@ in
       MATRIX_ENCRYPTION=true
       MATRIX_RECOVERY_KEY=${config.sops.placeholder."hermes-agent/matrix-recovery-key"}
       SEARXNG_URL=http://10.0.2.2:${toString config.services.searx.settings.server.port}
+      MCP_GRAFANA_URL=http://10.0.2.2:${toString config.my.services.mcp-grafana.ports.ro}/mcp
+      MCP_GRAFANA_TOKEN=${config.sops.placeholder."mcp-grafana-ro-server-token"}
     '';
     owner = "microvm";
     group = "kvm";
