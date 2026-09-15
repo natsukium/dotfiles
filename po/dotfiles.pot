@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-15 23:56+0900\n"
+"POT-Creation-Date: 2026-09-16 01:30+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7054,22 +7054,76 @@ msgstr ""
 #. type: paragraph in src
 #: overlays/configuration.org:136
 #, no-wrap
-msgid "pre-release = final: prev: { };"
+msgid ""
+"pre-release = final: prev: {\n"
+"  <<mcp-grafana>>\n"
+"};"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:139 overlays/configuration.org:148
+#: overlays/configuration.org:141 overlays/configuration.org:157
+#, no-wrap
+msgid "mcp-grafana"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:143
+msgid ""
+"manyara serves Grafana over MCP behind caddy and to the hermes guest, so "
+"both clients arrive with a =Host= that is not loopback. In 1.2.0 the "
+"=--allowed-hosts= flag only reached mcp-grafana's own middleware: the mcp-go "
+"server underneath kept its own loopback-only check and answered =invalid "
+"Host header=. That check runs after caller authentication, so "
+"unauthenticated probes returned 401 and looked healthy, while the one client "
+"that actually held a token was the only one to see the 403. Upstream wired "
+"the flag through to the inner server in 1.4.0."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:151
+msgid ""
+"One dashboard test talks to a local test server and fails under the build "
+"sandbox with a truncated response, so it is skipped rather than turning off "
+"the whole suite."
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:155
+msgid "Drop this once nixpkgs ships 1.4.0 or newer."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:159
+#, no-wrap
+msgid ""
+"mcp-grafana = prev.mcp-grafana.overrideAttrs (\n"
+"  finalAttrs: _: {\n"
+"    version = \"1.4.2\";\n"
+"    src = final.fetchFromGitHub {\n"
+"      owner = \"grafana\";\n"
+"      repo = \"mcp-grafana\";\n"
+"      tag = \"v${finalAttrs.version}\";\n"
+"      hash = \"sha256-MUqVsrfjlDLanWzXzMVGYhlXjF23ovGm/ocz7A4vrxw=\";\n"
+"    };\n"
+"    vendorHash = \"sha256-y/Hk1hDQ00wHqTOcaoKVvz2PgF0ZiwHartbuF7qEkXc=\";\n"
+"    checkFlags = [ \"-skip=TestFetchDashboardViaK8s_V2Refetch\" ];\n"
+"  }\n"
+");"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:174 overlays/configuration.org:183
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:141
+#: overlays/configuration.org:176
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:143
+#: overlays/configuration.org:178
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7078,7 +7132,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:150
+#: overlays/configuration.org:185
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7088,13 +7142,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:156 overlays/configuration.org:169
+#: overlays/configuration.org:191 overlays/configuration.org:204
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:158
+#: overlays/configuration.org:193
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7103,7 +7157,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:163
+#: overlays/configuration.org:198
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7112,14 +7166,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:167
+#: overlays/configuration.org:202
 msgid ""
 "Reported upstream in "
 "[[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]]."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:171
+#: overlays/configuration.org:206
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7133,18 +7187,18 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:181
+#: overlays/configuration.org:216
 #, no-wrap
 msgid "mkShim"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:183
+#: overlays/configuration.org:218
 msgid "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:185
+#: overlays/configuration.org:220
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7154,20 +7208,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:190
+#: overlays/configuration.org:225
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:192
+#: overlays/configuration.org:227
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:194
+#: overlays/configuration.org:229
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""

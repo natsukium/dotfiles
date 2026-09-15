@@ -39,7 +39,21 @@
     });
   };
 
-  pre-release = final: prev: { };
+  pre-release = final: prev: {
+    mcp-grafana = prev.mcp-grafana.overrideAttrs (
+      finalAttrs: _: {
+        version = "1.4.2";
+        src = final.fetchFromGitHub {
+          owner = "grafana";
+          repo = "mcp-grafana";
+          tag = "v${finalAttrs.version}";
+          hash = "sha256-MUqVsrfjlDLanWzXzMVGYhlXjF23ovGm/ocz7A4vrxw=";
+        };
+        vendorHash = "sha256-y/Hk1hDQ00wHqTOcaoKVvz2PgF0ZiwHartbuF7qEkXc=";
+        checkFlags = [ "-skip=TestFetchDashboardViaK8s_V2Refetch" ];
+      }
+    );
+  };
 
   patches = final: prev: {
     gh-dash =
