@@ -5,6 +5,10 @@
 }:
 let
   matrix = config.services.matrix-continuwuity.settings.global;
+
+  # Loopback-only forward into the guest, shared with the ssh_config entry below
+  # so the alias and the forward cannot drift apart.
+  sshPort = 2222;
 in
 {
   imports = [
@@ -49,6 +53,15 @@ in
 
   microvm.autostart = [ "hermes-agent" ];
 
+  # The guest is only reachable through the loopback forward, which is awkward to
+  # type and easy to misremember.
+  programs.ssh.extraConfig = ''
+    Host hermes-agent
+      HostName 127.0.0.1
+      Port ${toString sshPort}
+      User root
+  '';
+
   # SMBIOS OEM strings rather than a virtiofs share: systemd in the guest
   # surfaces these at /run/credentials/@system/<name> before any unit starts,
   # avoiding the bespoke RequiresMountsFor + writable-share-dir setup the
@@ -60,6 +73,7 @@ in
       _module.args = {
         self = inputs.self;
         operatorKeys = config.users.users.${config.my.username}.openssh.authorizedKeys.keys;
+        inherit sshPort;
       };
       microvm.credentialFiles = {
         "hermes-agent.env" = config.sops.templates."hermes-agent.env".path;
