@@ -3,6 +3,7 @@
   pkgs,
   self,
   operatorKeys,
+  sshPort,
   ...
 }:
 let
@@ -37,7 +38,7 @@ in
       {
         from = "host";
         host.address = "127.0.0.1";
-        host.port = 2222;
+        host.port = sshPort;
         guest.port = 22;
       }
     ];
@@ -140,7 +141,20 @@ in
       KbdInteractiveAuthentication = false;
       PermitRootLogin = "prohibit-password";
     };
+    # The guest root is ephemeral, so a key left there is regenerated on every
+    # boot and each connection then looks like a changed host key. The state
+    # volume already survives redeploys, so the key lives there instead.
+    hostKeys = [
+      {
+        path = "/var/lib/hermes/ssh/ssh_host_ed25519_key";
+        type = "ed25519";
+      }
+    ];
   };
+
+  # sshd-keygen would otherwise write the key onto the ephemeral root before the
+  # volume is mounted over it.
+  systemd.services.sshd-keygen.unitConfig.RequiresMountsFor = [ "/var/lib/hermes" ];
   users.users.root.openssh.authorizedKeys.keys = operatorKeys;
 
   # Upstream's environmentFiles/authFile run before /var/lib/hermes is mounted,

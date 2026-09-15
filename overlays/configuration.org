@@ -125,7 +125,40 @@ upstream review. Once a package is available in nixpkgs, remove it from this ove
 
 #+NAME: pre-release
 #+begin_src nix
-pre-release = final: prev: { };
+pre-release = final: prev: {
+  <<mcp-grafana>>
+};
+#+end_src
+
+** mcp-grafana
+
+manyara serves Grafana over MCP behind caddy and to the hermes guest, so both
+clients arrive with a =Host= that is not loopback. In 1.2.0 the =--allowed-hosts=
+flag only reached mcp-grafana's own middleware: the mcp-go server underneath kept
+its own loopback-only check and answered =invalid Host header=. That check runs
+after caller authentication, so unauthenticated probes returned 401 and looked
+healthy, while the one client that actually held a token was the only one to see
+the 403. Upstream wired the flag through to the inner server in 1.4.0.
+
+One dashboard test talks to a local test server and fails under the build sandbox
+with a truncated response, so it is skipped rather than turning off the whole
+suite.
+
+Drop this once nixpkgs ships 1.4.0 or newer.
+
+#+NAME: mcp-grafana
+#+begin_src nix
+mcp-grafana = prev.mcp-grafana.overrideAttrs (finalAttrs: {
+  version = "1.4.2";
+  src = final.fetchFromGitHub {
+    owner = "grafana";
+    repo = "mcp-grafana";
+    tag = "v${finalAttrs.version}";
+    hash = "sha256-MUqVsrfjlDLanWzXzMVGYhlXjF23ovGm/ocz7A4vrxw=";
+  };
+  vendorHash = "sha256-y/Hk1hDQ00wHqTOcaoKVvz2PgF0ZiwHartbuF7qEkXc=";
+  checkFlags = [ "-skip=TestFetchDashboardViaK8s_V2Refetch" ];
+});
 #+end_src
 
 * patches
