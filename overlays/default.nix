@@ -24,6 +24,12 @@
     );
 
   temporary-fix = final: prev: {
+    calibre-web = prev.calibre-web.overrideAttrs (old: {
+      postPatch = old.postPatch + ''
+        substituteInPlace pyproject.toml \
+          --replace-fail 'calibreweb.__main__:main' 'calibreweb:main'
+      '';
+    });
   };
 
   pre-release = final: prev: { };
