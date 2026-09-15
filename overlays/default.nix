@@ -17,9 +17,16 @@
             allowUnfree = true;
           };
         };
+        pkgsWithoutCuda = import inputs.nixpkgs {
+          inherit (prev.stdenv.hostPlatform) system;
+          config.allowUnfree = true;
+        };
       in
       {
         inherit (pkgs) onnxruntime ollama;
+        firefox-unwrapped = prev.firefox-unwrapped.override {
+          inherit (pkgsWithoutCuda) onnxruntime;
+        };
       }
     );
 
