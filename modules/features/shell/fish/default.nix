@@ -153,6 +153,10 @@ in
               src = pkgs.fishPlugins.fzf-fish.src;
             }
           ];
+
+          completions = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+            launchctl.body = builtins.readFile ./completions/launchctl.fish;
+          };
         };
 
         xdg.configFile = {
