@@ -6,12 +6,15 @@ let
   homeModule =
     {
       config,
+      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       cfg = config.my.programs.handy;
+      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      app = appIdentity.stabilizeApp pkgs.handy;
     in
     {
       options.my.programs.handy = {
@@ -25,9 +28,9 @@ let
 
       config = lib.mkIf cfg.enable (
         lib.mkMerge [
-          { home.packages = [ pkgs.handy ]; }
-
           (lib.mkIf pkgs.stdenv.hostPlatform.isLinux {
+            home.packages = [ pkgs.handy ];
+
             systemd.user.services.handy = lib.mkIf cfg.autostart {
               Unit = {
                 Description = "Handy speech-to-text";
@@ -44,11 +47,13 @@ let
           })
 
           (lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+            targets.darwin.appIdentity.apps = [ pkgs.handy ];
+
             launchd.agents.handy = lib.mkIf cfg.autostart {
               enable = true;
               config = {
                 ProgramArguments = [
-                  "${pkgs.handy}/Applications/Handy.app/Contents/MacOS/handy"
+                  "${app}/Applications/Handy.app/Contents/MacOS/handy"
                 ];
                 RunAtLoad = true;
                 # Relaunch only on a crash, not on a clean quit, so closing the

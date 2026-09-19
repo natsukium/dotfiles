@@ -3,12 +3,15 @@
   flake.modules.homeManager.kitty =
     {
       config,
+      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       inherit (pkgs) stdenv;
+      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+
       tmux-prefix = "ctrl+j";
       tmux-compat-keybindings = {
         "${tmux-prefix}>c" = "new_tab";
@@ -30,6 +33,7 @@
         programs = {
           kitty = {
             enable = true;
+            package = lib.mkIf stdenv.hostPlatform.isDarwin (appIdentity.stabilizeApp pkgs.kitty);
             settings =
               let
                 moralerspace = family: "'Moralerspace ${family} HW'";

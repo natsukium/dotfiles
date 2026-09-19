@@ -8,10 +8,27 @@
       pkgs,
       ...
     }:
+    let
+      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+
+      # A launchd agent runs a bare executable, which macOS identifies by
+      # absolute path; in the store that path moves on every rebuild, taking
+      # the Accessibility grant the window manager needs with it.
+      app = appIdentity.mkAppBundle {
+        package = config.services.paneru.finalPackage;
+        identifier = "com.github.karinushka.paneru";
+        # finalPackage is a symlinkJoin, so its name and version describe the
+        # wrapper rather than paneru.
+        name = "paneru";
+        inherit (config.services.paneru.package) version;
+      };
+    in
     {
       options.my.programs.paneru.enable = lib.mkEnableOption "paneru";
 
       config = lib.mkIf config.my.programs.paneru.enable {
+        launchd.agents.paneru.config.Program = lib.mkForce (lib.getExe app);
+
         services.paneru = {
           enable = true;
 

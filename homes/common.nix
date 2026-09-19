@@ -6,6 +6,7 @@
 let
   inherit (inputs)
     nix-colors
+    nix-mac-app-identity
     paneru
     sops-nix
     ;
@@ -34,5 +35,6 @@ in
     nix-colors.homeManagerModule
     sops-nix.homeManagerModules.sops
     paneru.homeModules.paneru
+    nix-mac-app-identity.homeManagerModules.default
   ];
 }

@@ -25,6 +25,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-mac-app-identity = {
+      url = "github:natsukium/nix-mac-app-identity";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     nixos-wsl = {
       url = "github:nix-community/nixos-wsl";
       inputs.flake-compat.follows = "";

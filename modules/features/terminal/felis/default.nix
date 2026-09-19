@@ -33,7 +33,12 @@ in
     }:
     let
       inherit (config.colorScheme) palette;
-      package = inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      package =
+        let
+          felis = inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default;
+        in
+        if pkgs.stdenv.hostPlatform.isDarwin then appIdentity.stabilizeApp felis else felis;
       # The configured Neovim, reused as a read-only scrollback viewer.
       neovim = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
       # My standalone hint picker; it links felis' own VT parser and cell

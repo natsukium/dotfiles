@@ -96,6 +96,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     # System Configuration
     <<darwin>>
     <<home-manager>>
+    <<nix-mac-app-identity>>
     <<nixos-wsl>>
     <<nix-on-droid>>
     <<disko>>
@@ -750,6 +751,26 @@ See [[*MCP Servers][MCP Servers]] for configuration details.
 #+begin_src nix
 mcp-servers = {
   url = "github:natsukium/mcp-servers-nix";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** nix-mac-app-identity
+
+https://github.com/natsukium/nix-mac-app-identity
+
+#+BEGIN_QUOTE
+Preserve macOS TCC permissions across Nix rebuilds with stable code signing identities
+#+END_QUOTE
+
+Nixpkgs apps are ad-hoc signed, so macOS tracks TCC permissions by binary hash and
+revokes them on every rebuild. Re-signs bundles and wraps binaries with stable
+code signing identities so granted permissions persist across updates.
+
+#+NAME: nix-mac-app-identity
+#+begin_src nix
+nix-mac-app-identity = {
+  url = "github:natsukium/nix-mac-app-identity";
   inputs.nixpkgs.follows = "nixpkgs";
 };
 #+end_src
