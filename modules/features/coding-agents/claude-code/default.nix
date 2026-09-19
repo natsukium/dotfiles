@@ -45,6 +45,8 @@
                   effort=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.effort.level // empty')
                   used=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.context_window.used_percentage // empty')
                   exceeds=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.exceeds_200k_tokens // false')
+                  cache_warm=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.prompt_cache.warm // empty')
+                  cache_expires_at=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.prompt_cache.expires_at // empty')
                   version=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.version // "?"')
                   branch=$(cd "$(echo "$data" | ${lib.getExe pkgs.jq} -r '.cwd // "."')" 2>/dev/null && ${lib.getExe pkgs.git} rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
@@ -61,12 +63,19 @@
                     model="''${model}/''${effort}"
                   fi
 
+                  cache_fmt=""
+                  if [ "$cache_warm" = "true" ] && [ -n "$cache_expires_at" ]; then
+                    cache_fmt=" | cache:until $(${lib.getExe' pkgs.coreutils "date"} -d "@''${cache_expires_at}" +%H:%M)"
+                  elif [ -n "$cache_warm" ]; then
+                    cache_fmt=" | cache:cold"
+                  fi
+
                   branch_fmt=""
                   if [ -n "$branch" ]; then
                     branch_fmt=" $branch"
                   fi
 
-                  echo -e "''${model} | ctx:''${used_fmt} | v''${version}''${branch_fmt}"
+                  echo -e "''${model} | ctx:''${used_fmt}''${cache_fmt} | v''${version}''${branch_fmt}"
                 ''
               );
             };
