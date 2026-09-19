@@ -41,14 +41,19 @@
                 pkgs.writeShellScript "claude-statusline" ''
                   data=$(cat)
 
-                  model=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.model.display_name // "?"')
-                  effort=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.effort.level // empty')
-                  used=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.context_window.used_percentage // empty')
-                  exceeds=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.exceeds_200k_tokens // false')
-                  cache_warm=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.prompt_cache.warm // empty')
-                  cache_expires_at=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.prompt_cache.expires_at // empty')
-                  version=$(echo "$data" | ${lib.getExe pkgs.jq} -r '.version // "?"')
-                  branch=$(cd "$(echo "$data" | ${lib.getExe pkgs.jq} -r '.cwd // "."')" 2>/dev/null && ${lib.getExe pkgs.git} rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+                  fields=$(echo "$data" | ${lib.getExe pkgs.jq} -r '[
+                    (.model.display_name // "?"),
+                    (.effort.level // ""),
+                    (.context_window.used_percentage // "" | tostring),
+                    (.exceeds_200k_tokens // false | tostring),
+                    (.prompt_cache.warm // "" | tostring),
+                    (.prompt_cache.expires_at // "" | tostring),
+                    (.version // "?"),
+                    (.cwd // ".")
+                  ] | join("\u001f")')
+                  IFS=$'\x1f' read -r model effort used exceeds cache_warm cache_expires_at version cwd <<< "$fields"
+
+                  branch=$(cd "$cwd" 2>/dev/null && ${lib.getExe pkgs.git} rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
                   if [ -n "$used" ]; then
                     used_fmt=$(printf "%.0f%%" "$used")
