@@ -80,10 +80,6 @@ return {
 		end,
 	},
 	{
-		"nvim-treesitter",
-		event = "BufRead",
-	},
-	{
 		"rainbow-delimiters.nvim",
 		event = "DeferredUIEnter",
 	},
