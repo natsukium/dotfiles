@@ -4,6 +4,7 @@
     {
       config,
       lib,
+      pkgs,
       ...
     }:
     let
@@ -31,7 +32,19 @@
         # inside the namespace. The library is reached through the world-readable
         # bits of /data/books instead, which also stops BookOrbit from rewriting
         # metadata into files that syncthing would push to every peer.
-        systemd.services.bookorbit.serviceConfig.ReadOnlyPaths = [ "/data/books" ];
+        systemd.services.bookorbit = {
+          serviceConfig.ReadOnlyPaths = [ "/data/books" ];
+
+          # BookOrbit shells out to pdftoppm for PDF covers and to ffmpeg for
+          # audiobooks, but the nixpkgs package lists ffmpeg as a build input
+          # and wraps the binary without a PATH prefix, so neither reaches the
+          # running service. Every PDF import fails with
+          # code=cover-extraction-failed and a bare "spawn pdftoppm ENOENT".
+          path = with pkgs; [
+            poppler-utils
+            ffmpeg
+          ];
+        };
 
         services.caddy.virtualHosts."http://${domain}".extraConfig = ''
           reverse_proxy localhost:${toString port}
