@@ -31,7 +31,7 @@ endef
 tangle:
 	@$(MAKE) --no-print-directory -j tangle-all
 
-tangle-all: $(STAMPS)/configuration $(STAMPS)/modules $(STAMPS)/overlays CLAUDE.md .github/README.org
+tangle-all: $(STAMPS)/configuration $(STAMPS)/modules $(STAMPS)/overlays AGENTS.md .github/README.org
 
 $(STAMPS)/configuration: configuration.org
 	$(call tangle-org,$<)
@@ -42,8 +42,8 @@ $(STAMPS)/overlays: overlays/configuration.org
 $(STAMPS)/modules: modules/configuration.org
 	$(call tangle-org,$<)
 
-CLAUDE.md: configuration.org scripts/export-claude-md.el
-	$(EMACS) --visit $< -l scripts/export-claude-md.el
+AGENTS.md: configuration.org scripts/export-agents-md.el
+	$(EMACS) --visit $< -l scripts/export-agents-md.el
 
 .github/README.org: configuration.org scripts/export-readme-org.el
 	@mkdir -p .github

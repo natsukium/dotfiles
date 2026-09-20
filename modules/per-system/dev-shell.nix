@@ -39,8 +39,8 @@
                 export MCP_GRAFANA_TOKEN="$(${lib.getExe pkgs.rbw} get mcp-grafana)"
               fi
 
-              echo "Syncing CLAUDE.md..."
-              make CLAUDE.md >/dev/null 2>&1 || echo "Warning: Failed to generate CLAUDE.md"
+              echo "Syncing AGENTS.md..."
+              make AGENTS.md >/dev/null 2>&1 || echo "Warning: Failed to generate AGENTS.md"
             '';
         };
 
