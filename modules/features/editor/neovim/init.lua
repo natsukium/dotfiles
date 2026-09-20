@@ -53,8 +53,6 @@ vim.keymap.set("n", "<leader><tab>]", "<cmd>tabnext<cr>", { desc = "Next Tab" })
 vim.keymap.set("n", "<leader><tab>d", "<cmd>tabclose<cr>", { desc = "Close Tab" })
 vim.keymap.set("n", "<leader><tab>[", "<cmd>tabprevious<cr>", { desc = "Previous Tab" })
 
-require("lz.n").load("plugins")
-
 -- Load nix-helper only for nix files
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "nix",
@@ -64,5 +62,3 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 require("lsp")
-
-vim.cmd([[colorscheme nord]])

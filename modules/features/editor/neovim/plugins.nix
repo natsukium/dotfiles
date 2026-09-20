@@ -57,7 +57,6 @@ toLazyPlugins [
   which-key-nvim
 ]
 ++ (toEagerPlugins [
-  lz-n
   nvim-lspconfig
   # Eager load to make treesitter queries available in runtimepath for Telescope preview highlighting.
   nvim-treesitter.withAllGrammars

@@ -112,6 +112,7 @@ let
       ./init.lua
       ./lsp
       ./lua
+      ./plugin
     ];
   };
 
