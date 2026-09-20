@@ -53,12 +53,14 @@ return {
 	},
 	{
 		"flit.nvim",
-		keys = function()
-			local ret = {}
-			for _, key in ipairs({ "f", "f", "t", "t" }) do
-				ret[#ret + 1] = { key, mode = { "n", "x", "o" }, desc = key }
-			end
-			return ret
+		keys = {
+			{ "f", mode = { "n", "x", "o" }, desc = "f" },
+			{ "t", mode = { "n", "x", "o" }, desc = "t" },
+			{ "F", mode = { "n", "x", "o" }, desc = "F" },
+			{ "T", mode = { "n", "x", "o" }, desc = "T" },
+		},
+		before = function()
+			require("lz.n").trigger_load("leap.nvim")
 		end,
 		after = function()
 			require("flit").setup({ labeled_modes = "nx" })
@@ -71,19 +73,11 @@ return {
 			{ "S", mode = { "n", "x", "o" }, desc = "Leap backward to" },
 			{ "gs", mode = { "n", "x", "o" }, desc = "Leap from windows" },
 		},
-		after = function(_, opts)
-			local leap = require("leap")
-			for k, v in pairs(opts) do
-				leap.opts[k] = v
-			end
-			leap.add_default_mappings(true)
+		after = function()
+			require("leap").add_default_mappings(true)
 			vim.keymap.del({ "x", "o" }, "x")
 			vim.keymap.del({ "x", "o" }, "X")
 		end,
-	},
-	{
-		"nvim-treesitter",
-		event = "BufRead",
 	},
 	{
 		"rainbow-delimiters.nvim",
