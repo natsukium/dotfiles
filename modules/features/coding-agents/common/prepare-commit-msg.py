@@ -7,8 +7,9 @@ import sys
 MODEL_OVERRIDES = {
     "gpt-5.6-luna": "GPT 5.6 Luna",
     "gpt-5.6-sol": "GPT 5.6 Sol",
-    "muse-spark-1.2-contributor-free": "Muse Spark 1.2",
-    "muse-spark-1.3-contributor-free": "Muse Spark 1.3",
+    "muse-spark-1.3-contributor": "Muse Spark 1.3",
+    "deepseek-v4.1-flash": "DeepSeek V4.1 Flash",
+    "glm-5.3-flash": "GLM 5.3 Flash",
 }
 
 

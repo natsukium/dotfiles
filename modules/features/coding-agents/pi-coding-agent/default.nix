@@ -38,12 +38,17 @@
           enable = true;
           configDir = "${config.xdg.configHome}/pi/agent";
           context = ../common/AGENTS.md;
-          settings.enabledModels = [
-            "openai-codex/gpt-5.6-luna"
-            "openai-codex/gpt-5.6-sol"
-            "opencode/muse-spark-1.2-contributor-free"
-            "opencode/muse-spark-1.3-contributor-free"
-          ];
+          settings = {
+            defaultProvider = "openai-codex";
+            defaultModel = "gpt-5.6-luna";
+            enabledModels = [
+              "openai-codex/gpt-5.6-luna"
+              "openai-codex/gpt-5.6-sol"
+              "opencode-go/muse-spark-1.3-contributor"
+              "opencode-go/deepseek-v4.1-flash"
+              "opencode-go/glm-5.3-flash"
+            ];
+          };
         };
 
         home.file = {
