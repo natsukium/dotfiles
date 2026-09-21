@@ -3,7 +3,7 @@
 
 { inputs, ... }:
 {
-  flake.modules.nixos.windows-ci =
+  flake.modules.nixos.forgejo-runner-windows =
     {
       config,
       lib,
@@ -12,17 +12,17 @@
     }:
     let
       nixvirt = inputs.nixvirt.lib;
-      cfg = config.my.services.windows-ci;
+      runner = config.my.services.forgejo-runner;
+      cfg = runner.windows;
+      windows = config.my.services.windows-vm;
 
-      baseImage = "${cfg.stateDir}/base.qcow2";
-      systemImage = "${cfg.stateDir}/system.qcow2";
-      stateImage = "${cfg.stateDir}/state.qcow2";
-      seedIso = "${cfg.stateDir}/seed.iso";
-      # libvirt chowns every disk source it opens, which fails on the ntfs-3g mount
-      # the ISO lives on, so the unit copies it in first.
-      installIsoCopy = "${cfg.stateDir}/install.iso";
+      baseImage = windows.baseImage;
+      systemImage = "${windows.stateDir}/ci-system.qcow2";
+      stateImage = "${windows.stateDir}/ci-state.qcow2";
+      nvram = "${windows.stateDir}/ci-nvram.fd";
+      seedIso = "${windows.stateDir}/ci-seed.iso";
 
-      guestMac = "52:54:00:c9:a0:e4";
+      guestMac = "52:54:00:c9:a0:e5";
 
       forgejoRunnerExe = pkgs.forgejo-runner.overrideAttrs (old: {
         env = old.env // {
@@ -35,40 +35,19 @@
         doInstallCheck = false;
       });
 
-      spiceVdagent = pkgs.callPackage ./spice-vdagent.nix { };
-
-      provisionScript = pkgs.replaceVars ./provision.ps1 {
-        instanceUrl = cfg.url;
+      registerScript = pkgs.replaceVars ./register.ps1 {
+        instanceUrl = runner.url;
         runnerName = cfg.name;
         labels = lib.concatStringsSep "," cfg.labels;
       };
 
-      payloadIso = pkgs.runCommand "windows-ci-payload.iso" { nativeBuildInputs = [ pkgs.xorriso ]; } ''
-        mkdir payload
-        cp ${forgejoRunnerExe}/bin/windows_amd64/runner.exe payload/forgejo-runner.exe
-        cp ${provisionScript} payload/provision.ps1
-        cp ${spiceVdagent} payload/spice-vdagent.msi
-        xorriso -as mkisofs -J -r -V WINCI -o $out payload
+      runnerIso = pkgs.runCommand "windows-ci-runner.iso" { nativeBuildInputs = [ pkgs.xorriso ]; } ''
+        mkdir runner
+        cp ${forgejoRunnerExe}/bin/windows_amd64/runner.exe runner/forgejo-runner.exe
+        cp ${registerScript} runner/register.ps1
+        cp ${./bootstrap.ps1} runner/bootstrap.ps1
+        xorriso -as mkisofs -J -r -V WINRUN -o $out runner
       '';
-
-      answerImage =
-        pkgs.runCommand "windows-ci-answer.img"
-          {
-            nativeBuildInputs = [
-              pkgs.dosfstools
-              pkgs.mtools
-              pkgs.util-linux
-            ];
-          }
-          ''
-            truncate -s 16M image
-            printf 'label: dos\n2048,,c,*\n' | sfdisk image
-            mkfs.fat --offset 2048 -F 16 -n ANSWER image
-            sed '/<settings pass="windowsPE">/,/<\/settings>/d' ${./autounattend.xml} > unattend.xml
-            mcopy -i image@@1M ${./autounattend.xml} ::/autounattend.xml
-            mcopy -i image@@1M unattend.xml ::/unattend.xml
-            mv image $out
-          '';
 
       template = nixvirt.domain.templates.windows {
         name = "windows-ci";
@@ -80,19 +59,15 @@
           count = cfg.memory;
           unit = "GiB";
         };
-        storage_vol = if cfg.installer then baseImage else systemImage;
-        backing_vol = if cfg.installer then null else baseImage;
-        install_vol = if cfg.installer then installIsoCopy else null;
-        nvram_path = "${cfg.stateDir}/nvram.fd";
+        storage_vol = systemImage;
+        backing_vol = baseImage;
+        nvram_path = nvram;
         net_iface_mac = guestMac;
-        # The fallback model is an rtl8139, which Windows has no driver for. NetKVM
-        # comes off the virtio disc while WinPE is up.
         virtio_net = true;
         virtio_drive = true;
         # null keeps the virtio framebuffer without 3D acceleration. A CI guest
         # renders nothing, so SPICE's OpenGL path only adds a failure mode.
         virtio_video = null;
-        install_virtio = true;
       };
 
       domain = template // {
@@ -122,16 +97,15 @@
           ];
 
           disk = [
-            # The template's own three, in order: system disk, installer CDROM,
-            # virtio-win CDROM.
+            # The template's own two, in order: system disk and the installer CDROM it
+            # emits empty.
             (
               builtins.elemAt template.devices.disk 0
               // {
-                boot.order = if cfg.installer then 2 else 1;
+                boot.order = 1;
               }
             )
-            (builtins.elemAt template.devices.disk 1 // lib.optionalAttrs cfg.installer { boot.order = 1; })
-            (builtins.elemAt template.devices.disk 2)
+            (builtins.elemAt template.devices.disk 1)
             {
               type = "file";
               device = "cdrom";
@@ -139,9 +113,23 @@
                 name = "qemu";
                 type = "raw";
               };
-              source.file = "${payloadIso}";
+              source.file = "${windows.payloadIso}";
               target = {
                 dev = "hde";
+                bus = "sata";
+              };
+              readonly = true;
+            }
+            {
+              type = "file";
+              device = "cdrom";
+              driver = {
+                name = "qemu";
+                type = "raw";
+              };
+              source.file = "${runnerIso}";
+              target = {
+                dev = "hdf";
                 bus = "sata";
               };
               readonly = true;
@@ -158,7 +146,7 @@
                 startupPolicy = "optional";
               };
               target = {
-                dev = "hdf";
+                dev = "hdg";
                 bus = "sata";
               };
               readonly = true;
@@ -178,59 +166,13 @@
                 bus = "virtio";
               };
             }
-          ]
-          ++ lib.optional cfg.installer {
-            type = "file";
-            device = "disk";
-            driver = {
-              name = "qemu";
-              type = "raw";
-            };
-            source.file = "${answerImage}";
-            target = {
-              dev = "sda";
-              bus = "usb";
-            };
-            # The image sits in the store, and qemu opens a writable disk for writing,
-            # which the store refuses. Setup only ever reads the answer file.
-            readonly = true;
-          };
+          ];
         };
       };
     in
     {
-      imports = [ inputs.nixvirt.nixosModules.default ];
-
-      options.my.services.windows-ci = {
+      options.my.services.forgejo-runner.windows = {
         enable = lib.mkEnableOption "a Windows guest registered as a Forgejo Actions runner";
-
-        installer = lib.mkEnableOption ''
-          the install shape, where the guest writes into the golden image itself
-        '';
-
-        installerIso = lib.mkOption {
-          type = lib.types.nullOr lib.types.str;
-          default = null;
-          description = ''
-            Windows installation ISO on the host, read only while
-            {option}`installer` is on.
-          '';
-        };
-
-        tokenFile = lib.mkOption {
-          type = lib.types.path;
-          description = ''
-            Path to an environment file holding the registration token as
-            `TOKEN=...`. The host supplies this, typically a secret-manager path, so
-            the feature stays free of any secret-store assumption.
-          '';
-        };
-
-        url = lib.mkOption {
-          type = lib.types.str;
-          default = "https://git.natsukium.com";
-          description = "Forgejo instance the runner registers with.";
-        };
 
         name = lib.mkOption {
           type = lib.types.str;
@@ -260,62 +202,27 @@
           default = 16;
           description = "Memory given to the guest, in GiB.";
         };
-
-        stateDir = lib.mkOption {
-          type = lib.types.str;
-          default = "/var/lib/libvirt/windows-ci";
-          description = "Directory holding the guest's disk images and its seed disc.";
-        };
       };
 
       config = lib.mkIf cfg.enable {
-        assertions = [
+        # The guest is an overlay of that feature's golden image, so it cannot be
+        # had without it.
+        my.services.windows-vm.enable = true;
+
+        my.virtualisation.libvirt.dhcpHosts = [
           {
-            assertion = !cfg.installer || cfg.installerIso != null;
-            message = "my.services.windows-ci.installerIso has to name an installation ISO while installer is on.";
+            mac = guestMac;
+            name = "windows-ci";
+            ip = "192.168.122.11";
           }
         ];
 
-        virtualisation.libvirt = {
-          enable = true;
-          # Windows 11 refuses to install without a TPM 2.0.
-          swtpm.enable = true;
-
-          connections."qemu:///system" = {
-            networks = [
-              {
-                definition = nixvirt.network.writeXML (
-                  nixvirt.network.templates.bridge {
-                    uuid = "4de77f71-1aba-49e0-a139-5454e752db84";
-                    subnet_byte = 122;
-                    dhcp_hosts = [
-                      {
-                        mac = guestMac;
-                        name = "windows-ci";
-                        ip = "192.168.122.10";
-                      }
-                    ];
-                  }
-                );
-                active = true;
-              }
-            ];
-            domains = [
-              {
-                # Setup only reads the answer file off a removable drive, and
-                # NixVirt's schema has no attribute for that. Without the flag the disk
-                # mounts and setup silently asks every question itself.
-                definition = pkgs.runCommand "windows-ci.xml" { } ''
-                  sed "s|<target dev='sda' bus='usb'/>|<target dev='sda' bus='usb' removable='on'/>|" \
-                    ${nixvirt.domain.writeXML domain} > $out
-                '';
-                # Installing means starting and stopping the guest by hand, so the
-                # activation script keeps out of it until the image is ready.
-                active = if cfg.installer then null else true;
-              }
-            ];
-          };
-        };
+        virtualisation.libvirt.connections."qemu:///system".domains = [
+          {
+            definition = nixvirt.domain.writeXML domain;
+            active = true;
+          }
+        ];
 
         systemd.services.windows-ci-images = {
           description = "Provision disk images for the Windows CI guest";
@@ -324,30 +231,16 @@
             "libvirtd.service"
             "nixvirt.service"
           ];
+          after = [ "windows-vm-images.service" ];
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            # Copying an 8 GiB ISO runs well past the 90 second default.
-            TimeoutStartSec = "30min";
           };
-          path = [
-            pkgs.e2fsprogs
-            pkgs.qemu-utils
-          ];
+          path = [ pkgs.qemu-utils ];
           script = ''
-            mkdir -p ${cfg.stateDir}
-            # btrfs doing copy-on-write on top of qcow2's own fragments the image
-            # badly. The attribute is inherited, so it has to land before the images do.
-            chattr +C ${cfg.stateDir} || true
-            test -e ${baseImage} || qemu-img create -f qcow2 ${baseImage} 80G
             test -e ${stateImage} || qemu-img create -f qcow2 ${stateImage} 32G
-          ''
-          + lib.optionalString cfg.installer ''
-            # Sizes rather than timestamps: a truncated download leaves a copy that
-            # looks current.
-            if [ "$(stat -c %s ${cfg.installerIso})" != "$(stat -c %s ${installIsoCopy} 2>/dev/null)" ]; then
-              cp ${cfg.installerIso} ${installIsoCopy}
-            fi
+            test ! -e ${windows.stateDir}/nvram.fd || test -e ${nvram} || \
+              cp ${windows.stateDir}/nvram.fd ${nvram}
           '';
         };
 
@@ -368,7 +261,7 @@
             dir=$(mktemp -d)
             trap 'rm -rf "$dir"' EXIT
 
-            sed -n 's/^TOKEN=//p' ${cfg.tokenFile} > "$dir/token.txt"
+            sed -n 's/^TOKEN=//p' ${runner.tokenFile} > "$dir/token.txt"
 
             xorriso -as mkisofs -J -r -V WINCISEED -o ${seedIso}.new "$dir"
             chmod 0400 ${seedIso}.new
@@ -376,27 +269,15 @@
           '';
         };
 
-        virtualisation.libvirtd = {
-          onShutdown = "shutdown";
+        virtualisation.libvirtd.hooks.qemu.windows-ci =
+          pkgs.writeShellScript "windows-ci-reset-system-disk" ''
+            if [ "$1" != windows-ci ] || [ "$2" != prepare ] || [ "$3" != begin ]; then
+              exit 0
+            fi
 
-          hooks.qemu = lib.optionalAttrs (!cfg.installer) {
-            windows-ci = pkgs.writeShellScript "windows-ci-reset-system-disk" ''
-              if [ "$1" != windows-ci ] || [ "$2" != prepare ] || [ "$3" != begin ]; then
-                exit 0
-              fi
-
-              rm -f ${systemImage}
-              ${pkgs.qemu-utils}/bin/qemu-img create -f qcow2 -F qcow2 -b ${baseImage} ${systemImage}
-            '';
-          };
-        };
-
-        environment.systemPackages = [
-          pkgs.virt-manager
-          pkgs.virt-viewer
-        ];
-
-        users.users.${config.my.username}.extraGroups = [ "libvirtd" ];
+            rm -f ${systemImage}
+            ${pkgs.qemu-utils}/bin/qemu-img create -f qcow2 -F qcow2 -b ${baseImage} ${systemImage}
+          '';
       };
     };
 }

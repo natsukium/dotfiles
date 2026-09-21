@@ -2988,6 +2988,911 @@ every push to the forge over ssh instead, leaving fetch on the tunnel.
 programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
 #+end_src
 
+* Virtual Machines
+
+Declares virtual machines managed through libvirt using [[https://github.com/AshleyYakeley/NixVirt][NixVirt]], allowing domain
+definitions to be expressed declaratively alongside the rest of the system
+configuration.
+
+** Host
+
+Configures libvirt, a software TPM emulator, a default NAT network, and VM
+viewers. Guests contribute their own static DHCP leases via =dhcpHosts=.
+
+#+begin_src nix :tangle features/virtual-machine/libvirt.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/virtual-machine/libvirt.nix
+{ inputs, ... }:
+{
+  flake.modules.nixos.libvirt =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      nixvirt = inputs.nixvirt.lib;
+      cfg = config.my.virtualisation.libvirt;
+    in
+    {
+      imports = [ inputs.nixvirt.nixosModules.default ];
+
+      options.my.virtualisation.libvirt = {
+        enable = lib.mkEnableOption "libvirt with a NAT network for local guests";
+
+        dhcpHosts = lib.mkOption {
+          type = lib.types.listOf (
+            lib.types.submodule {
+              options = {
+                mac = lib.mkOption {
+                  type = lib.types.str;
+                  description = "MAC address the guest's interface is given.";
+                };
+
+                name = lib.mkOption {
+                  type = lib.types.str;
+                  description = "Name the lease is registered under.";
+                };
+
+                ip = lib.mkOption {
+                  type = lib.types.str;
+                  description = "Address to hand out for that MAC.";
+                };
+              };
+            }
+          );
+          default = [ ];
+          description = ''
+            Fixed leases on the guest network, contributed by the guests
+            themselves.
+          '';
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
+        virtualisation.libvirt = {
+          enable = true;
+          # Windows 11 refuses to install without a TPM 2.0, and nothing else
+          # here minds having one.
+          swtpm.enable = true;
+
+          connections."qemu:///system".networks = [
+            {
+              definition = nixvirt.network.writeXML (
+                nixvirt.network.templates.bridge {
+                  uuid = "4de77f71-1aba-49e0-a139-5454e752db84";
+                  subnet_byte = 122;
+                  dhcp_hosts = cfg.dhcpHosts;
+                }
+              );
+              active = true;
+            }
+          ];
+        };
+
+        # Host shutdown stops a guest rather than saving it. A memory image
+        # restored onto a disk that has since been replaced is a guest that never
+        # comes back, and libvirt-guests starts a stopped guest again on the next
+        # boot anyway.
+        virtualisation.libvirtd.onShutdown = "shutdown";
+
+        environment.systemPackages = [
+          pkgs.virt-manager
+          pkgs.virt-viewer
+        ];
+
+        users.users.${config.my.username}.extraGroups = [ "libvirtd" ];
+      };
+    };
+}
+#+end_src
+
+** Windows
+
+Manages a Windows golden image and an interactive guest backed by a persistent
+overlay. [[*Windows guest][The Forgejo runner]] shares this same base image.
+
+A logon scheduled task executes =D:\bootstrap.ps1= on the guest's state disk if
+present, decoupling guest-specific startup logic from the shared base image.
+
+#+begin_src nix :tangle features/virtual-machine/windows/default.nix :exports none
+# This file is auto-generated from configuration.org.
+# Do not edit directly.
+#+end_src
+
+#+begin_src nix :tangle features/virtual-machine/windows/default.nix
+{ inputs, ... }:
+{
+  flake.modules.nixos.windows-vm =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      nixvirt = inputs.nixvirt.lib;
+      cfg = config.my.services.windows-vm;
+
+      <<windows-vm-disks>>
+
+      <<windows-vm-payload>>
+
+      <<windows-vm-answer-image>>
+
+      <<windows-vm-domain>>
+    in
+    {
+      options.my.services.windows-vm = {
+        <<windows-vm-options>>
+      };
+
+      config = lib.mkIf cfg.enable {
+        assertions = [
+          {
+            assertion = !cfg.installer || cfg.installerIso != null;
+            message = "my.services.windows-vm.installerIso has to name an installation ISO while installer is on.";
+          }
+        ];
+
+        my.virtualisation.libvirt = {
+          enable = true;
+          dhcpHosts = [
+            {
+              mac = guestMac;
+              name = "windows";
+              ip = "192.168.122.10";
+            }
+          ];
+        };
+
+        <<windows-vm-libvirt>>
+
+        <<windows-vm-images>>
+      };
+    };
+}
+#+end_src
+
+*** Options
+
+Resource and disk configuration for the Windows guest. =baseImage= and
+=payloadIso= are exposed as read-only options so secondary guests can reference
+them without coupling to internal directory layout.
+
+#+NAME: windows-vm-options
+#+begin_src nix
+enable = lib.mkEnableOption "a Windows guest and the golden image behind it";
+
+installer = lib.mkEnableOption ''
+  the install shape, where the guest writes into the golden image itself
+'';
+
+installerIso = lib.mkOption {
+  type = lib.types.nullOr lib.types.str;
+  default = null;
+  description = ''
+    Windows installation ISO on the host, read only while
+    {option}`installer` is on.
+  '';
+};
+
+vcpu = lib.mkOption {
+  type = lib.types.ints.positive;
+  default = 4;
+  description = "Threads given to the guest.";
+};
+
+memory = lib.mkOption {
+  type = lib.types.ints.positive;
+  default = 8;
+  description = "Memory given to the guest, in GiB.";
+};
+
+stateDir = lib.mkOption {
+  type = lib.types.str;
+  default = "/var/lib/libvirt/windows";
+  description = "Directory holding the golden image and the guest's disks.";
+};
+
+sharedDirectories = lib.mkOption {
+  type = lib.types.listOf lib.types.str;
+  default = [ ];
+  example = [ "/data" ];
+  description = ''
+    Host directories the guest reaches over virtiofs, read and write, one mount
+    each, tagged with the directory's own name.
+  '';
+};
+
+baseImage = lib.mkOption {
+  type = lib.types.str;
+  readOnly = true;
+  default = "${cfg.stateDir}/base.qcow2";
+  description = "The golden image, for guests that stack an overlay on it.";
+};
+
+payloadIso = lib.mkOption {
+  type = lib.types.package;
+  readOnly = true;
+  default = payloadIso;
+  description = ''
+    The disc carrying {file}`provision.ps1`, which every guest needs to set its
+    own D: up.
+  '';
+};
+#+end_src
+
+*** Disks
+
+Defines disk paths for the base image, the system overlay (C:), and the
+persistent state disk (D:). Unlike ephemeral runner guests, this interactive
+guest preserves its overlay across reboots.
+
+#+NAME: windows-vm-disks
+#+begin_src nix
+baseImage = cfg.baseImage;
+systemImage = "${cfg.stateDir}/system.qcow2";
+stateImage = "${cfg.stateDir}/state.qcow2";
+# libvirt chowns every disk source it opens, which fails on the ntfs-3g mount
+# the ISO lives on, so the unit copies it in first.
+installIsoCopy = "${cfg.stateDir}/install.iso";
+
+guestMac = "52:54:00:c9:a0:e4";
+#+end_src
+
+*** The payload disc
+
+Builds an ISO carrying provisioning scripts and the SPICE guest agent. The agent
+version is pinned in =spice-vdagent.nix= rather than inline so Renovate updates
+are not overwritten by tangling.
+
+#+NAME: windows-vm-payload
+#+begin_src nix
+spiceVdagent = pkgs.callPackage ./spice-vdagent.nix { };
+
+payloadIso = pkgs.runCommand "windows-vm-payload.iso" { nativeBuildInputs = [ pkgs.xorriso ]; } ''
+  mkdir payload
+  cp ${./provision.ps1} payload/provision.ps1
+  cp ${./bootstrap.ps1} payload/bootstrap.ps1
+  cp ${./share.ps1} payload/share.ps1
+  cp ${spiceVdagent} payload/spice-vdagent.msi
+  xorriso -as mkisofs -J -r -V WINVM -o $out payload
+'';
+#+end_src
+
+*** The answer disk
+
+Generates a partitioned FAT disk image containing =autounattend.xml= (for WinPE)
+and =unattend.xml= (for post-reboot passes). Windows Setup requires a partitioned
+disk to read unattended answers and ignores ISO media. Target disk selection is
+omitted to prevent unattended installation from overwriting the wrong drive.
+
+#+NAME: windows-vm-answer-image
+#+begin_src nix
+answerImage =
+  pkgs.runCommand "windows-vm-answer.img"
+    {
+      nativeBuildInputs = [
+        pkgs.dosfstools
+        pkgs.mtools
+        pkgs.util-linux
+      ];
+    }
+    ''
+      truncate -s 16M image
+      printf 'label: dos\n2048,,c,*\n' | sfdisk image
+      mkfs.fat --offset 2048 -F 16 -n ANSWER image
+      sed '/<settings pass="windowsPE">/,/<\/settings>/d' ${./autounattend.xml} > unattend.xml
+      mcopy -i image@@1M ${./autounattend.xml} ::/autounattend.xml
+      mcopy -i image@@1M unattend.xml ::/unattend.xml
+      mv image $out
+    '';
+#+end_src
+
+*** The domain
+
+Extends NixVirt's Windows template for both installer and normal modes.
+Reusing a single domain preserves NVRAM variables written during installation,
+ensuring the Windows boot loader entry remains intact when booting the overlay.
+
+#+NAME: windows-vm-domain
+#+begin_src nix
+template = nixvirt.domain.templates.windows {
+  name = "windows";
+  uuid = "e68fc8b5-3214-4c79-8469-62c76aec521b";
+  vcpu = {
+    count = cfg.vcpu;
+  };
+  memory = {
+    count = cfg.memory;
+    unit = "GiB";
+  };
+  storage_vol = if cfg.installer then baseImage else systemImage;
+  backing_vol = if cfg.installer then null else baseImage;
+  install_vol = if cfg.installer then installIsoCopy else null;
+  nvram_path = "${cfg.stateDir}/nvram.fd";
+  net_iface_mac = guestMac;
+  # The fallback model is an rtl8139, which Windows has no driver for. NetKVM
+  # comes off the virtio disc while WinPE is up.
+  virtio_net = true;
+  virtio_drive = true;
+  # null keeps the virtio framebuffer without 3D acceleration. SPICE's OpenGL
+  # path only adds a failure mode, and nothing here draws hard enough to miss it.
+  virtio_video = null;
+  install_virtio = true;
+};
+
+domain =
+  template
+  // lib.optionalAttrs (cfg.sharedDirectories != [ ]) {
+    # virtiofsd reads the guest's memory rather than copying through qemu, so
+    # qemu has to hold it somewhere another process can map.
+    memoryBacking.access.mode = "shared";
+  }
+  // {
+    # Per-device boot order rather than an os-level `boot dev='cdrom'`, which
+    # with three CDROMs attached drops OVMF into its boot manager on every start.
+    # libvirt rejects the two forms together.
+    os = template.os // {
+      boot = [ ];
+    };
+
+    devices = template.devices // {
+      memballoon = {
+        model = "virtio";
+        freePageReporting = true;
+      };
+
+      # NixOS links no virtiofsd where libvirt goes looking for one, so the
+      # domain names the binary itself.
+      filesystem = map (dir: {
+        type = "mount";
+        accessmode = "passthrough";
+        driver.type = "virtiofs";
+        binary.path = "${pkgs.virtiofsd}/bin/virtiofsd";
+        source.dir = dir;
+        target.dir = builtins.baseNameOf dir;
+      }) cfg.sharedDirectories;
+
+      # Without the guest agent channel `virsh shutdown` reaches nothing and the
+      # guest can only be killed.
+      channel = template.devices.channel ++ [
+        {
+          type = "unix";
+          target = {
+            type = "virtio";
+            name = "org.qemu.guest_agent.0";
+          };
+        }
+      ];
+
+      disk = [
+        # The template's own three, in order: system disk, installer CDROM,
+        # virtio-win CDROM.
+        (
+          builtins.elemAt template.devices.disk 0
+          // {
+            boot.order = if cfg.installer then 2 else 1;
+          }
+        )
+        (builtins.elemAt template.devices.disk 1 // lib.optionalAttrs cfg.installer { boot.order = 1; })
+        (builtins.elemAt template.devices.disk 2)
+        {
+          type = "file";
+          device = "cdrom";
+          driver = {
+            name = "qemu";
+            type = "raw";
+          };
+          source.file = "${payloadIso}";
+          target = {
+            dev = "hde";
+            bus = "sata";
+          };
+          readonly = true;
+        }
+        {
+          type = "file";
+          device = "disk";
+          driver = {
+            name = "qemu";
+            type = "qcow2";
+            cache = "none";
+            discard = "unmap";
+          };
+          source.file = stateImage;
+          target = {
+            dev = "vdb";
+            bus = "virtio";
+          };
+        }
+      ]
+      ++ lib.optional cfg.installer {
+        type = "file";
+        device = "disk";
+        driver = {
+          name = "qemu";
+          type = "raw";
+        };
+        source.file = "${answerImage}";
+        target = {
+          dev = "sda";
+          bus = "usb";
+        };
+        # The image sits in the store, and qemu opens a writable disk for writing,
+        # which the store refuses. Setup only ever reads the answer file.
+        readonly = true;
+      };
+    };
+  };
+#+end_src
+
+The domain is defined but not started automatically on host activation, as it
+is intended for on-demand interactive use.
+
+#+NAME: windows-vm-libvirt
+#+begin_src nix
+virtualisation.libvirt.connections."qemu:///system".domains = [
+  {
+    # Setup only reads the answer file off a removable drive, and NixVirt's
+    # schema has no attribute for that. Without the flag the disk mounts and
+    # setup silently asks every question itself.
+    definition = pkgs.runCommand "windows.xml" { } ''
+      sed "s|<target dev='sda' bus='usb'/>|<target dev='sda' bus='usb' removable='on'/>|" \
+        ${nixvirt.domain.writeXML domain} > $out
+    '';
+    active = null;
+  }
+];
+#+end_src
+
+*** Images
+
+Initializes empty qcow2 images for the base image, state disk, and system
+overlay on first boot. When =installer= is enabled, synchronizes the installer
+ISO into the state directory.
+
+#+NAME: windows-vm-images
+#+begin_src nix
+systemd.services.windows-vm-images = {
+  description = "Provision disk images for the Windows guest";
+  wantedBy = [ "multi-user.target" ];
+  before = [
+    "libvirtd.service"
+    "nixvirt.service"
+  ];
+  serviceConfig = {
+    Type = "oneshot";
+    RemainAfterExit = true;
+    # Copying an 8 GiB ISO runs well past the 90 second default.
+    TimeoutStartSec = "30min";
+  };
+  path = [
+    pkgs.e2fsprogs
+    pkgs.qemu-utils
+  ];
+  script = ''
+    mkdir -p ${cfg.stateDir}
+    # btrfs doing copy-on-write on top of qcow2's own fragments the image
+    # badly. The attribute is inherited, so it has to land before the images do.
+    chattr +C ${cfg.stateDir} || true
+    test -e ${baseImage} || qemu-img create -f qcow2 ${baseImage} 80G
+    test -e ${stateImage} || qemu-img create -f qcow2 ${stateImage} 32G
+  ''
+  + lib.optionalString (!cfg.installer) ''
+    if [ -e ${baseImage} ] && [ ! -e ${systemImage} ]; then
+      qemu-img create -f qcow2 -F qcow2 -b ${baseImage} ${systemImage}
+    fi
+  ''
+  + lib.optionalString cfg.installer ''
+    # Sizes rather than timestamps: a truncated download leaves a copy that
+    # looks current.
+    if [ "$(stat -c %s ${cfg.installerIso})" != "$(stat -c %s ${installIsoCopy} 2>/dev/null)" ]; then
+      cp ${cfg.installerIso} ${installIsoCopy}
+    fi
+  '';
+};
+#+end_src
+
+*** Provisioning
+
+=provision.ps1= configures the guest environment: virtio drivers, QEMU guest
+agent, Git, Node.js, MSVC tools, and the nightly Rust toolchain. Software is
+installed via direct downloads because winget is unavailable in unattended
+sessions.
+
+Toolchain caches are directed to D: so they persist across overlay resets.
+Desktop animations and transparency are disabled to reduce CPU overhead under
+the unaccelerated virtio-gpu driver. All steps are idempotent.
+
+#+begin_src powershell :tangle features/virtual-machine/windows/provision.ps1
+#Requires -RunAsAdministrator
+<#
+    Turns a bare Windows install into the golden image, and a guest's blank
+    second disk into D:.
+
+    Run from the payload disc:
+      powershell -ExecutionPolicy Bypass -File X:\provision.ps1
+
+    Re-running is safe. Each step checks for its own result first, so this is
+    both how the image is changed after the fact and how a new guest gets its own
+    toolchain onto D:.
+#>
+[CmdletBinding()]
+param()
+
+$ErrorActionPreference = "Stop"
+
+function Step($message) {
+    Write-Host "==> $message" -ForegroundColor Cyan
+}
+
+# Native tools write their progress to stderr, and with ErrorActionPreference
+# set to Stop a single line there aborts the script. Redirecting stderr is not
+# enough on its own: the preference has to come down for the call as well.
+function Invoke-Native($exe, [string[]]$arguments) {
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $exe @arguments 2>&1 | ForEach-Object { Write-Host $_ }
+    }
+    finally {
+        $ErrorActionPreference = $previous
+    }
+}
+
+function Set-MachineVariable($name, $value) {
+    if ([Environment]::GetEnvironmentVariable($name, "Machine") -ne $value) {
+        [Environment]::SetEnvironmentVariable($name, $value, "Machine")
+    }
+    Set-Item -Path "Env:$name" -Value $value
+}
+
+$payload = (Get-Volume -FileSystemLabel WINVM).DriveLetter + ":"
+
+if (-not (Get-Service -Name "QEMU-GA" -ErrorAction SilentlyContinue)) {
+    Step "Installing the virtio guest tools"
+    # The disc has no Joliet names, so every hyphen in a filename arrives as an
+    # underscore.
+    $tools = Get-Volume |
+        Where-Object DriveLetter |
+        ForEach-Object { Get-Item "$($_.DriveLetter):\virtio?win?gt?x64.msi" -ErrorAction SilentlyContinue } |
+        Select-Object -First 1
+    if (-not $tools) {
+        throw "the virtio-win disc is not attached, so there is no guest agent to install"
+    }
+    Start-Process msiexec.exe -Wait -ArgumentList @("/i", $tools.FullName, "/qn", "/norestart")
+
+    # The guest tools package installs the drivers but leaves the agent out.
+    $agent = Get-Item (Join-Path $tools.PSDrive.Root "guest?agent\qemu?ga?x86_64.msi")
+    Start-Process msiexec.exe -Wait -ArgumentList @("/i", $agent.FullName, "/qn", "/norestart")
+}
+
+# The guest tools usually carry a vdagent of their own. This stays because
+# they have dropped it before, and a console you cannot paste into is miserable.
+if (-not (Get-Service -Name "spice-agent", "vdservice" -ErrorAction SilentlyContinue)) {
+    Step "Installing the SPICE agent so the console has a clipboard"
+    Start-Process msiexec.exe -Wait -ArgumentList "/i `"$payload\spice-vdagent.msi`" /qn /norestart"
+}
+
+Step "Installing the logon task"
+New-Item -ItemType Directory -Force -Path "C:\windows-vm" | Out-Null
+Copy-Item "$payload\bootstrap.ps1" "C:\windows-vm\bootstrap.ps1" -Force
+
+# At logon as the interactive user, not at startup as SYSTEM: a job that opens a
+# real window and a wgpu swapchain needs a desktop, and session 0 has none, where
+# wgpu fails with "Invalid surface" before the first frame. The account autologs
+# on, so this fires on every boot anyway.
+Register-ScheduledTask -TaskName "windows-vm-bootstrap" -Force `
+    -Action (New-ScheduledTaskAction -Execute "powershell.exe" `
+        -Argument "-NoProfile -ExecutionPolicy Bypass -File C:\windows-vm\bootstrap.ps1") `
+    -Trigger (New-ScheduledTaskTrigger -AtLogOn -User "ci") `
+    -Principal (New-ScheduledTaskPrincipal -UserId "ci" -LogonType Interactive -RunLevel Highest) `
+    -Settings (New-ScheduledTaskSettingsSet -ExecutionTimeLimit 0 -RestartCount 3 `
+        -RestartInterval (New-TimeSpan -Minutes 1)) |
+    Out-Null
+
+Step "Preparing the state disk"
+# -StateOnly, because the guest's own bootstrap may never return: on the runner
+# guest it is the daemon.
+& "C:\windows-vm\bootstrap.ps1" -StateOnly
+# The disc the script itself came from moved with the other optical drives.
+$payload = (Get-Volume -FileSystemLabel WINVM).DriveLetter + ":"
+
+Step "Pointing the toolchain caches at D:"
+Set-MachineVariable "RUSTUP_HOME" "D:\rustup"
+Set-MachineVariable "CARGO_HOME" "D:\cargo"
+$machinePath = [Environment]::GetEnvironmentVariable("Path", "Machine")
+if ($machinePath -notlike "*D:\cargo\bin*") {
+    [Environment]::SetEnvironmentVariable("Path", "$machinePath;D:\cargo\bin", "Machine")
+}
+$env:Path = "$env:Path;D:\cargo\bin"
+
+# winget is an AppX package, so it is missing or unusable depending on which
+# account runs the script and whether the Store has updated App Installer.
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+
+function Get-Installer($url, $name) {
+    $path = Join-Path $env:TEMP $name
+    if (-not (Test-Path $path)) {
+        Invoke-WebRequest -Uri $url -OutFile $path -UseBasicParsing
+    }
+    return $path
+}
+
+if (-not (Test-Path "C:\Program Files\Git\cmd\git.exe")) {
+    Step "Installing Git for Windows"
+    $asset = (Invoke-RestMethod "https://api.github.com/repos/git-for-windows/git/releases/latest").assets |
+        Where-Object name -like "*-64-bit.exe" |
+        Select-Object -First 1
+    $installer = Get-Installer $asset.browser_download_url $asset.name
+    Invoke-Native $installer @("/VERYSILENT", "/NORESTART", "/NOCANCEL", "/SP-", "/SUPPRESSMSGBOXES")
+}
+$env:Path = "$env:Path;C:\Program Files\Git\cmd"
+
+# The Forgejo runner executes JS actions (actions/checkout above all) with a node
+# it finds on the host PATH; without one every job dies at its first step with
+# "Cannot find: node in PATH" before any tool of ours runs.
+if (-not (Test-Path "C:\Program Files\nodejs\node.exe")) {
+    Step "Installing Node.js"
+    $lts = (Invoke-RestMethod "https://nodejs.org/dist/index.json") |
+        Where-Object lts |
+        Select-Object -First 1
+    $installer = Get-Installer "https://nodejs.org/dist/$($lts.version)/node-$($lts.version)-x64.msi" "node-$($lts.version)-x64.msi"
+    Start-Process msiexec.exe -Wait -ArgumentList @("/i", $installer, "/qn", "/norestart")
+}
+$env:Path = "$env:Path;C:\Program Files\nodejs"
+
+if (-not (Test-Path "D:\cargo\bin\rustup.exe")) {
+    Step "Installing rustup with the nightly toolchain"
+    $installer = Get-Installer "https://static.rust-lang.org/rustup/dist/x86_64-pc-windows-msvc/rustup-init.exe" "rustup-init.exe"
+    # The machine PATH already carries D:\cargo\bin, and letting rustup edit
+    # the user PATH would put the entry on C:, where a reset erases it.
+    Invoke-Native $installer @("-y", "--no-modify-path", "--default-toolchain", "nightly", "--profile", "default")
+    if ($LASTEXITCODE -ne 0) {
+        throw "rustup-init failed (exit $LASTEXITCODE)"
+    }
+}
+
+$vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+$hasVCTools = (Test-Path $vswhere) -and
+    (& $vswhere -products * -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+if (-not $hasVCTools) {
+    Step "Installing the MSVC build tools (this takes a while)"
+    $installer = Get-Installer "https://aka.ms/vs/17/release/vs_BuildTools.exe" "vs_BuildTools.exe"
+    Invoke-Native $installer @("--quiet", "--wait", "--norestart", "--nocache",
+        "--add", "Microsoft.VisualStudio.Workload.VCTools", "--includeRecommended")
+    # 3010 means it wants a reboot, which is not a failure.
+    if ($LASTEXITCODE -ne 0 -and $LASTEXITCODE -ne 3010) {
+        throw "vs_BuildTools failed (exit $LASTEXITCODE)"
+    }
+}
+
+Step "Pinning nightly as the default toolchain"
+Invoke-Native "D:\cargo\bin\rustup.exe" @("default", "nightly")
+
+if (-not (Test-Path "D:\cargo\bin\cargo-nextest.exe")) {
+    # The prebuilt binary takes seconds, where `cargo install` rebuilds
+    # nextest and everything under it from source.
+    Step "Installing cargo-nextest"
+    $archive = Join-Path $env:TEMP "cargo-nextest.zip"
+    Invoke-WebRequest -Uri "https://get.nexte.st/latest/windows" -OutFile $archive
+    Expand-Archive -Path $archive -DestinationPath "D:\cargo\bin" -Force
+    Remove-Item $archive
+}
+
+Step "Keeping the guest awake and out of Windows Update's way"
+# A reset throws away whatever Windows Update installed on a guest that resets,
+# and a reboot taken mid-job is a failed job.
+$policy = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"
+New-Item -Path $policy -Force | Out-Null
+Set-ItemProperty -Path $policy -Name "NoAutoUpdate" -Value 1 -Type DWord
+
+Invoke-Native powercfg @("/change", "standby-timeout-ac", "0")
+Invoke-Native powercfg @("/change", "hibernate-timeout-ac", "0")
+Invoke-Native powercfg @("/change", "monitor-timeout-ac", "0")
+
+Step "Turning the desktop effects off"
+# Written into the account's own hive rather than through HKCU, because the
+# script runs as SYSTEM when it is driven through the guest agent.
+$sid = (Get-CimInstance Win32_UserAccount -Filter "Name='ci' AND LocalAccount=True").SID
+New-PSDrive -Name HKU -PSProvider Registry -Root HKEY_USERS -ErrorAction SilentlyContinue | Out-Null
+if (-not (Test-Path "HKU:\$sid")) {
+    throw "ci is not logged on, so its hive is not loaded and there is nothing to write to"
+}
+
+function Set-UserValue($path, $name, $value, $type) {
+    $full = "HKU:\$sid\$path"
+    if (-not (Test-Path $full)) {
+        New-Item -Path $full -Force | Out-Null
+    }
+    Set-ItemProperty -Path $full -Name $name -Value $value -Type $type
+}
+
+Set-UserValue "Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects" "VisualFXSetting" 2 DWord
+Set-UserValue "Control Panel\Desktop" "UserPreferencesMask" ([byte[]](0x90, 0x12, 0x03, 0x80, 0x10, 0x00, 0x00, 0x00)) Binary
+Set-UserValue "Control Panel\Desktop" "DragFullWindows" "0" String
+Set-UserValue "Control Panel\Desktop" "MenuShowDelay" "0" String
+Set-UserValue "Control Panel\Desktop\WindowMetrics" "MinAnimate" "0" String
+# ClearType stays on. Unreadable text costs more than the cycles it saves.
+Set-UserValue "Control Panel\Desktop" "FontSmoothing" "2" String
+foreach ($name in "TaskbarAnimations", "ListviewAlphaSelect", "ListviewShadow") {
+    Set-UserValue "Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced" $name 0 DWord
+}
+Set-UserValue "Software\Microsoft\Windows\DWM" "EnableAeroPeek" 0 DWord
+Set-UserValue "Software\Microsoft\Windows\CurrentVersion\Themes\Personalize" "EnableTransparency" 0 DWord
+
+Step "Done"
+#+end_src
+
+=bootstrap.ps1= runs at user logon to partition and format the state disk as
+=D:= on first boot and remount optical drives. It then invokes =D:\bootstrap.ps1=
+if present, allowing guests to run custom startup tasks.
+
+#+begin_src powershell :tangle features/virtual-machine/windows/bootstrap.ps1
+<#
+    Runs at every logon, from the copy the golden image carries at
+    C:\windows-vm\bootstrap.ps1.
+
+    -StateOnly stops after D: is ready, for callers that have their own idea of
+    what comes next.
+#>
+[CmdletBinding()]
+param(
+    [switch]$StateOnly
+)
+
+$ErrorActionPreference = "Stop"
+
+# The optical drives take D: and up before any disk gets a letter, so D: is not
+# free until they move.
+$optical = @(Get-CimInstance Win32_Volume -Filter "DriveType = 5")
+# Released first, because the letters they start on overlap the ones they end
+# on, and asking for a letter another drive still holds fails with
+# "Not available".
+$optical | ForEach-Object { $_ | Set-CimInstance -Property @{ DriveLetter = $null } }
+$letter = 90
+$optical | ForEach-Object {
+    $_ | Set-CimInstance -Property @{ DriveLetter = ([char]$letter + ":") }
+    $letter--
+}
+
+$state = Get-Volume | Where-Object FileSystemLabel -eq "state" | Select-Object -First 1
+if (-not $state) {
+    # Picking the disk by "not the one holding C:" rather than by RAW, because
+    # a half-finished attempt leaves the disk initialized but empty, and a RAW
+    # filter then matches nothing and silently skips the whole step. USB is out
+    # because the answer disk is one, and it is attached whenever the image
+    # itself is being worked on.
+    $systemDisk = (Get-Partition -DriveLetter C).DiskNumber
+    $candidates = @(Get-Disk | Where-Object { $_.Number -ne $systemDisk -and $_.BusType -ne "USB" })
+    if ($candidates.Count -ne 1) {
+        throw "expected exactly one non-system disk, found $($candidates.Count)"
+    }
+    $disk = $candidates[0]
+
+    if ($disk.PartitionStyle -eq "RAW") {
+        Initialize-Disk -Number $disk.Number -PartitionStyle GPT | Out-Null
+    }
+    Get-Partition -DiskNumber $disk.Number -ErrorAction SilentlyContinue |
+        Where-Object Type -ne "Reserved" |
+        Remove-Partition -Confirm:$false
+    New-Partition -DiskNumber $disk.Number -DriveLetter D -UseMaximumSize |
+        Format-Volume -FileSystem NTFS -NewFileSystemLabel state -Confirm:$false |
+        Out-Null
+}
+elseif ($state.DriveLetter -ne "D") {
+    # Windows records the letter against a disk signature, and the image has
+    # never seen this guest's disk, so a guest other than the one the image was
+    # made on comes up with the state disk somewhere else.
+    Set-Partition -DriveLetter $state.DriveLetter -NewDriveLetter D
+}
+
+if (-not (Test-Path "D:\")) {
+    throw "D: is missing, so anything written there would land on C: and die with the next reset"
+}
+
+if (-not $StateOnly -and (Test-Path "D:\bootstrap.ps1")) {
+    & "D:\bootstrap.ps1"
+}
+#+end_src
+
+*** Shared directories
+
+=share.ps1= installs WinFsp and configures the =VirtioFsSvc= service to mount
+host directories shared via virtiofs at a designated drive letter. This runs
+once on the interactive guest rather than the shared golden image.
+
+#+begin_src powershell :tangle features/virtual-machine/windows/share.ps1
+#Requires -RunAsAdministrator
+<#
+    Mounts whatever the domain shares over virtiofs at S:.
+
+    Run once from the payload disc:
+      powershell -ExecutionPolicy Bypass -File X:\share.ps1
+
+    Not part of provision.ps1, because the golden image is shared with a guest
+    that has no share to reach. This guest's C: is never reset, so once is once.
+#>
+[CmdletBinding()]
+param(
+    [string]$MountPoint = "S:"
+)
+
+$ErrorActionPreference = "Stop"
+
+function Step($message) {
+    Write-Host "==> $message" -ForegroundColor Cyan
+}
+
+# The viofs driver and its service come off the virtio-win disc with the rest of
+# the guest tools. WinFsp is what they mount through, and nothing installs it.
+if (-not (Test-Path "${env:ProgramFiles(x86)}\WinFsp\bin")) {
+    Step "Installing WinFsp"
+    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    $asset = (Invoke-RestMethod "https://api.github.com/repos/winfsp/winfsp/releases/latest").assets |
+        Where-Object name -like "winfsp-*.msi" |
+        Select-Object -First 1
+    $installer = Join-Path $env:TEMP $asset.name
+    if (-not (Test-Path $installer)) {
+        Invoke-WebRequest -Uri $asset.browser_download_url -OutFile $installer -UseBasicParsing
+    }
+    Start-Process msiexec.exe -Wait -ArgumentList @("/i", $installer, "/qn", "/norestart")
+}
+
+$service = Get-Service VirtioFsSvc -ErrorAction SilentlyContinue
+if (-not $service) {
+    throw "the virtio-win guest tools have not installed VirtioFsSvc, so there is nothing to mount with"
+}
+
+Step "Pinning the share to $MountPoint"
+# Left alone the service takes the first free letter counting down from Z, which
+# is where the optical drives sit, so the share lands wherever the disc count
+# leaves room. -m is the only way it takes a letter: the Parameters key the
+# older builds read is gone.
+$key = "HKLM:\SYSTEM\CurrentControlSet\Services\VirtioFsSvc"
+$exe = ([string](Get-ItemProperty $key).ImagePath) -replace ' -m .*$', ''
+if ($service.Status -eq "Running") {
+    Stop-Service -Name VirtioFsSvc
+}
+Set-ItemProperty -Path $key -Name ImagePath -Value "$exe -m $MountPoint" -Type ExpandString
+
+Set-Service -Name VirtioFsSvc -StartupType Automatic
+Start-Service -Name VirtioFsSvc
+
+Step "Done"
+#+end_src
+
+*** Installing Windows
+
+To install the golden image, set =installerIso= to an official Windows
+installation ISO, enable =installer = true=, and boot the guest.
+
+#+begin_src sh :tangle no
+sudo nixos-rebuild switch --flake .
+virsh -c qemu:///system start windows
+virt-viewer -c qemu:///system windows
+#+end_src
+
+Send a key press to satisfy the initial CD-ROM boot prompt. Setup will
+automatically format the disk according to the answer file and execute
+=provision.ps1= on first logon; only the target disk needs to be selected
+manually.
+
+#+begin_src sh :tangle no
+virsh -c qemu:///system send-key windows --holdtime 150 KEY_SPACE
+virsh -c qemu:///system screenshot windows shot.ppm
+#+end_src
+
+Once installation finishes, disable =installer= and rebuild. The domain will
+then boot from its overlay disk. Future updates to the golden image can be made
+by enabling =installer= again and re-running =provision.ps1=.
+
 * Continuous Integration
 
 ** Forgejo Actions Runner
@@ -3460,22 +4365,12 @@ nixosWrapper =
 
 *** Windows guest
 
-Software that has to keep working on Windows needs a Windows machine to build
-and test it on, so one runner is a Windows guest. This feature declares it as a
-libvirt domain through [[https://github.com/AshleyYakeley/NixVirt][NixVirt]] and registers it under a =windows= label. A host
-turns it on with =my.services.windows-ci= and hands over the registration token
-it already keeps for its Linux runner.
+Declares a Forgejo Actions runner hosted on a Windows guest, reusing the golden
+image from [[*Windows][the Windows VM module]].
 
-The guest boots on a throwaway overlay of a golden image, and a libvirt hook
-recreates that overlay every time qemu starts. So nothing a job leaves behind
-outlives the next start of the guest. Only the second disk survives, and it
-holds nothing I could not rebuild: the runner credential, the rustup toolchains,
-and the cargo registry cache.
-
-Windows cannot be built from this flake, so the golden image is installed once
-from an answer file. =installer= switches the domain over for that: the guest
-writes into the base image directly, the installation ISO is attached, and the
-reset hook is withheld. [[*Installing Windows][Installing Windows]] below is that one-time procedure.
+The guest boots from an ephemeral overlay recreated on each VM start via a
+libvirt hook. A persistent secondary disk (D:) preserves the runner
+credentials, toolchains, and cargo caches across resets.
 
 #+begin_src nix :tangle features/forgejo-runner/windows/default.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -3485,7 +4380,7 @@ reset hook is withheld. [[*Installing Windows][Installing Windows]] below is tha
 #+begin_src nix :tangle features/forgejo-runner/windows/default.nix
 { inputs, ... }:
 {
-  flake.modules.nixos.windows-ci =
+  flake.modules.nixos.forgejo-runner-windows =
     {
       config,
       lib,
@@ -3494,43 +4389,41 @@ reset hook is withheld. [[*Installing Windows][Installing Windows]] below is tha
     }:
     let
       nixvirt = inputs.nixvirt.lib;
-      cfg = config.my.services.windows-ci;
+      runner = config.my.services.forgejo-runner;
+      cfg = runner.windows;
+      windows = config.my.services.windows-vm;
 
-      <<windows-ci-disks>>
+      <<forgejo-windows-disks>>
 
-      <<windows-ci-payload>>
+      <<forgejo-windows-payload>>
 
-      <<windows-ci-answer-image>>
-
-      <<windows-ci-domain>>
+      <<forgejo-windows-domain>>
     in
     {
-      imports = [ inputs.nixvirt.nixosModules.default ];
-
-      <<windows-ci-options>>
+      options.my.services.forgejo-runner.windows = {
+        <<forgejo-windows-options>>
+      };
 
       config = lib.mkIf cfg.enable {
-        assertions = [
+        # The guest is an overlay of that feature's golden image, so it cannot be
+        # had without it.
+        my.services.windows-vm.enable = true;
+
+        my.virtualisation.libvirt.dhcpHosts = [
           {
-            assertion = !cfg.installer || cfg.installerIso != null;
-            message = "my.services.windows-ci.installerIso has to name an installation ISO while installer is on.";
+            mac = guestMac;
+            name = "windows-ci";
+            ip = "192.168.122.11";
           }
         ];
 
-        <<windows-ci-libvirt>>
+        <<forgejo-windows-libvirt>>
 
-        <<windows-ci-images>>
+        <<forgejo-windows-images>>
 
-        <<windows-ci-seed>>
+        <<forgejo-windows-seed>>
 
-        <<windows-ci-reset>>
-
-        environment.systemPackages = [
-          pkgs.virt-manager
-          pkgs.virt-viewer
-        ];
-
-        users.users.${config.my.username}.extraGroups = [ "libvirtd" ];
+        <<forgejo-windows-reset>>
       };
     };
 }
@@ -3538,124 +4431,71 @@ reset hook is withheld. [[*Installing Windows][Installing Windows]] below is tha
 
 **** Options
 
-The host decides what it can afford and where its secrets are, and nothing
-else. Sizing is the interesting one: half the host threads and a quarter of its
-RAM leaves the desktop, Hydra, and the Linux runner working while a Windows job
-compiles. The runner identity carries my defaults the way the Forgejo runner
-wrappers do, so a host that just wants a Windows runner sets =enable= and
-=tokenFile=.
+Runner identity and token settings are inherited from the parent Forgejo runner
+configuration. Resource allocations default to half of host threads and a
+quarter of RAM to avoid starving other host services during builds.
 
-#+NAME: windows-ci-options
+#+NAME: forgejo-windows-options
 #+begin_src nix
-options.my.services.windows-ci = {
-  enable = lib.mkEnableOption "a Windows guest registered as a Forgejo Actions runner";
+enable = lib.mkEnableOption "a Windows guest registered as a Forgejo Actions runner";
 
-  installer = lib.mkEnableOption ''
-    the install shape, where the guest writes into the golden image itself
+name = lib.mkOption {
+  type = lib.types.str;
+  default = "${config.networking.hostName}-windows";
+  defaultText = lib.literalExpression ''"''${config.networking.hostName}-windows"'';
+  description = "Name the runner registers under.";
+};
+
+labels = lib.mkOption {
+  type = lib.types.listOf lib.types.str;
+  default = [ "windows:host" ];
+  description = ''
+    Labels the runner advertises. Only `host` labels make sense here: a
+    `docker` label would need Windows containers, which means Docker Desktop
+    and its licence.
   '';
+};
 
-  installerIso = lib.mkOption {
-    type = lib.types.nullOr lib.types.str;
-    default = null;
-    description = ''
-      Windows installation ISO on the host, read only while
-      {option}`installer` is on.
-    '';
-  };
+vcpu = lib.mkOption {
+  type = lib.types.ints.positive;
+  default = 6;
+  description = "Threads given to the guest.";
+};
 
-  tokenFile = lib.mkOption {
-    type = lib.types.path;
-    description = ''
-      Path to an environment file holding the registration token as
-      `TOKEN=...`. The host supplies this, typically a secret-manager path, so
-      the feature stays free of any secret-store assumption.
-    '';
-  };
-
-  url = lib.mkOption {
-    type = lib.types.str;
-    default = "https://git.natsukium.com";
-    description = "Forgejo instance the runner registers with.";
-  };
-
-  name = lib.mkOption {
-    type = lib.types.str;
-    default = "${config.networking.hostName}-windows";
-    defaultText = lib.literalExpression ''"''${config.networking.hostName}-windows"'';
-    description = "Name the runner registers under.";
-  };
-
-  labels = lib.mkOption {
-    type = lib.types.listOf lib.types.str;
-    default = [ "windows:host" ];
-    description = ''
-      Labels the runner advertises. Only `host` labels make sense here: a
-      `docker` label would need Windows containers, which means Docker Desktop
-      and its licence.
-    '';
-  };
-
-  vcpu = lib.mkOption {
-    type = lib.types.ints.positive;
-    default = 6;
-    description = "Threads given to the guest.";
-  };
-
-  memory = lib.mkOption {
-    type = lib.types.ints.positive;
-    default = 16;
-    description = "Memory given to the guest, in GiB.";
-  };
-
-  stateDir = lib.mkOption {
-    type = lib.types.str;
-    default = "/var/lib/libvirt/windows-ci";
-    description = "Directory holding the guest's disk images and its seed disc.";
-  };
+memory = lib.mkOption {
+  type = lib.types.ints.positive;
+  default = 16;
+  description = "Memory given to the guest, in GiB.";
 };
 #+end_src
 
 **** Disks
 
-The state disk is the one that survives a reset. It carries the runner
-credential, because re-registering on every boot would leave a dead runner in
-Forgejo each time, and the rustup and cargo caches beside it.
+Configures guest disk paths and MAC address. The state disk persists the runner
+registration and toolchain caches across resets. NVRAM variables are cloned from
+the base Windows guest to retain EFI boot entries.
 
-#+NAME: windows-ci-disks
+#+NAME: forgejo-windows-disks
 #+begin_src nix
-baseImage = "${cfg.stateDir}/base.qcow2";
-systemImage = "${cfg.stateDir}/system.qcow2";
-stateImage = "${cfg.stateDir}/state.qcow2";
-seedIso = "${cfg.stateDir}/seed.iso";
-# libvirt chowns every disk source it opens, which fails on the ntfs-3g mount
-# the ISO lives on, so the unit copies it in first.
-installIsoCopy = "${cfg.stateDir}/install.iso";
+baseImage = windows.baseImage;
+systemImage = "${windows.stateDir}/ci-system.qcow2";
+stateImage = "${windows.stateDir}/ci-state.qcow2";
+nvram = "${windows.stateDir}/ci-nvram.fd";
+seedIso = "${windows.stateDir}/ci-seed.iso";
 
-guestMac = "52:54:00:c9:a0:e4";
+guestMac = "52:54:00:c9:a0:e5";
 #+end_src
 
-**** The payload disc
+**** The runner disc
 
-Windows owns its disk, but the flake still owns what runs on it. Handing the
-guest a disc is the one way in that needs nothing installed on either side, so
-anything the guest cannot fetch for itself rides in this way: the runner
-binary, the provisioning script, and a SPICE agent.
+Builds an ISO containing the Windows runner binary and setup scripts. The runner
+is cross-compiled with Go rather than =pkgsCross.mingwW64=, whose build hooks
+fail on mingw dependencies.
 
-Forgejo releases runner binaries for Linux only, so the Windows one is built
-here by pointing Go at another target. Dropping the git wrapper and the version
-check is all else it takes. =pkgsCross.mingwW64= is the other route and costs
-more than it returns: the package's =meta.platforms= rules Windows out, and the
-wrapper hook it still pulls in wants a mingw bash and gawk that do not build.
+Copying the binary to =D:\runner= on each boot ensures that updates pinned in
+the flake take effect even though D: survives VM resets.
 
-The SPICE agent is fetched rather than built, and it stays on the disc because
-provisioning the console means pasting into it. Its version is pinned in
-=spice-vdagent.nix= rather than here: Renovate rewrites the pin in the tangled
-file, which the next tangle of this document would undo.
-
-=provision.ps1= is documented with [[*Provisioning][the guest's own setup]] below, and its runner
-identity is substituted in here rather than written into the script.
-
-#+NAME: windows-ci-payload
+#+NAME: forgejo-windows-payload
 #+begin_src nix
 forgejoRunnerExe = pkgs.forgejo-runner.overrideAttrs (old: {
   env = old.env // {
@@ -3668,76 +4508,27 @@ forgejoRunnerExe = pkgs.forgejo-runner.overrideAttrs (old: {
   doInstallCheck = false;
 });
 
-spiceVdagent = pkgs.callPackage ./spice-vdagent.nix { };
-
-provisionScript = pkgs.replaceVars ./provision.ps1 {
-  instanceUrl = cfg.url;
+registerScript = pkgs.replaceVars ./register.ps1 {
+  instanceUrl = runner.url;
   runnerName = cfg.name;
   labels = lib.concatStringsSep "," cfg.labels;
 };
 
-payloadIso = pkgs.runCommand "windows-ci-payload.iso" { nativeBuildInputs = [ pkgs.xorriso ]; } ''
-  mkdir payload
-  cp ${forgejoRunnerExe}/bin/windows_amd64/runner.exe payload/forgejo-runner.exe
-  cp ${provisionScript} payload/provision.ps1
-  cp ${spiceVdagent} payload/spice-vdagent.msi
-  xorriso -as mkisofs -J -r -V WINCI -o $out payload
+runnerIso = pkgs.runCommand "windows-ci-runner.iso" { nativeBuildInputs = [ pkgs.xorriso ]; } ''
+  mkdir runner
+  cp ${forgejoRunnerExe}/bin/windows_amd64/runner.exe runner/forgejo-runner.exe
+  cp ${registerScript} runner/register.ps1
+  cp ${./bootstrap.ps1} runner/bootstrap.ps1
+  xorriso -as mkisofs -J -r -V WINRUN -o $out runner
 '';
-#+end_src
-
-**** The answer disk
-
-Setup would not read the answer file off a disc, and it cannot go on the
-install media either: that ISO keeps its real tree in UDF, which xorriso cannot
-write, so rewriting it leaves an image holding nothing but a README. A disk it
-does read. The partition table matters as much as the contents, because a bare
-filesystem with no table is a disk Windows never mounts.
-
-The same answers go on twice under both names setup looks for. It reads
-=autounattend.xml= while WinPE is up and =unattend.xml= for every pass after the
-reboot, and the passes that matter here are the later ones.
-
-Two things about the file itself have to be right at once, and while either was
-wrong setup just asked every question itself, with no error anywhere. It is
-validated against a schema whose sequences are alphabetical, so =AutoLogon=
-before =OOBE=, =Password= before =Name=, and =CommandLine= before =Order=. A
-file that fails validation is discarded in silence. And the driver paths live in
-=Microsoft-Windows-PnpCustomizationsWinPE=, not in =Microsoft-Windows-Setup=
-where I first wrote them, which is enough on its own to invalidate the file.
-
-The file names no disk to install onto, so setup asks. It can only name a disk
-by number, and this guest's two disks came up in an order I could not predict,
-so a wrong guess would wipe the state disk rather than the base image.
-
-#+NAME: windows-ci-answer-image
-#+begin_src nix
-answerImage =
-  pkgs.runCommand "windows-ci-answer.img"
-    {
-      nativeBuildInputs = [
-        pkgs.dosfstools
-        pkgs.mtools
-        pkgs.util-linux
-      ];
-    }
-    ''
-      truncate -s 16M image
-      printf 'label: dos\n2048,,c,*\n' | sfdisk image
-      mkfs.fat --offset 2048 -F 16 -n ANSWER image
-      sed '/<settings pass="windowsPE">/,/<\/settings>/d' ${./autounattend.xml} > unattend.xml
-      mcopy -i image@@1M ${./autounattend.xml} ::/autounattend.xml
-      mcopy -i image@@1M unattend.xml ::/unattend.xml
-      mv image $out
-    '';
 #+end_src
 
 **** The domain
 
-NixVirt's Windows template gives the machine type, the firmware, and the SPICE
-devices. What it does not give is anything about this guest in particular, so
-the domain is the template with a handful of devices replaced.
+Extends the Windows NixVirt template with the runner, payload, and seed ISOs,
+plus the persistent state disk.
 
-#+NAME: windows-ci-domain
+#+NAME: forgejo-windows-domain
 #+begin_src nix
 template = nixvirt.domain.templates.windows {
   name = "windows-ci";
@@ -3749,19 +4540,15 @@ template = nixvirt.domain.templates.windows {
     count = cfg.memory;
     unit = "GiB";
   };
-  storage_vol = if cfg.installer then baseImage else systemImage;
-  backing_vol = if cfg.installer then null else baseImage;
-  install_vol = if cfg.installer then installIsoCopy else null;
-  nvram_path = "${cfg.stateDir}/nvram.fd";
+  storage_vol = systemImage;
+  backing_vol = baseImage;
+  nvram_path = nvram;
   net_iface_mac = guestMac;
-  # The fallback model is an rtl8139, which Windows has no driver for. NetKVM
-  # comes off the virtio disc while WinPE is up.
   virtio_net = true;
   virtio_drive = true;
   # null keeps the virtio framebuffer without 3D acceleration. A CI guest
   # renders nothing, so SPICE's OpenGL path only adds a failure mode.
   virtio_video = null;
-  install_virtio = true;
 };
 
 domain = template // {
@@ -3791,16 +4578,15 @@ domain = template // {
     ];
 
     disk = [
-      # The template's own three, in order: system disk, installer CDROM,
-      # virtio-win CDROM.
+      # The template's own two, in order: system disk and the installer CDROM it
+      # emits empty.
       (
         builtins.elemAt template.devices.disk 0
         // {
-          boot.order = if cfg.installer then 2 else 1;
+          boot.order = 1;
         }
       )
-      (builtins.elemAt template.devices.disk 1 // lib.optionalAttrs cfg.installer { boot.order = 1; })
-      (builtins.elemAt template.devices.disk 2)
+      (builtins.elemAt template.devices.disk 1)
       {
         type = "file";
         device = "cdrom";
@@ -3808,9 +4594,23 @@ domain = template // {
           name = "qemu";
           type = "raw";
         };
-        source.file = "${payloadIso}";
+        source.file = "${windows.payloadIso}";
         target = {
           dev = "hde";
+          bus = "sata";
+        };
+        readonly = true;
+      }
+      {
+        type = "file";
+        device = "cdrom";
+        driver = {
+          name = "qemu";
+          type = "raw";
+        };
+        source.file = "${runnerIso}";
+        target = {
+          dev = "hdf";
           bus = "sata";
         };
         readonly = true;
@@ -3827,7 +4627,7 @@ domain = template // {
           startupPolicy = "optional";
         };
         target = {
-          dev = "hdf";
+          dev = "hdg";
           bus = "sata";
         };
         readonly = true;
@@ -3847,83 +4647,29 @@ domain = template // {
           bus = "virtio";
         };
       }
-    ]
-    ++ lib.optional cfg.installer {
-      type = "file";
-      device = "disk";
-      driver = {
-        name = "qemu";
-        type = "raw";
-      };
-      source.file = "${answerImage}";
-      target = {
-        dev = "sda";
-        bus = "usb";
-      };
-      # The image sits in the store, and qemu opens a writable disk for writing,
-      # which the store refuses. Setup only ever reads the answer file.
-      readonly = true;
-    };
+    ];
   };
 };
 #+end_src
 
-**** Connection
+Started automatically on activation so the runner remains available.
 
-The guest sits on its own NAT network with a fixed lease, so the host always
-knows where to find it.
-
-#+NAME: windows-ci-libvirt
+#+NAME: forgejo-windows-libvirt
 #+begin_src nix
-virtualisation.libvirt = {
-  enable = true;
-  # Windows 11 refuses to install without a TPM 2.0.
-  swtpm.enable = true;
-
-  connections."qemu:///system" = {
-    networks = [
-      {
-        definition = nixvirt.network.writeXML (
-          nixvirt.network.templates.bridge {
-            uuid = "4de77f71-1aba-49e0-a139-5454e752db84";
-            subnet_byte = 122;
-            dhcp_hosts = [
-              {
-                mac = guestMac;
-                name = "windows-ci";
-                ip = "192.168.122.10";
-              }
-            ];
-          }
-        );
-        active = true;
-      }
-    ];
-    domains = [
-      {
-        # Setup only reads the answer file off a removable drive, and
-        # NixVirt's schema has no attribute for that. Without the flag the disk
-        # mounts and setup silently asks every question itself.
-        definition = pkgs.runCommand "windows-ci.xml" { } ''
-          sed "s|<target dev='sda' bus='usb'/>|<target dev='sda' bus='usb' removable='on'/>|" \
-            ${nixvirt.domain.writeXML domain} > $out
-        '';
-        # Installing means starting and stopping the guest by hand, so the
-        # activation script keeps out of it until the image is ready.
-        active = if cfg.installer then null else true;
-      }
-    ];
-  };
-};
+virtualisation.libvirt.connections."qemu:///system".domains = [
+  {
+    definition = nixvirt.domain.writeXML domain;
+    active = true;
+  }
+];
 #+end_src
 
 **** Images
 
-Both qcow2 images are created empty on first boot, and neither is ever
-recreated by this unit. The base image is what an install writes into, so
-removing it is the only way to start over.
+Creates the persistent state disk if missing and seeds NVRAM firmware variables
+from the base Windows guest.
 
-#+NAME: windows-ci-images
+#+NAME: forgejo-windows-images
 #+begin_src nix
 systemd.services.windows-ci-images = {
   description = "Provision disk images for the Windows CI guest";
@@ -3932,44 +4678,26 @@ systemd.services.windows-ci-images = {
     "libvirtd.service"
     "nixvirt.service"
   ];
+  after = [ "windows-vm-images.service" ];
   serviceConfig = {
     Type = "oneshot";
     RemainAfterExit = true;
-    # Copying an 8 GiB ISO runs well past the 90 second default.
-    TimeoutStartSec = "30min";
   };
-  path = [
-    pkgs.e2fsprogs
-    pkgs.qemu-utils
-  ];
+  path = [ pkgs.qemu-utils ];
   script = ''
-    mkdir -p ${cfg.stateDir}
-    # btrfs doing copy-on-write on top of qcow2's own fragments the image
-    # badly. The attribute is inherited, so it has to land before the images do.
-    chattr +C ${cfg.stateDir} || true
-    test -e ${baseImage} || qemu-img create -f qcow2 ${baseImage} 80G
     test -e ${stateImage} || qemu-img create -f qcow2 ${stateImage} 32G
-  ''
-  + lib.optionalString cfg.installer ''
-    # Sizes rather than timestamps: a truncated download leaves a copy that
-    # looks current.
-    if [ "$(stat -c %s ${cfg.installerIso})" != "$(stat -c %s ${installIsoCopy} 2>/dev/null)" ]; then
-      cp ${cfg.installerIso} ${installIsoCopy}
-    fi
+    test ! -e ${windows.stateDir}/nvram.fd || test -e ${nvram} || \
+      cp ${windows.stateDir}/nvram.fd ${nvram}
   '';
 };
 #+end_src
 
 **** Seed disc
 
-The token is the one thing the guest cannot be handed at build time. Building
-the disc at activation keeps it out of the Nix store, and stripping the
-=TOKEN== prefix keeps the guest from having to parse an environment file. qemu
-runs as root here, so the disc can stay readable only by root. A token typed at
-the console instead would sit in the shell history, and in the golden image with
-it.
+Generates a root-only ISO containing the registration token on activation,
+keeping credentials out of the Nix store and guest command history.
 
-#+NAME: windows-ci-seed
+#+NAME: forgejo-windows-seed
 #+begin_src nix
 systemd.services.windows-ci-seed = {
   description = "Hand the Forgejo registration token to the Windows CI guest";
@@ -3988,7 +4716,7 @@ systemd.services.windows-ci-seed = {
     dir=$(mktemp -d)
     trap 'rm -rf "$dir"' EXIT
 
-    sed -n 's/^TOKEN=//p' ${cfg.tokenFile} > "$dir/token.txt"
+    sed -n 's/^TOKEN=//p' ${runner.tokenFile} > "$dir/token.txt"
 
     xorriso -as mkisofs -J -r -V WINCISEED -o ${seedIso}.new "$dir"
     chmod 0400 ${seedIso}.new
@@ -3999,144 +4727,135 @@ systemd.services.windows-ci-seed = {
 
 **** Reset
 
-The system disk is an overlay over the base image, and a libvirt hook replaces
-it every time qemu starts. A hook rather than a boot-time unit, because the
-overlay cannot be swapped out while qemu holds it open. The same limit means only
-a fresh qemu process gets a fresh disk: a reboot from inside Windows keeps
-whatever the last job left behind, and only a stop and start through libvirt
-clears it.
+A libvirt QEMU hook recreates the system overlay before the VM starts, ensuring
+each run begins from a clean state. Guest-initiated reboots retain the overlay;
+a domain stop and start via libvirt is required to reset it.
 
-Host shutdown stops the guest rather than saving it. A memory image restored
-onto a system disk that no longer exists is a guest that never comes back, and
-libvirt-guests starts a stopped guest again on the next boot anyway.
-
-#+NAME: windows-ci-reset
+#+NAME: forgejo-windows-reset
 #+begin_src nix
-virtualisation.libvirtd = {
-  onShutdown = "shutdown";
+virtualisation.libvirtd.hooks.qemu.windows-ci =
+  pkgs.writeShellScript "windows-ci-reset-system-disk" ''
+    if [ "$1" != windows-ci ] || [ "$2" != prepare ] || [ "$3" != begin ]; then
+      exit 0
+    fi
 
-  hooks.qemu = lib.optionalAttrs (!cfg.installer) {
-    windows-ci = pkgs.writeShellScript "windows-ci-reset-system-disk" ''
-      if [ "$1" != windows-ci ] || [ "$2" != prepare ] || [ "$3" != begin ]; then
-        exit 0
-      fi
-
-      rm -f ${systemImage}
-      ${pkgs.qemu-utils}/bin/qemu-img create -f qcow2 -F qcow2 -b ${baseImage} ${systemImage}
-    '';
-  };
-};
+    rm -f ${systemImage}
+    ${pkgs.qemu-utils}/bin/qemu-img create -f qcow2 -F qcow2 -b ${baseImage} ${systemImage}
+  '';
 #+end_src
 
-**** Provisioning
+**** Registering the runner
 
-Setup injects only the two drivers it cannot boot without, so =provision.ps1=
-runs the virtio guest tools from the virtio disc first, and then the guest agent
-package beside it, which the tools leave out. The agent is what makes the guest
-reachable at all: with it, =virsh qemu-agent-command= runs PowerShell in there,
-and the rest of provisioning needs no console.
-
-That disc carries no Joliet names, so every hyphen in a filename arrives as an
-underscore, and the script matches its files with wildcards rather than by name.
-
-Everything else a job needs has to sit in the golden image, because C: returns
-to that image on every start. Actions cannot stand in for this. Both
-=dtolnay/rust-toolchain= and =actions-rust-lang/setup-rust-toolchain= assume
-rustup is already installed, and pulling the MSVC toolchain per job would cost
-gigabytes and ten minutes of every run.
-
-None of it goes through winget. winget is an AppX package, so whether it exists
-at all depends on the account running it and on the Store having updated App
-Installer, and the first run of this on a fresh install answered with "winget is
-not recognized". Vendor installers have neither problem.
-
-Native tools are called through a wrapper that drops =ErrorActionPreference=
-for the call. Otherwise a single line on stderr ends the script, and these tools
-talk on stderr for reasons that have nothing to do with failure: rustup
-reporting =info: using existing install= stopped provisioning halfway through,
-twice, and left no error behind to explain it.
-
-So the whole of it lives in =provision.ps1=: the state disk, the machine-scoped
-=RUSTUP_HOME= and =CARGO_HOME= that keep the caches on D:, git, Node.js, rustup
-with the nightly toolchain, the MSVC build tools, cargo-nextest, and the runner
-itself. Node is not for any project: the runner executes JS actions —
-=actions/checkout= before anything else — with a node from the host PATH, and
-its first job without one died at step one with "Cannot find: node in PATH". A
-task registered at logon copies the runner across to =D:\runner= and runs the
-daemon as the =ci= user in its own interactive session — session 0, where a
-SYSTEM task runs, has no desktop, and a job that opens a window and a wgpu
-swapchain fails there with "Invalid surface" before its first frame, so the
-account autologs on permanently and the runner rides that session. Copying on
-every boot keeps the version the flake pins as the
-version that runs, even though D: outlives the resets that would otherwise carry
-the update. Registration writes =.runner= beside the working directory, so the
-daemon runs from D: for the credential to survive a reset.
-
-The answer file runs it at first logon, so a fresh install needs no command from
-me. Every step checks for its own result first, so re-running it after a change
-is safe. That is one line.
+Initializes a new state disk by running =provision.ps1= to install toolchains,
+followed by =register.ps1= to register the runner using the token from the
+[[*Seed disc][seed disc]].
 
 #+begin_src powershell :tangle no
-$payload = (Get-Volume -FileSystemLabel WINCI).DriveLetter + ":"
+$payload = (Get-Volume -FileSystemLabel WINVM).DriveLetter + ":"
 powershell -ExecutionPolicy Bypass -File "$payload\provision.ps1"
+
+$runner = (Get-Volume -FileSystemLabel WINRUN).DriveLetter + ":"
+powershell -ExecutionPolicy Bypass -File "$runner\register.ps1"
 #+end_src
 
-No token appears in that line. The script reads it off the [[*Seed disc][seed disc]].
+#+begin_src powershell :tangle features/forgejo-runner/windows/register.ps1
+#Requires -RunAsAdministrator
+<#
+    Makes this guest the Forgejo Actions runner.
 
-**** Installing Windows
+    Run once from the runner disc:
+      powershell -ExecutionPolicy Bypass -File X:\register.ps1
 
-Microsoft hands out a download link per session rather than a stable URL.
-quickget knows how to ask for one, but Microsoft refused the automated request
-from my home address. So the ISO comes off the download page in a browser
-instead. Nothing reads this guest's UI, so I take the English image rather than
-the Japanese one.
+    Everything it writes goes to D:, which outlives the reset of C: on every
+    start.
+#>
+[CmdletBinding()]
+param(
+    [string]$RunnerToken,
+    [string]$InstanceUrl = "@instanceUrl@",
+    [string]$RunnerName = "@runnerName@",
+    [string]$Labels = "@labels@"
+)
 
-Point =installerIso= at the result, turn =installer= on, and start the guest.
+$ErrorActionPreference = "Stop"
 
-#+begin_src sh :tangle no
-sudo nixos-rebuild switch --flake .
-virsh -c qemu:///system start windows-ci
-virt-viewer -c qemu:///system windows-ci
+function Step($message) {
+    Write-Host "==> $message" -ForegroundColor Cyan
+}
+
+# Native tools write their progress to stderr, and with ErrorActionPreference
+# set to Stop a single line there aborts the script. Redirecting stderr is not
+# enough on its own: the preference has to come down for the call as well.
+function Invoke-Native($exe, [string[]]$arguments) {
+    $previous = $ErrorActionPreference
+    $ErrorActionPreference = "Continue"
+    try {
+        & $exe @arguments 2>&1 | ForEach-Object { Write-Host $_ }
+    }
+    finally {
+        $ErrorActionPreference = $previous
+    }
+}
+
+$runner = (Get-Volume -FileSystemLabel WINRUN).DriveLetter + ":"
+
+if (-not (Test-Path "D:\")) {
+    throw "D: is missing, so the runner would land on C: and die with the next reset"
+}
+
+Step "Installing the startup script"
+New-Item -ItemType Directory -Force -Path "D:\runner" | Out-Null
+Copy-Item "$runner\bootstrap.ps1" "D:\bootstrap.ps1" -Force
+
+if (-not $RunnerToken) {
+    $seed = Get-Volume -FileSystemLabel WINCISEED -ErrorAction SilentlyContinue
+    if ($seed) {
+        $RunnerToken = (Get-Content "$($seed.DriveLetter):\token.txt" -Raw).Trim()
+    }
+}
+
+if (Test-Path "D:\runner\.runner") {
+    # The token stays valid after use, so registering again does not replace
+    # the runner, it adds a second one that Forgejo then lists forever.
+    Step "The runner is already registered"
+}
+elseif ($RunnerToken) {
+    # Registration writes .runner next to the working directory, so it has to
+    # run from D: for the credential to survive a reset.
+    Step "Registering the runner"
+    Copy-Item "$runner\forgejo-runner.exe" "D:\runner\forgejo-runner.exe" -Force
+    Push-Location "D:\runner"
+    try {
+        Invoke-Native "D:\runner\forgejo-runner.exe" @("register", "--no-interactive",
+            "--instance", $InstanceUrl, "--token", $RunnerToken, "--name", $RunnerName,
+            "--labels", $Labels)
+    }
+    finally {
+        Pop-Location
+    }
+}
+else {
+    throw "no token given and no seed disc found, so there is nothing to register with"
+}
+
+Step "Done"
 #+end_src
 
-A NixOS rebuild redefines the domain, and NixVirt stops the guest to apply the
-new definition. So do not rebuild while setup is running.
+Leaves =D:\bootstrap.ps1=, which the logon task executes on each boot to run the
+runner daemon.
 
-Setup reads the answer file at the start of each pass. It creates the local =ci=
-administrator, keeps OOBE from ever asking for a Microsoft account, and runs
-=provision.ps1= at first logon, so the install ends with a registered runner and
-no keystrokes of mine in it. It still asks which disk to install onto, because
-[[*The answer disk][the answer file]] names none. Picking the 80 GiB one by hand costs three key
-presses.
+#+begin_src powershell :tangle features/forgejo-runner/windows/bootstrap.ps1
+<#
+    Runs at every logon, from the copy register.ps1 left at D:\bootstrap.ps1.
+#>
+$ErrorActionPreference = "Stop"
 
-Once a pass has begun it is too late to fix its answers. No amount of dropping
-files into =C:\Windows\Panther= or pointing =HKLM\System\Setup!UnattendFile= at
-one changes anything, so a bad file means installing again rather than repairing
-in place.
+$runner = (Get-Volume -FileSystemLabel WINRUN).DriveLetter + ":"
+Copy-Item "$runner\forgejo-runner.exe" "D:\runner\forgejo-runner.exe" -Force
 
-The interactive route is where I started, and it has a dead end. Windows 11
-25H2 wants a Microsoft account before it will finish OOBE, and this guest has
-no network to sign in with. =bypassnro.cmd= is gone from this build and
-=ms-cxh:localonly= opens nothing. The =BypassNRO= registry flag does get past
-the account wall, but by then I had also tried =sysprep /audit=, which left the
-image believing setup was still running. The task scheduler in that state
-queues every task in the system and launches none of them, including
-Microsoft's own, so the runner could never start at boot. Repairing the
-registry markers by hand did not bring it back.
-
-The firmware asks to press a key to boot from CD. Nothing else on the guest is
-bootable at that point, so it waits rather than falling through, and
-=virsh send-key= answers it. The rest of setup can be driven the same way, and
-=virsh screenshot= shows where it is.
-
-#+begin_src sh :tangle no
-virsh -c qemu:///system send-key windows-ci --holdtime 150 KEY_SPACE
-virsh -c qemu:///system screenshot windows-ci shot.ppm
+Set-Location "D:\runner"
+& "D:\runner\forgejo-runner.exe" daemon
 #+end_src
-
-Turning =installer= back off and rebuilding gives the domain its overlay and its
-reset hook, and activation starts it. The copied ISO under the state directory
-can go at that point.
 
 * Devices
 
