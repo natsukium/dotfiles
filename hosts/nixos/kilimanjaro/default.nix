@@ -20,9 +20,13 @@
   my.profiles.development.enable = true;
 
   my.home.enable = true;
-  home-manager.users.${config.my.username}.imports = [
-    ../../../homes/nixos/desktop.nix
-  ];
+  home-manager.users.${config.my.username} = {
+    imports = [
+      ../../../homes/nixos/desktop.nix
+    ];
+
+    my.programs.calibre.enable = true;
+  };
 
   inherit
     (pkgs.callPackage ./disko-config.nix {
