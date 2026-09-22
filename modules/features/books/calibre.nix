@@ -11,6 +11,10 @@
 
       config = lib.mkIf config.my.programs.calibre.enable {
         programs.calibre.enable = true;
+
+        xdg.configFile."calibre/tweaks.json".text = builtins.toJSON {
+          east_asian_base_language = "ja";
+        };
       };
     };
 }
