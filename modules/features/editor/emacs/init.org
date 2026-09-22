@@ -1086,6 +1086,28 @@ repeating for me, chaining fetches until the server returns nothing.
   (keymap-set elfeed-search-mode-map "G" #'my/elfeed-update-until-done))
 #+end_src
 
+** Gaps in Fever article ids
+
+That fixed window poses a sharper problem than merely slowing down catch-up.
+The window is a literal list of ids rather than a request for everything
+newer, and Miniflux deletes old entries, so the ids on the server are not
+contiguous. A machine that has been away long enough for every id in its
+window to have been deleted gets an empty answer, never advances its stored
+last id, and stops receiving articles for good. Nothing is logged, because an
+empty result looks exactly like being up to date, and the catch-up loop above
+cannot help either: every round recomputes the same dead window.
+
+One of my machines fell six months behind and landed in front of a run of 318
+deleted ids, far beyond the reach of the default 50-id window. A 500-id window
+crosses a gap of that size in one fetch. That is a wider margin rather than a
+permanent fix. A longer run of deleted ids would strand a machine again, and
+recovering from it requires manually setting the mark past the gap with
+=elfeed-protocol-fever-set-update-mark=.
+
+#+begin_src emacs-lisp
+(setq elfeed-protocol-fever-maxsize 500)
+#+end_src
+
 ** Expiring news
 
 News articles arrive in volume and are worth reading the week they appear and

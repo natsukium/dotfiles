@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-21 11:48+0900\n"
+"POT-Creation-Date: 2026-09-23 02:23+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6048,11 +6048,48 @@ msgstr ""
 #. type: heading **
 #: modules/features/editor/emacs/init.org:1089
 #, no-wrap
-msgid "Expiring news"
+msgid "Gaps in Fever article ids"
 msgstr ""
 
 #. type: paragraph
 #: modules/features/editor/emacs/init.org:1091
+msgid ""
+"That fixed window poses a sharper problem than merely slowing down "
+"catch-up.  The window is a literal list of ids rather than a request for "
+"everything newer, and Miniflux deletes old entries, so the ids on the server "
+"are not contiguous. A machine that has been away long enough for every id in "
+"its window to have been deleted gets an empty answer, never advances its "
+"stored last id, and stops receiving articles for good. Nothing is logged, "
+"because an empty result looks exactly like being up to date, and the "
+"catch-up loop above cannot help either: every round recomputes the same dead "
+"window."
+msgstr ""
+
+#. type: paragraph
+#: modules/features/editor/emacs/init.org:1100
+msgid ""
+"One of my machines fell six months behind and landed in front of a run of "
+"318 deleted ids, far beyond the reach of the default 50-id window. A 500-id "
+"window crosses a gap of that size in one fetch. That is a wider margin "
+"rather than a permanent fix. A longer run of deleted ids would strand a "
+"machine again, and recovering from it requires manually setting the mark "
+"past the gap with =elfeed-protocol-fever-set-update-mark=."
+msgstr ""
+
+#. type: paragraph in src
+#: modules/features/editor/emacs/init.org:1108
+#, no-wrap
+msgid "(setq elfeed-protocol-fever-maxsize 500)"
+msgstr ""
+
+#. type: heading **
+#: modules/features/editor/emacs/init.org:1111
+#, no-wrap
+msgid "Expiring news"
+msgstr ""
+
+#. type: paragraph
+#: modules/features/editor/emacs/init.org:1113
 msgid ""
 "News articles arrive in volume and are worth reading the week they appear "
 "and never again, so keeping them around only bloats the local "
@@ -6061,7 +6098,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1097
+#: modules/features/editor/emacs/init.org:1119
 #, no-wrap
 msgid ""
 "(defvar my/elfeed-expire-tag 'news\n"
@@ -6069,7 +6106,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1100
+#: modules/features/editor/emacs/init.org:1122
 #, no-wrap
 msgid ""
 "(defvar my/elfeed-expire-age \"1 month\"\n"
@@ -6077,7 +6114,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1103
+#: modules/features/editor/emacs/init.org:1125
 #, no-wrap
 msgid ""
 "(defun my/elfeed-expire-entries ()\n"
@@ -6107,13 +6144,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1126
+#: modules/features/editor/emacs/init.org:1148
 #, no-wrap
 msgid "mail"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1128
+#: modules/features/editor/emacs/init.org:1150
 msgid ""
 "[[https://notmuchmail.org/][notmuch]] is a tag-based email indexer and "
 "searcher.  [[https://notmuchmail.org/notmuch-emacs/][notmuch.el]] provides "
@@ -6122,7 +6159,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1132
+#: modules/features/editor/emacs/init.org:1154
 msgid ""
 "notmuch was chosen over mu4e because the notmuch indexer is already "
 "configured for all email accounts.  Adding notmuch.el only requires the "
@@ -6130,7 +6167,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1137
+#: modules/features/editor/emacs/init.org:1159
 msgid ""
 "notmuch has no built-in delete operation; it manages metadata (tags)  rather "
 "than maildir folder placement.  Pressing =d= tags the message with "
@@ -6143,7 +6180,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1147
+#: modules/features/editor/emacs/init.org:1169
 msgid ""
 "=shr-use-colors= is disabled so sender HTML colors don't clash with the dark "
 "theme. Inline CID images ship with the mail and are enabled, but "
@@ -6154,7 +6191,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1154
+#: modules/features/editor/emacs/init.org:1176
 msgid ""
 "=notmuch-show-part-button-default-action= defaults to saving an attachment "
 "to disk; I switch it to =notmuch-show-view-part= so the part opens with its "
@@ -6163,7 +6200,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1160
+#: modules/features/editor/emacs/init.org:1182
 #, no-wrap
 msgid ""
 "(use-package notmuch\n"
@@ -6216,7 +6253,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1203
+#: modules/features/editor/emacs/init.org:1225
 msgid ""
 "[[https://orgmode.org/manual/Protocols.html][ol-notmuch]] integrates notmuch "
 "with Org mode's link system.  Calling =org-store-link= (=C-c l=) in a "
@@ -6225,7 +6262,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1209
+#: modules/features/editor/emacs/init.org:1231
 #, no-wrap
 msgid ""
 "(use-package ol-notmuch\n"
@@ -6234,19 +6271,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1214
+#: modules/features/editor/emacs/init.org:1236
 #, no-wrap
 msgid "terminal"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1215
+#: modules/features/editor/emacs/init.org:1237
 #, no-wrap
 msgid "vterm"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1217
+#: modules/features/editor/emacs/init.org:1239
 msgid ""
 "[[https://github.com/akermu/emacs-libvterm][emacs-libvterm]] is a "
 "fully-fledged terminal emulator based on libvterm.  It provides better "
@@ -6255,7 +6292,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1222
+#: modules/features/editor/emacs/init.org:1244
 #, no-wrap
 msgid ""
 "(use-package vterm\n"
@@ -6263,13 +6300,13 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1226
+#: modules/features/editor/emacs/init.org:1248
 #, no-wrap
 msgid "encryption"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1228
+#: modules/features/editor/emacs/init.org:1250
 msgid ""
 "[[https://github.com/anticomputer/age.el][age.el]] provides transparent "
 "encryption and decryption of =.age= files in Emacs using the "
@@ -6277,14 +6314,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1231
+#: modules/features/editor/emacs/init.org:1253
 msgid ""
 "Using SSH keys as identity/recipient so that no separate age keypair is "
 "needed."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1235
+#: modules/features/editor/emacs/init.org:1257
 #, no-wrap
 msgid ""
 "(use-package age\n"
@@ -6298,33 +6335,33 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1245
+#: modules/features/editor/emacs/init.org:1267
 #, no-wrap
 msgid "AI"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1247
+#: modules/features/editor/emacs/init.org:1269
 #, no-wrap
 msgid "gptel"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1249
+#: modules/features/editor/emacs/init.org:1271
 msgid ""
 "[[https://github.com/karthink/gptel][gptel]] turns any buffer into a chat "
 "with an LLM backend."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1252
+#: modules/features/editor/emacs/init.org:1274
 msgid ""
 "Authenticate once with =gptel-openai-oauth-login= (ChatGPT device flow); the "
 "token is cached under =.cache/gptel-openai/= in =user-emacs-directory=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1256
+#: modules/features/editor/emacs/init.org:1278
 #, no-wrap
 msgid ""
 "(use-package gptel\n"
@@ -6335,19 +6372,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:1263
+#: modules/features/editor/emacs/init.org:1285
 #, no-wrap
 msgid "misc"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1264
+#: modules/features/editor/emacs/init.org:1286
 #, no-wrap
 msgid "vundo"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1266
+#: modules/features/editor/emacs/init.org:1288
 #, no-wrap
 msgid ""
 "(use-package vundo\n"
@@ -6358,13 +6395,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1273
+#: modules/features/editor/emacs/init.org:1295
 #, no-wrap
 msgid "consult"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1275
+#: modules/features/editor/emacs/init.org:1297
 #, no-wrap
 msgid ""
 ";; Example configuration for Consult\n"
@@ -6443,7 +6480,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1332
+#: modules/features/editor/emacs/init.org:1354
 #, no-wrap
 msgid ""
 ";; The :init configuration is always executed (Not lazy)\n"
@@ -6451,7 +6488,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1335
+#: modules/features/editor/emacs/init.org:1357
 #, no-wrap
 msgid ""
 ";; Tweak the register preview for `consult-register-load',\n"
@@ -6464,7 +6501,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1342
+#: modules/features/editor/emacs/init.org:1364
 #, no-wrap
 msgid ""
 ";; Use Consult to select xref locations with preview\n"
@@ -6473,7 +6510,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1346
+#: modules/features/editor/emacs/init.org:1368
 #, no-wrap
 msgid ""
 ";; Configure other variables and modes in the :config section,\n"
@@ -6482,7 +6519,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1350
+#: modules/features/editor/emacs/init.org:1372
 #, no-wrap
 msgid ""
 ";; Optionally configure preview. The default value\n"
@@ -6504,7 +6541,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1366
+#: modules/features/editor/emacs/init.org:1388
 #, no-wrap
 msgid ""
 ";; Optionally configure the narrowing key.\n"
@@ -6513,7 +6550,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1370
+#: modules/features/editor/emacs/init.org:1392
 #, no-wrap
 msgid ""
 "  ;; Optionally make narrowing help available in the minibuffer.\n"
@@ -6525,7 +6562,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1377
+#: modules/features/editor/emacs/init.org:1399
 #, no-wrap
 msgid ""
 "(use-package embark-consult\n"
@@ -6534,13 +6571,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1382
+#: modules/features/editor/emacs/init.org:1404
 #, no-wrap
 msgid "compilation"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1384
+#: modules/features/editor/emacs/init.org:1406
 msgid ""
 "The compilation buffer does not inherit from comint-mode, so ANSI escape "
 "sequences are displayed as raw text by default.  Adding "
@@ -6549,19 +6586,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1390
+#: modules/features/editor/emacs/init.org:1412
 #, no-wrap
 msgid "(add-hook 'compilation-filter-hook 'ansi-color-compilation-filter)"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1393
+#: modules/features/editor/emacs/init.org:1415
 #, no-wrap
 msgid "copy-region-reference"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1395
+#: modules/features/editor/emacs/init.org:1417
 msgid ""
 "Copy the absolute path and line range of the selected region in "
 "=file:start-end= format (e.g. =/path/to/file.el:10-20=).  Pasting the result "
@@ -6570,7 +6607,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1401
+#: modules/features/editor/emacs/init.org:1423
 #, no-wrap
 msgid ""
 "(defun my/copy-region-reference (start end)\n"
@@ -6587,31 +6624,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1412
+#: modules/features/editor/emacs/init.org:1434
 #, no-wrap
 msgid "(global-set-key (kbd \"C-c r\") #'my/copy-region-reference)"
 msgstr ""
 
 #. type: heading **
-#: modules/features/editor/emacs/init.org:1415
+#: modules/features/editor/emacs/init.org:1437
 #, no-wrap
 msgid "Others"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1417
+#: modules/features/editor/emacs/init.org:1439
 #, no-wrap
 msgid "(which-key-mode)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1419
+#: modules/features/editor/emacs/init.org:1441
 #, no-wrap
 msgid "(setq-default indent-tabs-mode nil)"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1421
+#: modules/features/editor/emacs/init.org:1443
 #, no-wrap
 msgid ""
 ";; org-tempo provides the \"<s TAB\" snippet expansion.  At top level, both "
@@ -6627,31 +6664,31 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1430
+#: modules/features/editor/emacs/init.org:1452
 #, no-wrap
 msgid "(setq org-src-preserve-indentation t)"
 msgstr ""
 
 #. type: heading ***
-#: modules/features/editor/emacs/init.org:1433
+#: modules/features/editor/emacs/init.org:1455
 #, no-wrap
 msgid "project.el"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1435
+#: modules/features/editor/emacs/init.org:1457
 msgid ""
 "Register all repositories cloned by ghq (https://github.com/x-motemen/ghq) "
 "as projects."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1437
+#: modules/features/editor/emacs/init.org:1459
 msgid "Specifically, directories under =~/src/$ACCOUNT/$VCS_HOST/$OWNER/$REPO=."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1440
+#: modules/features/editor/emacs/init.org:1462
 #, no-wrap
 msgid ""
 "(defun my/sync-project-list ()\n"
@@ -6667,7 +6704,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1450
+#: modules/features/editor/emacs/init.org:1472
 #, no-wrap
 msgid ""
 ";; 3. Build file contents in a temporary buffer\n"
@@ -6680,7 +6717,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1458
+#: modules/features/editor/emacs/init.org:1480
 #, no-wrap
 msgid ""
 ";; 4. Write the built contents to file\n"
@@ -6688,20 +6725,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1461
+#: modules/features/editor/emacs/init.org:1483
 #, no-wrap
 msgid "(my/sync-project-list)"
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1464
+#: modules/features/editor/emacs/init.org:1486
 msgid ""
 "Sort the project list by modification time, placing recently updated "
 "projects first."
 msgstr ""
 
 #. type: paragraph
-#: modules/features/editor/emacs/init.org:1466
+#: modules/features/editor/emacs/init.org:1488
 msgid ""
 "Using advice instead of sorting in =my/sync-project-list= ensures that "
 "projects are sorted by their current mtime at selection time, not at file "
@@ -6710,7 +6747,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1471
+#: modules/features/editor/emacs/init.org:1493
 #, no-wrap
 msgid ""
 "(defun my/sort-projects-by-mtime (projects)\n"
@@ -6725,7 +6762,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/features/editor/emacs/init.org:1481
+#: modules/features/editor/emacs/init.org:1503
 #, no-wrap
 msgid "(advice-add 'project-known-project-roots :filter-return"
 msgstr ""
