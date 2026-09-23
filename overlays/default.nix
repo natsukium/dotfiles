@@ -10,23 +10,24 @@
     final: prev:
     prev.lib.optionalAttrs (prev.config.cudaSupport or false) (
       let
-        pkgs = import inputs.nixpkgs-cuda {
+        pkgsWithCuda = import inputs.nixpkgs-cuda {
           inherit (prev.stdenv.hostPlatform) system;
           config = {
             cudaSupport = true;
             allowUnfree = true;
           };
         };
-        pkgsWithoutCuda = import inputs.nixpkgs {
+        pkgs = import inputs.nixpkgs {
           inherit (prev.stdenv.hostPlatform) system;
           config.allowUnfree = true;
         };
       in
       {
-        inherit (pkgs) onnxruntime ollama;
+        inherit (pkgsWithCuda) onnxruntime ollama;
         firefox-unwrapped = prev.firefox-unwrapped.override {
-          inherit (pkgsWithoutCuda) onnxruntime;
+          inherit (pkgs) onnxruntime;
         };
+        calibre = pkgs.calibre;
       }
     );
 

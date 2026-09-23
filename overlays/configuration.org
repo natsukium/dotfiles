@@ -65,8 +65,9 @@ The package set is imported plain because the CUDA Hydra builds plain nixpkgs, a
 overlay reaching into that closure would move the store paths off the cache. The guard
 keeps the pin off hosts that leave =cudaSupport= unset.
 
-Firefox takes onnxruntime as a build input on Linux since 141, so a host-wide =cudaSupport=
-drags the browser off cache.nixos.org and rebuilds it from source.
+Firefox takes onnxruntime as a build input on Linux since 141, and Calibre does the same for
+its Python environment. A host-wide =cudaSupport= would drag both applications off
+cache.nixos.org and rebuild their CUDA-enabled onnxruntime dependencies from source.
 
 #+NAME: cuda
 #+begin_src nix
@@ -74,23 +75,24 @@ cuda =
   final: prev:
   prev.lib.optionalAttrs (prev.config.cudaSupport or false) (
     let
-      pkgs = import inputs.nixpkgs-cuda {
+      pkgsWithCuda = import inputs.nixpkgs-cuda {
         inherit (prev.stdenv.hostPlatform) system;
         config = {
           cudaSupport = true;
           allowUnfree = true;
         };
       };
-      pkgsWithoutCuda = import inputs.nixpkgs {
+      pkgs = import inputs.nixpkgs {
         inherit (prev.stdenv.hostPlatform) system;
         config.allowUnfree = true;
       };
     in
     {
-      inherit (pkgs) onnxruntime ollama;
+      inherit (pkgsWithCuda) onnxruntime ollama;
       firefox-unwrapped = prev.firefox-unwrapped.override {
-        inherit (pkgsWithoutCuda) onnxruntime;
+        inherit (pkgs) onnxruntime;
       };
+      calibre = pkgs.calibre;
     }
   );
 #+end_src

@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-09-23 10:11+0900\n"
+"POT-Creation-Date: 2026-09-23 10:52+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -6865,13 +6865,13 @@ msgid "^:{}"
 msgstr ""
 
 #. type: heading *
-#: overlays/configuration.org:5 modules/configuration.org:5
+#: overlays/configuration.org:6 modules/configuration.org:5
 #, no-wrap
 msgid "Overview"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:7
+#: overlays/configuration.org:8
 msgid ""
 "This file defines nixpkgs overlays for patching broken packages, pinning "
 "specific versions, and adding local workarounds. Each overlay modifies the "
@@ -6880,7 +6880,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:11
+#: overlays/configuration.org:12
 msgid ""
 "For details on overlay mechanics (=final: prev:= pattern, composition order, "
 "etc.), see [[https://nixos.org/manual/nixpkgs/stable/#chap-overlays][nixpkgs "
@@ -6888,14 +6888,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:14
+#: overlays/configuration.org:15
 msgid ""
 "Overlays are organized into five categories based on their purpose and "
 "expected lifetime:"
 msgstr ""
 
 #. type: plain list -
-#: overlays/configuration.org:18
+#: overlays/configuration.org:19
 #, no-wrap
 msgid ""
 "*stable*: Packages fetched from nixpkgs-stable when broken in unstable and "
@@ -6904,7 +6904,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: overlays/configuration.org:20
+#: overlays/configuration.org:21
 #, no-wrap
 msgid ""
 "*cuda*: Packages taken from the CUDA channel, the only revision whose CUDA "
@@ -6913,7 +6913,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: overlays/configuration.org:22
+#: overlays/configuration.org:23
 #, no-wrap
 msgid ""
 "*temporary-fix*: Local overrides (e.g., disabling tests) that don't require "
@@ -6922,7 +6922,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: overlays/configuration.org:23
+#: overlays/configuration.org:24
 #, no-wrap
 msgid ""
 "*pre-release*: Alpha, beta, or pre-release packages for testing before they "
@@ -6930,7 +6930,7 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: overlays/configuration.org:25
+#: overlays/configuration.org:26
 #, no-wrap
 msgid ""
 "*patches*: Workarounds not suitable for upstream contribution (e.g., "
@@ -6939,7 +6939,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:32
+#: overlays/configuration.org:33
 #, no-wrap
 msgid ""
 "{ inputs }:\n"
@@ -6948,25 +6948,25 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:36
+#: overlays/configuration.org:37
 #, no-wrap
 msgid "<<cuda>>"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:38
+#: overlays/configuration.org:39
 #, no-wrap
 msgid "<<temporary-fix>>"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:40
+#: overlays/configuration.org:41
 #, no-wrap
 msgid "<<pre-release>>"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:42
+#: overlays/configuration.org:43
 #, no-wrap
 msgid ""
 "  <<patches>>\n"
@@ -6974,13 +6974,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:46 overlays/configuration.org:52
+#: overlays/configuration.org:47 overlays/configuration.org:53
 #, no-wrap
 msgid "stable"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:48
+#: overlays/configuration.org:49
 msgid ""
 "Fetch packages from nixpkgs-stable when broken in unstable. This includes "
 "cases where the upstream fix would trigger excessive rebuilds, or where the "
@@ -6988,7 +6988,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:54
+#: overlays/configuration.org:55
 #, no-wrap
 msgid ""
 "stable = final: prev: {\n"
@@ -6996,13 +6996,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:58 overlays/configuration.org:71
+#: overlays/configuration.org:59 overlays/configuration.org:73
 #, no-wrap
 msgid "cuda"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:60
+#: overlays/configuration.org:61
 msgid ""
 "[[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the head "
 "of =nixos-unstable-cuda=, so kilimanjaro takes its CUDA packages from "
@@ -7011,7 +7011,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:64
+#: overlays/configuration.org:65
 msgid ""
 "The package set is imported plain because the CUDA Hydra builds plain "
 "nixpkgs, and a local overlay reaching into that closure would move the store "
@@ -7020,50 +7020,52 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:68
+#: overlays/configuration.org:69
 msgid ""
-"Firefox takes onnxruntime as a build input on Linux since 141, so a "
-"host-wide =cudaSupport= drags the browser off cache.nixos.org and rebuilds "
-"it from source."
+"Firefox takes onnxruntime as a build input on Linux since 141, and Calibre "
+"does the same for its Python environment. A host-wide =cudaSupport= would "
+"drag both applications off cache.nixos.org and rebuild their CUDA-enabled "
+"onnxruntime dependencies from source."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:73
+#: overlays/configuration.org:75
 #, no-wrap
 msgid ""
 "cuda =\n"
 "  final: prev:\n"
 "  prev.lib.optionalAttrs (prev.config.cudaSupport or false) (\n"
 "    let\n"
-"      pkgs = import inputs.nixpkgs-cuda {\n"
+"      pkgsWithCuda = import inputs.nixpkgs-cuda {\n"
 "        inherit (prev.stdenv.hostPlatform) system;\n"
 "        config = {\n"
 "          cudaSupport = true;\n"
 "          allowUnfree = true;\n"
 "        };\n"
 "      };\n"
-"      pkgsWithoutCuda = import inputs.nixpkgs {\n"
+"      pkgs = import inputs.nixpkgs {\n"
 "        inherit (prev.stdenv.hostPlatform) system;\n"
 "        config.allowUnfree = true;\n"
 "      };\n"
 "    in\n"
 "    {\n"
-"      inherit (pkgs) onnxruntime ollama;\n"
+"      inherit (pkgsWithCuda) onnxruntime ollama;\n"
 "      firefox-unwrapped = prev.firefox-unwrapped.override {\n"
-"        inherit (pkgsWithoutCuda) onnxruntime;\n"
+"        inherit (pkgs) onnxruntime;\n"
 "      };\n"
+"      calibre = pkgs.calibre;\n"
 "    }\n"
 "  );"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:98 overlays/configuration.org:105
+#: overlays/configuration.org:101 overlays/configuration.org:108
 #, no-wrap
 msgid "temporary-fix"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:100
+#: overlays/configuration.org:103
 msgid ""
 "Local overrides for packages that build but have failing tests or minor "
 "issues.  Unlike the =stable= overlay, these don't require fetching packages "
@@ -7073,7 +7075,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:107
+#: overlays/configuration.org:110
 #, no-wrap
 msgid ""
 "temporary-fix = final: prev: {\n"
@@ -7082,13 +7084,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:112 overlays/configuration.org:118
+#: overlays/configuration.org:115 overlays/configuration.org:121
 #, no-wrap
 msgid "calibre-web"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:114
+#: overlays/configuration.org:117
 msgid ""
 "The 0.6.27 bump left the console script pointing at "
 "=calibreweb.__main__:main=, but nixpkgs moves upstream's =cps.py= to "
@@ -7096,7 +7098,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:120
+#: overlays/configuration.org:123
 #, no-wrap
 msgid ""
 "calibre-web = prev.calibre-web.overrideAttrs (old: {\n"
@@ -7108,13 +7110,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:128 overlays/configuration.org:134
+#: overlays/configuration.org:131 overlays/configuration.org:137
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:130
+#: overlays/configuration.org:133
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7123,7 +7125,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:136
+#: overlays/configuration.org:139
 #, no-wrap
 msgid ""
 "pre-release = final: prev: {\n"
@@ -7132,13 +7134,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:141 overlays/configuration.org:157
+#: overlays/configuration.org:144 overlays/configuration.org:160
 #, no-wrap
 msgid "mcp-grafana"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:143
+#: overlays/configuration.org:146
 msgid ""
 "manyara serves Grafana over MCP behind caddy and to the hermes guest, so "
 "both clients arrive with a =Host= that is not loopback. In 1.2.0 the "
@@ -7151,7 +7153,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:151
+#: overlays/configuration.org:154
 msgid ""
 "One dashboard test talks to a local test server and fails under the build "
 "sandbox with a truncated response, so it is skipped rather than turning off "
@@ -7159,12 +7161,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:155
+#: overlays/configuration.org:158
 msgid "Drop this once nixpkgs ships 1.4.0 or newer."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:159
+#: overlays/configuration.org:162
 #, no-wrap
 msgid ""
 "mcp-grafana = prev.mcp-grafana.overrideAttrs (\n"
@@ -7183,18 +7185,18 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:174 overlays/configuration.org:183
+#: overlays/configuration.org:177 overlays/configuration.org:186
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:176
+#: overlays/configuration.org:179
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:178
+#: overlays/configuration.org:181
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7203,7 +7205,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:185
+#: overlays/configuration.org:188
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7213,13 +7215,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:191 overlays/configuration.org:204
+#: overlays/configuration.org:194 overlays/configuration.org:207
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:193
+#: overlays/configuration.org:196
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7228,7 +7230,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:198
+#: overlays/configuration.org:201
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7237,14 +7239,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:202
+#: overlays/configuration.org:205
 msgid ""
 "Reported upstream in "
 "[[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]]."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:206
+#: overlays/configuration.org:209
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7258,18 +7260,18 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:216
+#: overlays/configuration.org:219
 #, no-wrap
 msgid "mkShim"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:218
+#: overlays/configuration.org:221
 msgid "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:220
+#: overlays/configuration.org:223
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7279,20 +7281,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:225
+#: overlays/configuration.org:228
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:227
+#: overlays/configuration.org:230
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:229
+#: overlays/configuration.org:232
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
