@@ -40,10 +40,11 @@
           context = ../common/AGENTS.md;
           settings = {
             defaultProvider = "openai-codex";
-            defaultModel = "gpt-5.6-luna";
+            defaultModel = "gpt-6-luna";
             enabledModels = [
-              "openai-codex/gpt-5.6-luna"
-              "openai-codex/gpt-5.6-sol"
+              "openai-codex/gpt-6-luna"
+              "openai-codex/gpt-6-sol"
+              "openai-codex/gpt-6-astra"
               "opencode-go/muse-spark-1.3-contributor"
               "opencode-go/deepseek-v4.1-flash"
               "opencode-go/glm-5.3-flash"

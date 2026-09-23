@@ -96,7 +96,7 @@ in
     enable = true;
     settings = {
       model.provider = "openai-codex";
-      model.default = "gpt-5.6-terra";
+      model.default = "gpt-6-luna";
       web.search_backend = "searxng";
       # The endpoint and token come from the seeded .env (see the host module),
       # which is also where hermes resolves these references from; the config

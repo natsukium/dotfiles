@@ -11,10 +11,10 @@ owns any revisions.
 
 ## Models
 
-| Model                       | Use for                                                   |
-| --------------------------- | --------------------------------------------------------- |
-| `openai-codex/gpt-5.6-sol`  | Adversarial design or diff review; final gate             |
-| `openai-codex/gpt-5.6-luna` | Early drafts, quick checks, and triage between sol rounds |
+| Model                     | Use for                                                   |
+| ------------------------- | --------------------------------------------------------- |
+| `openai-codex/gpt-6-sol`  | Adversarial design or diff review; final gate             |
+| `openai-codex/gpt-6-luna` | Early drafts, quick checks, and triage between sol rounds |
 
 Use an explicitly requested model. Otherwise use luna for an early pass and sol
 for high-risk reasoning or the final pass.
@@ -46,7 +46,7 @@ Use a foreground command with a timeout of at least 30 minutes:
 
 ```bash
 PI_REVIEW_WORKER=1 pi \
-  --model openai-codex/gpt-5.6-sol --thinking high \
+  --model openai-codex/gpt-6-sol --thinking high \
   --tools read,grep,find,ls,bash --print --no-session \
   "@<skill-directory>/references/reviewer.md" \
   "@/absolute/path/to/review-context.md" \
