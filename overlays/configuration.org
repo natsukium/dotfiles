@@ -107,24 +107,7 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 #+NAME: temporary-fix
 #+begin_src nix
 temporary-fix = final: prev: {
-  <<calibre-web>>
 };
-#+end_src
-
-** calibre-web
-
-The 0.6.27 bump left the console script pointing at =calibreweb.__main__:main=, but
-nixpkgs moves upstream's =cps.py= to =calibreweb/__init__.py=, so no =__main__= module
-is ever installed.
-
-#+NAME: calibre-web
-#+begin_src nix
-calibre-web = prev.calibre-web.overrideAttrs (old: {
-  postPatch = old.postPatch + ''
-    substituteInPlace pyproject.toml \
-      --replace-fail 'calibreweb.__main__:main' 'calibreweb:main'
-  '';
-});
 #+end_src
 
 * pre-release
