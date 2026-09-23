@@ -3,14 +3,13 @@
   flake.modules.homeManager.skhd =
     {
       config,
-      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       cfg = config.my.services.skhd;
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
 
       # macOS identifies a bare executable by absolute path, so skhd's
       # Accessibility grant would die with the store path on every rebuild.

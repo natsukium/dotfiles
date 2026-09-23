@@ -6,14 +6,13 @@ let
   homeModule =
     {
       config,
-      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       cfg = config.my.programs.handy;
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
       app = appIdentity.stabilizeApp pkgs.handy;
     in
     {

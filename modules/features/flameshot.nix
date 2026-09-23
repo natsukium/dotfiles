@@ -4,14 +4,13 @@
     {
       config,
       options,
-      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       cfg = config.my.services.flameshot;
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
       app = appIdentity.stabilizeApp cfg.package;
       iniFormat = pkgs.formats.ini { };
       iniFile = iniFormat.generate "flameshot.ini" cfg.settings;

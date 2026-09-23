@@ -9,7 +9,7 @@
       ...
     }:
     let
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
 
       # A launchd agent runs a bare executable, which macOS identifies by
       # absolute path; in the store that path moves on every rebuild, taking

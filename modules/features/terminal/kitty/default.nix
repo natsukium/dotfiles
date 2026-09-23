@@ -3,14 +3,13 @@
   flake.modules.homeManager.kitty =
     {
       config,
-      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       inherit (pkgs) stdenv;
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
 
       tmux-prefix = "ctrl+j";
       tmux-compat-keybindings = {

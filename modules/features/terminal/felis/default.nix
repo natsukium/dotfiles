@@ -33,7 +33,7 @@ in
     }:
     let
       inherit (config.colorScheme) palette;
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
       package =
         let
           felis = inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default;

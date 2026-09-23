@@ -4,14 +4,13 @@
     {
       config,
       options,
-      inputs,
       lib,
       pkgs,
       ...
     }:
     let
       cfg = config.my.services.copyq;
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
       app = appIdentity.stabilizeApp cfg.package;
     in
     {

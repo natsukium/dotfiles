@@ -3,13 +3,12 @@
   flake.modules.homeManager.qutebrowser =
     {
       config,
-      inputs,
       lib,
       pkgs,
       ...
     }:
     let
-      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      inherit (config.lib) appIdentity;
     in
     {
       options.my.programs.qutebrowser.enable = lib.mkEnableOption "qutebrowser";
