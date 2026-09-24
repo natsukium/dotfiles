@@ -1,0 +1,172 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'EOF'
+usage:
+  pi-review start --out PREFIX --context FILE [--attach FILE]... [--model sol|luna|ID]
+                  [--thinking LEVEL] [--repo DIR]
+  pi-review wait PREFIX [--timeout SEC] [--stall SEC]
+  pi-review stop PREFIX
+
+start  launches pi detached from the caller and returns at once.
+wait   blocks until the review ends and prints it.
+       exit 0 PASS, 1 BLOCKED, 2 ended without a verdict,
+       3 stalled (still running), 124 --timeout reached (still running; wait again).
+stop   kills the review started under PREFIX.
+EOF
+  exit 64
+}
+
+die() {
+  echo "pi-review: $*" >&2
+  exit 2
+}
+
+here=$(cd -P -- "${BASH_SOURCE[0]%/*}" && pwd)
+reviewer=$here/../references/reviewer.md
+
+absolute() {
+  case $1 in
+    /*) printf '%s\n' "$1" ;;
+    *) printf '%s\n' "$PWD/$1" ;;
+  esac
+}
+
+cmd_start() {
+  local out="" context="" model=sol thinking=high repo=""
+  local -a attach=()
+  while (($#)); do
+    case $1 in
+      --out) out=$(absolute "$2"); shift 2 ;;
+      --context) context=$(absolute "$2"); shift 2 ;;
+      --attach) attach+=("@$(absolute "$2")"); shift 2 ;;
+      --model) model=$2; shift 2 ;;
+      --thinking) thinking=$2; shift 2 ;;
+      --repo) repo=$2; shift 2 ;;
+      *) usage ;;
+    esac
+  done
+  [[ -n $out && -n $context ]] || usage
+  [[ -f $context ]] || die "no such context file: $context"
+
+  case $model in
+    sol | luna) model=openai-codex/gpt-6-$model ;;
+  esac
+
+  # A review started outside the target repository cannot read the source it
+  # is asked about, and still returns a confident verdict.
+  repo=$(git -C "${repo:-.}" rev-parse --show-toplevel 2>/dev/null) ||
+    die "run from inside the target repository or pass --repo"
+
+  if [[ -f $out.pid ]] && kill -0 "$(<"$out.pid")" 2>/dev/null; then
+    die "a review is already running under $out"
+  fi
+  rm -f "$out.jsonl" "$out.err" "$out.md" "$out.pid"
+
+  local -a detach=(nohup)
+  command -v setsid >/dev/null && detach=(setsid nohup)
+
+  # pi --print reads a non-TTY stdin to EOF before its first request, so an
+  # inherited open pipe hangs it with no output; hence </dev/null.
+  # Detaching lets the review outlive a caller whose shell gets reaped.
+  (
+    cd "$repo"
+    PI_REVIEW_WORKER=1 exec "${detach[@]}" pi \
+      --model "$model" --thinking "$thinking" \
+      --tools read,grep,find,ls,bash --print --no-session --mode json \
+      "@$reviewer" "@$context" "${attach[@]}" \
+      "Follow reviewer.md and the review context. Inspect the repository in the current working directory." \
+      </dev/null >"$out.jsonl" 2>"$out.err"
+  ) &
+  echo $! >"$out.pid"
+  echo "started pid $! in $repo; next: pi-review wait $out"
+}
+
+final_text() {
+  # A dropped connection ends one attempt with agent_end and retries, so the
+  # first agent_end is not the end; take the last assistant text instead.
+  jq -Rrn '
+    [inputs | fromjson? | select(.type == "message_end" and .message.role == "assistant")
+     | [.message.content[]? | select(.type == "text") | .text] | join("")
+     | select(length > 0)]
+    | last // empty' "$1"
+}
+
+cmd_wait() {
+  local out="" timeout=0 stall=900
+  while (($#)); do
+    case $1 in
+      --timeout) timeout=$2; shift 2 ;;
+      --stall) stall=$2; shift 2 ;;
+      -*) usage ;;
+      *) out=$(absolute "$1"); shift ;;
+    esac
+  done
+  [[ -n $out && -f $out.pid ]] || die "no review started under ${out:-?}"
+  local pid lines=-1 now_lines last_change=$SECONDS
+  local -a seen
+  pid=$(<"$out.pid")
+
+  while kill -0 "$pid" 2>/dev/null; do
+    mapfile -t seen <"$out.jsonl"
+    now_lines=${#seen[@]}
+    if ((now_lines != lines)); then
+      lines=$now_lines
+      last_change=$SECONDS
+    elif ((SECONDS - last_change >= stall)); then
+      echo "pi-review: no output for ${stall}s; stop and restart it once" >&2
+      exit 3
+    fi
+    if ((timeout > 0 && SECONDS >= timeout)); then
+      echo "pi-review: still running after ${timeout}s; run wait again" >&2
+      exit 124
+    fi
+    sleep 15
+  done
+
+  final_text "$out.jsonl" >"$out.md"
+  if [[ ! -s $out.md ]]; then
+    echo "pi-review: ended without a review; stderr follows" >&2
+    cat "$out.err" >&2
+    exit 2
+  fi
+  cat "$out.md"
+  echo
+  echo "review saved to $out.md"
+  local verdict
+  verdict=$(grep -Eo '^Verdict: (PASS|BLOCKED)' "$out.md" | tail -n 1) || true
+  case $verdict in
+    "Verdict: PASS") exit 0 ;;
+    "Verdict: BLOCKED") exit 1 ;;
+    *) exit 2 ;;
+  esac
+}
+
+cmd_stop() {
+  [[ $# -eq 1 ]] || usage
+  local out pid
+  out=$(absolute "$1")
+  [[ -f $out.pid ]] || die "no review started under $out"
+  pid=$(<"$out.pid")
+  kill -0 "$pid" 2>/dev/null || {
+    echo "not running"
+    return
+  }
+  # Match on the pid recorded at start, never on a pattern: pkill -f with the
+  # model name also matches the calling shell's own command line.
+  [[ $(ps -p "$pid" -o comm=) =~ (^|/)(pi|node|\.pi-wrapped)$ ]] ||
+    die "pid $pid is no longer a pi process"
+  kill "$pid"
+  echo "stopped pid $pid"
+}
+
+(($#)) || usage
+sub=$1
+shift
+case $sub in
+  start) cmd_start "$@" ;;
+  wait) cmd_wait "$@" ;;
+  stop) cmd_stop "$@" ;;
+  *) usage ;;
+esac

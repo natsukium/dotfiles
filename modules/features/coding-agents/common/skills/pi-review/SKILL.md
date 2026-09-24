@@ -21,8 +21,7 @@ for high-risk reasoning or the final pass.
 
 ## Prepare the review
 
-Run pi from the target repository root. Write the change-specific information to
-a scratch file outside the repository:
+Write the change-specific information to a scratch file outside the repository:
 
 ```markdown
 # Review context
@@ -34,33 +33,40 @@ Focus: <risks to examine>
 Previous findings: <findings and claimed resolutions, or none>
 ```
 
-For a design, attach the document as another `@file`. For code, let pi inspect the
+For a design, attach the document with `--attach`. For code, let pi inspect the
 named Git range and surrounding source instead of copying the diff into the prompt.
-
-The fixed review criteria and output format live in
-`./references/reviewer.md`. Resolve that file to an absolute path before invoking pi.
+The fixed review criteria and output format live in `./references/reviewer.md`,
+which the script passes itself.
 
 ## Run the review
 
-Use a foreground command with a timeout of at least 30 minutes:
+`./scripts/pi-review` launches pi detached from the calling shell and waits for it
+in a separate step, so the review survives a caller whose shell is killed or
+timed out. Run it from inside the target repository: it starts pi at the
+repository root and refuses to start elsewhere.
 
 ```bash
-PI_REVIEW_WORKER=1 pi \
-  --model openai-codex/gpt-6-sol --thinking high \
-  --tools read,grep,find,ls,bash --print --no-session \
-  "@<skill-directory>/references/reviewer.md" \
-  "@/absolute/path/to/review-context.md" \
-  "@/absolute/path/to/design.md" \
-  "Follow reviewer.md and review-context.md. Inspect the repository in the current working directory." \
-  > /absolute/path/to/review-1.md 2>&1
+<skill-directory>/scripts/pi-review start --out /abs/scratch/review-1 \
+  --context /abs/scratch/review-context.md [--attach /abs/path/design.md] [--model luna]
+<skill-directory>/scripts/pi-review wait /abs/scratch/review-1
 ```
 
-Omit the design attachment for a code review. Change the model ID for a luna pass.
-Keep `PI_REVIEW_WORKER=1`: pi then omits this delegation skill from the child while
-loading other global and project skills normally. Print mode may stay silent until
-completion, so an empty output file does not indicate a hang. Treat the process as
-hung when it exceeds the harness's 30-minute wall-clock timeout, then terminate it
-and retry once. A nonzero exit is not a review result.
+`--model` defaults to sol. `wait` prints the review, saves it to `<out>.md`, and
+exits 0 for `PASS`, 1 for `BLOCKED`, and 2 when pi ended without a verdict (its
+stderr is in `<out>.err`; that is not a review result). Sol rounds take 13 to 50
+minutes and luna 10 to 15.
+
+Where the caller's command timeout is shorter than a review, pass
+`wait --timeout <seconds>` below that limit and call `wait` again after exit 124;
+the review keeps running in between. Claude Code may instead run `wait` as a
+background command and act on its completion notice. `wait` exits 3 when the
+event stream has been silent for 15 minutes (`--stall`); then run
+`pi-review stop <out>` and start the round once more. Stop a review only through
+`stop`, which kills the recorded pid: a `pkill -f` pattern naming the model also
+matches the calling shell's own command line.
+
+`PI_REVIEW_WORKER=1` is set by the script: pi then omits this delegation skill
+from the child while loading other global and project skills normally.
 
 ## Iterate
 
@@ -70,4 +76,6 @@ and retry once. A nonzero exit is not a review result.
    new context file. Narrow `Focus` as the remaining risk changes.
 4. Continue until the verdict is `PASS`. Do not change the target for a mistaken or
    out-of-scope finding; record the evidence or scope boundary in the next context.
+   After three consecutive `BLOCKED` rounds, stop and ask the user whether the
+   direction still holds before starting another.
 5. Report each round's verdict and the accepted or rejected findings to the user.

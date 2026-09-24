@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'EOF'
+usage: ci-wait --repo OWNER/REPO [-H URL] [--timeout SEC] [--interval SEC]
+               [--appear SEC] [--log-lines N] COMMIT
+
+Waits until every Forgejo Actions run for COMMIT (a SHA, or a ref resolved in
+the current checkout) has finished, then prints each run and the log tail of
+every failed job.
+exit 0 all passed, 1 a run failed or was cancelled, 2 no run appeared,
+124 --timeout reached (runs still going; call again).
+Set FORGEJO_TOKEN for a private repository.
+EOF
+  exit 64
+}
+
+host=https://git.natsukium.com repo="" commit="" timeout=0 interval=30 appear=180 log_lines=40
+while (($#)); do
+  case $1 in
+    -H) host=${2%/}; shift 2 ;;
+    --repo | -r) repo=$2; shift 2 ;;
+    --timeout) timeout=$2; shift 2 ;;
+    --interval) interval=$2; shift 2 ;;
+    --appear) appear=$2; shift 2 ;;
+    --log-lines) log_lines=$2; shift 2 ;;
+    -*) usage ;;
+    *) commit=$1; shift ;;
+  esac
+done
+[[ -n $repo && -n $commit ]] || usage
+[[ $host == http* ]] || host=https://$host
+if [[ ! $commit =~ ^[0-9a-f]{40}$ ]]; then
+  commit=$(git rev-parse --verify "$commit^{commit}") || exit 2
+fi
+
+api=$host/api/v1/repos/$repo
+auth=()
+[[ -n ${FORGEJO_TOKEN:-} ]] && auth=(-H "Authorization: token $FORGEJO_TOKEN")
+get() { curl -fsS --retry 3 "${auth[@]}" "$api/$1"; }
+
+# Runs are matched by commit because the run number `fj actions tasks` prints
+# is not the id the REST API takes.
+while :; do
+  runs=$(get "actions/runs?head_sha=$commit&limit=50")
+  count=$(jq '.workflow_runs | length' <<<"$runs")
+  pending=$(jq '[.workflow_runs[] | select(.status | IN("success","failure","cancelled","skipped") | not)] | length' <<<"$runs")
+  if ((count == 0 && SECONDS >= appear)); then
+    echo "ci-wait: no Actions run for $commit after ${appear}s" >&2
+    exit 2
+  fi
+  ((count > 0 && pending == 0)) && break
+  if ((timeout > 0 && SECONDS >= timeout)); then
+    echo "ci-wait: $pending of $count runs still going after ${timeout}s; call again" >&2
+    exit 124
+  fi
+  sleep "$interval"
+done
+
+jq -r '.workflow_runs[] | "\(.status)\t\(.workflow_id)\t\(.html_url)"' <<<"$runs"
+
+failed=$(jq -r '.workflow_runs[] | select(.status | IN("failure","cancelled")) | .id' <<<"$runs")
+[[ -z $failed ]] && exit 0
+
+for run in $failed; do
+  # The jobs endpoint returns a bare array, unlike the runs endpoint.
+  get "actions/runs/$run/jobs" |
+    jq -r '.[] | select(.status | IN("failure","cancelled")) | "\(.id)\t\(.name)"' |
+    while IFS=$'\t' read -r job name; do
+      echo
+      echo "== $name (job $job): $api/actions/jobs/$job/logs"
+      get "actions/jobs/$job/logs" | tail -n "$log_lines"
+    done
+done
+exit 1

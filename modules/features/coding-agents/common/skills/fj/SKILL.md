@@ -92,6 +92,32 @@ fj release --help
 fj actions --help
 ```
 
+## Waiting for CI
+
+`fj` has no command that waits for Actions or prints job logs. Use
+`./scripts/ci-wait`, which polls the REST API for every run on one commit and, once
+all have finished, prints each run and the log tail of each failed job:
+
+```bash
+<skill-directory>/scripts/ci-wait --repo owner/repo HEAD
+<skill-directory>/scripts/ci-wait --repo owner/repo --timeout 540 <sha>
+```
+
+It exits 0 when every run passed, 1 when one failed or was cancelled, 2 when no run
+appeared for the commit, and 124 at `--timeout` with runs still going; call it again
+then. Pass a `--timeout` below the caller's own command limit, or run it as a
+background command where the agent is notified when one ends. Set `FORGEJO_TOKEN`
+for a private repository.
+
+For anything the script does not cover, the REST API under
+`/api/v1/repos/owner/repo/actions/` needs no token on a public repository:
+
+- `runs?head_sha=<sha>` returns `{"workflow_runs": [...]}`; `runs/<id>/jobs` returns a
+  bare array; `jobs/<job-id>/logs` returns plain text.
+- The `#N` that `fj actions tasks` prints is the run number, not the run `id` these
+  endpoints take.
+- There is no rerun endpoint; rerun from the web UI or push a new commit.
+
 ## Important differences from gh
 
 - `--repo` is not universal; use the command-specific forms above rather than translating a `gh` command mechanically.
@@ -99,4 +125,5 @@ fj actions --help
 - Bare issue or PR numbers are safe only when checkout inference is intentional and verified.
 - In `fj` 0.6.0, `pr status` can panic while formatting Forgejo check data (`Unknown variable: $created_at`); use `pr view` and the Forgejo web UI if that occurs.
 - Quote qualified references containing `#`.
+- `issue create` prints the new number wrapped in Unicode bidi isolates (`#⁨385⁩`); strip non-digits before reusing it.
 - Use `gh`, not `fj`, for `github.com` remotes and URLs. If unsure, inspect `git remote -v` first.
