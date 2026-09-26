@@ -183,7 +183,7 @@
 
         labels = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          default = [ "windows:host" ];
+          default = [ "x86_64-windows:host" ];
           description = ''
             Labels the runner advertises. Only `host` labels make sense here: a
             `docker` label would need Windows containers, which means Docker Desktop

@@ -56,8 +56,7 @@ let
 
       config = lib.mkIf config.my.services.forgejo-runner.enable {
         my.services.forgejo-runner.labels = lib.mkDefault [
-          "macos:host"
-          "macos-aarch64:host"
+          "aarch64-darwin:host"
         ];
 
         services.forgejo-runner.instances.default = mkInstance config (
@@ -89,7 +88,7 @@ let
       config = lib.mkIf config.my.services.forgejo-runner.enable {
         my.services.forgejo-runner.labels = lib.mkDefault [
           "ubuntu-latest:docker://node:22-bookworm"
-          "nix:host"
+          "x86_64-linux:host"
         ];
 
         services.gitea-actions-runner = {

@@ -54,7 +54,7 @@ let
 
         labels = lib.mkOption {
           type = lib.types.listOf lib.types.str;
-          example = [ "macos:host" ];
+          example = [ "aarch64-darwin:host" ];
           description = "Labels the runner advertises.";
         };
 

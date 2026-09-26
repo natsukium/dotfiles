@@ -4018,7 +4018,7 @@ instanceModule =
 
       labels = lib.mkOption {
         type = lib.types.listOf lib.types.str;
-        example = [ "macos:host" ];
+        example = [ "aarch64-darwin:host" ];
         description = "Labels the runner advertises.";
       };
 
@@ -4245,7 +4245,9 @@ the NixOS instance schema, the wrappers share one option surface and one
 host owns the secret and hands only its path. Each wrapper holds only the
 per-platform deltas: the =labels= default, =hostPackages=, and — on NixOS — the
 package and Docker for container jobs. Both push to my binary cache, so each
-=hostPackages= adds =nix= and the niks3 client.
+=hostPackages= adds =nix= and the niks3 client. A host label names the Nix
+system its jobs run on (=x86_64-linux=, =aarch64-darwin=, =x86_64-windows=), so
+a workflow's =runs-on= states the platform it needs.
 
 #+NAME: forgejo-runner-wrapper-shared
 #+begin_src nix
@@ -4305,8 +4307,7 @@ darwinWrapper =
 
     config = lib.mkIf config.my.services.forgejo-runner.enable {
       my.services.forgejo-runner.labels = lib.mkDefault [
-        "macos:host"
-        "macos-aarch64:host"
+        "aarch64-darwin:host"
       ];
 
       services.forgejo-runner.instances.default = mkInstance config (
@@ -4338,7 +4339,7 @@ nixosWrapper =
     config = lib.mkIf config.my.services.forgejo-runner.enable {
       my.services.forgejo-runner.labels = lib.mkDefault [
         "ubuntu-latest:docker://node:22-bookworm"
-        "nix:host"
+        "x86_64-linux:host"
       ];
 
       services.gitea-actions-runner = {
@@ -4448,7 +4449,7 @@ name = lib.mkOption {
 
 labels = lib.mkOption {
   type = lib.types.listOf lib.types.str;
-  default = [ "windows:host" ];
+  default = [ "x86_64-windows:host" ];
   description = ''
     Labels the runner advertises. Only `host` labels make sense here: a
     `docker` label would need Windows containers, which means Docker Desktop
