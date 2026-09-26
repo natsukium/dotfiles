@@ -67,7 +67,10 @@ in
       forgejo = {
         issuer = "https://git.natsukium.com/api/actions";
         audience = "https://${serverDomain}";
-        boundClaims.repository_owner = [ "natsukium" ];
+        boundClaims.repository_owner = [
+          "natsukium"
+          "felis-terminal"
+        ];
       };
     };
   };
