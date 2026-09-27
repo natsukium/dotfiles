@@ -528,6 +528,11 @@ refuses to realise anything. Upstream's per-crate wrapper copies its binary out
 of the unpatched workspace, so the feature lifts =hydra-builder= out of the
 patched one itself.
 
+I point the queue runner's GC roots at the web app's =gcRootsDir=. Upstream's modules
+default the two to different directories. =hydra-update-gc-roots= prunes only
+=gcRootsDir=, so every output root the queue runner registered elsewhere stayed
+forever, and garbage collection slowed as they piled up.
+
 #+begin_src nix :tangle features/hydra/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -686,6 +691,7 @@ let
           settings = {
             machineFreeFn = "DynamicWithMaxJobLimit";
             useSubstitutes = true;
+            rootsDir = config.services.hydra-dev.gcRootsDir;
           };
         };
 

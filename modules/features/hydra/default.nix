@@ -153,6 +153,7 @@ let
           settings = {
             machineFreeFn = "DynamicWithMaxJobLimit";
             useSubstitutes = true;
+            rootsDir = config.services.hydra-dev.gcRootsDir;
           };
         };
 
