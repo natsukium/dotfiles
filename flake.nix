@@ -123,7 +123,7 @@
       inputs.nixpkgs.follows = "nixpkgs";
     };
     felis = {
-      url = "git+https://git.natsukium.com/natsukium/felis";
+      url = "git+https://git.natsukium.com/felis-terminal/felis";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-parts.follows = "flake-parts";
     };
