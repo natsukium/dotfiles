@@ -1,0 +1,22 @@
+diff --git a/script/hydra-eval-jobset b/script/hydra-eval-jobset
+index 13f7f77e..a554b89c 100755
+--- a/script/hydra-eval-jobset
++++ b/script/hydra-eval-jobset
+@@ -717,12 +717,16 @@ sub applyDrvPathRepoints {
+     return unless @ids;
+ 
+     my $builds = $db->resultset('Builds');
++    # A ResultSet update goes straight to SQL, so the column's deflator never
++    # runs and a StorePath would be stored as its bare base name.
++    my $storeDir = $db->storeDir;
+     for (my $attempt = 1; ; $attempt++) {
+         eval {
+             $db->txn_do(sub {
+                 for my $id (@ids) {
+                     $builds->search({ id => $id })->update(
+-                        { drvpath => $buildMap->{$id}->{drvPath}, finished => 0, buildstatus => undef });
++                        { drvpath => printStorePath($storeDir, $buildMap->{$id}->{drvPath})
++                        , finished => 0, buildstatus => undef });
+                 }
+             });
+         };

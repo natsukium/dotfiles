@@ -11,9 +11,17 @@
     # separate URIws that Catalyst still propagates. An overlay cannot reach this
     # package because hydra's flake builds it from nixpkgs.legacyPackages, so the
     # alias goes in here. Drop once nixpkgs stops propagating URIws.
-    package = inputs.hydra.packages.${pkgs.stdenv.hostPlatform.system}.hydra.override {
-      perlPackages = pkgs.perlPackages.overrideScope (_: prev: { URIws = prev.URI; });
-    };
+    #
+    # The patch stops hydra-eval-jobset from writing repointed drvpaths without the
+    # store directory, which halts the queue runner and hydra-update-gc-roots. Drop
+    # once upstream fixes applyDrvPathRepoints.
+    package =
+      (inputs.hydra.packages.${pkgs.stdenv.hostPlatform.system}.hydra.override {
+        perlPackages = pkgs.perlPackages.overrideScope (_: prev: { URIws = prev.URI; });
+      }).overrideAttrs
+        (old: {
+          patches = (old.patches or [ ]) ++ [ ./eval-jobset-print-store-dir.patch ];
+        });
     hydraURL = "http://hydra.home.natsukium.com";
     port = 3000;
     notificationSender = "";
