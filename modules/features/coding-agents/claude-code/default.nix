@@ -29,6 +29,8 @@
           settings = {
             outputStyle = "Concise";
 
+            remoteControlAtStartup = true;
+
             attribution = {
               commit = "";
               pr = "";
