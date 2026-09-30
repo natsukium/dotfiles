@@ -42,7 +42,19 @@ def claude_model():
     # Claude Code derives its project directory from $PWD by replacing
     # "/", "." and "_" with "-".
     slug = os.getcwd().replace("/", "-").replace(".", "-").replace("_", "-")
-    transcript = pathlib.Path.home() / ".claude" / "projects" / slug / f"{session_id}.jsonl"
+    project = pathlib.Path.home() / ".claude" / "projects" / slug
+    transcript = project / f"{session_id}.jsonl"
+    # A subagent inherits the parent's CLAUDE_CODE_SESSION_ID and cwd and
+    # exports nothing that names it, so its own model (which can differ from
+    # the parent's) is only reachable through its transcript. The agent that
+    # is committing has appended to its transcript most recently, which makes
+    # the newest file the best available guess; concurrent subagents can
+    # still be confused with one another.
+    candidates = [transcript, *(project / session_id / "subagents").glob("agent-*.jsonl")]
+    try:
+        transcript = max(candidates, key=lambda p: p.stat().st_mtime)
+    except OSError:
+        return None
     model = None
     try:
         with transcript.open(encoding="utf-8") as fh:
