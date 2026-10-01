@@ -5106,12 +5106,11 @@ defaults are transcribed here: an unset preference does not match any =-moz-pref
 and dropping the list would leave the theme running on whatever the stylesheets fall back
 to rather than on what its author intended.
 
-Four values depart from that baseline. =sidebar.verticalTabs= and =sidebar.visibility= are
+Three values depart from that baseline. =sidebar.verticalTabs= and =sidebar.visibility= are
 Firefox's own preferences, and the =hide-sidebar= value is what puts parfait into its
 floating layout: the navigation bar slides off screen and the sidebar hovers over the
-page, which is the compact mode I came here for. =parfait.blur.enabled= adds the backdrop
-filter behind the floating address bar. =parfait.urlbar.search-mode.glow= is off: I do not
-want an animation firing every time the search mode changes.
+page, which is the compact mode I came here for. =parfait.theme.blur.enabled= adds a
+backdrop filter behind the floating sidebar and the find bar.
 
 #+NAME: firefox-settings
 #+begin_src nix
@@ -5131,25 +5130,23 @@ settings = {
   "signon.rememberSignons" = false;
 
   "parfait.animations.enabled" = true;
-  "parfait.blur.enabled" = true;
+  "parfait.theme.borderless" = false;
+  "parfait.theme.blur.enabled" = true;
   "parfait.theme.roundness.preset" = 0;
-  "parfait.window.borderless" = false;
-  "parfait.bg.accent-color" = false;
-  "parfait.bg.contrast" = 2;
-  "parfait.bg.gradient" = false;
-  "parfait.bg.opacity" = 4;
-  "parfait.bg.transparent" = false;
-  "parfait.tabs.groups.color" = false;
-  "parfait.sidebar.width.preset" = 2;
+  "parfait.background.accent-color" = false;
+  "parfait.background.accent-color.contrast" = 2;
+  "parfait.background.accent-color.gradient" = false;
+  "parfait.background.accent-color.opacity" = 4;
+  "parfait.background.transparent" = false;
+  "parfait.tabs.groups.fx-colors-on-folders" = false;
+  "parfait.layout.unified-sidebar" = true;
+  "parfait.layout.unified-sidebar.width.preset" = 2;
   "parfait.toolbar.sidebar-gutter" = true;
-  "parfait.toolbar.unified-sidebar" = true;
   "parfait.traffic-lights.enabled" = false;
   "parfait.traffic-lights.mono" = false;
-  "parfait.urlbar.url.center" = false;
-  "parfait.urlbar.results.compact" = false;
-  "parfait.urlbar.search-mode.glow" = false;
-  "parfait.new-tab.logo" = 1;
-  "parfait.new-tab.bg.pattern" = false;
+  "parfait.urlbar.center-url" = false;
+  "parfait.new-tab.logo.preset" = 1;
+  "parfait.new-tab.background.pattern" = false;
 };
 #+end_src
 
