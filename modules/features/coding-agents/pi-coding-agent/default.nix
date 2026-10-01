@@ -43,7 +43,7 @@
             defaultModel = "gpt-6-luna";
             enabledModels = [
               "openai-codex/gpt-6-luna"
-              "openai-codex/gpt-6-sol"
+              "openai-codex/gpt-6.1-sol"
               "openai-codex/gpt-6-astra"
               "opencode-go/muse-spark-1.3-contributor"
               "opencode-go/deepseek-v4.1-flash"

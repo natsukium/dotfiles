@@ -11,10 +11,10 @@ owns any revisions.
 
 ## Models
 
-| Model                     | Use for                                                   |
-| ------------------------- | --------------------------------------------------------- |
-| `openai-codex/gpt-6-sol`  | Adversarial design or diff review; final gate             |
-| `openai-codex/gpt-6-luna` | Early drafts, quick checks, and triage between sol rounds |
+| Model                      | Use for                                                   |
+| -------------------------- | --------------------------------------------------------- |
+| `openai-codex/gpt-6.1-sol` | Adversarial design or diff review; final gate             |
+| `openai-codex/gpt-6-luna`  | Early drafts, quick checks, and triage between sol rounds |
 
 Use an explicitly requested model. Otherwise use luna for an early pass and sol
 for high-risk reasoning or the final pass.
