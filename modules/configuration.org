@@ -5100,54 +5100,63 @@ rebuild would mean approving every one by hand.
 
 I keep my passwords in Bitwarden, so I turn off =signon.rememberSignons=.
 
-parfait ships its defaults in a =user.js= that its install instructions tell you to copy
-into the profile. home-manager generates =user.js= itself from =settings=, so those
-defaults are transcribed here: an unset preference does not match any =-moz-pref()= query,
-and dropping the list would leave the theme running on whatever the stylesheets fall back
-to rather than on what its author intended.
+parfait's stylesheets rely on =-moz-pref()= queries, so its preferences must be present
+in Firefox's =user.js=; an unset preference falls back to stylesheet defaults rather than
+the intended theme styling. Because home-manager generates =user.js= from =settings=,
+upstream's =user.js= is parsed at evaluation time so the baseline preferences track the
+pinned theme version.
 
-Three values depart from that baseline. =sidebar.verticalTabs= and =sidebar.visibility= are
-Firefox's own preferences, and the =hide-sidebar= value is what puts parfait into its
-floating layout: the navigation bar slides off screen and the sidebar hovers over the
-page, which is the compact mode I came here for. =parfait.theme.blur.enabled= adds a
-backdrop filter behind the floating sidebar and the find bar.
+The source is fetched via =fetchTarball= rather than read from the =parfait= derivation:
+reading a derivation output during evaluation is an import-from-derivation, which
+=nix flake check --no-build= in CI rejects. =parfait.nix= uses =fetchFromGitHub= because
+=update-nix-hash=, which rehashes Renovate's version bumps, only understands that form.
+Both fetchers take the same URL and hash and resolve to the same store path, so the source
+is downloaded once.
+
+Setting =sidebar.verticalTabs= and =sidebar.visibility = "hide-sidebar"= puts parfait into
+its floating layout: the navigation bar slides off screen and the sidebar hovers over the
+page. =parfaitOverrides= customizes the theme with a backdrop filter behind the floating
+sidebar and the find bar (=parfait.theme.blur.enabled=). Evaluation fails if an override
+is no longer defined in upstream's =user.js=, catching renamed preferences that would
+otherwise silently stop applying.
 
 #+NAME: firefox-settings
 #+begin_src nix
-settings = {
-  "extensions.autoDisableScopes" = 0;
+settings =
+  let
+    parfaitSrc = fetchTarball {
+      inherit (parfait) url;
+      sha256 = parfait.outputHash;
+    };
+    parfaitDefaults = lib.pipe "${parfaitSrc}/user.js" [
+      builtins.readFile
+      (lib.splitString "\n")
+      (map (builtins.match ''user_pref\("([^"]+)", (.*)\);''))
+      (lib.filter (m: m != null))
+      (map (m: lib.nameValuePair (lib.elemAt m 0) (builtins.fromJSON (lib.elemAt m 1))))
+      lib.listToAttrs
+    ];
+    parfaitOverrides = {
+      "parfait.theme.blur.enabled" = true;
+    };
+    staleOverrides = lib.attrNames (removeAttrs parfaitOverrides (lib.attrNames parfaitDefaults));
+  in
+  lib.throwIf (staleOverrides != [ ])
+    "parfait's user.js no longer defines ${lib.concatStringsSep ", " staleOverrides}"
+    (
+      parfaitDefaults
+      // parfaitOverrides
+      // {
+        "extensions.autoDisableScopes" = 0;
 
-  # parfait reads its own stylesheets from the profile, and paints icons through
-  # context-fill, which is gated behind the second preference.
-  "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-  "svg.context-properties.content.enabled" = true;
+        "sidebar.verticalTabs" = true;
+        "sidebar.visibility" = "hide-sidebar";
 
-  "sidebar.verticalTabs" = true;
-  "sidebar.visibility" = "hide-sidebar";
-
-  "browser.translations.automaticallyPopup" = false;
-  "layout.spellcheckDefault" = 0;
-  "signon.rememberSignons" = false;
-
-  "parfait.animations.enabled" = true;
-  "parfait.theme.borderless" = false;
-  "parfait.theme.blur.enabled" = true;
-  "parfait.theme.roundness.preset" = 0;
-  "parfait.background.accent-color" = false;
-  "parfait.background.accent-color.contrast" = 2;
-  "parfait.background.accent-color.gradient" = false;
-  "parfait.background.accent-color.opacity" = 4;
-  "parfait.background.transparent" = false;
-  "parfait.tabs.groups.fx-colors-on-folders" = false;
-  "parfait.layout.unified-sidebar" = true;
-  "parfait.layout.unified-sidebar.width.preset" = 2;
-  "parfait.toolbar.sidebar-gutter" = true;
-  "parfait.traffic-lights.enabled" = false;
-  "parfait.traffic-lights.mono" = false;
-  "parfait.urlbar.center-url" = false;
-  "parfait.new-tab.logo.preset" = 1;
-  "parfait.new-tab.background.pattern" = false;
-};
+        "browser.translations.automaticallyPopup" = false;
+        "layout.spellcheckDefault" = 0;
+        "signon.rememberSignons" = false;
+      }
+    );
 #+end_src
 
 *** Theme files

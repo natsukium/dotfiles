@@ -56,40 +56,41 @@ in
             };
             containersForce = true;
 
-            settings = {
-              "extensions.autoDisableScopes" = 0;
+            settings =
+              let
+                parfaitSrc = fetchTarball {
+                  inherit (parfait) url;
+                  sha256 = parfait.outputHash;
+                };
+                parfaitDefaults = lib.pipe "${parfaitSrc}/user.js" [
+                  builtins.readFile
+                  (lib.splitString "\n")
+                  (map (builtins.match ''user_pref\("([^"]+)", (.*)\);''))
+                  (lib.filter (m: m != null))
+                  (map (m: lib.nameValuePair (lib.elemAt m 0) (builtins.fromJSON (lib.elemAt m 1))))
+                  lib.listToAttrs
+                ];
+                parfaitOverrides = {
+                  "parfait.theme.blur.enabled" = true;
+                };
+                staleOverrides = lib.attrNames (removeAttrs parfaitOverrides (lib.attrNames parfaitDefaults));
+              in
+              lib.throwIf (staleOverrides != [ ])
+                "parfait's user.js no longer defines ${lib.concatStringsSep ", " staleOverrides}"
+                (
+                  parfaitDefaults
+                  // parfaitOverrides
+                  // {
+                    "extensions.autoDisableScopes" = 0;
 
-              # parfait reads its own stylesheets from the profile, and paints icons through
-              # context-fill, which is gated behind the second preference.
-              "toolkit.legacyUserProfileCustomizations.stylesheets" = true;
-              "svg.context-properties.content.enabled" = true;
+                    "sidebar.verticalTabs" = true;
+                    "sidebar.visibility" = "hide-sidebar";
 
-              "sidebar.verticalTabs" = true;
-              "sidebar.visibility" = "hide-sidebar";
-
-              "browser.translations.automaticallyPopup" = false;
-              "layout.spellcheckDefault" = 0;
-              "signon.rememberSignons" = false;
-
-              "parfait.animations.enabled" = true;
-              "parfait.theme.borderless" = false;
-              "parfait.theme.blur.enabled" = true;
-              "parfait.theme.roundness.preset" = 0;
-              "parfait.background.accent-color" = false;
-              "parfait.background.accent-color.contrast" = 2;
-              "parfait.background.accent-color.gradient" = false;
-              "parfait.background.accent-color.opacity" = 4;
-              "parfait.background.transparent" = false;
-              "parfait.tabs.groups.fx-colors-on-folders" = false;
-              "parfait.layout.unified-sidebar" = true;
-              "parfait.layout.unified-sidebar.width.preset" = 2;
-              "parfait.toolbar.sidebar-gutter" = true;
-              "parfait.traffic-lights.enabled" = false;
-              "parfait.traffic-lights.mono" = false;
-              "parfait.urlbar.center-url" = false;
-              "parfait.new-tab.logo.preset" = 1;
-              "parfait.new-tab.background.pattern" = false;
-            };
+                    "browser.translations.automaticallyPopup" = false;
+                    "layout.spellcheckDefault" = 0;
+                    "signon.rememberSignons" = false;
+                  }
+                );
           };
         };
 
