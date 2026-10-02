@@ -5851,13 +5851,10 @@ Radon, Krypton. felis derives bold and italic from a family's own faces, but
 these flavors are separate families rather than weights of one, so naming them
 per style is the only way to reach them.
 
-Two keymap entries work around problems outside felis. On a JIS keyboard the yen
-key still types =¥= though macOS is set to emit =\=, because winit drops the
+One keymap entry works around a problem outside felis. On a JIS keyboard the
+yen key still types =¥= though macOS is set to emit =\=, because winit drops the
 substituted character unless an IME preedit is active; rebinding it here avoids
-waiting for a winit release. Shift+Enter already goes out as =CSI 13;2u= under
-the Kitty keyboard protocol, but Claude Code enables that protocol only for
-terminals on a hardcoded list, so I send the Option+Enter newline it does
-recognize instead. Both go away once upstream catches up.
+waiting for a winit release, and the entry goes away once winit catches up.
 
 The built-in =switch_session= binding only steps one session at a time.
 =felis-switch= (=Ctrl+Shift+p=, via the =run= action) instead pipes =felis
@@ -6048,11 +6045,6 @@ in
                 kind = "send_string";
                 text = "\\";
                 escapes = "none";
-              };
-              "shift+enter" = {
-                kind = "send_string";
-                text = "\\e\\r";
-                escapes = "c_style";
               };
               "ctrl+]" = {
                 kind = "switch_session";

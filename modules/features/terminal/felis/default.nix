@@ -155,11 +155,6 @@ in
                 text = "\\";
                 escapes = "none";
               };
-              "shift+enter" = {
-                kind = "send_string";
-                text = "\\e\\r";
-                escapes = "c_style";
-              };
               "ctrl+]" = {
                 kind = "switch_session";
                 to = "next";
