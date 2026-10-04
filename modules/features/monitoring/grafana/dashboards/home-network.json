@@ -1,0 +1,587 @@
+{
+  "uid": "home-network",
+  "title": "Home Network",
+  "tags": ["network", "wan"],
+  "description": "Uplink latency and loss per hop, probed over ICMP from manyara.",
+  "editable": true,
+  "graphTooltip": 1,
+  "schemaVersion": 42,
+  "refresh": "1m",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "templating": {
+    "list": []
+  },
+  "annotations": {
+    "list": []
+  },
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 1,
+      "title": "Internet RTT",
+      "type": "stat",
+      "description": "Round trip to 1.1.1.1, 5 minute mean of answered probes. A healthy Japanese uplink sits in single-digit milliseconds.",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.03
+              },
+              {
+                "color": "red",
+                "value": 0.1
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"cloudflare\"} > 0)[5m:15s])",
+          "refId": "A",
+          "range": false,
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 2,
+      "title": "ISP edge added latency",
+      "type": "stat",
+      "description": "Delay added between the PPPoE peer and the ISP's first router. A high value with a low PPPoE RTT places the congestion inside the ISP.",
+      "gridPos": {
+        "x": 6,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.02
+              },
+              {
+                "color": "red",
+                "value": 0.05
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"isp-edge\"} > 0)[5m:15s]) - ignoring(instance) avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"pppoe\"} > 0)[5m:15s])",
+          "refId": "A",
+          "range": false,
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 3,
+      "title": "Internet loss (1h)",
+      "type": "stat",
+      "description": "Share of unanswered echoes to 1.1.1.1 and 8.8.8.8 over the last hour.",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.01
+              },
+              {
+                "color": "red",
+                "value": 0.05
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "1 - avg(avg_over_time(probe_success{job=\"wan\",instance=~\"cloudflare|google\"}[1h]))",
+          "refId": "A",
+          "range": false,
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 4,
+      "title": "LAN loss (1h)",
+      "type": "stat",
+      "description": "Share of unanswered echoes to the home router and the PPPoE peer. Non-zero here points at the cable or NIC rather than the ISP.",
+      "gridPos": {
+        "x": 18,
+        "y": 0,
+        "w": 6,
+        "h": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "color": {
+            "mode": "thresholds"
+          },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "orange",
+                "value": 0.005
+              },
+              {
+                "color": "red",
+                "value": 0.01
+              }
+            ]
+          },
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "textMode": "auto",
+        "reduceOptions": {
+          "calcs": ["lastNotNull"],
+          "fields": "",
+          "values": false
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "1 - avg(avg_over_time(probe_success{job=\"wan\",instance=~\"router|pppoe\"}[1h]))",
+          "refId": "A",
+          "range": false,
+          "instant": true
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 5,
+      "title": "Round-trip time by hop",
+      "type": "timeseries",
+      "description": "Mean RTT of answered probes per hop. Log scale, so the sub-millisecond LAN hops and the WAN hops share one axis.",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 24,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false,
+            "scaleDistribution": {
+              "type": "log",
+              "log": 10
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "avg_over_time(((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\"} > 0))[$__interval:15s])",
+          "refId": "A",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{instance}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 6,
+      "title": "Latency added per segment",
+      "type": "timeseries",
+      "description": "Each hop's RTT minus the previous hop's, stacked so the total equals the RTT to 1.1.1.1. The tallest band is where the delay accrues.",
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 40,
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "mode": "normal",
+              "group": "A"
+            }
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(clamp_min(avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"router\"} > 0)[5m:15s]), 0), \"segment\", \"LAN\", \"\", \"\")",
+          "refId": "A",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{segment}}"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(clamp_min(avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"pppoe\"} > 0)[5m:15s]) - ignoring(instance) avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"router\"} > 0)[5m:15s]), 0), \"segment\", \"PPPoE\", \"\", \"\")",
+          "refId": "B",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{segment}}"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(clamp_min(avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"isp-edge\"} > 0)[5m:15s]) - ignoring(instance) avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"pppoe\"} > 0)[5m:15s]), 0), \"segment\", \"ISP edge\", \"\", \"\")",
+          "refId": "C",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{segment}}"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "label_replace(clamp_min(avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"cloudflare\"} > 0)[5m:15s]) - ignoring(instance) avg_over_time((probe_icmp_duration_seconds{job=\"wan\",phase=\"rtt\",instance=\"isp-edge\"} > 0)[5m:15s]), 0), \"segment\", \"Beyond ISP\", \"\", \"\")",
+          "refId": "D",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{segment}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 7,
+      "title": "Packet loss by hop",
+      "type": "timeseries",
+      "description": "Share of unanswered echoes over a sliding 15 minutes. One echo per 15 s probe, so a single loss reads as about 1.7%.",
+      "gridPos": {
+        "x": 12,
+        "y": 13,
+        "w": 12,
+        "h": 9
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          },
+          "min": 0,
+          "decimals": 1
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "1 - avg_over_time(probe_success{job=\"wan\"}[15m])",
+          "refId": "A",
+          "range": true,
+          "instant": false,
+          "legendFormat": "{{instance}}"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "PBFA97CFB590B2093"
+      },
+      "id": 8,
+      "title": "manyara uplink throughput",
+      "type": "timeseries",
+      "description": "Traffic on manyara's wired NIC, receive drawn below zero. Rules out manyara saturating the line itself when RTT rises.",
+      "gridPos": {
+        "x": 0,
+        "y": 22,
+        "w": 24,
+        "h": 8
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bps",
+          "custom": {
+            "drawStyle": "line",
+            "lineWidth": 1,
+            "fillOpacity": 10,
+            "showPoints": "never",
+            "spanNulls": false
+          },
+          "color": {
+            "mode": "palette-classic"
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "max"]
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "pluginVersion": "12.0.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "rate(node_network_transmit_bytes_total{job=\"node\",device=\"enp1s0\"}[$__rate_interval]) * 8",
+          "refId": "A",
+          "range": true,
+          "instant": false,
+          "legendFormat": "transmit"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "-rate(node_network_receive_bytes_total{job=\"node\",device=\"enp1s0\"}[$__rate_interval]) * 8",
+          "refId": "B",
+          "range": true,
+          "instant": false,
+          "legendFormat": "receive"
+        }
+      ]
+    }
+  ]
+}
