@@ -120,7 +120,7 @@
           "refId": "A",
           "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
           "editorMode": "code",
-          "expr": "count(probe_success == 0) or vector(0)",
+          "expr": "count(probe_success{job=\"blackbox\"} == 0) or vector(0)",
           "instant": true,
           "range": false,
           "legendFormat": "failing"
@@ -313,7 +313,7 @@
           "refId": "A",
           "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
           "editorMode": "code",
-          "expr": "probe_success",
+          "expr": "probe_success{job=\"blackbox\"}",
           "legendFormat": "{{instance}}",
           "range": true
         }
@@ -364,7 +364,7 @@
           "refId": "A",
           "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
           "editorMode": "code",
-          "expr": "probe_duration_seconds",
+          "expr": "probe_duration_seconds{job=\"blackbox\"}",
           "legendFormat": "{{instance}}",
           "range": true
         }

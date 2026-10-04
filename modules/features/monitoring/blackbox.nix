@@ -28,6 +28,17 @@
         adguardhome = "http://127.0.0.1:${toString config.services.adguardhome.port}/";
         niks3 = "http://${config.services.niks3.httpAddr}/health";
       };
+
+      # Each hop along the uplink, so a latency rise can be placed on the LAN,
+      # the PPPoE session, the ISP edge, or beyond. The ISP edge address was
+      # read off tracepath and moves if the ISP re-routes the session.
+      wanTargets = {
+        router = "192.168.2.1";
+        pppoe = "10.128.0.1";
+        isp-edge = "115.31.55.25";
+        cloudflare = "1.1.1.1";
+        google = "8.8.8.8";
+      };
     in
     {
       options.my.services.blackbox.enable =
@@ -56,6 +67,11 @@
                 preferred_ip_protocol = "ip4";
               };
             };
+            modules.icmp = {
+              prober = "icmp";
+              timeout = "5s";
+              icmp.preferred_ip_protocol = "ip4";
+            };
           };
         };
 
@@ -81,6 +97,28 @@
               }
             ];
           }
+          {
+            job_name = "wan";
+            metrics_path = "/probe";
+            params.module = [ "icmp" ];
+            # One echo per probe, so loss is the mean of probe_success and a
+            # 1m interval would leave too few samples per hour to read it.
+            scrape_interval = "15s";
+            static_configs = lib.mapAttrsToList (name: host: {
+              labels.instance = name;
+              targets = [ host ];
+            }) wanTargets;
+            relabel_configs = [
+              {
+                source_labels = [ "__address__" ];
+                target_label = "__param_target";
+              }
+              {
+                target_label = "__address__";
+                replacement = "127.0.0.1:${toString blackboxPort}";
+              }
+            ];
+          }
         ];
 
         services.vmalert.instances.main.rules.groups = [
@@ -89,7 +127,7 @@
             rules = [
               {
                 alert = "ServiceProbeFailed";
-                expr = "probe_success == 0";
+                expr = ''probe_success{job="blackbox"} == 0'';
                 for = "5m";
                 labels.severity = "warning";
                 annotations.summary = "HTTP probe failed for {{ $labels.instance }}";
