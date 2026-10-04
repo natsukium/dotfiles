@@ -108,6 +108,39 @@ resource "cloudflare_workers_route" "matrix_well_known" {
   script  = cloudflare_workers_script.matrix_well_known.script_name
 }
 
+# Per-commit tree, blame and history pages form an unbounded URL space that
+# Forgejo cannot cache. A scraper spread over residential proxies walks it at
+# one or two requests per IP, so IP-based blocking misses it.
+# Logged-in users are not exempted: a session-cookie check is trivially forged,
+# and a solved challenge is remembered for the challenge passage window anyway.
+import {
+  to = cloudflare_ruleset.zone_custom_firewall
+  id = "zones/${local.zone_id}/33794acddef846b69dfc8c7d998b32e0"
+}
+
+resource "cloudflare_ruleset" "zone_custom_firewall" {
+  zone_id = local.zone_id
+  name    = "default"
+  kind    = "zone"
+  phase   = "http_request_firewall_custom"
+
+  rules = [
+    {
+      description = "Challenge per-commit Forgejo pages"
+      action      = "managed_challenge"
+      enabled     = true
+      expression = join(" ", [
+        "http.host eq \"git.natsukium.com\" and (",
+        "http.request.uri.path contains \"/src/commit/\"",
+        "or http.request.uri.path contains \"/blame/commit/\"",
+        "or http.request.uri.path contains \"/commits/commit/\"",
+        "or http.request.uri.path contains \"/raw/commit/\"",
+        ")",
+      ])
+    },
+  ]
+}
+
 # Separate from the Attic bucket: niks3's standard binary-cache layout is
 # incompatible with Attic's chunked store.
 resource "cloudflare_r2_bucket" "nix_cache_niks3" {
