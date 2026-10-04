@@ -113,11 +113,6 @@ resource "cloudflare_workers_route" "matrix_well_known" {
 # one or two requests per IP, so IP-based blocking misses it.
 # Logged-in users are not exempted: a session-cookie check is trivially forged,
 # and a solved challenge is remembered for the challenge passage window anyway.
-import {
-  to = cloudflare_ruleset.zone_custom_firewall
-  id = "zones/${local.zone_id}/33794acddef846b69dfc8c7d998b32e0"
-}
-
 resource "cloudflare_ruleset" "zone_custom_firewall" {
   zone_id = local.zone_id
   name    = "default"
