@@ -6,11 +6,11 @@
 }:
 let
   # renovate: datasource=github-releases depName=retorquere/zotero-better-bibtex extractVersion=^v(?<version>.+)$
-  version = "9.0.68";
+  version = "9.0.70";
 
   xpi = fetchurl {
     url = "https://github.com/retorquere/zotero-better-bibtex/releases/download/v${version}/zotero-better-bibtex-${version}.xpi";
-    hash = "sha256-02maNI8AEl85C1pp5aJjM0BELKx3in4Mjwm+r+HK6Lg=";
+    hash = "sha256-2v+3hsYoCJLp+oMnCFjzs/q6e/XYODr4UKQ9P9TUhq0=";
   };
 in
 stdenvNoCC.mkDerivation {
