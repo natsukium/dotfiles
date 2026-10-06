@@ -80,6 +80,19 @@ fj -H https://git.natsukium.com pr merge 'owner/repo#5' --method squash --delete
 
 Inspect the PR and its diff before merging, and use the merge method requested by the user or repository policy. `pr checkout` is an exception to qualified references: it accepts a numeric ID and must run in the corresponding local Git repository.
 
+### Attaching images
+
+`fj` cannot upload attachments, and the API takes them only on an existing issue or PR. Create the PR first, upload with `./scripts/attach`, then put the printed links into the body:
+
+```bash
+<skill-directory>/scripts/attach --repo owner/repo 5 before.png after.png
+# ![before.png](https://git.natsukium.com/attachments/…)
+# ![after.png](https://git.natsukium.com/attachments/…)
+fj -H https://git.natsukium.com pr edit 'owner/repo#5' body "$(< /tmp/pr.md)"
+```
+
+The script reads the token `fj auth` stored, so do not read `fj`'s key store yourself. For other API calls `fj` lacks, use `curl`: Python `urllib` gets 403 from this API (its User-Agent is blocked).
+
 ## Other operations
 
 ```bash

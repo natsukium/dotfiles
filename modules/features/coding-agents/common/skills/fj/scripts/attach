@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat >&2 <<'EOF'
+usage: attach --repo OWNER/REPO [-H URL] NUMBER FILE...
+
+Uploads each FILE as an attachment of issue or PR NUMBER and prints one
+Markdown image link per file, ready to paste into the body.
+The token is FORGEJO_TOKEN, or else the one `fj auth` stored for the host.
+EOF
+  exit 64
+}
+
+host=https://git.natsukium.com repo="" number="" files=()
+while (($#)); do
+  case $1 in
+    -H) host=${2%/}; shift 2 ;;
+    --repo | -r) repo=$2; shift 2 ;;
+    -*) usage ;;
+    *) if [[ -z $number ]]; then number=${1##*#}; else files+=("$1"); fi; shift ;;
+  esac
+done
+[[ -n $repo && $number =~ ^[0-9]+$ && ${#files[@]} -gt 0 ]] || usage
+[[ $host == http* ]] || host=https://$host
+
+token=${FORGEJO_TOKEN:-}
+if [[ -z $token ]]; then
+  shopt -s nullglob
+  for keys in "${XDG_DATA_HOME:-$HOME/.local/share}/forgejo-cli/keys.json" \
+    "$HOME/Library/Application Support/"*forgejo-cli*/keys.json; do
+    [[ -r $keys ]] || continue
+    token=$(jq -r --arg h "${host#*://}" '.hosts[$h].token // empty' "$keys")
+    [[ -n $token ]] && break
+  done
+fi
+if [[ -z $token ]]; then
+  echo "attach: no token for $host; run fj auth login -H $host or set FORGEJO_TOKEN" >&2
+  exit 1
+fi
+
+# A PR shares its number with its issue, so the issue endpoint takes both.
+api=$host/api/v1/repos/$repo/issues/$number/assets
+for f in "${files[@]}"; do
+  name=$(basename "$f")
+  url=$(curl -fsS --retry 3 -H "Authorization: token $token" \
+    -F "attachment=@$f" --url-query "name=$name" "$api" | jq -r .browser_download_url)
+  printf '![%s](%s)\n' "$name" "$url"
+done
