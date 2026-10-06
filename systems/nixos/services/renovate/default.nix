@@ -36,6 +36,13 @@
     instances.github = {
       schedule = "hourly";
 
+      # The gomod manager shells out to go to rewrite go.sum, which leaves a
+      # buildGoModule's vendorHash for nix-update to recompute.
+      runtimePackages = with pkgs; [
+        go
+        nix-update
+      ];
+
       githubApp = {
         appId = 4535054;
         privateKeyFile = config.sops.secrets.renovate-github-app-key.path;
@@ -45,7 +52,10 @@
         platform = "github";
         # I list repositories rather than autodiscover so the move off the
         # hosted app happens one repository at a time.
-        repositories = [ "natsukium/dotfiles" ];
+        repositories = [
+          "natsukium/dotfiles"
+          "natsukium/sprout"
+        ];
         # Every repository here already carries its own config; an onboarding
         # pull request would only be noise.
         onboarding = false;
@@ -53,9 +63,13 @@
         # to the App instead of to an unverified local git author.
         platformCommit = "enabled";
         # postUpgradeTasks runs nothing unless the command matches; I allow only
-        # update-nix-hash so a repository config cannot turn a dependency bump
-        # into arbitrary code execution on this host.
-        allowedCommands = [ "^update-nix-hash .+$" ];
+        # update-nix-hash and a hashes-only nix-update so a repository config
+        # cannot turn a dependency bump into arbitrary code execution on this
+        # host.
+        allowedCommands = [
+          "^update-nix-hash .+$"
+          "^nix-update --flake --version=skip [A-Za-z0-9_.-]+$"
+        ];
       };
     };
 
