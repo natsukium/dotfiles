@@ -188,12 +188,14 @@ in
                 source = "scrollback";
                 target.command = [ "${felis-scrollback}/bin/felis-scrollback" ];
               };
-              # Hints over the visible grid. `ansi` defaults to false
-              # (plain), which is exactly what spoor wants — embedded
-              # SGR would corrupt the URL match.
+              # Hints over the visible grid. The SGR that `ansi` keeps
+              # cannot break the URL match: spoor parses the region
+              # through felis' VT engine and matches on cells, so it
+              # only colours the repaint.
               "ctrl+shift+o" = {
                 kind = "pipe";
                 source = "visible";
+                ansi = true;
                 target.command = [ "${felis-hints}/bin/felis-hints" ];
               };
               # The kitty Ctrl+Shift+l port: page the build log of a
