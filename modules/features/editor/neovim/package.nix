@@ -42,6 +42,9 @@ let
   ];
 
   neovim-unwrapped' = neovim-unwrapped.overrideAttrs (oldAttrs: {
+    # Only postInstall differs from the Hydra-tested build, so rerunning the
+    # upstream suite here adds its timing flakiness and nothing else.
+    doCheck = false;
     postInstall = (oldAttrs.postInstall or "") + ''
       rm ${lib.concatStringsSep " " disabledBuiltinPluginPaths}
     '';
