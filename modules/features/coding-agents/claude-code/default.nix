@@ -31,6 +31,10 @@
 
             remoteControlAtStartup = true;
 
+            # Haiku defaults to compacting near 1M tokens, which makes long
+            # Haiku runs cost more than I want to pay for them.
+            modelSettings.claude-haiku-5-5.autoCompactWindow = 100000;
+
             attribution = {
               commit = "";
               pr = "";
