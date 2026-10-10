@@ -14,14 +14,14 @@
 buildPythonPackage (finalAttrs: {
   pname = "pypetkitapi";
   # renovate: datasource=github-releases depName=Jezza34000/py-petkit-api
-  version = "1.28.0";
+  version = "1.30.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "Jezza34000";
     repo = "py-petkit-api";
     tag = finalAttrs.version;
-    hash = "sha256-kzPI6warWbaucHZowS1OLJIejKPCOJNV1lgDTwHptNk=";
+    hash = "sha256-yNMgVL4r3VM6A/7PIRyAcSTNleU0c8Yu6PgPY6js5fc=";
   };
 
   build-system = [ poetry-core ];
