@@ -107,12 +107,12 @@ in
       folders = gmail/Inbox "gmail/[Gmail]/All Mail" "gmail/[Gmail]/Sent Mail" gmail/[Gmail]/Drafts gmail/[Gmail]/Starred work/Inbox "work/[Gmail]/All Mail" "work/[Gmail]/Sent Mail" work/[Gmail]/Drafts work/[Gmail]/Starred
       rename = true
 
-      gmail/Inbox = 'tag:deleted':'gmail/[Gmail]/Trash' 'tag:github':'gmail/[Gmail]/All Mail'
+      gmail/Inbox = 'tag:deleted':'gmail/[Gmail]/Trash' 'NOT tag:inbox':'gmail/[Gmail]/All Mail'
       gmail/[Gmail]/All Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Sent Mail = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Drafts = 'tag:deleted':'gmail/[Gmail]/Trash'
       gmail/[Gmail]/Starred = 'tag:deleted':'gmail/[Gmail]/Trash'
-      work/Inbox = 'tag:deleted':'work/[Gmail]/Trash' 'tag:github':'work/[Gmail]/All Mail'
+      work/Inbox = 'tag:deleted':'work/[Gmail]/Trash' 'NOT tag:inbox':'work/[Gmail]/All Mail'
       work/[Gmail]/All Mail = 'tag:deleted':'work/[Gmail]/Trash'
       work/[Gmail]/Sent Mail = 'tag:deleted':'work/[Gmail]/Trash'
       work/[Gmail]/Drafts = 'tag:deleted':'work/[Gmail]/Trash'
