@@ -142,6 +142,8 @@ in
 
   my.programs.neomutt.enableHtmlView = true;
 
+  my.programs.coding-agents.skills.mail = ./skills/mail;
+
   my.services.pizauth = {
     enable = true;
     persistence.enable = true;
