@@ -94,6 +94,11 @@ in
       pattern = \.attmcojp\.github\.com
       tags = +github::attmcojp
 
+      [HeaderMatchingFilter.3]
+      header = List-Id
+      pattern = <(?P<list>[^>]+?)\.attm\.co\.jp>
+      tags = +lists::{list}
+
       # remove 'new' from github-tagged messages so InboxFilter skips them,
       # placed after all HeaderMatchingFilters to avoid breaking their
       # tag:new query
