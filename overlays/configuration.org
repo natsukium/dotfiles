@@ -58,16 +58,21 @@ stable = final: prev: {
 * cuda
 
 [[https://cache.nixos-cuda.org][cache.nixos-cuda.org]] only covers the head of =nixos-unstable-cuda=, so kilimanjaro takes
-its CUDA packages from =nixpkgs-cuda=. Naming =ollama= and =onnxruntime= is enough:
+its CUDA packages from =nixpkgs-cuda=. Naming =ollama= and Handy's =onnxruntime= is enough:
 =openvino=, =opencv= and =cudnn-frontend= are only reachable through them.
 
 The package set is imported plain because the CUDA Hydra builds plain nixpkgs, and a local
 overlay reaching into that closure would move the store paths off the cache. The guard
 keeps the pin off hosts that leave =cudaSupport= unset.
 
-Firefox takes onnxruntime as a build input on Linux since 141, and Calibre does the same for
-its Python environment. A host-wide =cudaSupport= would drag both applications off
-cache.nixos.org and rebuild their CUDA-enabled onnxruntime dependencies from source.
+Handy is the only consumer that needs onnxruntime on the GPU. Firefox and Firefox ESR also
+take onnxruntime as a build input, and Zotero builds on Firefox ESR. A CUDA onnxruntime
+anywhere else would drag those applications off cache.nixos.org and rebuild them from
+source. So the host-wide =onnxruntime= stays the plain build, and only Handy gets the CUDA
+one.
+
+Calibre is swapped whole instead. Its Python environment reaches torch through piper-tts,
+and the host-wide =cudaSupport= turns that torch into a CUDA build as well.
 
 #+NAME: cuda
 #+begin_src nix
@@ -88,9 +93,10 @@ cuda =
       };
     in
     {
-      inherit (pkgsWithCuda) onnxruntime ollama;
-      firefox-unwrapped = prev.firefox-unwrapped.override {
-        inherit (pkgs) onnxruntime;
+      inherit (pkgsWithCuda) ollama;
+      inherit (pkgs) onnxruntime;
+      handy = prev.handy.override {
+        inherit (pkgsWithCuda) onnxruntime;
       };
       calibre = pkgs.calibre;
     }

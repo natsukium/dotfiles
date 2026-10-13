@@ -23,9 +23,10 @@
         };
       in
       {
-        inherit (pkgsWithCuda) onnxruntime ollama;
-        firefox-unwrapped = prev.firefox-unwrapped.override {
-          inherit (pkgs) onnxruntime;
+        inherit (pkgsWithCuda) ollama;
+        inherit (pkgs) onnxruntime;
+        handy = prev.handy.override {
+          inherit (pkgsWithCuda) onnxruntime;
         };
         calibre = pkgs.calibre;
       }
