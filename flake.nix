@@ -61,7 +61,6 @@
     };
     hydra = {
       url = "github:NixOS/hydra";
-      inputs.nixpkgs.follows = "nixpkgs";
       inputs.treefmt-nix.follows = "treefmt-nix";
     };
     microvm = {
