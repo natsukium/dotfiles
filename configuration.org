@@ -420,11 +420,15 @@ https://github.com/NixOS/hydra
 Hydra's Rust queue runner and builder are developed in the Hydra repository, while
 nixpkgs only exposes the legacy service module.
 
+Hydra links against a Nix it builds with Nix's own packaging, and upstream only
+tests that build against its pinned stable nixpkgs. I keep that pin instead of
+following ours, so a toolchain bump in unstable cannot break the build before
+Hydra catches up.
+
 #+NAME: hydra
 #+begin_src nix
 hydra = {
   url = "github:NixOS/hydra";
-  inputs.nixpkgs.follows = "nixpkgs";
   inputs.treefmt-nix.follows = "treefmt-nix";
 };
 #+end_src
