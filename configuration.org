@@ -2,6 +2,7 @@
 #+STARTUP: overview
 #+PROPERTY: header-args:nix :mkdirp yes :noweb tangle
 #+OPTIONS: ^:{} tags:nil
+#+MACRO: agent-host (eval (if (org-export-derived-backend-p org-export-current-backend 'md) (format "This checkout lives on the host where =uname -nmo= reports =%s=." (string-trim (shell-command-to-string "uname -nmo"))) ""))
 
 * About                                                              :readme:
 
@@ -66,6 +67,8 @@ in Org mode documents where prose surrounds code.
 For most settings, one or two sentences—what it enables and the visible
 effect—is enough. Reserve the full problem-and-alternatives form for non-obvious
 trade-offs: architectural choices, package pins, temporary workarounds.
+
+{{{agent-host}}}
 
 * Configuration
 
