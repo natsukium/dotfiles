@@ -99,14 +99,13 @@
   my.services.forgejo-runner = {
     enable = true;
     tokenFile = config.sops.secrets.forgejo-runner-token.path;
-    windows.enable = false;
+    windows.enable = true;
   };
   sops.secrets.forgejo-runner-token.sopsFile = ./secrets.yaml;
 
   my.services.windows-vm = {
     enable = true;
     installerIso = "/data/Win11_25H2_English_x64.iso";
-    installer = true;
     sharedDirectories = [ "/data" ];
   };
 
