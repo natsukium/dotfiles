@@ -3580,6 +3580,12 @@ if (-not (Get-Service -Name "spice-agent", "vdservice" -ErrorAction SilentlyCont
     Start-Process msiexec.exe -Wait -ArgumentList "/i `"$payload\spice-vdagent.msi`" /qn /norestart"
 }
 
+# Local accounts expire after 42 days by default, and every boot starts from
+# this image, so once the image's password ages out autologon stops at the
+# "password has expired" screen and the logon task never fires.
+Step "Keeping the autologon password from expiring"
+Set-LocalUser -Name "ci" -PasswordNeverExpires $true
+
 Step "Installing the logon task"
 New-Item -ItemType Directory -Force -Path "C:\windows-vm" | Out-Null
 Copy-Item "$payload\bootstrap.ps1" "C:\windows-vm\bootstrap.ps1" -Force
