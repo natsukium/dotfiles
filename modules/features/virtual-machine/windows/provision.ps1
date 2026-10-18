@@ -182,9 +182,26 @@ if (-not (Test-Path "D:\cargo\bin\cargo-nextest.exe")) {
 Step "Keeping the guest awake and out of Windows Update's way"
 # A reset throws away whatever Windows Update installed on a guest that resets,
 # and a reboot taken mid-job is a failed job.
-$policy = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU"
-New-Item -Path $policy -Force | Out-Null
-Set-ItemProperty -Path $policy -Name "NoAutoUpdate" -Value 1 -Type DWord
+$wu = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate"
+New-Item -Path "$wu\AU" -Force | Out-Null
+Set-ItemProperty -Path "$wu\AU" -Name "NoAutoUpdate" -Value 1 -Type DWord
+# NoAutoUpdate alone still lets the Update Orchestrator scan and download on
+# its own tasks, the post-OOBE expedite among them, so the client is also
+# pointed at a WSUS that does not exist.
+Set-ItemProperty -Path $wu -Name "WUServer" -Value "http://127.0.0.1:1"
+Set-ItemProperty -Path $wu -Name "WUStatusServer" -Value "http://127.0.0.1:1"
+Set-ItemProperty -Path $wu -Name "DoNotConnectToWindowsUpdateInternetLocations" -Value 1 -Type DWord
+Set-ItemProperty -Path "$wu\AU" -Name "UseWUServer" -Value 1 -Type DWord
+
+$store = "HKLM:\SOFTWARE\Policies\Microsoft\WindowsStore"
+New-Item -Path $store -Force | Out-Null
+Set-ItemProperty -Path $store -Name "AutoDownload" -Value 2 -Type DWord
+
+# Edge updates itself outside Windows Update, and its EdgeUpdate policies are
+# honoured only on domain-joined or MDM-enrolled machines.
+Get-ScheduledTask -TaskName "MicrosoftEdgeUpdateTask*" | Disable-ScheduledTask | Out-Null
+Get-Service -Name "edgeupdate", "edgeupdatem" -ErrorAction SilentlyContinue |
+    Set-Service -StartupType Disabled
 
 Invoke-Native powercfg @("/change", "standby-timeout-ac", "0")
 Invoke-Native powercfg @("/change", "hibernate-timeout-ac", "0")
