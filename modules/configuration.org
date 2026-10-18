@@ -252,6 +252,12 @@ unfree drivers and CUDA libraries, and specifying each unfree package individual
 =allowUnfreePredicate= would be prohibitively tedious for the number of transitive
 dependencies involved.
 
+Zotero 10 still embeds Firefox ESR 140, which reached end-of-life on 2026-10-13.
+nixpkgs marks that prebuilt Firefox insecure, so every host that installs Zotero
+fails to evaluate. I accept the stale engine until Zotero moves to a newer ESR.
+The entry names the exact version, so a bump fails evaluation again and makes
+me revisit it.
+
 #+begin_src nix :tangle features/nixpkgs.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -287,6 +293,9 @@ let
       config = lib.mkIf cfg.enable {
         nixpkgs = {
           config.allowUnfree = cfg.allowUnfree;
+          config.permittedInsecurePackages = [
+            "firefox-esr-140-bin-unwrapped-140.17.0esr"
+          ];
         };
       };
     };
