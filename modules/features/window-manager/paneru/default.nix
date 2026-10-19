@@ -45,6 +45,7 @@
             options = {
               focus_follows_mouse = true;
               mouse_follows_focus = true;
+              menubar_height = 0;
               preset_column_widths = [
                 0.33
                 0.50
