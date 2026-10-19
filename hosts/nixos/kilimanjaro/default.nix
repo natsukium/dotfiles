@@ -143,6 +143,8 @@
 
   programs.nix-ld.enable = true;
 
+  my.devices.audio.at2040.enable = true;
+
   services.pipewire.wireplumber.extraConfig = {
     "51-alsa-default" = {
       "monitor.alsa.rules" = [
