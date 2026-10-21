@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-10-21 11:17+0900\n"
+"POT-Creation-Date: 2026-10-21 11:41+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -7248,7 +7248,7 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:58 overlays/configuration.org:77
+#: overlays/configuration.org:58 overlays/configuration.org:84
 #, no-wrap
 msgid "cuda"
 msgstr ""
@@ -7304,8 +7304,22 @@ msgid ""
 "CUDA build as well."
 msgstr ""
 
+#. type: paragraph
+#: overlays/configuration.org:77
+msgid ""
+"Two of Calibre's dependencies are broken in nixpkgs right now, and the "
+"=temporary-fix= overlay does not reach this plain package set, so I fix them "
+"here. piper-tts pulls in pyopenjtalk-plus, whose test suite still expects "
+"the =TypeError= wording from before Cython 3.3. speechd lists Python only as "
+"a host input, so configure finds no interpreter and skips the Python "
+"bindings that Calibre's install check imports. Drop these once [[https://"
+"github.com/NixOS/nixpkgs/pull/576063][NixOS/nixpkgs#576063]] and [[https://"
+"github.com/NixOS/nixpkgs/pull/576062][NixOS/nixpkgs#576062]] reach nixos-"
+"unstable."
+msgstr ""
+
 #. type: paragraph in src
-#: overlays/configuration.org:79
+#: overlays/configuration.org:86
 #, no-wrap
 msgid ""
 "cuda =\n"
@@ -7322,6 +7336,27 @@ msgid ""
 "      pkgs = import inputs.nixpkgs {\n"
 "        inherit (prev.stdenv.hostPlatform) system;\n"
 "        config.allowUnfree = true;\n"
+"        overlays = [\n"
+"          (pfinal: pprev: {\n"
+"            speechd = pprev.speechd.overrideAttrs (old: {\n"
+"              nativeBuildInputs = old.nativeBuildInputs ++ [ pfinal.python3 ];\n"
+"            });\n"
+"            pythonPackagesExtensions = pprev.pythonPackagesExtensions ++ [\n"
+"              (_: pyprev: {\n"
+"                pyopenjtalk-plus = pyprev.pyopenjtalk-plus.overridePythonAttrs (old: {\n"
+"                  patches = (old.patches or [ ]) ++ [\n"
+"                    (pfinal.fetchpatch {\n"
+"                      name = \"fix-cython-3.3.0.patch\";\n"
+"                      url = \"https://github.com/tsukumijima/pyopenjtalk-plus/commit/90b644f9e9d397882e6eafe4dcd1843a4fde6a63.patch\";\n"
+"                      includes = [ \"tests/test_frontend.py\" ];\n"
+"                      hash = \"sha256-Jb7T/bRUHxqwBLwV6xYC/teaFHm5GmqJxA7sCX+oiNI=\";\n"
+"                    })\n"
+"                  ];\n"
+"                });\n"
+"              })\n"
+"            ];\n"
+"          })\n"
+"        ];\n"
 "      };\n"
 "    in\n"
 "    {\n"
@@ -7336,13 +7371,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:106 overlays/configuration.org:113
+#: overlays/configuration.org:134 overlays/configuration.org:141
 #, no-wrap
 msgid "temporary-fix"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:108
+#: overlays/configuration.org:136
 msgid ""
 "Local overrides for packages that build but have failing tests or minor "
 "issues.  Unlike the =stable= overlay, these don't require fetching packages "
@@ -7357,7 +7392,7 @@ msgstr ""
 "らこれらのオーバーライドを削除します。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:115
+#: overlays/configuration.org:143
 #, no-wrap
 msgid ""
 "temporary-fix = final: prev: {\n"
@@ -7367,13 +7402,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:121 overlays/configuration.org:132
+#: overlays/configuration.org:149 overlays/configuration.org:160
 #, no-wrap
 msgid "afew"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:123
+#: overlays/configuration.org:151
 msgid ""
 "afew now builds with =__structuredAttrs=, and two of its attributes break "
 "under it.  Each =makeWrapperArgs= element reaches makeWrapper as a single "
@@ -7389,7 +7424,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:134
+#: overlays/configuration.org:162
 #, no-wrap
 msgid ""
 "afew = prev.afew.overridePythonAttrs {\n"
@@ -7404,13 +7439,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:145 overlays/configuration.org:151
+#: overlays/configuration.org:173 overlays/configuration.org:179
 #, no-wrap
 msgid "mozc"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:147
+#: overlays/configuration.org:175
 msgid ""
 "Qt 6.12's uic rejects custom widget class names with a leading =::=, and the "
 "dictionary tool's form uses one, so mozc and fcitx5-mozc fail to build. I "
@@ -7418,7 +7453,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:153
+#: overlays/configuration.org:181
 #, no-wrap
 msgid ""
 "mozc = prev.mozc.overrideAttrs (old: {\n"
@@ -7433,13 +7468,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:164 overlays/configuration.org:170
+#: overlays/configuration.org:192 overlays/configuration.org:198
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:166
+#: overlays/configuration.org:194
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7452,7 +7487,7 @@ msgstr ""
 "除します。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:172
+#: overlays/configuration.org:200
 #, no-wrap
 msgid ""
 "pre-release = final: prev: {\n"
@@ -7461,13 +7496,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:177 overlays/configuration.org:193
+#: overlays/configuration.org:205 overlays/configuration.org:221
 #, no-wrap
 msgid "mcp-grafana"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:179
+#: overlays/configuration.org:207
 msgid ""
 "manyara serves Grafana over MCP behind caddy and to the hermes guest, so "
 "both clients arrive with a =Host= that is not loopback. In 1.2.0 the =--"
@@ -7480,7 +7515,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:187
+#: overlays/configuration.org:215
 msgid ""
 "One dashboard test talks to a local test server and fails under the build "
 "sandbox with a truncated response, so it is skipped rather than turning off "
@@ -7488,12 +7523,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:191
+#: overlays/configuration.org:219
 msgid "Drop this once nixpkgs ships 1.4.0 or newer."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:195
+#: overlays/configuration.org:223
 #, no-wrap
 msgid ""
 "mcp-grafana = prev.mcp-grafana.overrideAttrs (\n"
@@ -7512,18 +7547,18 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:210 overlays/configuration.org:219
+#: overlays/configuration.org:238 overlays/configuration.org:247
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:212
+#: overlays/configuration.org:240
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr "アップストリームへの貢献に適さない回避策です。"
 
 #. type: paragraph
-#: overlays/configuration.org:214
+#: overlays/configuration.org:242
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7536,7 +7571,7 @@ msgstr ""
 "久的に残る想定です。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:221
+#: overlays/configuration.org:249
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7546,13 +7581,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:227 overlays/configuration.org:240
+#: overlays/configuration.org:255 overlays/configuration.org:268
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:229
+#: overlays/configuration.org:257
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7565,7 +7600,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:234
+#: overlays/configuration.org:262
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7578,7 +7613,7 @@ msgstr ""
 "います。"
 
 #. type: paragraph
-#: overlays/configuration.org:238
+#: overlays/configuration.org:266
 msgid ""
 "Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/"
 "gh-dash#316]]."
@@ -7587,7 +7622,7 @@ msgstr ""
 "gh-dash#316]]で報告済みです。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:242
+#: overlays/configuration.org:270
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7601,19 +7636,19 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:252
+#: overlays/configuration.org:280
 #, no-wrap
 msgid "mkShim"
 msgstr "mkShim"
 
 #. type: paragraph
-#: overlays/configuration.org:254
+#: overlays/configuration.org:282
 msgid ""
 "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr "macOS Command Line Toolsのスタブ実装を提供するshimユーティリティです。"
 
 #. type: paragraph
-#: overlays/configuration.org:256
+#: overlays/configuration.org:284
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7628,7 +7663,7 @@ msgstr ""
 "制し不要なビルド失敗を防ぎます。"
 
 #. type: paragraph
-#: overlays/configuration.org:261
+#: overlays/configuration.org:289
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
@@ -7637,13 +7672,13 @@ msgstr ""
 "mkShim]]を参照してください。"
 
 #. type: keyword NAME
-#: overlays/configuration.org:263
+#: overlays/configuration.org:291
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:265
+#: overlays/configuration.org:293
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
