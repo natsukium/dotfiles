@@ -82,20 +82,42 @@ let
       inputs,
       ...
     }:
+    let
+      cfg = config.my.services.forgejo-runner;
+    in
     {
       imports = [ wrapperOptions ];
 
-      config = lib.mkIf config.my.services.forgejo-runner.enable {
+      options.my.services.forgejo-runner = {
+        uuid = lib.mkOption {
+          type = lib.types.str;
+          description = "UUID of the runner as registered with Forgejo.";
+        };
+
+        runnerTokenFile = lib.mkOption {
+          type = lib.types.path;
+          description = "Path to a file holding only the runner token paired with {option}`uuid`.";
+        };
+      };
+
+      config = lib.mkIf cfg.enable {
         my.services.forgejo-runner.labels = lib.mkDefault [
           "ubuntu-latest:docker://node:22-bookworm"
           "x86_64-linux:host"
         ];
 
-        services.gitea-actions-runner = {
+        services.forgejo-runner = {
           package = pkgs.forgejo-runner;
-          instances.default = mkInstance config (
-            with pkgs;
-            [
+          instances.default = {
+            enable = true;
+            settings = {
+              runner.labels = cfg.labels;
+              server.connections.default = {
+                inherit (cfg) url uuid;
+              };
+            };
+            secrets.server.connections.default.token_url = cfg.runnerTokenFile;
+            hostPackages = with pkgs; [
               bash
               (lib.hiPrio gnutar)
               busybox
@@ -104,8 +126,8 @@ let
               nix
               nodejs
               inputs.niks3.packages.${pkgs.stdenv.hostPlatform.system}.niks3
-            ]
-          );
+            ];
+          };
         };
 
         virtualisation.docker.enable = true;

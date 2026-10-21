@@ -3,33 +3,9 @@
 
 { inputs, ... }:
 let
-  # Cleared so the daemon builds the step here instead of relaying it to
-  # nix.buildMachines.
-  builderPackage =
-    pkgs:
-    let
-      version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
-      workspace = pkgs.callPackage "${inputs.hydra}/packaging/rust-workspace.nix" {
-        craneLib = inputs.hydra.inputs.crane.mkLib pkgs;
-        inherit version;
-      };
-      patched = workspace.workspace.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [ ./no-redistribute.patch ];
-      });
-    in
-    pkgs.runCommand "hydra-builder-${version}" { meta.mainProgram = "hydra-builder"; } ''
-      mkdir -p "$out/bin"
-      cp "${patched}/bin/hydra-builder" "$out/bin/hydra-builder"
-    '';
-
   mkBuilderModule =
     upstreamModule:
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, lib, ... }:
     let
       cfg = config.my.services.hydra;
     in
@@ -119,7 +95,6 @@ let
       config = lib.mkIf cfg.builder.enable {
         services.hydra-queue-builder-dev = {
           enable = true;
-          package = builderPackage pkgs;
           queueRunnerAddr = cfg.builder.queueRunnerAddress;
           settings = {
             inherit (cfg.builder)

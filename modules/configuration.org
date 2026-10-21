@@ -252,6 +252,12 @@ unfree drivers and CUDA libraries, and specifying each unfree package individual
 =allowUnfreePredicate= would be prohibitively tedious for the number of transitive
 dependencies involved.
 
+Zotero 10 still embeds Firefox ESR 140, which reached end-of-life on 2026-10-13.
+nixpkgs marks that prebuilt Firefox insecure, so every host that installs Zotero
+fails to evaluate. I accept the stale engine until Zotero moves to a newer ESR.
+The entry names the exact version, so a bump fails evaluation again and makes
+me revisit it.
+
 #+begin_src nix :tangle features/nixpkgs.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -287,6 +293,9 @@ let
       config = lib.mkIf cfg.enable {
         nixpkgs = {
           config.allowUnfree = cfg.allowUnfree;
+          config.permittedInsecurePackages = [
+            "firefox-esr-140-bin-unwrapped-140.17.0esr"
+          ];
         };
       };
     };
@@ -512,22 +521,6 @@ The upstream REST and gRPC ports, 8080 and 50051, are common development-server
 choices. I use 24050 and 24051 instead; neither is used elsewhere in this repository,
 and both sit outside the default ephemeral ranges on Linux and macOS.
 
-Each builder agent runs its builds through the local Nix daemon. On a host that
-also sets =nix.buildMachines=, that daemon hands the step straight back out over
-ssh. Hydra then credits the build to the machine that only relayed it, and both
-agents go on counting the slot as free. The legacy queue runner avoided this by
-passing =nix-store --serve --builders ''= for localhost builds
-([[https://github.com/NixOS/hydra/pull/749][NixOS/hydra#749]]). The Rust rewrite dropped that guard, so I patch it back in.
-Nix lets any client clear =builders=, even an untrusted one, so the agent only
-has to send the setting.
-
-The patch goes on the workspace derivation, not on the source tree. Patching the
-tree first would mean reading the workspace expression out of a built copy, and
-that import from derivation fails under =nix flake check --no-build=, which
-refuses to realise anything. Upstream's per-crate wrapper copies its binary out
-of the unpatched workspace, so the feature lifts =hydra-builder= out of the
-patched one itself.
-
 #+begin_src nix :tangle features/hydra/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -536,33 +529,9 @@ patched one itself.
 #+begin_src nix :tangle features/hydra/default.nix
 { inputs, ... }:
 let
-  # Cleared so the daemon builds the step here instead of relaying it to
-  # nix.buildMachines.
-  builderPackage =
-    pkgs:
-    let
-      version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
-      workspace = pkgs.callPackage "${inputs.hydra}/packaging/rust-workspace.nix" {
-        craneLib = inputs.hydra.inputs.crane.mkLib pkgs;
-        inherit version;
-      };
-      patched = workspace.workspace.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [ ./no-redistribute.patch ];
-      });
-    in
-    pkgs.runCommand "hydra-builder-${version}" { meta.mainProgram = "hydra-builder"; } ''
-      mkdir -p "$out/bin"
-      cp "${patched}/bin/hydra-builder" "$out/bin/hydra-builder"
-    '';
-
   mkBuilderModule =
     upstreamModule:
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, lib, ... }:
     let
       cfg = config.my.services.hydra;
     in
@@ -652,7 +621,6 @@ let
       config = lib.mkIf cfg.builder.enable {
         services.hydra-queue-builder-dev = {
           enable = true;
-          package = builderPackage pkgs;
           queueRunnerAddr = cfg.builder.queueRunnerAddress;
           settings = {
             inherit (cfg.builder)
@@ -3924,7 +3892,7 @@ by enabling =installer= again and re-running =provision.ps1=.
 ** Forgejo Actions Runner
 
 My Forgejo instance dispatches Actions jobs to registered runners. Linux hosts
-use nixpkgs' =services.gitea-actions-runner=; macOS has no such module, so I add
+use nixpkgs' =services.forgejo-runner=; macOS has no such module, so I add
 =services.forgejo-runner= for Darwin, driven by launchd and shaped like the
 NixOS option so a runner reads the same on either platform.
 
@@ -3959,7 +3927,7 @@ in
 *** nix-darwin module
 
 This module carries nothing personal — just =services.forgejo-runner=, mirroring
-the instance schema of nixpkgs' =services.gitea-actions-runner=
+the instance schema nixpkgs' =services.gitea-actions-runner= used
 (=token=/=tokenFile=, =labels=, freeform =settings=). Each enabled instance
 becomes a launchd job that registers, then execs the daemon. I record a hash of
 =token= plus =labels= in =.registration-state= so registration re-runs when
@@ -4263,14 +4231,19 @@ system.activationScripts.launchd.text = lib.mkBefore (
 
 *** Opinionated wrappers
 
-The two platforms drive different options — =services.forgejo-runner= on Darwin,
-=services.gitea-actions-runner= on NixOS — but since the nix-darwin module mirrors
-the NixOS instance schema, the wrappers share one option surface and one
-=mkInstance= builder. My =my.services.forgejo-runner= options give =enable=,
-=url= (defaulting to my Forgejo instance), =labels=, and a =tokenFile= path; the
-host owns the secret and hands only its path. Each wrapper holds only the
-per-platform deltas: the =labels= default, =hostPackages=, and — on NixOS — the
-package and Docker for container jobs. Both push to my binary cache, so each
+The two platforms drive different modules under the same
+=services.forgejo-runner= name. My =my.services.forgejo-runner= options give
+=enable=, =url= (defaulting to my Forgejo instance), =labels=, and a =tokenFile=
+path holding a registration token. The host owns each secret and hands only its
+path. The nix-darwin module registers itself with that token, and
+=mkInstance= builds its instance.
+
+The NixOS module no longer registers. It takes the =uuid= and runner token of an
+existing registration, so the NixOS wrapper adds =uuid= and =runnerTokenFile=.
+On kilimanjaro both come from the =.runner= file the old module wrote. The
+registration =tokenFile= stays for the Windows guest, which still registers on
+first boot. Each wrapper also sets the =labels= default, =hostPackages=, and, on
+NixOS, the package and Docker for container jobs. Both push to my binary cache, so each
 =hostPackages= adds =nix= and the niks3 client. A host label names the Nix
 system its jobs run on (=x86_64-linux=, =aarch64-darwin=, =x86_64-windows=), so
 a workflow's =runs-on= states the platform it needs.
@@ -4359,20 +4332,42 @@ nixosWrapper =
     inputs,
     ...
   }:
+  let
+    cfg = config.my.services.forgejo-runner;
+  in
   {
     imports = [ wrapperOptions ];
 
-    config = lib.mkIf config.my.services.forgejo-runner.enable {
+    options.my.services.forgejo-runner = {
+      uuid = lib.mkOption {
+        type = lib.types.str;
+        description = "UUID of the runner as registered with Forgejo.";
+      };
+
+      runnerTokenFile = lib.mkOption {
+        type = lib.types.path;
+        description = "Path to a file holding only the runner token paired with {option}`uuid`.";
+      };
+    };
+
+    config = lib.mkIf cfg.enable {
       my.services.forgejo-runner.labels = lib.mkDefault [
         "ubuntu-latest:docker://node:22-bookworm"
         "x86_64-linux:host"
       ];
 
-      services.gitea-actions-runner = {
+      services.forgejo-runner = {
         package = pkgs.forgejo-runner;
-        instances.default = mkInstance config (
-          with pkgs;
-          [
+        instances.default = {
+          enable = true;
+          settings = {
+            runner.labels = cfg.labels;
+            server.connections.default = {
+              inherit (cfg) url uuid;
+            };
+          };
+          secrets.server.connections.default.token_url = cfg.runnerTokenFile;
+          hostPackages = with pkgs; [
             bash
             (lib.hiPrio gnutar)
             busybox
@@ -4381,8 +4376,8 @@ nixosWrapper =
             nix
             nodejs
             inputs.niks3.packages.${pkgs.stdenv.hostPlatform.system}.niks3
-          ]
-        );
+          ];
+        };
       };
 
       virtualisation.docker.enable = true;

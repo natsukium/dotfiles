@@ -99,9 +99,12 @@
   my.services.forgejo-runner = {
     enable = true;
     tokenFile = config.sops.secrets.forgejo-runner-token.path;
+    uuid = "a07d2847-d308-414a-9459-789c6e9a8a37";
+    runnerTokenFile = config.sops.secrets.forgejo-runner-connection-token.path;
     windows.enable = true;
   };
   sops.secrets.forgejo-runner-token.sopsFile = ./secrets.yaml;
+  sops.secrets.forgejo-runner-connection-token.sopsFile = ./secrets.yaml;
 
   my.services.windows-vm = {
     enable = true;
