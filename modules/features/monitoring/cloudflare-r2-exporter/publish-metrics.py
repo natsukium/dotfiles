@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 import urllib.request
-from datetime import datetime, timedelta, timezone
+from datetime import UTC, datetime, timedelta
 
 ACCOUNT = os.environ["CLOUDFLARE_ACCOUNT_ID"]
 TEXTFILE = os.environ["TEXTFILE_PATH"]
@@ -69,7 +69,7 @@ def fetch():
     with open(os.environ["CREDENTIALS_DIRECTORY"] + "/api-token") as f:
         token = f.read().strip()
 
-    now = datetime.now(timezone.utc)
+    now = datetime.now(UTC)
     body = json.dumps(
         {
             "query": QUERY,
