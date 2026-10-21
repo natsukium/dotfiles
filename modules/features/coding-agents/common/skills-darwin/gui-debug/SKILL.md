@@ -1,17 +1,16 @@
 ---
 name: gui-debug
-description: Verify a rendering or window-chrome change in any macOS GUI app unattended — find its CGWindowID via JXA, capture that window alone (with per-pixel alpha) using screencapture -l, and read exact RGBA via NSBitmapImageRep. Use for blur/opacity/corner-radius/glyph/color rendering bugs where a screenshot or pixel value is the ground truth. No Python and no Accessibility permission needed.
+description: Verify a rendering or window-chrome change in any macOS GUI app unattended — find its CGWindowID via JXA, capture that window alone (with per-pixel alpha) using screencapture -l, read exact RGBA via NSBitmapImageRep, and synthesize keystrokes, chords, clicks and drags with CGEventPost. Use for blur/opacity/corner-radius/glyph/color rendering bugs where a screenshot or pixel value is the ground truth, and for driving keyboard or mouse behavior into the window. No Python needed.
 ---
 
 # macOS GUI debugging
 
 Verify a rendering or window-chrome change by launching the app,
-capturing **just its window**, and probing pixels. None of this needs
-Accessibility permission. (System Events / keystroke injection _does_
-need it and is usually blocked — don't plan on typing into the window
-unattended.) Screen Recording permission is required for screenshots:
-if `screencapture -x /tmp/full.png` produces a non-black image, you
-have it.
+capturing **just its window**, and probing pixels. Screen Recording
+permission is required for screenshots: if `screencapture -x
+/tmp/full.png` produces a non-black image, you have it. Input goes
+through `CGEventPost` from JXA, not System Events, whose keystroke
+injection is blocked without an Accessibility grant.
 
 Throughout, replace `MyApp` with the app's window-owner name (what
 shows in the menu bar / Activity Monitor) and `myapp` with the process
@@ -58,6 +57,91 @@ JSON.stringify({w:w,h:h,center:p(Math.floor(w/2),Math.floor(h/2)),tl:p(2,2),bl:p
   Metal/CALayer reads centre alpha `255` even when "transparent" —
   that's the opaque blur material, not a transparency failure. Test raw
   alpha with blur disabled.
+
+## Keyboard input
+
+```js
+// osascript -l JavaScript key.js <pid> <keycode> [flags]
+ObjC.import("CoreGraphics");
+ObjC.import("AppKit");
+function run(argv) {
+  const pid = parseInt(argv[0], 10);
+  const app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(pid);
+  if (!app.isNil()) app.activateWithOptions($.NSApplicationActivateIgnoringOtherApps);
+  delay(1.5); // let focus and the WM settle
+  const src = $.CGEventSourceCreate(1); // kCGEventSourceStateHIDSystemState
+  const down = $.CGEventCreateKeyboardEvent(src, parseInt(argv[1], 10), true);
+  const up = $.CGEventCreateKeyboardEvent(src, parseInt(argv[1], 10), false);
+  const flags = argv[2] ? parseInt(argv[2], 10) : 0;
+  if (flags) {
+    $.CGEventSetFlags(down, flags);
+    $.CGEventSetFlags(up, flags);
+  }
+  $.CGEventPostToPid(pid, down);
+  delay(0.12);
+  $.CGEventPostToPid(pid, up);
+}
+```
+
+- Prefer `CGEventPostToPid` over the tap-wide `CGEventPost(0, …)`: a
+  mistimed tap post lands in whatever window the WM focused.
+- Flag masks: shift `0x20000`, control `0x40000`, option `0x80000`,
+  command `0x100000`. OR them for a chord: `ctrl+shift+h` is keycode 4
+  with 393216.
+- Keycodes are ANSI key positions, not characters: `h` 4, `c` 8, `d` 2,
+  `x` 7, PageUp 116.
+
+## Mouse gestures
+
+```js
+// osascript -l JavaScript click.js <pid> <fracX> <fracY>
+ObjC.import("CoreGraphics");
+ObjC.import("AppKit");
+function run(argv) {
+  const pid = parseInt(argv[0], 10);
+  const app = $.NSRunningApplication.runningApplicationWithProcessIdentifier(pid);
+  if (!app.isNil()) app.activateWithOptions($.NSApplicationActivateIgnoringOtherApps);
+  delay(1.5);
+  const list = ObjC.castRefToObject(
+    $.CGWindowListCopyWindowInfo($.kCGWindowListOptionOnScreenOnly, $.kCGNullWindowID),
+  );
+  const b = ObjC.deepUnwrap(list).filter(
+    (w) => w.kCGWindowOwnerPID === pid && w.kCGWindowLayer === 0,
+  )[0].kCGWindowBounds;
+  const at = (rx, ry) => ({ x: b.X + b.Width * rx, y: b.Y + b.Height * ry });
+  const src = $.CGEventSourceCreate(1);
+  const post = (type, p) => {
+    $.CGEventPost(0, $.CGEventCreateMouseEvent(src, type, $.CGPointMake(p.x, p.y), 0));
+    delay(0.15);
+  };
+  // types: 1 down, 2 up, 5 moved, 6 dragged
+  const p0 = at(parseFloat(argv[1]), parseFloat(argv[2]));
+  post(5, p0);
+  post(1, p0);
+  post(2, p0);
+}
+```
+
+- Read the window bounds **after** activating. A tiling WM moves the
+  window on focus, so a click computed from stale coordinates lands on
+  another app. Stop the WM for anything multi-step.
+- Address the window by fractions of `kCGWindowBounds`, not absolute
+  pixels.
+- Step a drag through several `dragged` (6) events. A single jump to the
+  end point skips the intermediate positions an app needs to turn a
+  click into a drag.
+- If events silently do nothing, check Accessibility for the terminal
+  running `osascript`.
+
+## Catching an animation mid-flight
+
+A capture takes ~200 ms to set up, so a one-shot animation is over
+before `screencapture` runs. Make the trigger repeat faster than the
+effect decays, and any capture moment shows it.
+
+To prove the opposite, that the animation ends and the app goes idle,
+read `ps -o pcpu= -p <pid>` over several seconds and expect `0.0`.
+`ps -o time=` needs an entitlement on current macOS and fails.
 
 ## Process hygiene
 
