@@ -114,6 +114,7 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 #+begin_src nix
 temporary-fix = final: prev: {
   <<afew>>
+  <<mozc>>
 };
 #+end_src
 
@@ -139,6 +140,25 @@ afew = prev.afew.overridePythonAttrs {
     "${final.notmuch}/bin"
   ];
 };
+#+end_src
+
+** mozc
+
+Qt 6.12's uic rejects custom widget class names with a leading =::=, and the
+dictionary tool's form uses one, so mozc and fcitx5-mozc fail to build. I apply
+the upstream fix. Drop this once nixpkgs ships a mozc that contains it.
+
+#+NAME: mozc
+#+begin_src nix
+mozc = prev.mozc.overrideAttrs (old: {
+  patches = (old.patches or [ ]) ++ [
+    (final.fetchpatch {
+      name = "mozc-uic-leading-colons.patch";
+      url = "https://github.com/google/mozc/commit/29c082a64b577b661694148760a2ae19817beb57.patch";
+      hash = "sha256-Gft1mnLPSMexDMg/PVhwjUVl9D9g1cVGvVNgFmpK168=";
+    })
+  ];
+});
 #+end_src
 
 * pre-release
