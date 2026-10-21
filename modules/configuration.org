@@ -521,22 +521,6 @@ The upstream REST and gRPC ports, 8080 and 50051, are common development-server
 choices. I use 24050 and 24051 instead; neither is used elsewhere in this repository,
 and both sit outside the default ephemeral ranges on Linux and macOS.
 
-Each builder agent runs its builds through the local Nix daemon. On a host that
-also sets =nix.buildMachines=, that daemon hands the step straight back out over
-ssh. Hydra then credits the build to the machine that only relayed it, and both
-agents go on counting the slot as free. The legacy queue runner avoided this by
-passing =nix-store --serve --builders ''= for localhost builds
-([[https://github.com/NixOS/hydra/pull/749][NixOS/hydra#749]]). The Rust rewrite dropped that guard, so I patch it back in.
-Nix lets any client clear =builders=, even an untrusted one, so the agent only
-has to send the setting.
-
-The patch goes on the workspace derivation, not on the source tree. Patching the
-tree first would mean reading the workspace expression out of a built copy, and
-that import from derivation fails under =nix flake check --no-build=, which
-refuses to realise anything. Upstream's per-crate wrapper copies its binary out
-of the unpatched workspace, so the feature lifts =hydra-builder= out of the
-patched one itself.
-
 #+begin_src nix :tangle features/hydra/default.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -545,33 +529,9 @@ patched one itself.
 #+begin_src nix :tangle features/hydra/default.nix
 { inputs, ... }:
 let
-  # Cleared so the daemon builds the step here instead of relaying it to
-  # nix.buildMachines.
-  builderPackage =
-    pkgs:
-    let
-      version = pkgs.lib.strings.trim (builtins.readFile "${inputs.hydra}/version.txt");
-      workspace = pkgs.callPackage "${inputs.hydra}/packaging/rust-workspace.nix" {
-        craneLib = inputs.hydra.inputs.crane.mkLib pkgs;
-        inherit version;
-      };
-      patched = workspace.workspace.overrideAttrs (old: {
-        patches = (old.patches or [ ]) ++ [ ./no-redistribute.patch ];
-      });
-    in
-    pkgs.runCommand "hydra-builder-${version}" { meta.mainProgram = "hydra-builder"; } ''
-      mkdir -p "$out/bin"
-      cp "${patched}/bin/hydra-builder" "$out/bin/hydra-builder"
-    '';
-
   mkBuilderModule =
     upstreamModule:
-    {
-      config,
-      lib,
-      pkgs,
-      ...
-    }:
+    { config, lib, ... }:
     let
       cfg = config.my.services.hydra;
     in
@@ -661,7 +621,6 @@ let
       config = lib.mkIf cfg.builder.enable {
         services.hydra-queue-builder-dev = {
           enable = true;
-          package = builderPackage pkgs;
           queueRunnerAddr = cfg.builder.queueRunnerAddress;
           settings = {
             inherit (cfg.builder)
