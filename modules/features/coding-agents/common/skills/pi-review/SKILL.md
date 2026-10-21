@@ -31,7 +31,11 @@ Review range: <git diff, git diff --cached, or base...HEAD; omit for a document>
 Revision context: <what changed and why>
 Focus: <risks to examine>
 Previous findings: <findings and claimed resolutions, or none>
+Settled: <scope cuts and trade-offs the user already decided, or none>
 ```
+
+`Settled` items are not findings: without them a reviewer re-flags every cut
+as a gap in each round.
 
 For a design, attach the document with `--attach`. For code, let pi inspect the
 named Git range and surrounding source instead of copying the diff into the prompt.
@@ -53,8 +57,7 @@ repository root and refuses to start elsewhere.
 
 `--model` defaults to sol. `wait` prints the review, saves it to `<out>.md`, and
 exits 0 for `PASS`, 1 for `BLOCKED`, and 2 when pi ended without a verdict (its
-stderr is in `<out>.err`; that is not a review result). Sol rounds take 13 to 50
-minutes and luna 10 to 15.
+stderr is in `<out>.err`; that is not a review result).
 
 Where the caller's command timeout is shorter than a review, pass
 `wait --timeout <seconds>` below that limit and call `wait` again after exit 124;
@@ -76,6 +79,10 @@ from the child while loading other global and project skills normally.
    new context file. Narrow `Focus` as the remaining risk changes.
 4. Continue until the verdict is `PASS`. Do not change the target for a mistaken or
    out-of-scope finding; record the evidence or scope boundary in the next context.
-   After three consecutive `BLOCKED` rounds, stop and ask the user whether the
-   direction still holds before starting another.
+   Three consecutive `BLOCKED` rounds suggest the problem is being framed as
+   harder than it is and the design has grown to match. Stop patching and
+   question the premises: which requirements the user actually stated, which
+   ones were assumed, and what the smallest change that meets the stated ones
+   looks like. Present that alternative next to the current design, with what
+   each gives up, and continue only with the one the user chooses.
 5. Report each round's verdict and the accepted or rejected findings to the user.
