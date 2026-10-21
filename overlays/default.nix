@@ -33,6 +33,15 @@
     );
 
   temporary-fix = final: prev: {
+    afew = prev.afew.overridePythonAttrs {
+      sphinxBuilders = "html man";
+      makeWrapperArgs = [
+        "--prefix"
+        "PATH"
+        ":"
+        "${final.notmuch}/bin"
+      ];
+    };
   };
 
   pre-release = final: prev: {

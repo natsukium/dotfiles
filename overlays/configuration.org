@@ -113,6 +113,31 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 #+NAME: temporary-fix
 #+begin_src nix
 temporary-fix = final: prev: {
+  <<afew>>
+};
+#+end_src
+
+** afew
+
+afew now builds with =__structuredAttrs=, and two of its attributes break under it.
+Each =makeWrapperArgs= element reaches makeWrapper as a single argument. The
+nixpkgs expression packs the whole =--prefix PATH= triple into one string, and
+makeWrapper rejects it, so I split it into separate elements. sphinxHook still
+reads =sphinxBuilders= as a plain variable, which yields only the first element
+of the list. The man page is then never built and the =man= output goes missing.
+A space-separated string works with both the current hook and its fix in staging.
+Drop this once [[https://github.com/NixOS/nixpkgs/pull/575801][NixOS/nixpkgs#575801]] and [[https://github.com/NixOS/nixpkgs/pull/573479][NixOS/nixpkgs#573479]] reach nixos-unstable.
+
+#+NAME: afew
+#+begin_src nix
+afew = prev.afew.overridePythonAttrs {
+  sphinxBuilders = "html man";
+  makeWrapperArgs = [
+    "--prefix"
+    "PATH"
+    ":"
+    "${final.notmuch}/bin"
+  ];
 };
 #+end_src
 
