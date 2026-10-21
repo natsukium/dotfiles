@@ -1,4 +1,4 @@
-From 76381761bec9873180489e33f6c610e2b4305d86 Mon Sep 17 00:00:00 2001
+From fb0e3d46e8f74712ac55c71a90929f61aef96572 Mon Sep 17 00:00:00 2001
 From: natsukium <tomoya.otabi@gmail.com>
 Date: Fri, 31 Jul 2026 12:18:35 +0900
 Subject: [PATCH] fix: exclude Emacs child frames from being tiled
@@ -24,10 +24,10 @@ unmanaged does not strand them on the desktop.
  2 files changed, 37 insertions(+), 4 deletions(-)
 
 diff --git a/src/manager.rs b/src/manager.rs
-index 0a59f18..a721e0c 100644
+index 9d69ad1..71bcdc9 100644
 --- a/src/manager.rs
 +++ b/src/manager.rs
-@@ -667,6 +667,23 @@ pub fn window_iterator_for_id(window_id: WinID) -> Option<CFRetained<CFType>> {
+@@ -700,6 +700,23 @@ pub fn window_iterator_for_id(window_id: WinID) -> Option<CFRetained<CFType>> {
      Some(unsafe { CFRetained::from_raw(SLSWindowQueryResultCopyWindows(query.deref().into())) })
  }
  
@@ -52,19 +52,19 @@ index 0a59f18..a721e0c 100644
  /// This function implements complex logic to filter out irrelevant or invalid windows.
  ///
 diff --git a/src/manager/windows.rs b/src/manager/windows.rs
-index 220dc03..a78de27 100644
+index a05b2a8..b48eede 100644
 --- a/src/manager/windows.rs
 +++ b/src/manager/windows.rs
-@@ -28,7 +28,7 @@ use super::skylight::{
+@@ -30,7 +30,7 @@ use super::skylight::{
  };
  use crate::config::Config;
  use crate::errors::{Error, Result};
 -use crate::manager::{Origin, Size, irect_from};
 +use crate::manager::{Origin, Size, irect_from, window_parent_id};
- use crate::platform::{Pid, ProcessSerialNumber, WinID, macos_major_version};
+ use crate::platform::{OSStatus, Pid, ProcessSerialNumber, WinID, macos_major_version};
  use crate::util::{AXUIAttributes, AXUIWrapper, MacResult};
  
-@@ -253,9 +253,25 @@ impl WindowOS {
+@@ -526,9 +526,25 @@ impl WindowOS {
          let role = self.role().ok();
          let subrole = self.subrole().ok();
  
