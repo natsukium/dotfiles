@@ -72,6 +72,14 @@
         })
       ];
     });
+    toybox = prev.toybox.overrideAttrs (
+      old:
+      prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
+        preBuild = (old.preBuild or "") + ''
+          sed -i 's/^CONFIG_READAHEAD=y$/# CONFIG_READAHEAD is not set/' .config
+        '';
+      }
+    );
   };
 
   pre-release = final: prev: {

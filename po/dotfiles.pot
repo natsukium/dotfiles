@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-10-21 11:41+0900\n"
+"POT-Creation-Date: 2026-10-21 12:06+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -7153,17 +7153,18 @@ msgid ""
 "temporary-fix = final: prev: {\n"
 "  <<afew>>\n"
 "  <<mozc>>\n"
+"  <<toybox>>\n"
 "};"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:149 overlays/configuration.org:160
+#: overlays/configuration.org:150 overlays/configuration.org:161
 #, no-wrap
 msgid "afew"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:151
+#: overlays/configuration.org:152
 msgid ""
 "afew now builds with =__structuredAttrs=, and two of its attributes break "
 "under it.  Each =makeWrapperArgs= element reaches makeWrapper as a single "
@@ -7179,7 +7180,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:162
+#: overlays/configuration.org:163
 #, no-wrap
 msgid ""
 "afew = prev.afew.overridePythonAttrs {\n"
@@ -7194,13 +7195,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:173 overlays/configuration.org:179
+#: overlays/configuration.org:174 overlays/configuration.org:180
 #, no-wrap
 msgid "mozc"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:175
+#: overlays/configuration.org:176
 msgid ""
 "Qt 6.12's uic rejects custom widget class names with a leading =::=, and the "
 "dictionary tool's form uses one, so mozc and fcitx5-mozc fail to build. I "
@@ -7209,7 +7210,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:181
+#: overlays/configuration.org:182
 #, no-wrap
 msgid ""
 "mozc = prev.mozc.overrideAttrs (old: {\n"
@@ -7225,13 +7226,44 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:192 overlays/configuration.org:198
+#: overlays/configuration.org:193 overlays/configuration.org:200
+#, no-wrap
+msgid "toybox"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:195
+msgid ""
+"toybox 0.8.15 implements =readahead= with =posix_fadvise=, which macOS "
+"lacks, so the darwin build fails to compile. =extraConfig= cannot switch the "
+"applet off because the package prepends it to the defconfig, which then "
+"wins. I disable it in =.config= right before the build instead. Drop this "
+"once toybox guards the applet on macOS."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:202
+#, no-wrap
+msgid ""
+"toybox = prev.toybox.overrideAttrs (\n"
+"  old:\n"
+"  prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {\n"
+"    preBuild = (old.preBuild or \"\") + ''\n"
+"      sed -i 's/^CONFIG_READAHEAD=y$/# CONFIG_READAHEAD is not set/' "
+".config\n"
+"    '';\n"
+"  }\n"
+");"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:212 overlays/configuration.org:218
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:194
+#: overlays/configuration.org:214
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7240,7 +7272,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:200
+#: overlays/configuration.org:220
 #, no-wrap
 msgid ""
 "pre-release = final: prev: {\n"
@@ -7249,13 +7281,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:205 overlays/configuration.org:221
+#: overlays/configuration.org:225 overlays/configuration.org:241
 #, no-wrap
 msgid "mcp-grafana"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:207
+#: overlays/configuration.org:227
 msgid ""
 "manyara serves Grafana over MCP behind caddy and to the hermes guest, so "
 "both clients arrive with a =Host= that is not loopback. In 1.2.0 the "
@@ -7268,7 +7300,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:215
+#: overlays/configuration.org:235
 msgid ""
 "One dashboard test talks to a local test server and fails under the build "
 "sandbox with a truncated response, so it is skipped rather than turning off "
@@ -7276,12 +7308,12 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:219
+#: overlays/configuration.org:239
 msgid "Drop this once nixpkgs ships 1.4.0 or newer."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:223
+#: overlays/configuration.org:243
 #, no-wrap
 msgid ""
 "mcp-grafana = prev.mcp-grafana.overrideAttrs (\n"
@@ -7300,18 +7332,18 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:238 overlays/configuration.org:247
+#: overlays/configuration.org:258 overlays/configuration.org:267
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:240
+#: overlays/configuration.org:260
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:242
+#: overlays/configuration.org:262
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7320,7 +7352,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:249
+#: overlays/configuration.org:269
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7330,13 +7362,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:255 overlays/configuration.org:268
+#: overlays/configuration.org:275 overlays/configuration.org:288
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:257
+#: overlays/configuration.org:277
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7345,7 +7377,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:262
+#: overlays/configuration.org:282
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7354,14 +7386,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:266
+#: overlays/configuration.org:286
 msgid ""
 "Reported upstream in "
 "[[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]]."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:270
+#: overlays/configuration.org:290
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7375,18 +7407,18 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:280
+#: overlays/configuration.org:300
 #, no-wrap
 msgid "mkShim"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:282
+#: overlays/configuration.org:302
 msgid "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:284
+#: overlays/configuration.org:304
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7396,20 +7428,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:289
+#: overlays/configuration.org:309
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:291
+#: overlays/configuration.org:311
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:293
+#: overlays/configuration.org:313
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""

@@ -143,6 +143,7 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 temporary-fix = final: prev: {
   <<afew>>
   <<mozc>>
+  <<toybox>>
 };
 #+end_src
 
@@ -187,6 +188,25 @@ mozc = prev.mozc.overrideAttrs (old: {
     })
   ];
 });
+#+end_src
+
+** toybox
+
+toybox 0.8.15 implements =readahead= with =posix_fadvise=, which macOS lacks, so the
+darwin build fails to compile. =extraConfig= cannot switch the applet off because the
+package prepends it to the defconfig, which then wins. I disable it in =.config= right
+before the build instead. Drop this once toybox guards the applet on macOS.
+
+#+NAME: toybox
+#+begin_src nix
+toybox = prev.toybox.overrideAttrs (
+  old:
+  prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
+    preBuild = (old.preBuild or "") + ''
+      sed -i 's/^CONFIG_READAHEAD=y$/# CONFIG_READAHEAD is not set/' .config
+    '';
+  }
+);
 #+end_src
 
 * pre-release
