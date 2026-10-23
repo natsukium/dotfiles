@@ -120,6 +120,7 @@ let
             hostPackages = with pkgs; [
               bash
               (lib.hiPrio gnutar)
+              coreutils
               busybox
               curl
               git
