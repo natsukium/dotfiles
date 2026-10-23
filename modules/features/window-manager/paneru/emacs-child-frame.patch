@@ -1,4 +1,4 @@
-From fb0e3d46e8f74712ac55c71a90929f61aef96572 Mon Sep 17 00:00:00 2001
+From 21dd3a5f5996b4ea2d47254f0d49bd91e6a3e1bd Mon Sep 17 00:00:00 2001
 From: natsukium <tomoya.otabi@gmail.com>
 Date: Fri, 31 Jul 2026 12:18:35 +0900
 Subject: [PATCH] fix: exclude Emacs child frames from being tiled
@@ -15,19 +15,26 @@ relationship does distinguish them: child frames carry a non-zero CGS parent ID.
 `found_valid_window` already relies on that same signal, so this reuses
 `SLSWindowIteratorGetParentID` on the window-creation path.
 
+Emacs creates the child window first and attaches it to its parent about 20ms
+later, so the AX creation notification arrives while the parent ID is still 0
+and a single check lets the popup through. The check therefore polls for up to
+100ms. Deferring the decision inside the ECS instead would need the idle event
+loop, which sleeps up to 500ms, to be woken for the re-check; the synchronous
+wait is confined to top-level floating windows, which are created rarely.
+
 Scoping the check to the floating subrole leaves standard windows untouched,
 and macOS keeps child windows attached to their parent, so leaving them
 unmanaged does not strand them on the desktop.
 ---
- src/manager.rs         | 17 +++++++++++++++++
- src/manager/windows.rs | 24 ++++++++++++++++++++----
- 2 files changed, 37 insertions(+), 4 deletions(-)
+ src/manager.rs         | 34 ++++++++++++++++++++++++++++++++++
+ src/manager/windows.rs | 21 +++++++++++++++++----
+ 2 files changed, 51 insertions(+), 4 deletions(-)
 
 diff --git a/src/manager.rs b/src/manager.rs
-index 9d69ad1..71bcdc9 100644
+index 9d69ad1..3f0876a 100644
 --- a/src/manager.rs
 +++ b/src/manager.rs
-@@ -700,6 +700,23 @@ pub fn window_iterator_for_id(window_id: WinID) -> Option<CFRetained<CFType>> {
+@@ -700,6 +700,40 @@ pub fn window_iterator_for_id(window_id: WinID) -> Option<CFRetained<CFType>> {
      Some(unsafe { CFRetained::from_raw(SLSWindowQueryResultCopyWindows(query.deref().into())) })
  }
  
@@ -48,23 +55,45 @@ index 9d69ad1..71bcdc9 100644
 +    unsafe { SLSWindowIteratorGetParentID(&raw const *iterator) }
 +}
 +
++/// Polls until the window gains a WindowServer-level parent or `timeout` elapses.
++///
++/// Reason: apps such as Emacs create a child window first and attach it to its parent
++/// only afterwards, so a single `window_parent_id` call at creation time reports 0.
++pub fn window_has_parent_within(window_id: WinID, timeout: Duration) -> bool {
++    let deadline = Instant::now() + timeout;
++    loop {
++        if window_parent_id(window_id) != 0 {
++            return true;
++        }
++        if Instant::now() >= deadline {
++            return false;
++        }
++        std::thread::sleep(Duration::from_millis(5));
++    }
++}
++
  /// Determines if a window is valid based on its parent ID, attributes, and tags.
  /// This function implements complex logic to filter out irrelevant or invalid windows.
  ///
 diff --git a/src/manager/windows.rs b/src/manager/windows.rs
-index a05b2a8..b48eede 100644
+index a05b2a8..766a93c 100644
 --- a/src/manager/windows.rs
 +++ b/src/manager/windows.rs
-@@ -30,7 +30,7 @@ use super::skylight::{
+@@ -30,10 +30,12 @@ use super::skylight::{
  };
  use crate::config::Config;
  use crate::errors::{Error, Result};
 -use crate::manager::{Origin, Size, irect_from};
-+use crate::manager::{Origin, Size, irect_from, window_parent_id};
++use crate::manager::{Origin, Size, irect_from, window_has_parent_within};
  use crate::platform::{OSStatus, Pid, ProcessSerialNumber, WinID, macos_major_version};
  use crate::util::{AXUIAttributes, AXUIWrapper, MacResult};
  
-@@ -526,9 +526,25 @@ impl WindowOS {
++const CHILD_WINDOW_ATTACH_TIMEOUT: Duration = Duration::from_millis(100);
++
+ /// The registry lock only looks up per-app locks; AX calls never hold it.
+ static ENHANCED_UI_STATES: LazyLock<Mutex<HashMap<Pid, Arc<Mutex<EnhancedUiState>>>>> =
+     LazyLock::new(|| Mutex::new(HashMap::new()));
+@@ -526,9 +528,20 @@ impl WindowOS {
          let role = self.role().ok();
          let subrole = self.subrole().ok();
  
@@ -79,20 +108,15 @@ index a05b2a8..b48eede 100644
 +        {
 +            return false;
 +        }
-+        // Reason: Emacs (and similar apps such as corfu, company-box, vertico-posframe)
-+        // reports child frames as `AXWindow`/`AXFloatingWindow`, indistinguishable by
-+        // role from legitimate floating windows like inspector panels. The structural
-+        // discriminator is the WindowServer-level child-window relationship: child
-+        // frames have a non-zero CGS parent ID, while top-level floats do not.
-+        // `kAXParentAttribute` cannot be used here because it always reports the app
-+        // element regardless of `NSWindow` parentage. Scoping the check to the floating
-+        // subrole keeps standard windows unaffected, and macOS automatically keeps
-+        // child windows attached to their parent so leaving them unmanaged does not
-+        // strand them on the desktop.
-+        window_parent_id(self.id) == 0
++        // Reason: Emacs child frames (corfu, company-box, vertico-posframe) report as
++        // `AXWindow`/`AXFloatingWindow` like legitimate floating panels; only their
++        // non-zero CGS parent ID tells them apart. Emacs attaches the child window about
++        // 20ms after creating it, so the parent has to be awaited rather than read once.
++        // Only top-level floating windows pay the full timeout, and those are rare.
++        !window_has_parent_within(self.id, CHILD_WINDOW_ATTACH_TIMEOUT)
      }
  
      fn app_reference(&self) -> Option<CFRetained<AXUIWrapper>> {
 -- 
-2.55.0
+2.56.0
 
