@@ -90,7 +90,10 @@
       settings = {
         platform = "forgejo";
         endpoint = "https://${config.services.forgejo.settings.server.DOMAIN}/";
-        repositories = [ "felis-terminal/felis" ];
+        repositories = [
+          "felis-terminal/felis"
+          "felis-terminal/conpty-bin-vendored"
+        ];
         onboarding = false;
         configFileNames = [ ".forgejo/renovate.json5" ];
         onboardingConfigFileName = ".forgejo/renovate.json5";
