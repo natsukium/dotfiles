@@ -134,6 +134,7 @@
       url = "github:natsukium/hermes-agent/fix/nix-read-only-eval";
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "";
     };
     mcp-servers = {
       url = "github:natsukium/mcp-servers-nix";
