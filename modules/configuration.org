@@ -5898,12 +5898,8 @@ table's columns, which is what broke them the last time the CLI changed.
 felis makes only OSC 8 hyperlinks clickable, not the plain-text URLs that fill
 real output, leaving that heuristic to an external tool as kitty does.
 =felis-hints= (=Ctrl+Shift+o=) is felis' side: the =pipe= action ships the
-visible grid to [[https://git.natsukium.com/natsukium/spoor][spoor]], my own hint picker, which overlays single-key labels and
-opens the pick. I chose spoor over thumbs because it links felis' own VT parser
-and cell grid, so its labels land on exactly the columns felis drew; thumbs
-rebuilds the grid itself and drifts on a wide character or soft wrap. The pick
-opens rather than landing back at the prompt: felis now exports the originating
-session id, so typing it back is possible, but opening is what I reach for.
+visible grid to [[https://git.natsukium.com/felis-terminal/pouncer][pouncer]], my own hint picker, which overlays single-key labels and
+opens the pick.
 
 =felis-nix-log= (=Ctrl+Shift+l=, ported from kitty) scans the grid for a =nix
 log <drv>= line and pages that build log. It uses grep + fzf rather than a label
@@ -5966,7 +5962,7 @@ in
       neovim = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
       # My standalone hint picker; it links felis' own VT parser and cell
       # grid, so its label overlay lands on exactly the columns felis drew.
-      spoor = inputs.spoor.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      pouncer = inputs.pouncer.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
       # The pickers and hints live in a sibling file so this module
       # reads as configuration, not writeShellApplication bodies.
@@ -5977,7 +5973,7 @@ in
             pkgs
             package
             neovim
-            spoor
+            pouncer
             ;
         })
         felis-switch
@@ -6112,7 +6108,7 @@ in
                 target.command = [ "${felis-scrollback}/bin/felis-scrollback" ];
               };
               # Hints over the visible grid. The SGR that `ansi` keeps
-              # cannot break the URL match: spoor parses the region
+              # cannot break the URL match: pouncer parses the region
               # through felis' VT engine and matches on cells, so it
               # only colours the repaint.
               "ctrl+shift+o" = {
@@ -6143,7 +6139,7 @@ in
 The keymap points at six shell programs, none touching the module system; their
 =writeShellApplication= bodies would bury the configuration if they sat in
 =default.nix=, so they live in a sibling =utilities.nix= handed the felis
-client, spoor, and Neovim. Besides =felis-switch= and the two hints above, it
+client, pouncer, and Neovim. Besides =felis-switch= and the two hints above, it
 holds =felis-kill=, the multi-select cousin that tears sessions down;
 =felis-grep=, a cross-session scrollback search the built-in per-session facet
 can't do; and =felis-scrollback=, which opens the scrollback =pipe= region
@@ -6160,7 +6156,7 @@ read-only in Neovim so editor motions replace the pager.
   pkgs,
   package,
   neovim,
-  spoor,
+  pouncer,
 }:
 let
   opener = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
@@ -6347,7 +6343,7 @@ let
   # agent prints for what it just wrote, whose OSC 8 link the plain
   # region has already dropped. Only .html and .pdf: every further
   # extension is one more label competing for the short keys, and the
-  # rest of a screen's dotted words open in Neovim anyway. spoor reads
+  # rest of a screen's dotted words open in Neovim anyway. pouncer reads
   # the visible region from the temp-file path in the last argv slot,
   # keeping stdin free for its /dev/tty overlay.
   # The pick comes back on stdout rather than through `--action open`
@@ -6358,11 +6354,11 @@ let
   felis-hints = pkgs.writeShellApplication {
     name = "felis-hints";
     runtimeInputs = [
-      spoor
+      pouncer
     ]
     ++ lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.xdg-utils;
     text = ''
-      picked=$(spoor \
+      picked=$(pouncer \
         --preset url \
         --regex '[\w.~/@+-]+\.(?i:html?|pdf)\b' \
         "''${1:?no region file}") || exit 0

@@ -154,14 +154,14 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nix-darwin.follows = "darwin";
     };
+    pouncer = {
+      url = "git+https://git.natsukium.com/felis-terminal/pouncer";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-parts.follows = "flake-parts";
+    };
     simple-wol-manager = {
       url = "git+https://git.natsukium.com/natsukium/simple-wol-manager";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    spoor = {
-      url = "git+https://git.natsukium.com/natsukium/spoor";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.flake-parts.follows = "flake-parts";
     };
     vicinae = {
       url = "github:vicinaehq/vicinae";

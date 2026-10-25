@@ -43,7 +43,7 @@ in
       neovim = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
       # My standalone hint picker; it links felis' own VT parser and cell
       # grid, so its label overlay lands on exactly the columns felis drew.
-      spoor = inputs.spoor.packages.${pkgs.stdenv.hostPlatform.system}.default;
+      pouncer = inputs.pouncer.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
       # The pickers and hints live in a sibling file so this module
       # reads as configuration, not writeShellApplication bodies.
@@ -54,7 +54,7 @@ in
             pkgs
             package
             neovim
-            spoor
+            pouncer
             ;
         })
         felis-switch
@@ -189,7 +189,7 @@ in
                 target.command = [ "${felis-scrollback}/bin/felis-scrollback" ];
               };
               # Hints over the visible grid. The SGR that `ansi` keeps
-              # cannot break the URL match: spoor parses the region
+              # cannot break the URL match: pouncer parses the region
               # through felis' VT engine and matches on cells, so it
               # only colours the repaint.
               "ctrl+shift+o" = {

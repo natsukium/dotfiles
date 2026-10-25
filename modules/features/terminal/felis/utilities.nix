@@ -6,7 +6,7 @@
   pkgs,
   package,
   neovim,
-  spoor,
+  pouncer,
 }:
 let
   opener = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
@@ -193,7 +193,7 @@ let
   # agent prints for what it just wrote, whose OSC 8 link the plain
   # region has already dropped. Only .html and .pdf: every further
   # extension is one more label competing for the short keys, and the
-  # rest of a screen's dotted words open in Neovim anyway. spoor reads
+  # rest of a screen's dotted words open in Neovim anyway. pouncer reads
   # the visible region from the temp-file path in the last argv slot,
   # keeping stdin free for its /dev/tty overlay.
   # The pick comes back on stdout rather than through `--action open`
@@ -204,11 +204,11 @@ let
   felis-hints = pkgs.writeShellApplication {
     name = "felis-hints";
     runtimeInputs = [
-      spoor
+      pouncer
     ]
     ++ lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.xdg-utils;
     text = ''
-      picked=$(spoor \
+      picked=$(pouncer \
         --preset url \
         --regex '[\w.~/@+-]+\.(?i:html?|pdf)\b' \
         "''${1:?no region file}") || exit 0
