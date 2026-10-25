@@ -1,7 +1,7 @@
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
 
-# Requires: inputs.vicinae
+# Requires: inputs.vicinae, inputs.vicinae-extensions
 { inputs, ... }:
 {
   flake.modules.homeManager.vicinae =
@@ -25,22 +25,7 @@
             environment.PATH = "${lib.makeBinPath [ pkgs.rbw ]}:/usr/bin:/bin:/usr/sbin:/sbin";
           };
           extensions = [
-            (inputs.vicinae.lib.${pkgs.stdenv.hostPlatform.system}.mkVicinaeExtension (finalAttrs: {
-              pname = "rbw";
-              version = "0-unstable-2026-07-01";
-              src = pkgs.fetchFromGitea {
-                domain = "git.natsukium.com";
-                owner = "natsukium";
-                repo = "vicinae-extension-rbw";
-                rev = "66444c3c02bd4121f7127ced30dfc5b1d29b5bcf";
-                hash = "sha256-jhbn2eICx7Sf8lm7d5/6cYM3Cl1b/llQyVKuAQvWVWE=";
-              };
-              npmDeps = pkgs.fetchNpmDeps {
-                inherit (finalAttrs) src;
-                hash = "sha256-Mo+OxyoCaDIbwoW5KRFl0GZarWVp0iFNW/NtkUlr35Q=";
-              };
-              npmConfigHook = pkgs.npmHooks.npmConfigHook;
-            }))
+            inputs.vicinae-extensions.packages.${pkgs.stdenv.hostPlatform.system}.bitwarden
           ];
           settings = {
             keybinding = "emacs";

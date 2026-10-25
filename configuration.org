@@ -133,6 +133,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     <<pouncer>>
     <<simple-wol-manager>>
     <<vicinae>>
+    <<vicinae-extensions>>
   };
 
   nixConfig = {
@@ -885,6 +886,28 @@ Vicinae is a Raycast-style native launcher.
 vicinae = {
   url = "github:vicinaehq/vicinae";
   inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
+***** vicinae-extensions
+
+https://github.com/vicinaehq/extensions
+
+#+BEGIN_QUOTE
+Extensions for the Vicinae launcher
+#+END_QUOTE
+
+The repository behind the Vicinae extension store. Each extension is exposed as a
+flake package, so I install store extensions declaratively instead of through the
+in-app store.
+
+#+NAME: vicinae-extensions
+#+begin_src nix
+vicinae-extensions = {
+  url = "github:vicinaehq/extensions";
+  inputs.nixpkgs.follows = "nixpkgs";
+  inputs.vicinae.follows = "vicinae";
+  inputs.flake-compat.follows = "";
 };
 #+end_src
 
