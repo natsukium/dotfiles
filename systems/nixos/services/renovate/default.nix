@@ -93,6 +93,7 @@
         repositories = [
           "felis-terminal/felis"
           "felis-terminal/conpty-bin-vendored"
+          "felis-terminal/pouncer"
         ];
         onboarding = false;
         configFileNames = [ ".forgejo/renovate.json5" ];
