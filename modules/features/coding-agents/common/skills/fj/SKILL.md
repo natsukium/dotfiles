@@ -9,7 +9,7 @@ Use `fj` for Forgejo-specific operations on `git.natsukium.com`. Use `git` for l
 
 ## Select the host and repository explicitly
 
-For unattended commands, avoid checkout inference and provide both the public host and repository:
+Inside a checkout, `fj` infers the host and repository from the Git remote. Elsewhere, or to act on another repository, pass the host and repository explicitly:
 
 ```bash
 fj -H https://git.natsukium.com issue search --repo owner/repo
@@ -24,7 +24,7 @@ Repository syntax depends on the command:
 - Repository commands generally take `owner/repo` as a positional argument. Releases, tags, Actions, and wikis expose their own global `--repo`; check the relevant `--help` before composing less common commands.
 - Convert a URL such as `https://git.natsukium.com/owner/repo/issues/42` or `/pulls/42` to `'owner/repo#42'`.
 
-`-C`, `-R`, and the current directory infer the instance and repository from a Git remote. Prefer `-H` with `--repo` (or a qualified reference) over `-R` for unattended commands: `-R` resolves the named remote and takes precedence over `-H`, and an SSH remote host is resolved through OpenSSH config, so a `HostName` rewrite to the internal host makes `fj` dial `https://` on a host that does not serve it. If a command fails against the internal host, retry with `-H https://git.natsukium.com` and an explicit repository or qualified reference instead of connecting Tailscale; reserve `-R` for deliberate checkout inference.
+`-R` resolves the named remote and takes precedence over `-H`. If a command still dials `manyara.tail4108.ts.net`, the key store lacks its alias to `git.natsukium.com`; retry with `-H https://git.natsukium.com` and an explicit repository.
 
 ## Authentication
 
@@ -36,7 +36,7 @@ fj auth add-token -H https://git.natsukium.com  # reads the token from stdin whe
 fj auth logout -H https://git.natsukium.com
 ```
 
-`fj auth list` should include `git.natsukium.com`. Never print or place an access token directly in a recorded command.
+`fj auth list` should include `git.natsukium.com`. Never print or place an access token directly in a recorded command. Where home-manager renders the key store from sops, it is read-only and `login`, `add-token`, and `logout` fail; ask the user to rotate the token in sops instead.
 
 ## Issues
 

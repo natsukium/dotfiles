@@ -2725,7 +2725,7 @@ snapshot.max-new-file-size = "1MiB";
 
 I self-host [[https://forgejo.org/][Forgejo]] on manyara as my personal forge at =git.natsukium.com=. This
 feature carries the NixOS module that runs the instance and the home-manager
-module that routes git's ssh traffic to it.
+module that configures my machines to talk to it.
 
 #+begin_src nix :tangle features/forgejo/default.nix :exports none
 # This file is auto-generated from configuration.org.
@@ -2913,21 +2913,39 @@ my.services.restic.backups.forgejo.paths = [
 
 *** Client Settings
 
-What every machine of mine needs to talk to the instance: where ssh goes, and
-which remotes take that route.
+What my machines need to talk to the instance: where ssh goes, which remotes
+take that route, and the credentials [[https://codeberg.org/Cyborus/forgejo-cli][=fj=]] uses against the API. Every machine
+turns on the ssh and git settings; =credentials.enable= is separate because
+only the desktop hosts carry a user age key that can decrypt
+=homes/shared/secrets.yaml=.
 
 #+NAME: forgejo-client
 #+begin_src nix
 flake.modules.homeManager.forgejo =
-  { config, lib, ... }:
   {
-    options.my.programs.forgejo.enable = lib.mkEnableOption "the ssh route to my forge";
-
-    config = lib.mkIf config.my.programs.forgejo.enable {
-      <<forgejo-ssh-route>>
-
-      <<forgejo-push-url>>
+    config,
+    lib,
+    pkgs,
+    ...
+  }:
+  {
+    options.my.programs.forgejo = {
+      enable = lib.mkEnableOption "the ssh route to my forge";
+      credentials.enable = lib.mkEnableOption "fj credentials from sops";
     };
+
+    config = lib.mkIf config.my.programs.forgejo.enable (
+      lib.mkMerge [
+        {
+          <<forgejo-ssh-route>>
+
+          <<forgejo-push-url>>
+        }
+        (lib.mkIf config.my.programs.forgejo.credentials.enable {
+          <<forgejo-cli-keys>>
+        })
+      ]
+    );
   };
 #+end_src
 
@@ -2954,6 +2972,43 @@ every push to the forge over ssh instead, leaving fetch on the tunnel.
 #+NAME: forgejo-push-url
 #+begin_src nix
 programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
+#+end_src
+
+**** CLI Credentials
+
+When =fj= infers the instance from a checkout's git remote, it runs the remote
+host through =~/.ssh/config= even for =https://= URLs. The [[*SSH Route][ssh route]] above
+therefore rewrites =git.natsukium.com= to =manyara.tail4108.ts.net=, and =fj=
+dials =https://manyara.tail4108.ts.net=, where nothing is listening. The
+=aliases= map in =keys.json= rewrites an inferred host before =fj= connects, so
+mapping the tailnet name back to =git.natsukium.com= fixes inference in
+checkouts.
+
+=keys.json= also holds the API token, and =fj= rewrites the whole file on
+login, logout, and OAuth refresh, so the alias cannot be managed on its own.
+Rendering the entire file from sops with an =Application= token works because
+application tokens never refresh, leaving =fj= no reason to write to the
+read-only file after activation; rotating the token just means editing
+=homes/shared/secrets.yaml= instead of running =fj auth=.
+
+#+NAME: forgejo-cli-keys
+#+begin_src nix
+sops.secrets.forgejo-cli-token.sopsFile = ../../../homes/shared/secrets.yaml;
+
+sops.templates."forgejo-cli-keys.json" = {
+  path =
+    if pkgs.stdenv.hostPlatform.isDarwin then
+      "${config.home.homeDirectory}/Library/Application Support/forgejo-cli.forgejo-cli/keys.json"
+    else
+      "${config.xdg.dataHome}/forgejo-cli/keys.json";
+  content = builtins.toJSON {
+    hosts."git.natsukium.com" = {
+      type = "Application";
+      token = config.sops.placeholder.forgejo-cli-token;
+    };
+    aliases."manyara.tail4108.ts.net" = "git.natsukium.com";
+  };
+};
 #+end_src
 
 * Virtual Machines

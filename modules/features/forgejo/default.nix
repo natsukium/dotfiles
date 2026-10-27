@@ -119,17 +119,47 @@
     };
 
   flake.modules.homeManager.forgejo =
-    { config, lib, ... }:
     {
-      options.my.programs.forgejo.enable = lib.mkEnableOption "the ssh route to my forge";
-
-      config = lib.mkIf config.my.programs.forgejo.enable {
-        programs.ssh.settings."git.natsukium.com" = {
-          HostName = "manyara.tail4108.ts.net";
-          Port = 2022;
-        };
-
-        programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    {
+      options.my.programs.forgejo = {
+        enable = lib.mkEnableOption "the ssh route to my forge";
+        credentials.enable = lib.mkEnableOption "fj credentials from sops";
       };
+
+      config = lib.mkIf config.my.programs.forgejo.enable (
+        lib.mkMerge [
+          {
+            programs.ssh.settings."git.natsukium.com" = {
+              HostName = "manyara.tail4108.ts.net";
+              Port = 2022;
+            };
+
+            programs.git.settings.url."forgejo@git.natsukium.com:".pushInsteadOf = "https://git.natsukium.com/";
+          }
+          (lib.mkIf config.my.programs.forgejo.credentials.enable {
+            sops.secrets.forgejo-cli-token.sopsFile = ../../../homes/shared/secrets.yaml;
+
+            sops.templates."forgejo-cli-keys.json" = {
+              path =
+                if pkgs.stdenv.hostPlatform.isDarwin then
+                  "${config.home.homeDirectory}/Library/Application Support/forgejo-cli.forgejo-cli/keys.json"
+                else
+                  "${config.xdg.dataHome}/forgejo-cli/keys.json";
+              content = builtins.toJSON {
+                hosts."git.natsukium.com" = {
+                  type = "Application";
+                  token = config.sops.placeholder.forgejo-cli-token;
+                };
+                aliases."manyara.tail4108.ts.net" = "git.natsukium.com";
+              };
+            };
+          })
+        ]
+      );
     };
 }

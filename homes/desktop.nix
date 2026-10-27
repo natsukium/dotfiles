@@ -13,6 +13,7 @@
 
   my.programs.emacs.enable = true;
   my.programs.felis.enable = true;
+  my.programs.forgejo.credentials.enable = true;
   my.programs.vicinae.enable = true;
 
   my.services.copyq.enable = true;
