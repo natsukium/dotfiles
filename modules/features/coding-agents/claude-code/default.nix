@@ -24,7 +24,16 @@
           enable = true;
           enableMcpIntegration = true;
 
-          package = pkgs.edge.claude-code-bin;
+          # The agent often reaches for python3 to edit files, so ship one on its
+          # PATH. Suffixing lets a project's devshell interpreter win.
+          package = pkgs.symlinkJoin {
+            inherit (pkgs.edge.claude-code-bin) pname version meta;
+            paths = [ pkgs.edge.claude-code-bin ];
+            nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
+            postBuild = ''
+              wrapProgram $out/bin/claude --suffix PATH : ${lib.makeBinPath [ pkgs.python3 ]}
+            '';
+          };
 
           settings = {
             outputStyle = "Concise";
