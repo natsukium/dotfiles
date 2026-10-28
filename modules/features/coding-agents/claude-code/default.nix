@@ -24,14 +24,20 @@
           enable = true;
           enableMcpIntegration = true;
 
-          # The agent often reaches for python3 to edit files, so ship one on its
-          # PATH. Suffixing lets a project's devshell interpreter win.
+          # The agent often reaches for python3 to edit files, and the figures
+          # plugin rasterizes every diagram through resvg, so ship both on its
+          # PATH. Suffixing lets a project's devshell tools win.
           package = pkgs.symlinkJoin {
             inherit (pkgs.edge.claude-code-bin) pname version meta;
             paths = [ pkgs.edge.claude-code-bin ];
             nativeBuildInputs = [ pkgs.makeBinaryWrapper ];
             postBuild = ''
-              wrapProgram $out/bin/claude --suffix PATH : ${lib.makeBinPath [ pkgs.python3 ]}
+              wrapProgram $out/bin/claude --suffix PATH : ${
+                lib.makeBinPath [
+                  pkgs.python3
+                  pkgs.resvg
+                ]
+              }
             '';
           };
 
@@ -158,6 +164,13 @@
 
               CLAUDE_CODE_AUTO_COMPACT_WINDOW = "450000";
             };
+          };
+
+          plugins.figures = pkgs.fetchFromGitHub {
+            owner = "natsukium";
+            repo = "claude-code-figures-plugin";
+            rev = "0f02aa298fff272283c4700d7e8d8ffd4f633e8d";
+            hash = "sha256-nv7KWJU7jCyxcCS2a8vog4hT3jUevRy6Khi40br2Ng4=";
           };
 
           context = ../common/AGENTS.md;
