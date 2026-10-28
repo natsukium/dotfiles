@@ -20,27 +20,6 @@
         pkgs = import inputs.nixpkgs {
           inherit (prev.stdenv.hostPlatform) system;
           config.allowUnfree = true;
-          overlays = [
-            (pfinal: pprev: {
-              speechd = pprev.speechd.overrideAttrs (old: {
-                nativeBuildInputs = old.nativeBuildInputs ++ [ pfinal.python3 ];
-              });
-              pythonPackagesExtensions = pprev.pythonPackagesExtensions ++ [
-                (_: pyprev: {
-                  pyopenjtalk-plus = pyprev.pyopenjtalk-plus.overridePythonAttrs (old: {
-                    patches = (old.patches or [ ]) ++ [
-                      (pfinal.fetchpatch {
-                        name = "fix-cython-3.3.0.patch";
-                        url = "https://github.com/tsukumijima/pyopenjtalk-plus/commit/90b644f9e9d397882e6eafe4dcd1843a4fde6a63.patch";
-                        includes = [ "tests/test_frontend.py" ];
-                        hash = "sha256-Jb7T/bRUHxqwBLwV6xYC/teaFHm5GmqJxA7sCX+oiNI=";
-                      })
-                    ];
-                  });
-                })
-              ];
-            })
-          ];
         };
       in
       {

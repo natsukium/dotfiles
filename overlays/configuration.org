@@ -74,13 +74,6 @@ one.
 Calibre is swapped whole instead. Its Python environment reaches torch through piper-tts,
 and the host-wide =cudaSupport= turns that torch into a CUDA build as well.
 
-Two of Calibre's dependencies are broken in nixpkgs right now, and the =temporary-fix=
-overlay does not reach this plain package set, so I fix them here. piper-tts pulls in
-pyopenjtalk-plus, whose test suite still expects the =TypeError= wording from before
-Cython 3.3. speechd lists Python only as a host input, so configure finds no
-interpreter and skips the Python bindings that Calibre's install check imports. Drop
-these once [[https://github.com/NixOS/nixpkgs/pull/576063][NixOS/nixpkgs#576063]] and [[https://github.com/NixOS/nixpkgs/pull/576062][NixOS/nixpkgs#576062]] reach nixos-unstable.
-
 #+NAME: cuda
 #+begin_src nix
 cuda =
@@ -97,27 +90,6 @@ cuda =
       pkgs = import inputs.nixpkgs {
         inherit (prev.stdenv.hostPlatform) system;
         config.allowUnfree = true;
-        overlays = [
-          (pfinal: pprev: {
-            speechd = pprev.speechd.overrideAttrs (old: {
-              nativeBuildInputs = old.nativeBuildInputs ++ [ pfinal.python3 ];
-            });
-            pythonPackagesExtensions = pprev.pythonPackagesExtensions ++ [
-              (_: pyprev: {
-                pyopenjtalk-plus = pyprev.pyopenjtalk-plus.overridePythonAttrs (old: {
-                  patches = (old.patches or [ ]) ++ [
-                    (pfinal.fetchpatch {
-                      name = "fix-cython-3.3.0.patch";
-                      url = "https://github.com/tsukumijima/pyopenjtalk-plus/commit/90b644f9e9d397882e6eafe4dcd1843a4fde6a63.patch";
-                      includes = [ "tests/test_frontend.py" ];
-                      hash = "sha256-Jb7T/bRUHxqwBLwV6xYC/teaFHm5GmqJxA7sCX+oiNI=";
-                    })
-                  ];
-                });
-              })
-            ];
-          })
-        ];
       };
     in
     {
