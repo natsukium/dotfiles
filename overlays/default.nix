@@ -42,15 +42,6 @@
         "${final.notmuch}/bin"
       ];
     };
-    mozc = prev.mozc.overrideAttrs (old: {
-      patches = (old.patches or [ ]) ++ [
-        (final.fetchpatch {
-          name = "mozc-uic-leading-colons.patch";
-          url = "https://github.com/google/mozc/commit/29c082a64b577b661694148760a2ae19817beb57.patch";
-          hash = "sha256-Gft1mnLPSMexDMg/PVhwjUVl9D9g1cVGvVNgFmpK168=";
-        })
-      ];
-    });
     toybox = prev.toybox.overrideAttrs (
       old:
       prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
