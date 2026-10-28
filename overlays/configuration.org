@@ -74,13 +74,6 @@ one.
 Calibre is swapped whole instead. Its Python environment reaches torch through piper-tts,
 and the host-wide =cudaSupport= turns that torch into a CUDA build as well.
 
-Two of Calibre's dependencies are broken in nixpkgs right now, and the =temporary-fix=
-overlay does not reach this plain package set, so I fix them here. piper-tts pulls in
-pyopenjtalk-plus, whose test suite still expects the =TypeError= wording from before
-Cython 3.3. speechd lists Python only as a host input, so configure finds no
-interpreter and skips the Python bindings that Calibre's install check imports. Drop
-these once [[https://github.com/NixOS/nixpkgs/pull/576063][NixOS/nixpkgs#576063]] and [[https://github.com/NixOS/nixpkgs/pull/576062][NixOS/nixpkgs#576062]] reach nixos-unstable.
-
 #+NAME: cuda
 #+begin_src nix
 cuda =
@@ -97,27 +90,6 @@ cuda =
       pkgs = import inputs.nixpkgs {
         inherit (prev.stdenv.hostPlatform) system;
         config.allowUnfree = true;
-        overlays = [
-          (pfinal: pprev: {
-            speechd = pprev.speechd.overrideAttrs (old: {
-              nativeBuildInputs = old.nativeBuildInputs ++ [ pfinal.python3 ];
-            });
-            pythonPackagesExtensions = pprev.pythonPackagesExtensions ++ [
-              (_: pyprev: {
-                pyopenjtalk-plus = pyprev.pyopenjtalk-plus.overridePythonAttrs (old: {
-                  patches = (old.patches or [ ]) ++ [
-                    (pfinal.fetchpatch {
-                      name = "fix-cython-3.3.0.patch";
-                      url = "https://github.com/tsukumijima/pyopenjtalk-plus/commit/90b644f9e9d397882e6eafe4dcd1843a4fde6a63.patch";
-                      includes = [ "tests/test_frontend.py" ];
-                      hash = "sha256-Jb7T/bRUHxqwBLwV6xYC/teaFHm5GmqJxA7sCX+oiNI=";
-                    })
-                  ];
-                });
-              })
-            ];
-          })
-        ];
       };
     in
     {
@@ -142,7 +114,6 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 #+begin_src nix
 temporary-fix = final: prev: {
   <<afew>>
-  <<mozc>>
   <<toybox>>
 };
 #+end_src
@@ -169,25 +140,6 @@ afew = prev.afew.overridePythonAttrs {
     "${final.notmuch}/bin"
   ];
 };
-#+end_src
-
-** mozc
-
-Qt 6.12's uic rejects custom widget class names with a leading =::=, and the
-dictionary tool's form uses one, so mozc and fcitx5-mozc fail to build. I apply
-the upstream fix. Drop this once nixpkgs ships a mozc that contains it.
-
-#+NAME: mozc
-#+begin_src nix
-mozc = prev.mozc.overrideAttrs (old: {
-  patches = (old.patches or [ ]) ++ [
-    (final.fetchpatch {
-      name = "mozc-uic-leading-colons.patch";
-      url = "https://github.com/google/mozc/commit/29c082a64b577b661694148760a2ae19817beb57.patch";
-      hash = "sha256-Gft1mnLPSMexDMg/PVhwjUVl9D9g1cVGvVNgFmpK168=";
-    })
-  ];
-});
 #+end_src
 
 ** toybox
@@ -217,42 +169,7 @@ upstream review. Once a package is available in nixpkgs, remove it from this ove
 
 #+NAME: pre-release
 #+begin_src nix
-pre-release = final: prev: {
-  <<mcp-grafana>>
-};
-#+end_src
-
-** mcp-grafana
-
-manyara serves Grafana over MCP behind caddy and to the hermes guest, so both
-clients arrive with a =Host= that is not loopback. In 1.2.0 the =--allowed-hosts=
-flag only reached mcp-grafana's own middleware: the mcp-go server underneath kept
-its own loopback-only check and answered =invalid Host header=. That check runs
-after caller authentication, so unauthenticated probes returned 401 and looked
-healthy, while the one client that actually held a token was the only one to see
-the 403. Upstream wired the flag through to the inner server in 1.4.0.
-
-One dashboard test talks to a local test server and fails under the build sandbox
-with a truncated response, so it is skipped rather than turning off the whole
-suite.
-
-Drop this once nixpkgs ships 1.4.0 or newer.
-
-#+NAME: mcp-grafana
-#+begin_src nix
-mcp-grafana = prev.mcp-grafana.overrideAttrs (
-  finalAttrs: _: {
-    version = "1.4.2";
-    src = final.fetchFromGitHub {
-      owner = "grafana";
-      repo = "mcp-grafana";
-      tag = "v${finalAttrs.version}";
-      hash = "sha256-MUqVsrfjlDLanWzXzMVGYhlXjF23ovGm/ocz7A4vrxw=";
-    };
-    vendorHash = "sha256-y/Hk1hDQ00wHqTOcaoKVvz2PgF0ZiwHartbuF7qEkXc=";
-    checkFlags = [ "-skip=TestFetchDashboardViaK8s_V2Refetch" ];
-  }
-);
+pre-release = final: prev: { };
 #+end_src
 
 * patches

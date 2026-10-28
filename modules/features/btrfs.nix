@@ -33,7 +33,6 @@
         (mkIf cfg.wipeRootOnBoot {
           # https://discourse.nixos.org/t/impermanence-vs-systemd-initrd-w-tpm-unlocking/25167
           # https://guekka.github.io/nixos-server-1/
-          boot.initrd.systemd.enable = true;
           boot.initrd.systemd.services.roolback =
             let
               # TODO: allow user to select device
