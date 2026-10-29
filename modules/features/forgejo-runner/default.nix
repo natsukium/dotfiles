@@ -112,6 +112,7 @@ let
             enable = true;
             settings = {
               runner.labels = cfg.labels;
+              host.workdir_parent = "/var/lib/private/forgejo-runner/default/.cache/act";
               server.connections.default = {
                 inherit (cfg) url uuid;
               };

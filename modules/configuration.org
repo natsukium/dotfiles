@@ -4303,6 +4303,14 @@ NixOS, the package and Docker for container jobs. Both push to my binary cache, 
 system its jobs run on (=x86_64-linux=, =aarch64-darwin=, =x86_64-windows=), so
 a workflow's =runs-on= states the platform it needs.
 
+On NixOS the runner runs with =DynamicUser=, so its state directory under
+=/var/lib/forgejo-runner= is a symlink into =/var/lib/private=. Host jobs used to
+work under the symlinked path. actions/checkout stores its token in a side file
+that git loads through an =includeIf.gitdir= written with that path. The runner
+starts =run= steps without =PWD=, so git sees only the resolved path, the
+condition never matches, and a =git push= from a job fails asking for a username.
+The NixOS wrapper therefore sets =host.workdir_parent= to the real path.
+
 #+NAME: forgejo-runner-wrapper-shared
 #+begin_src nix
 wrapperOptions =
@@ -4417,6 +4425,7 @@ nixosWrapper =
           enable = true;
           settings = {
             runner.labels = cfg.labels;
+            host.workdir_parent = "/var/lib/private/forgejo-runner/default/.cache/act";
             server.connections.default = {
               inherit (cfg) url uuid;
             };
