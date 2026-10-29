@@ -4303,6 +4303,13 @@ NixOS, the package and Docker for container jobs. Both push to my binary cache, 
 system its jobs run on (=x86_64-linux=, =aarch64-darwin=, =x86_64-windows=), so
 a workflow's =runs-on= states the platform it needs.
 
+systemd's =DynamicUser= makes =/var/lib/forgejo-runner= a symlink to
+=/var/lib/private/forgejo-runner=. =actions/checkout= configures git credentials
+with an =includeIf.gitdir= rule matching the symlinked path, while =git=
+resolves the working directory to the real path, so the rule never matches and
+=git push= fails to authenticate. Setting =host.workdir_parent= to the real path
+keeps both sides on the same path.
+
 #+NAME: forgejo-runner-wrapper-shared
 #+begin_src nix
 wrapperOptions =
@@ -4417,6 +4424,7 @@ nixosWrapper =
           enable = true;
           settings = {
             runner.labels = cfg.labels;
+            host.workdir_parent = "/var/lib/private/forgejo-runner/default/.cache/act";
             server.connections.default = {
               inherit (cfg) url uuid;
             };
