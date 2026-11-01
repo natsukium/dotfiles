@@ -1264,6 +1264,18 @@ so that no separate age keypair is needed.
   (setq auth-sources '("~/.authinfo.age")))
 #+end_src
 
+[[https://github.com/djgoku/sops][sops.el]] decrypts sops-encrypted files on =find-file=
+and re-encrypts them on save,
+so I can edit the secrets in this repository without running =sops= in a terminal.
+Backups and auto-save are suppressed for these buffers, so the plaintext never reaches disk.
+
+#+begin_src emacs-lisp
+(use-package sops
+  :ensure t
+  :init
+  (global-sops-mode 1))
+#+end_src
+
 * AI
 
 ** gptel
