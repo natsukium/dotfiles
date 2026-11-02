@@ -149,16 +149,48 @@ Merging =my/nix-exec-path= back after each update
 preserves access to wrapper-provided executables (e.g. yaml-language-server)
 inside direnv-managed buffers.
 
+By default envrc blocks Emacs until =direnv export= finishes, so the first
+file I open in a project freezes for as long as the devshell takes to load.
+This was a long-standing pain point of envrc, and asynchronous direnv
+invocation finally landed in
+[[https://github.com/purcell/envrc/pull/130][envrc#130]].
+I set =envrc-async= so direnv runs in the background and the buffer is editable
+immediately; the environment is applied once direnv completes.
+
+Running asynchronously breaks the guarantee that a buffer's environment is in
+place before anything uses it. =lsp-deferred= starts the server from an idle
+timer right after the file is shown, which would usually be before direnv
+finishes, so lsp-mode would look the server up in the global =PATH= and either
+fail or pick a different version than the devshell provides. I hold back =lsp=
+while envrc is still running in that buffer and hand it back to =lsp-deferred=
+once direnv has finished, so the visibility check still holds. If direnv fails,
+lsp starts with the global environment, as it did when envrc ran synchronously.
+
 #+begin_src emacs-lisp
 (use-package envrc
   :ensure t
   :hook (after-init . envrc-global-mode)
+  :custom
+  (envrc-async t)
   :config
-  (advice-add 'envrc--update :after
-    (defun my/envrc-preserve-nix-path (&rest _)
-      (when (local-variable-p 'exec-path)
-        (setq-local exec-path
-                    (delete-dups (append exec-path my/nix-exec-path)))))))
+  (defvar-local my/envrc-pending-lsp nil)
+
+  (advice-add 'lsp :around
+    (defun my/lsp-wait-for-envrc (orig &rest args)
+      (if (and (bound-and-true-p envrc-mode) envrc--running)
+          (setq-local my/envrc-pending-lsp t)
+        (apply orig args))))
+
+  (advice-add 'envrc--apply :after
+    (defun my/envrc-after-apply (buf _result)
+      (when (buffer-live-p buf)
+        (with-current-buffer buf
+          (when (local-variable-p 'exec-path)
+            (setq-local exec-path
+                        (delete-dups (append exec-path my/nix-exec-path))))
+          (when (and my/envrc-pending-lsp (not envrc--running))
+            (setq-local my/envrc-pending-lsp nil)
+            (lsp-deferred)))))))
 #+end_src
 
 ** TRAMP
