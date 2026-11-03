@@ -24,6 +24,8 @@
           enable = true;
           enableMcpIntegration = true;
 
+          configDir = "${config.home.homeDirectory}/.claude";
+
           # The agent often reaches for python3 to edit files, and the figures
           # plugin rasterizes every diagram through resvg, so ship both on its
           # PATH. Suffixing lets a project's devshell tools win.

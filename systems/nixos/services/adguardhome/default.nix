@@ -1,9 +1,12 @@
-{ config, ... }:
+{ ... }:
+let
+  port = 3333;
+in
 {
   services.adguardhome = {
     enable = true;
-    port = 3333;
     settings = {
+      http.address = "0.0.0.0:${toString port}";
       dns = {
         upstream_dns = [
           "[/ts.net/]100.100.100.100"
@@ -43,6 +46,6 @@
   };
 
   services.caddy.virtualHosts."http://adguard.home.natsukium.com".extraConfig = ''
-    reverse_proxy localhost:${toString config.services.adguardhome.port}
+    reverse_proxy localhost:${toString port}
   '';
 }

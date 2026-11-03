@@ -30,7 +30,10 @@
 
       config = lib.mkMerge [
         (lib.mkIf cfg.enable {
-          programs.nushell.enable = true;
+          programs.nushell = {
+            enable = true;
+            loadSessionVariables = true;
+          };
         })
 
         (lib.mkIf completerCfg.enable {

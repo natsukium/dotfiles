@@ -27,9 +27,7 @@
             autoupdate = false;
           };
 
-          tui = {
-            theme = "nord";
-          };
+          cli.theme.name = "nord";
         };
 
         home.sessionVariables.OPENCODE_DISABLE_LSP_DOWNLOAD = "true";

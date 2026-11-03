@@ -70,7 +70,7 @@ in
     # afew's --tag --new identifies unprocessed messages by the 'new' tag;
     # InboxFilter then replaces it with 'inbox' so the end result is the
     # same as before (inbox + unread) while allowing filters to run first
-    new.tags = [
+    settings.new.tags = [
       "new"
       "unread"
     ];

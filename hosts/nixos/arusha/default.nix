@@ -1,5 +1,6 @@
 {
   inputs,
+  lib,
   pkgs,
   config,
   ...
@@ -26,6 +27,10 @@
     enable = true;
     defaultUser = "natsukium";
   };
+
+  # WSL writes resolv.conf itself, so the tailnet nameservers set by the
+  # tailscale feature would never take effect here.
+  networking.nameservers = lib.mkForce [ ];
   hardware.graphics = {
     enable = true;
     enable32Bit = true;
