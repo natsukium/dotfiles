@@ -147,6 +147,7 @@ in
 
             window = {
               decorations = false;
+              macos_option_as_alt = true;
             };
 
             keymap = {
