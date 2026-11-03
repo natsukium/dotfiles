@@ -30,15 +30,27 @@ let
   # at a single `--tabstop`, so every column would round up to the
   # widest one's stop. Only the title carries wide characters, and it is
   # last, so padding by `length` holds.
+  #
+  # The status column folds a session's OSC 7501 records into the one
+  # that most needs me, so a blocked subtask is not hidden behind a
+  # working root. `roster waiting` keeps only sessions whose program
+  # has stopped on me: blocked on a question, finished, or failed.
   roster = ''
     roster() {
       felis sessions list --format json \
-        | jq -r '
+        | jq -r --arg mode "''${1:-all}" '
             .sessions[]
             | select(.exited != true)
+            | ([.program_status[]?.state]) as $states
+            | (["blocked", "error", "working", "done", "idle"]
+               | map(select(. as $s | $states | index($s)))
+               | first // "-") as $status
+            | select($mode != "waiting"
+                     or ($status | IN("blocked", "error", "done")))
             | [
                 .id,
                 ((.short_id + "         ")[:9]
+                 + ($status + "         ")[:9]
                  + (((.cwd // "" | sub("^file://[^/]*"; ""))
                      | if . == "" then "-"
                        else sub("^/(Users|home)/[^/]+"; "~")
@@ -61,6 +73,14 @@ let
   # Stacked rather than side by side: half a window cuts off both the
   # grid and the title. fzf's `<N(…)` compares the preview's own width
   # in the primary layout, not the terminal's.
+  #
+  # ctrl-x kills the marked (or current) sessions in place and alt-w
+  # narrows to sessions waiting on me; both refill the list by running
+  # this script again with `--list <mode>`, since fzf's reload needs a
+  # command and `roster` is only a function here. The prompt doubles as
+  # the mode, so a kill reloads whichever view is showing. fzf runs
+  # bind commands through $SHELL, which is fish inside felis, so
+  # `--with-shell` pins bash.
   felis-switch = pkgs.writeShellApplication {
     name = "felis-switch";
     runtimeInputs = [
@@ -74,20 +94,35 @@ let
       # FELIS_ORIGIN_SESSION_ID names where the window came from and
       # will return to. Both are dead ends as switch targets.
       ${roster}
-      list=$(roster | grep -v -e "''${FELIS_ORIGIN_SESSION_ID:-none}" -e "''${FELIS_SESSION_ID:-none}" || true)
+      candidates() {
+        roster "$1" | grep -v -e "''${FELIS_ORIGIN_SESSION_ID:-none}" -e "''${FELIS_SESSION_ID:-none}" || true
+      }
+
+      if [ "''${1:-}" = --list ]; then
+        candidates "''${2:-all}"
+        exit 0
+      fi
+
+      list=$(candidates all)
       if [ -z "$list" ]; then
         echo "no sessions" >&2
         exit 0
       fi
 
+      self=$(printf %q "$0")
       selection=$(
         printf '%s\n' "$list" \
           | fzf --ansi \
+                --multi \
                 --delimiter='\t' \
                 --with-nth=2.. \
-                --prompt='felis session> ' \
+                --with-shell="${pkgs.runtimeShell} -c" \
+                --prompt='all> ' \
+                --header='enter: switch / ctrl-x: kill / alt-w: toggle waiting' \
                 --preview='felis sessions capture {1} --ansi' \
-                --preview-window='right,50%,<80(up,50%)'
+                --preview-window='right,50%,<80(up,50%)' \
+                --bind="ctrl-x:execute-silent(for id in {+1}; do felis sessions kill \"\$id\"; done)+reload($self --list \"\''${FZF_PROMPT%> }\")" \
+                --bind="alt-w:transform:if [ \"\$FZF_PROMPT\" = 'waiting> ' ]; then echo 'change-prompt(all> )+reload($self --list all)'; else echo 'change-prompt(waiting> )+reload($self --list waiting)'; fi"
       ) || exit 0
 
       id=''${selection%%$'\t'*}
