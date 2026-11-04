@@ -39,34 +39,170 @@ in
           felis = inputs.felis.packages.${pkgs.stdenv.hostPlatform.system}.default;
         in
         if pkgs.stdenv.hostPlatform.isDarwin then appIdentity.stabilizeApp felis else felis;
-      # The configured Neovim, reused as a read-only scrollback viewer.
       neovim = inputs.self.packages.${pkgs.stdenv.hostPlatform.system}.neovim;
-      # My standalone hint picker; it links felis' own VT parser and cell
-      # grid, so its label overlay lands on exactly the columns felis drew.
       pouncer = inputs.pouncer.packages.${pkgs.stdenv.hostPlatform.system}.default;
 
-      # The pickers and hints live in a sibling file so this module
-      # reads as configuration, not writeShellApplication bodies.
-      inherit
-        (import ./utilities.nix {
-          inherit
-            lib
-            pkgs
-            package
-            neovim
-            pouncer
-            ;
-        })
-        felis-switch
-        felis-kill
-        felis-grep
-        felis-scrollback
-        felis-hints
-        felis-nix-log
-        ;
+      opener = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
 
-      # Moralerspace ships each style as its own flavor, not weights of
-      # one family, so each style names its flavor.
+      # `--format json` is the only stable shape felis promises. Columns are
+      # space-padded in jq because fzf applies a single uniform `--tabstop`.
+      roster = ''
+        roster() {
+          felis sessions list --format json \
+            | jq -r --arg mode "''${1:-all}" '
+                .sessions[]
+                | select(.exited != true)
+                | ([.program_status[]?.state]) as $states
+                | (["blocked", "error", "working", "done", "idle"]
+                   | map(select(. as $s | $states | index($s)))
+                   | first // "-") as $status
+                | select($mode != "waiting"
+                         or ($status | IN("blocked", "error", "done")))
+                | [
+                    .id,
+                    ((.short_id + "         ")[:9]
+                     + ($status + "         ")[:9]
+                     + (((.cwd // "" | sub("^file://[^/]*"; ""))
+                         | if . == "" then "-"
+                           else sub("^/(Users|home)/[^/]+"; "~")
+                             | split("/")
+                             | last
+                           end)
+                        + "               ")[:15]
+                     + ((.foreground // "-") + "                ")[:16]
+                     + (.title // ""))
+                  ]
+                | @tsv'
+        }
+      '';
+
+      felis-switch = pkgs.writeShellApplication {
+        name = "felis-switch";
+        runtimeInputs = [
+          package
+          pkgs.fzf
+          pkgs.jq
+        ];
+        text = ''
+          # A `run` action runs in its own transient session (FELIS_SESSION_ID), while
+          # FELIS_ORIGIN_SESSION_ID is the session the window came from; exclude both.
+          ${roster}
+          candidates() {
+            roster "$1" | grep -v -e "''${FELIS_ORIGIN_SESSION_ID:-none}" -e "''${FELIS_SESSION_ID:-none}" || true
+          }
+
+          if [ "''${1:-}" = --list ]; then
+            candidates "''${2:-all}"
+            exit 0
+          fi
+
+          list=$(candidates all)
+          if [ -z "$list" ]; then
+            echo "no sessions" >&2
+            exit 0
+          fi
+
+          self=$(printf %q "$0")
+          # fzf runs bind commands through $SHELL (fish), so pin bash with --with-shell.
+          selection=$(
+            printf '%s\n' "$list" \
+              | fzf --ansi \
+                    --multi \
+                    --delimiter='\t' \
+                    --with-nth=2.. \
+                    --with-shell="${pkgs.runtimeShell} -c" \
+                    --prompt='all> ' \
+                    --header='enter: switch / ctrl-x: kill / alt-w: toggle waiting' \
+                    --preview='felis sessions capture {1} --ansi' \
+                    --preview-window='right,50%,<80(up,50%)' \
+                    --bind="ctrl-x:execute-silent(for id in {+1}; do felis sessions kill \"\$id\"; done)+reload($self --list \"\''${FZF_PROMPT%> }\")" \
+                    --bind="alt-w:transform:if [ \"\$FZF_PROMPT\" = 'waiting> ' ]; then echo 'change-prompt(all> )+reload($self --list all)'; else echo 'change-prompt(waiting> )+reload($self --list waiting)'; fi"
+          ) || exit 0
+
+          id=''${selection%%$'\t'*}
+          [ -n "$id" ] && felis sessions switch "$id"
+        '';
+      };
+
+      felis-grep = pkgs.writeShellApplication {
+        name = "felis-grep";
+        runtimeInputs = [
+          package
+          pkgs.fzf
+          pkgs.gawk
+          pkgs.jq
+        ];
+        text = ''
+          ${roster}
+          matches=$(
+            roster \
+              | awk -F'\t' 'NF {print $1}' \
+              | while read -r id; do
+                  felis sessions capture "$id" --source scrollback 2>/dev/null \
+                    | awk -v id="$id" 'NF {print id"\t"$0}'
+                done
+          )
+          if [ -z "$matches" ]; then
+            echo "no scrollback" >&2
+            exit 0
+          fi
+
+          selection=$(
+            printf '%s\n' "$matches" \
+              | fzf --delimiter='\t' --with-nth=2.. --prompt='grep scrollback> '
+          ) || exit 0
+
+          id=$(printf '%s' "$selection" | awk -F'\t' '{print $1; exit}')
+          [ -n "$id" ] && felis sessions switch "$id"
+        '';
+      };
+
+      # Expand `~` in the shell rather than using pouncer's `--action open`, which
+      # passes `~` literally to the opener.
+      felis-hints = pkgs.writeShellApplication {
+        name = "felis-hints";
+        runtimeInputs = [
+          pouncer
+        ]
+        ++ lib.optional pkgs.stdenv.hostPlatform.isLinux pkgs.xdg-utils;
+        text = ''
+          picked=$(pouncer \
+            --preset url \
+            --regex '[\w.~/@+-]+\.(?i:html?|pdf)\b' \
+            "''${1:?no region file}") || exit 0
+          [ -n "$picked" ] || exit 0
+          # shellcheck disable=SC2088
+          case $picked in
+            "~/"*) picked=$HOME/''${picked#"~/"} ;;
+          esac
+          exec ${opener} "$picked"
+        '';
+      };
+
+      felis-nix-log = pkgs.writeShellApplication {
+        name = "felis-nix-log";
+        runtimeInputs = [
+          pkgs.nix
+          pkgs.fzf
+          pkgs.gnused
+          pkgs.gawk
+          pkgs.less
+        ];
+        text = ''
+          mapfile -t drvs < <(
+            grep -oE 'nix log /nix/store/[a-z0-9]{32}-[^ ]+\.drv' "''${1:?no region file}" \
+              | sed 's/^nix log //' \
+              | awk '!seen[$0]++'
+          )
+          case ''${#drvs[@]} in
+            0) echo "no 'nix log <drv>' on screen" >&2; exit 0 ;;
+            1) drv=''${drvs[0]} ;;
+            *) drv=$(printf '%s\n' "''${drvs[@]}" | fzf --prompt='nix log> ') || exit 0 ;;
+          esac
+          [ -n "$drv" ] && nix log "$drv" | less -R
+        '';
+      };
+
       moralerspace = flavor: "Moralerspace ${flavor} HW";
       font-features = [
         "calt"
@@ -88,16 +224,12 @@ in
 
         home.packages = [
           felis-switch
-          felis-kill
           felis-grep
         ];
 
         programs.felis = {
           enable = true;
           inherit package;
-
-          # Runs the module's relay (systemd user unit on Linux, launchd
-          # agent on macOS) forwarding alerts to the platform notifier.
           notifications.enable = true;
 
           settings = {
@@ -105,8 +237,6 @@ in
               family = moralerspace "Neon";
               size_px = 14.0;
               features = font-features;
-              # Each flavor is a distinct family, so felis' bold/italic
-              # derivation from the primary can't reach them; name them.
               bold.family = moralerspace "Xenon";
               italic.family = moralerspace "Radon";
               bold_italic.family = moralerspace "Krypton";
@@ -132,7 +262,6 @@ in
                 bright_magenta = "#${palette.base0E}";
                 bright_cyan = "#${palette.base0C}";
                 bright_white = "#${palette.base07}";
-                # extended base16 colors
                 indexed = {
                   "16" = "#${palette.base09}";
                   "17" = "#${palette.base0F}";
@@ -167,40 +296,35 @@ in
               "ctrl+shift+n" = {
                 kind = "new_session";
               };
-              # `run` launches the picker in a transient session over the
-              # live grid; an absolute store path keeps it independent of
-              # the daemon's minimal PATH.
               "ctrl+shift+p" = {
                 kind = "run";
                 command = [ "${felis-switch}/bin/felis-switch" ];
-              };
-              "ctrl+shift+d" = {
-                kind = "run";
-                command = [ "${felis-kill}/bin/felis-kill" ];
               };
               "ctrl+shift+g" = {
                 kind = "run";
                 command = [ "${felis-grep}/bin/felis-grep" ];
               };
-              # The default +h binding keeps the pager; this routes the
-              # same scrollback region into Neovim instead.
+              # Pipe actions pass the captured region's temp-file path as the last argument.
               "ctrl+shift+e" = {
                 kind = "pipe";
                 source = "scrollback";
-                target.command = [ "${felis-scrollback}/bin/felis-scrollback" ];
+                target.command = [
+                  "${neovim}/bin/nvim"
+                  "-R"
+                  "-c"
+                  "setlocal noswapfile"
+                  "-c"
+                  "normal! G"
+                ];
               };
-              # Hints over the visible grid. The SGR that `ansi` keeps
-              # cannot break the URL match: pouncer parses the region
-              # through felis' VT engine and matches on cells, so it
-              # only colours the repaint.
+              # pouncer parses ANSI through felis' VT engine and matches on cells,
+              # so ansi = true only colours the repaint.
               "ctrl+shift+o" = {
                 kind = "pipe";
                 source = "visible";
                 ansi = true;
                 target.command = [ "${felis-hints}/bin/felis-hints" ];
               };
-              # The kitty Ctrl+Shift+l port: page the build log of a
-              # `nix log <drv>` shown on screen.
               "ctrl+shift+l" = {
                 kind = "pipe";
                 source = "visible";
