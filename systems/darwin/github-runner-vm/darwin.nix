@@ -7,7 +7,7 @@
   config,
   lib,
   pkgs,
-  self,
+  inputs,
   ...
 }:
 let
@@ -19,7 +19,7 @@ let
   indices = map (s: builtins.fromJSON s) (lib.attrNames cfg.instances);
 
   # microvm.nix's nixpkgs (unstable) has vfkit with pty support
-  microvmPkgs = import self.inputs.microvm.inputs.nixpkgs {
+  microvmPkgs = import inputs.microvm.inputs.nixpkgs {
     system = "aarch64-darwin";
   };
 
@@ -79,7 +79,7 @@ let
     let
       inst = cfg.instances.${toString i};
     in
-    self.inputs.nixpkgs.lib.nixosSystem {
+    inputs.nixpkgs.lib.nixosSystem {
       system = "aarch64-linux";
       specialArgs = {
         runnerIndex = i;
@@ -87,7 +87,7 @@ let
         inherit (inst) runnerNamePrefix extraLabels diskSize;
       };
       modules = [
-        self.inputs.microvm.nixosModules.microvm
+        inputs.microvm.nixosModules.microvm
         ./guest.nix
         {
           microvm.vcpu = inst.vcpu;

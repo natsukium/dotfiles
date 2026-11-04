@@ -4,7 +4,7 @@
     ../../../systems/darwin/common.nix
     ../../../systems/darwin/desktop.nix
     ../../../systems/darwin/linux-builder.nix
-    ../../../modules/github-runner-vm/darwin.nix
+    ../../../systems/darwin/github-runner-vm/darwin.nix
     # ../../../systems/darwin/services/github-runner
   ];
 

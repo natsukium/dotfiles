@@ -78,7 +78,6 @@ pkgs: with pkgs; [
 
   # Package Management
   kubernetes-helm
-  nodePackages.npm
   python312Packages.pip
   pipx
   yarn
@@ -114,7 +113,6 @@ pkgs: with pkgs; [
   zstd
 
   # CLI Tools
-  azure-cli
   github-cli
   google-cloud-sdk
 
@@ -140,7 +138,7 @@ pkgs: with pkgs; [
 
   # Databases
   postgresql
-  mysql80
+  mysql84
 
   # Web Servers
   apacheHttpd
