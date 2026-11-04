@@ -17,6 +17,18 @@ let
           launchd command line.
         '';
       };
+      stabilityLevel = lib.mkOption {
+        type = lib.types.enum [
+          "generally-available"
+          "public-preview"
+          "experimental"
+        ];
+        default = "generally-available";
+        description = ''
+          Lowest component stability level Alloy will load. A snippet in
+          `configs` that uses a component below the default must raise this.
+        '';
+      };
     };
   };
 in
@@ -30,6 +42,7 @@ in
     // {
       config = lib.mkIf cfg.enable {
         services.alloy.enable = true;
+        services.alloy.extraFlags = [ "--stability.level=${cfg.stabilityLevel}" ];
         environment.etc = lib.mapAttrs' (
           name: text: lib.nameValuePair "alloy/${name}.alloy" { inherit text; }
         ) cfg.configs;
@@ -64,6 +77,7 @@ in
               (lib.getExe pkgs.grafana-alloy)
               "run"
               "--storage.path=${alloyDataDir}"
+              "--stability.level=${cfg.stabilityLevel}"
               "${configFile}"
             ];
             KeepAlive = true;

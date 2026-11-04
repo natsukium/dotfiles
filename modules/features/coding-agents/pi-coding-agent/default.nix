@@ -59,6 +59,8 @@
             ./extensions/claude-project-skills.ts;
           "${config.programs.pi-coding-agent.configDir}/extensions/pi-review-skill.ts".source =
             piReviewSkillExtension;
+          "${config.programs.pi-coding-agent.configDir}/extensions/otel-metrics.ts".source =
+            ./extensions/otel-metrics.ts;
         };
 
         # pi's /settings UI writes settings.json in place, which fails on the

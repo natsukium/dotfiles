@@ -1,6 +1,6 @@
 { lib, ... }:
 let
-  # Receives OTLP from Claude Code on localhost and fans it out to manyara:
+  # Receives OTLP from coding agents on localhost and fans it out to manyara:
   # remote_write to VictoriaMetrics, OTLP to Loki and Tempo. Sessions are too
   # short-lived to scrape, so metrics are pushed like the logs. One body for
   # both platforms since Alloy runs on both via my.services.alloy.
@@ -23,11 +23,14 @@ let
     in
     {
       options.my.services.otel-collector.enable =
-        lib.mkEnableOption "Alloy OTLP receiver for Claude Code telemetry";
+        lib.mkEnableOption "Alloy OTLP receiver for coding agent telemetry";
 
       config = lib.mkIf cfg.enable {
+        # deltatocumulative is still experimental in Alloy.
+        my.services.alloy.stabilityLevel = "experimental";
+
         my.services.alloy.configs.otlp = ''
-          otelcol.receiver.otlp "claude_code" {
+          otelcol.receiver.otlp "coding_agents" {
             grpc {
               endpoint = "127.0.0.1:4317"
             }
@@ -37,15 +40,48 @@ let
             }
 
             output {
-              metrics = [otelcol.exporter.prometheus.claude_code.input]
+              metrics = [otelcol.processor.transform.coding_agents.input]
               logs    = [otelcol.exporter.otlphttp.loki.input]
-              traces  = [otelcol.exporter.otlp.claude_code.input]
+              traces  = [otelcol.exporter.otlp.tempo.input]
             }
           }
 
-          otelcol.exporter.prometheus "claude_code" {
+          // Codex and pi export delta sums, which the Prometheus exporter
+          // drops, so they are accumulated here. One long-lived stream per
+          // label set also sums concurrent sessions correctly and spares each
+          // session a fresh series, whose first sample VictoriaMetrics'
+          // increase() would not count. Claude Code's cumulative streams pass
+          // through untouched.
+          otelcol.processor.transform "coding_agents" {
+            error_mode = "ignore"
+
+            // codex.turn.cost_microusd is tagged per turn, which would make
+            // every turn a single-sample series.
+            metric_statements {
+              context    = "datapoint"
+              statements = [
+                `delete_key(attributes, "turn.id")`,
+                `delete_key(attributes, "conversation.id")`,
+              ]
+            }
+
+            output {
+              metrics = [otelcol.processor.deltatocumulative.coding_agents.input]
+            }
+          }
+
+          otelcol.processor.deltatocumulative "coding_agents" {
+            // Outlive the gaps between sessions, including weekends.
+            max_stale = "168h"
+
+            output {
+              metrics = [otelcol.exporter.prometheus.coding_agents.input]
+            }
+          }
+
+          otelcol.exporter.prometheus "coding_agents" {
             // Drop the unit and _total suffixes so metric names keep the
-            // predictable claude_code_* form the dashboard queries against.
+            // predictable <agent>_* form the dashboard queries against.
             add_metric_suffixes = false
             forward_to          = [prometheus.remote_write.manyara.receiver]
           }
@@ -53,7 +89,7 @@ let
           // Alloy names this component after the protocol, not the server;
           // VictoriaMetrics accepts remote_write on the same path.
           prometheus.remote_write "manyara" {
-            // Claude Code metrics carry no host identity of their own; tag them
+            // Agent metrics carry no host identity of their own; tag them
             // here so the fleet's sessions are distinguishable in Grafana.
             external_labels = {
               host = "${hostname}",
@@ -70,7 +106,7 @@ let
             }
           }
 
-          otelcol.exporter.otlp "claude_code" {
+          otelcol.exporter.otlp "tempo" {
             client {
               endpoint = "${tempoEndpoint}"
               // Tempo's gRPC receiver is plaintext on the Tailscale network.

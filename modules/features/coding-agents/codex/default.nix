@@ -65,7 +65,23 @@
           enableMcpIntegration = true;
           context = ../common/AGENTS.md;
           package = codexWrapper;
-          settings.approvals_reviewer = "auto_review";
+          settings = {
+            approvals_reviewer = "auto_review";
+
+            # Feed the local Alloy receiver (my.services.otel-collector) like
+            # Claude Code does. Without metrics_exporter, metrics go to OpenAI's
+            # Statsig instead.
+            otel =
+              let
+                otlp.otlp-grpc.endpoint = "http://localhost:4317";
+              in
+              {
+                exporter = otlp;
+                trace_exporter = otlp;
+                metrics_exporter = otlp;
+                log_user_prompt = true;
+              };
+          };
         };
 
         # Codex updates its user config at runtime, so only immutable defaults
