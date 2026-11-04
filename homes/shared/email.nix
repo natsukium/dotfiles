@@ -152,21 +152,6 @@ in
   my.services.pizauth = {
     enable = true;
     persistence.enable = true;
-    # On macOS, unset XDG_RUNTIME_DIR so pizauth falls back to
-    # $TMPDIR/runtime-$USER, which is consistent between launchd and
-    # interactive shells (launchd can't expand shell variables in
-    # EnvironmentVariables, making XDG_RUNTIME_DIR unreliable).
-    package =
-      if pkgs.stdenv.hostPlatform.isDarwin then
-        pkgs.writeShellApplication {
-          name = "pizauth";
-          text = ''
-            unset XDG_RUNTIME_DIR
-            ${lib.getExe pkgs.pizauth} "$@"
-          '';
-        }
-      else
-        pkgs.pizauth;
     accounts.gmail = {
       authUri = "https://accounts.google.com/o/oauth2/auth";
       tokenUri = "https://oauth2.googleapis.com/token";

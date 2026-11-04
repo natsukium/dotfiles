@@ -7,6 +7,8 @@ or exit 0
 
 if test -n "$XDG_RUNTIME_DIR"
     set -g __starship_async_tmpdir "$XDG_RUNTIME_DIR"/fish-async-prompt
+else if test -n "$TMPDIR"
+    set -g __starship_async_tmpdir (string trim -r -c / -- "$TMPDIR")/fish-async-prompt
 else
     set -g __starship_async_tmpdir /tmp/fish-async-prompt
 end
