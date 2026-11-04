@@ -48,27 +48,25 @@ function nanos(ms: number): string {
   return (BigInt(ms) * 1_000_000n).toString();
 }
 
-// Sends are chained so delta windows reach Alloy in order and shutdown can
-// wait for one already in flight.
+// Each flush fixes its window and points immediately and queues the send, so
+// windows reach Alloy in order, a baseline queued by add() precedes the
+// window holding the series' first value, and shutdown can wait for a send
+// already in flight.
 function flush(): Promise<void> {
-  inFlight = inFlight.then(send);
-  return inFlight;
-}
-
-async function send() {
   if (timer) {
     clearTimeout(timer);
     timer = undefined;
   }
   if (pending.size === 0) {
-    return;
+    return inFlight;
   }
   const start = windowStart;
   const end = Date.now();
   windowStart = end;
   const points = [...pending.values()];
   pending.clear();
-  await post(points, start, end);
+  inFlight = inFlight.then(() => post(points, start, end));
+  return inFlight;
 }
 
 async function post(points: Point[], startMs: number, endMs: number) {
