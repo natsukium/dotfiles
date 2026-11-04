@@ -12,14 +12,26 @@ type Attributes = Record<string, string>;
 type Point = { name: string; unit: string; attributes: Attributes; value: number };
 
 const pending = new Map<string, Point>();
+const seen = new Set<string>();
 let windowStart = Date.now();
 let timer: ReturnType<typeof setTimeout> | undefined;
+let inFlight: Promise<void> = Promise.resolve();
 
 function add(name: string, unit: string, attributes: Attributes, value: number) {
   if (!Number.isFinite(value) || value === 0) {
     return;
   }
   const key = `${name}\0${JSON.stringify(Object.entries(attributes).sort())}`;
+  if (!seen.has(key)) {
+    seen.add(key);
+    // VictoriaMetrics' increase() does not count the first sample of a new
+    // series, so a series must start at zero for its first usage to show.
+    // It is stamped at the start of the window the first real delta will
+    // cover; a later stamp overlaps that window and Alloy drops the zero. On
+    // a stream Alloy already holds it is a no-op.
+    const at = windowStart;
+    inFlight = inFlight.then(() => post([{ name, unit, attributes, value: 0 }], at - 1, at));
+  }
   const point = pending.get(key);
   if (point) {
     point.value += value;
@@ -36,7 +48,14 @@ function nanos(ms: number): string {
   return (BigInt(ms) * 1_000_000n).toString();
 }
 
-async function flush() {
+// Sends are chained so delta windows reach Alloy in order and shutdown can
+// wait for one already in flight.
+function flush(): Promise<void> {
+  inFlight = inFlight.then(send);
+  return inFlight;
+}
+
+async function send() {
   if (timer) {
     clearTimeout(timer);
     timer = undefined;
@@ -44,14 +63,19 @@ async function flush() {
   if (pending.size === 0) {
     return;
   }
-  const start = nanos(windowStart);
+  const start = windowStart;
   const end = Date.now();
   windowStart = end;
+  const points = [...pending.values()];
+  pending.clear();
+  await post(points, start, end);
+}
+
+async function post(points: Point[], startMs: number, endMs: number) {
   const byMetric = new Map<string, Point[]>();
-  for (const point of pending.values()) {
+  for (const point of points) {
     byMetric.set(point.name, [...(byMetric.get(point.name) ?? []), point]);
   }
-  pending.clear();
 
   const metrics = [...byMetric].map(([name, points]) => ({
     name,
@@ -64,8 +88,8 @@ async function flush() {
           key,
           value: { stringValue: value },
         })),
-        startTimeUnixNano: start,
-        timeUnixNano: nanos(end),
+        startTimeUnixNano: nanos(startMs),
+        timeUnixNano: nanos(endMs),
         asDouble: p.value,
       })),
     },
@@ -94,8 +118,17 @@ async function flush() {
 }
 
 export default function (pi: ExtensionAPI) {
-  pi.on("session_start", (event) => {
-    add("pi.session.count", "1", { reason: event.reason }, 1);
+  pi.on("session_start", (event, ctx) => {
+    // reload and resume reopen a session that already exists, and so does a
+    // startup that continues one with prior messages.
+    const isNew =
+      event.reason === "new" ||
+      event.reason === "fork" ||
+      (event.reason === "startup" &&
+        !ctx.sessionManager.getEntries().some((entry) => entry.type === "message"));
+    if (isNew) {
+      add("pi.session.count", "1", { reason: event.reason }, 1);
+    }
   });
 
   pi.on("message_end", (event) => {

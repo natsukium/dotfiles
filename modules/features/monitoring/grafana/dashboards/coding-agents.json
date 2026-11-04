@@ -1973,7 +1973,7 @@
             "lineWidth": 1,
             "showPoints": "never",
             "stacking": {
-              "mode": "none",
+              "mode": "normal",
               "group": "A"
             }
           }
@@ -1998,10 +1998,43 @@
             "uid": "PBFA97CFB590B2093"
           },
           "editorMode": "code",
-          "expr": "sum by (token_type) (increase(codex_turn_token_usage_sum{token_type!=\"total\",host=~\"$host\"}[$__rate_interval]))",
-          "refId": "A",
+          "expr": "sum(increase(codex_turn_token_usage_sum{token_type=\"input\",host=~\"$host\"}[$__rate_interval])) - sum(increase(codex_turn_token_usage_sum{token_type=\"cached_input\",host=~\"$host\"}[$__rate_interval]))",
+          "legendFormat": "input (uncached)",
           "range": true,
-          "legendFormat": "{{token_type}}"
+          "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(increase(codex_turn_token_usage_sum{token_type=\"cached_input\",host=~\"$host\"}[$__rate_interval]))",
+          "legendFormat": "cached input",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(increase(codex_turn_token_usage_sum{token_type=\"output\",host=~\"$host\"}[$__rate_interval])) - sum(increase(codex_turn_token_usage_sum{token_type=\"reasoning_output\",host=~\"$host\"}[$__rate_interval]))",
+          "legendFormat": "output (excl. reasoning)",
+          "range": true,
+          "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "PBFA97CFB590B2093"
+          },
+          "editorMode": "code",
+          "expr": "sum(increase(codex_turn_token_usage_sum{token_type=\"reasoning_output\",host=~\"$host\"}[$__rate_interval]))",
+          "legendFormat": "reasoning output",
+          "range": true,
+          "refId": "D"
         }
       ]
     },
