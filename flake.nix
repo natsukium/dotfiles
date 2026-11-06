@@ -90,6 +90,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    pyproject-build-systems = {
+      url = "github:pyproject-nix/build-system-pkgs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Desktop & Theming
     nix-colors = {
       url = "github:misterio77/nix-colors";
@@ -135,6 +139,9 @@
       inputs.flake-parts.follows = "flake-parts";
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "";
+      inputs.pyproject-nix.follows = "pyproject-build-systems/pyproject-nix";
+      inputs.uv2nix.follows = "pyproject-build-systems/uv2nix";
+      inputs.pyproject-build-systems.follows = "pyproject-build-systems";
     };
     mcp-servers = {
       url = "github:natsukium/mcp-servers-nix";

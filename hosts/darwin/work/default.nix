@@ -29,6 +29,11 @@
       meetingbar
     ];
 
+    my.services.plamo-translate = {
+      enable = true;
+      host = "0.0.0.0";
+    };
+
     services.colima.profiles.default = {
       # Docker Desktop is installed on the work machine
       isActive = false;

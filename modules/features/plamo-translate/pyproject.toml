@@ -1,0 +1,21 @@
+[project]
+name = "plamo-translate"
+version = "0"
+requires-python = "==3.12.*"
+dependencies = ["vllm", "vllm-metal"]
+
+[tool.uv]
+environments = ["sys_platform == 'darwin' and platform_machine == 'arm64'"]
+override-dependencies = [
+  "opencv-python; sys_platform == 'never'",
+  "torch==2.16.0.dev20261013",
+  "torchvision==0.30.0.dev20261013",
+  "torchaudio==2.11.0.dev20261013",
+]
+
+[tool.uv.sources]
+vllm = { url = "https://github.com/vllm-project/vllm/releases/download/v0.33.0rc3/vllm-0.33.0%2Bcpu-cp38-abi3-macosx_11_0_arm64.whl" }
+vllm-metal = { url = "https://github.com/vllm-project/vllm-metal/releases/download/v0.33.0/vllm_metal-0.33.0-cp312-cp312-macosx_15_0_arm64.whl" }
+torch = { url = "https://download-r2.pytorch.org/whl/nightly/cpu/torch-2.16.0.dev20261013-cp312-cp312-macosx_14_0_arm64.whl" }
+torchvision = { url = "https://download-r2.pytorch.org/whl/nightly/cpu/torchvision-0.30.0.dev20261013-py3-none-macosx_14_0_arm64.whl" }
+torchaudio = { url = "https://download-r2.pytorch.org/whl/nightly/cpu/torchaudio-2.11.0.dev20261013-py3-none-macosx_14_0_arm64.whl" }

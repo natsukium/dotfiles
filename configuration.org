@@ -116,6 +116,7 @@ and includes tooling for development, code formatting, and pre-commit hooks.
     # Development Tools
     <<git-hooks>>
     <<treefmt-nix>>
+    <<pyproject-build-systems>>
     # Desktop & Theming
     <<nix-colors>>
     <<nix-wallpaper>>
@@ -572,6 +573,22 @@ treefmt-nix = {
 };
 #+end_src
 
+***** pyproject-build-systems
+
+https://github.com/pyproject-nix/build-system-pkgs
+
+#+BEGIN_QUOTE
+Nix packages for Python build systems
+#+END_QUOTE
+
+#+NAME: pyproject-build-systems
+#+begin_src nix
+pyproject-build-systems = {
+  url = "github:pyproject-nix/build-system-pkgs";
+  inputs.nixpkgs.follows = "nixpkgs";
+};
+#+end_src
+
 **** Desktop & Theming
 
 ***** nix-colors
@@ -741,6 +758,9 @@ hermes-agent = {
   inputs.flake-parts.follows = "flake-parts";
   inputs.nixpkgs.follows = "nixpkgs";
   inputs.home-manager.follows = "";
+  inputs.pyproject-nix.follows = "pyproject-build-systems/pyproject-nix";
+  inputs.uv2nix.follows = "pyproject-build-systems/uv2nix";
+  inputs.pyproject-build-systems.follows = "pyproject-build-systems";
 };
 #+end_src
 

@@ -1,0 +1,71 @@
+--- a/plamo3_fast.py
++++ b/plamo3_fast.py
+@@ -9,6 +9,7 @@
+ import mlx.nn as nn
+ from mlx_lm.models.base import BaseModelArgs, create_attention_mask, scaled_dot_product_attention
+ from mlx_lm.models.cache import KVCache, RotatingKVCache
++from mlx_lm.models.activations import swiglu
+ 
+ 
+ @dataclass
+@@ -73,10 +74,7 @@
+         return self._scale
+ 
+     def __call__(self, hidden_states: mx.array) -> mx.array:
+-        # HF rounds the normalized activation before multiplying the BF16 scale.
+-        value = hidden_states.astype(mx.float32)
+-        value = value * mx.rsqrt(mx.mean(value * value, axis=-1, keepdims=True) + self.variance_epsilon)
+-        return value.astype(hidden_states.dtype) * self.scale
++        return mx.fast.rms_norm(hidden_states, self.scale, self.variance_epsilon)
+ 
+ 
+ class SourceRoPE(nn.Module):
+@@ -104,19 +102,23 @@
+             else 1.0
+         )
+ 
++        self._freqs = 1.0 / self._inv_freq
++        self._dims = config.head_dim
++        # vllm-metal batches packed decode rows through mx.fast.rope when set.
++        self.supports_vector_offset = True
++
+     def __call__(self, x: mx.array, offset=0):
+-        positions = mx.arange(x.shape[-2], dtype=mx.float32)
+-        if isinstance(offset, mx.array) and offset.ndim:
+-            positions = positions[None, :] + offset.astype(mx.float32)[:, None]
+-            phase = positions[:, None, :, None] * self._inv_freq
+-        else:
+-            phase = (positions + offset)[..., None] * self._inv_freq
+-        phase = mx.concatenate([phase, phase], axis=-1)
+-        cos = mx.cos(phase).astype(x.dtype) * self._concentration
+-        sin = mx.sin(phase).astype(x.dtype) * self._concentration
+-        half = x.shape[-1] // 2
+-        rotated = mx.concatenate([-x[..., half:], x[..., :half]], axis=-1)
+-        return x * cos + rotated * sin
++        if self._concentration != 1.0:
++            x = x * self._concentration
++        return mx.fast.rope(
++            x,
++            self._dims,
++            traditional=False,
++            base=None,
++            scale=1.0,
++            offset=offset,
++            freqs=self._freqs,
++        )
+ 
+ 
+ class Attention(nn.Module):
+@@ -202,11 +204,7 @@
+ 
+     def __call__(self, x: mx.array) -> mx.array:
+         gate, value = mx.split(self.gate_up_proj(x).astype(x.dtype), 2, axis=-1)
+-        # torch.nn.functional.silu rounds once to the input dtype, while
+-        # sigmoid and multiply separately in BF16 introduce an extra rounding.
+-        gate_f32 = gate.astype(mx.float32)
+-        activated = (gate_f32 * mx.sigmoid(gate_f32)).astype(gate.dtype)
+-        return self.down_proj(activated * value).astype(x.dtype)
++        return self.down_proj(swiglu(gate, value)).astype(x.dtype)
+ 
+ 
+ class Plamo3DecoderLayer(nn.Module):

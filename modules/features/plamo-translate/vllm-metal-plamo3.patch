@@ -1,0 +1,148 @@
+diff --git a/vllm_metal/attention/impls/sdpa.py b/vllm_metal/attention/impls/sdpa.py
+index 7845ffb..1774011 100644
+--- a/vllm_metal/attention/impls/sdpa.py
++++ b/vllm_metal/attention/impls/sdpa.py
+@@ -77,9 +77,9 @@ def _has_packed_qkv_sdpa_contract(module: nn.Module) -> bool:
+     return (
+         hasattr(module, "qkv_proj")
+         and hasattr(module, "o_proj")
+-        and hasattr(module, "n_heads")
+-        and hasattr(module, "n_kv_heads")
+-        and hasattr(module, "head_dim")
++        and (hasattr(module, "n_heads") or hasattr(module, "q_num_heads"))
++        and (hasattr(module, "n_kv_heads") or hasattr(module, "k_num_heads"))
++        and (hasattr(module, "head_dim") or hasattr(module, "qk_dim"))
+         and hasattr(module, "scale")
+         and has_rotary
+     )
+@@ -356,6 +356,8 @@ def prepare_sdpa_qkv(
+     # corrupt downstream kernel shapes.
+     if hasattr(inner, "head_dim"):
+         head_dim = inner.head_dim
++    elif hasattr(inner, "qk_dim"):
++        head_dim = inner.qk_dim
+     elif hasattr(inner, "k_proj"):
+         head_dim = _projection_out_features(inner.k_proj) // n_kv_heads
+     else:
+@@ -366,7 +368,8 @@ def prepare_sdpa_qkv(
+         )
+ 
+     if packed_qkv:
+-        qkv = inner.qkv_proj(x)
++        # Quantized scales stored in fp16 promote bf16 activations to fp32.
++        qkv = inner.qkv_proj(x).astype(x.dtype)
+         q_width = n_heads * head_dim
+         kv_width = n_kv_heads * head_dim
+         queries, keys, values = mx.split(qkv, [q_width, q_width + kv_width], axis=-1)
+@@ -702,11 +705,13 @@ def sdpa_forward(
+     n_heads = (
+         getattr(inner, "n_heads", None)
+         or getattr(inner, "num_attention_heads", None)
++        or getattr(inner, "q_num_heads", None)
+         or inner.num_heads
+     )
+     n_kv_heads = (
+         getattr(inner, "n_kv_heads", None)
+         or getattr(inner, "num_kv_heads", None)
++        or getattr(inner, "k_num_heads", None)
+         or inner.num_key_value_heads
+     )
+ 
+@@ -1201,7 +1206,7 @@ def sdpa_forward(
+         else:
+             out = out * mx.sigmoid(gate)
+     out = apply_g_proj_gate(inner, out, x, n_heads, actual_head_dim)
+-    return _output_projection(inner)(out), kv_for_sharing
++    return _output_projection(inner)(out).astype(x.dtype), kv_for_sharing
+ 
+ 
+ def apply_g_proj_gate(
+diff --git a/vllm_metal/attention/impls/varlen_rope_compat.py b/vllm_metal/attention/impls/varlen_rope_compat.py
+index 09e90d9..a9a60be 100644
+--- a/vllm_metal/attention/impls/varlen_rope_compat.py
++++ b/vllm_metal/attention/impls/varlen_rope_compat.py
+@@ -177,7 +177,10 @@ def apply_packed_rope(
+         and queries.shape[2] == segment_count
+         and (not apply_keys or keys.shape[2] == segment_count)
+         and all(cu_seqlens[i] == i for i in range(segment_count + 1))
+-        and isinstance(rope_fn, _VECTOR_OFFSET_ROPE_TYPES)
++        and (
++            isinstance(rope_fn, _VECTOR_OFFSET_ROPE_TYPES)
++            or getattr(rope_fn, "supports_vector_offset", False)
++        )
+     ):
+         # Batch packed decode rows while preserving each row's absolute offset.
+         batch_offsets = (
+diff --git a/vllm_metal/attention/patching.py b/vllm_metal/attention/patching.py
+index 39eba58..e9b7594 100644
+--- a/vllm_metal/attention/patching.py
++++ b/vllm_metal/attention/patching.py
+@@ -28,7 +28,13 @@ def find_layers(model: Any) -> list[Any]:
+     # Try root.model.layers (Qwen3 Model wrapper)
+     layers_container = getattr(root, "model", root)
+     if hasattr(layers_container, "layers"):
+-        return layers_container.layers
++        layers = layers_container.layers
++        # PLaMo 3 nests the layer list one module deeper (model.layers.layers).
++        if not isinstance(layers, list) and isinstance(
++            getattr(layers, "layers", None), list
++        ):
++            layers = layers.layers
++        return layers
+     elif hasattr(root, "layers"):
+         return root.layers
+     else:
+@@ -39,7 +45,7 @@ def find_layers(model: Any) -> list[Any]:
+ 
+ # Attribute names to probe on each layer, in priority order. LFM2 uses
+ # ``conv`` for its ShortConv layers, which have no attention submodule.
+-DEFAULT_ATTN_ATTR_NAMES = ("self_attn", "linear_attn", "attention", "conv")
++DEFAULT_ATTN_ATTR_NAMES = ("self_attn", "linear_attn", "attention", "conv", "mixer")
+ 
+ 
+ def find_attn_attr(
+diff --git a/vllm_metal/v1/model_adapter.py b/vllm_metal/v1/model_adapter.py
+index 30be7d5..ed2f1d5 100644
+--- a/vllm_metal/v1/model_adapter.py
++++ b/vllm_metal/v1/model_adapter.py
+@@ -1182,7 +1182,8 @@ validate_paged_attention_support` only when ``kv_heads_per_layer`` has
+         without a ``sliding_window``, or without either source, return
+         ``None``, keeping window enforcement disabled everywhere.
+         """
+-        sliding_window = args.get("sliding_window")
++        # PLaMo 3 names it window_size.
++        sliding_window = args.get("sliding_window") or args.get("window_size")
+         if not sliding_window:
+             return None
+ 
+diff --git a/vllm_metal/v1/model_lifecycle.py b/vllm_metal/v1/model_lifecycle.py
+index 95acafc..a419fe8 100644
+--- a/vllm_metal/v1/model_lifecycle.py
++++ b/vllm_metal/v1/model_lifecycle.py
+@@ -420,6 +420,9 @@ class ModelLifecycle:
+                 model_name,
+                 lazy=lazy_weights or bool(expert_cache_bytes),
+                 revision=revision,
++                trust_remote_code=bool(
++                    getattr(model_config, "trust_remote_code", False)
++                ),
+             )
+             if expert_cache_bytes:
+                 self._runner._expert_store = ExpertStore.install(
+@@ -473,12 +476,15 @@ class ModelLifecycle:
+         *,
+         lazy: bool = False,
+         revision: str | None = None,
++        trust_remote_code: bool = False,
+     ) -> Any:
+         with _mlx_lm_compatible_model_path(model_name) as compatible_model_name:
+             model_path = resolve_mlx_lm_model_path(
+                 str(compatible_model_name), revision=revision
+             )
+-            model, _ = mlx_lm_load_model(model_path, lazy=lazy)
++            model, _ = mlx_lm_load_model(
++                model_path, lazy=lazy, trust_remote_code=trust_remote_code
++            )
+         return model
+ 
+     def _install_generation_model(
