@@ -5912,6 +5912,23 @@ only my change as a patch, applied to the downloaded copy.
 =--trust-remote-code= makes vLLM execute both Python files in that directory.
 Because the revisions are pinned, that code is the code I read.
 
+*** KV cache size
+
+Left to itself, vllm-metal sizes the KV cache as a fraction of all Metal memory,
+and on this 128 GB machine that reserved 94 GiB for a 2B model. The pages only
+become resident once a block is written. But vLLM takes new blocks from the head
+of its free list and returns freed ones to the tail, to keep prefix-cache hits
+alive, so a long uptime should walk the whole pool and leave it resident for
+good. Lowering =--gpu-memory-utilization= would not pin the size down either,
+because the cache gets whatever that fraction leaves after the weights and
+overhead.
+
+So I give the budget in bytes, from what the scheduler can actually hold:
+=maxNumSeqs= requests of =maxModelLen= tokens. Each of PLaMo 3's 24 layers
+caches keys and values for four KV heads of 128 dimensions in FP16, 2 KiB per
+token per layer. The sliding-window layers keep only the last 2048 tokens, so
+this overstates what they need a little.
+
 *** Module
 
 #+begin_src nix :tangle features/plamo-translate/default.nix :exports none
@@ -5998,6 +6015,9 @@ Because the revisions are pinned, that code is the code I read.
         rev = "355637cc04db67195ba87a97da85eaf1d52a22e8";
       };
 
+      maxModelLen = 4096;
+      kvBytesPerToken = 24 * 2 * 4 * 128 * 2;
+
       serve = pkgs.writeShellApplication {
         name = "plamo-translate-serve";
         runtimeInputs = [
@@ -6028,8 +6048,9 @@ Because the revisions are pinned, that code is the code I read.
             --host ${cfg.host} \
             --port ${toString cfg.port} \
             --served-model-name plamo-3-translate-2b \
-            --max-model-len 4096 \
-            --max-num-seqs ${toString cfg.maxNumSeqs}
+            --max-model-len ${toString maxModelLen} \
+            --max-num-seqs ${toString cfg.maxNumSeqs} \
+            --kv-cache-memory-bytes ${toString (cfg.maxNumSeqs * maxModelLen * kvBytesPerToken)}
         '';
       };
 

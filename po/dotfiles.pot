@@ -7,7 +7,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-06 15:26+0900\n"
+"POT-Creation-Date: 2026-11-09 02:02+0900\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -420,7 +420,7 @@ msgstr ""
 #: configuration.org:73 modules/features/editor/emacs/init.org:694
 #: modules/configuration.org:80 modules/configuration.org:466
 #: modules/configuration.org:779 modules/configuration.org:4164
-#: modules/configuration.org:6560
+#: modules/configuration.org:6581
 #, no-wrap
 msgid "Configuration"
 msgstr ""
@@ -4103,7 +4103,7 @@ msgid "(setq my/nix-exec-path exec-path)"
 msgstr ""
 
 #. type: heading *
-#: modules/features/editor/emacs/init.org:93 modules/configuration.org:6517
+#: modules/features/editor/emacs/init.org:93 modules/configuration.org:6538
 #, no-wrap
 msgid "Darwin"
 msgstr ""
@@ -7543,7 +7543,7 @@ msgstr ""
 #. type: heading ***
 #: modules/configuration.org:64 modules/configuration.org:366
 #: modules/configuration.org:738 modules/configuration.org:3189
-#: modules/configuration.org:4523 modules/configuration.org:6547
+#: modules/configuration.org:4523 modules/configuration.org:6568
 #, no-wrap
 msgid "Options"
 msgstr ""
@@ -17556,11 +17556,40 @@ msgstr ""
 #. type: heading ***
 #: modules/configuration.org:5915
 #, no-wrap
+msgid "KV cache size"
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:5917
+msgid ""
+"Left to itself, vllm-metal sizes the KV cache as a fraction of all Metal "
+"memory, and on this 128 GB machine that reserved 94 GiB for a 2B model. The "
+"pages only become resident once a block is written. But vLLM takes new "
+"blocks from the head of its free list and returns freed ones to the tail, to "
+"keep prefix-cache hits alive, so a long uptime should walk the whole pool "
+"and leave it resident for good. Lowering =--gpu-memory-utilization= would "
+"not pin the size down either, because the cache gets whatever that fraction "
+"leaves after the weights and overhead."
+msgstr ""
+
+#. type: paragraph
+#: modules/configuration.org:5926
+msgid ""
+"So I give the budget in bytes, from what the scheduler can actually hold: "
+"=maxNumSeqs= requests of =maxModelLen= tokens. Each of PLaMo 3's 24 layers "
+"caches keys and values for four KV heads of 128 dimensions in FP16, 2 KiB "
+"per token per layer. The sliding-window layers keep only the last 2048 "
+"tokens, so this overstates what they need a little."
+msgstr ""
+
+#. type: heading ***
+#: modules/configuration.org:5932
+#, no-wrap
 msgid "Module"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5923
+#: modules/configuration.org:5940
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -17577,19 +17606,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5935
+#: modules/configuration.org:5952
 #, no-wrap
 msgid "inherit (inputs.pyproject-build-systems.inputs) pyproject-nix uv2nix;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5937
+#: modules/configuration.org:5954
 #, no-wrap
 msgid "workspace = uv2nix.lib.workspace.loadWorkspace { workspaceRoot = ./.; };"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5939
+#: modules/configuration.org:5956
 #, no-wrap
 msgid ""
 "fixups =\n"
@@ -17639,7 +17668,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5980
+#: modules/configuration.org:5997
 #, no-wrap
 msgid ""
 "pythonSet =\n"
@@ -17655,13 +17684,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5990
+#: modules/configuration.org:6007
 #, no-wrap
 msgid "env = pythonSet.mkVirtualEnv \"plamo-translate-env\" workspace.deps.default;"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:5992
+#: modules/configuration.org:6009
 #, no-wrap
 msgid ""
 "weights = {\n"
@@ -17675,7 +17704,15 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6001
+#: modules/configuration.org:6018
+#, no-wrap
+msgid ""
+"maxModelLen = 4096;\n"
+"kvBytesPerToken = 24 * 2 * 4 * 128 * 2;"
+msgstr ""
+
+#. type: paragraph in src
+#: modules/configuration.org:6021
 #, no-wrap
 msgid ""
 "serve = pkgs.writeShellApplication {\n"
@@ -17712,14 +17749,16 @@ msgid ""
 "      --host ${cfg.host} \\\n"
 "      --port ${toString cfg.port} \\\n"
 "      --served-model-name plamo-3-translate-2b \\\n"
-"      --max-model-len 4096 \\\n"
-"      --max-num-seqs ${toString cfg.maxNumSeqs}\n"
+"      --max-model-len ${toString maxModelLen} \\\n"
+"      --max-num-seqs ${toString cfg.maxNumSeqs} \\\n"
+"      --kv-cache-memory-bytes ${toString (cfg.maxNumSeqs * maxModelLen * "
+"kvBytesPerToken)}\n"
 "  '';\n"
 "};"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6036
+#: modules/configuration.org:6057
 #, no-wrap
 msgid ""
 "  log = \"${config.home.homeDirectory}/Library/Logs/plamo-translate.log\";\n"
@@ -17744,7 +17783,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6055
+#: modules/configuration.org:6076
 #, no-wrap
 msgid ""
 "config = lib.mkIf cfg.enable {\n"
@@ -17759,7 +17798,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6063
+#: modules/configuration.org:6084
 #, no-wrap
 msgid ""
 "        launchd.agents.plamo-translate = {\n"
@@ -17784,19 +17823,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:6084
+#: modules/configuration.org:6105
 #, no-wrap
 msgid "Launcher"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:6086
+#: modules/configuration.org:6107
 #, no-wrap
 msgid "Vicinae"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6088
+#: modules/configuration.org:6109
 msgid ""
 "[[https://github.com/vicinae/vicinae][Vicinae]] is a cross-platform launcher "
 "for Linux and macOS, designed to run extensions from Raycast, the popular "
@@ -17805,14 +17844,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6093
+#: modules/configuration.org:6114
 msgid ""
 "On macOS I disable [[*Spotlight][Spotlight]] in favor of Vicinae, as "
 "described later."
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6102
+#: modules/configuration.org:6123
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -17829,7 +17868,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6114
+#: modules/configuration.org:6135
 #, no-wrap
 msgid ""
 "options.my.programs.vicinae.enable = lib.mkEnableOption \"vicinae "
@@ -17837,7 +17876,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6116
+#: modules/configuration.org:6137
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.vicinae.enable {\n"
@@ -17864,19 +17903,19 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: modules/configuration.org:6137
+#: modules/configuration.org:6158
 #, no-wrap
 msgid "Terminal"
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:6139
+#: modules/configuration.org:6160
 #, no-wrap
 msgid "Felis"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6141
+#: modules/configuration.org:6162
 msgid ""
 "[[https://git.natsukium.com/natsukium/felis][felis]] is a daemon/client "
 "terminal with session persistence across hosts. The system module installs "
@@ -17885,7 +17924,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6146
+#: modules/configuration.org:6167
 msgid ""
 "[[https://github.com/yuru7/moralerspace][Moralerspace]] ships its styles "
 "(Neon, Xenon, Radon, Krypton) as separate font families rather than weights "
@@ -17895,7 +17934,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6157
+#: modules/configuration.org:6178
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -17912,7 +17951,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6169
+#: modules/configuration.org:6190
 #, no-wrap
 msgid ""
 "      config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -17928,7 +17967,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6180
+#: modules/configuration.org:6201
 #, no-wrap
 msgid ""
 "flake.modules.homeManager.felis =\n"
@@ -17955,13 +17994,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6198
+#: modules/configuration.org:6219
 #, no-wrap
 msgid "<<felis-helpers>>"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6200
+#: modules/configuration.org:6221
 #, no-wrap
 msgid ""
 "  moralerspace = flavor: \"Moralerspace ${flavor} HW\";\n"
@@ -17980,13 +18019,13 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6214
+#: modules/configuration.org:6235
 #, no-wrap
 msgid "options.my.programs.felis.enable = lib.mkEnableOption \"felis\";"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6216
+#: modules/configuration.org:6237
 #, no-wrap
 msgid ""
 "config = lib.mkIf config.my.programs.felis.enable {\n"
@@ -17994,7 +18033,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6219
+#: modules/configuration.org:6240
 #, no-wrap
 msgid ""
 "home.packages = [\n"
@@ -18004,7 +18043,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6224
+#: modules/configuration.org:6245
 #, no-wrap
 msgid ""
 "programs.felis = {\n"
@@ -18014,7 +18053,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6229
+#: modules/configuration.org:6250
 #, no-wrap
 msgid ""
 "settings = {\n"
@@ -18029,7 +18068,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6239
+#: modules/configuration.org:6260
 #, no-wrap
 msgid ""
 "theme = {\n"
@@ -18066,7 +18105,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6271
+#: modules/configuration.org:6292
 #, no-wrap
 msgid ""
 "window = {\n"
@@ -18076,7 +18115,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6276
+#: modules/configuration.org:6297
 #, no-wrap
 msgid ""
 "keymap = {\n"
@@ -18131,7 +18170,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6329
+#: modules/configuration.org:6350
 #, no-wrap
 msgid ""
 "            mouse.scroll_multiplier = 5.0;\n"
@@ -18143,13 +18182,13 @@ msgid ""
 msgstr ""
 
 #. type: heading ***
-#: modules/configuration.org:6337
+#: modules/configuration.org:6358
 #, no-wrap
 msgid "Session and hint helpers"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6339
+#: modules/configuration.org:6360
 msgid ""
 "The built-in =switch_session= binding only steps one session at a time, and "
 "the built-in search (=Ctrl+Shift+f=) only searches the focused session.  "
@@ -18161,7 +18200,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6346
+#: modules/configuration.org:6367
 msgid ""
 "felis makes only OSC 8 hyperlinks clickable, leaving plain-text URLs and "
 "paths in terminal output to external tools via =pipe=. =felis-hints= "
@@ -18173,13 +18212,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:6353
+#: modules/configuration.org:6374
 #, no-wrap
 msgid "felis-helpers"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6355
+#: modules/configuration.org:6376
 #, no-wrap
 msgid ""
 "opener = if pkgs.stdenv.hostPlatform.isDarwin then \"open\" else "
@@ -18187,91 +18226,91 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6362
+#: modules/configuration.org:6383
 #, no-wrap
 msgid "jq -r --arg mode \"''${1:-all}\" '"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6364
+#: modules/configuration.org:6385
 #, no-wrap
 msgid "select(.exited != true)"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6365
+#: modules/configuration.org:6386
 #, no-wrap
 msgid "([.program_status[]?.state]) as $states"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6366
+#: modules/configuration.org:6387
 #, no-wrap
 msgid "([\"blocked\", \"error\", \"working\", \"done\", \"idle\"]"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6367
+#: modules/configuration.org:6388
 #, no-wrap
 msgid "map(select(. as $s"
 msgstr ""
 
 #. type: cell column 1
-#: modules/configuration.org:6367
+#: modules/configuration.org:6388
 #, no-wrap
 msgid "$states"
 msgstr ""
 
 #. type: cell column 2
-#: modules/configuration.org:6367
+#: modules/configuration.org:6388
 #, no-wrap
 msgid "index($s)))"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6368
+#: modules/configuration.org:6389
 #, no-wrap
 msgid "first // \"-\") as $status"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6369
+#: modules/configuration.org:6390
 #, no-wrap
 msgid "select($mode != \"waiting\""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6371
+#: modules/configuration.org:6392
 #, no-wrap
 msgid "["
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6376
+#: modules/configuration.org:6397
 #, no-wrap
 msgid "if . == \"\" then \"-\""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6378
+#: modules/configuration.org:6399
 #, no-wrap
 msgid "split(\"/\")"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6379
+#: modules/configuration.org:6400
 #, no-wrap
 msgid "last"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6385
+#: modules/configuration.org:6406
 #, no-wrap
 msgid "@tsv'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6359
+#: modules/configuration.org:6380
 #, no-wrap
 msgid ""
 "roster = ''\n"
@@ -18294,7 +18333,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6389
+#: modules/configuration.org:6410
 #, no-wrap
 msgid ""
 "felis-switch = pkgs.writeShellApplication {\n"
@@ -18313,7 +18352,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6404
+#: modules/configuration.org:6425
 #, no-wrap
 msgid ""
 "if [ \"''${1:-}\" = --list ]; then\n"
@@ -18323,7 +18362,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6409
+#: modules/configuration.org:6430
 #, no-wrap
 msgid ""
 "list=$(candidates all)\n"
@@ -18334,13 +18373,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6419
+#: modules/configuration.org:6440
 #, no-wrap
 msgid "fzf --ansi \\"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6415
+#: modules/configuration.org:6436
 #, no-wrap
 msgid ""
 "self=$(printf %q \"$0\")\n"
@@ -18365,7 +18404,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6432
+#: modules/configuration.org:6453
 #, no-wrap
 msgid ""
 "    id=''${selection%%$'\\t'*}\n"
@@ -18375,25 +18414,25 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6449
+#: modules/configuration.org:6470
 #, no-wrap
 msgid "awk -F'\\t' 'NF {print $1}' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6450
+#: modules/configuration.org:6471
 #, no-wrap
 msgid "while read -r id; do"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6452
+#: modules/configuration.org:6473
 #, no-wrap
 msgid "awk -v id=\"$id\" 'NF {print id\"\\t\"$0}'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6437
+#: modules/configuration.org:6458
 #, no-wrap
 msgid ""
 "felis-grep = pkgs.writeShellApplication {\n"
@@ -18419,13 +18458,13 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6462
+#: modules/configuration.org:6483
 #, no-wrap
 msgid "fzf --delimiter='\\t' --with-nth=2.. --prompt='grep scrollback> '"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6460
+#: modules/configuration.org:6481
 #, no-wrap
 msgid ""
 "selection=$(\n"
@@ -18434,7 +18473,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6465
+#: modules/configuration.org:6486
 #, no-wrap
 msgid ""
 "    id=$(printf '%s' \"$selection\" | awk -F'\\t' '{print $1; exit}')\n"
@@ -18444,7 +18483,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6472
+#: modules/configuration.org:6493
 #, no-wrap
 msgid ""
 "felis-hints = pkgs.writeShellApplication {\n"
@@ -18468,19 +18507,19 @@ msgid ""
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6504
+#: modules/configuration.org:6525
 #, no-wrap
 msgid "sed 's/^nix log //' \\"
 msgstr ""
 
 #. type: cell column 0
-#: modules/configuration.org:6505
+#: modules/configuration.org:6526
 #, no-wrap
 msgid "awk '!seen[$0]++'"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6492
+#: modules/configuration.org:6513
 #, no-wrap
 msgid ""
 "felis-nix-log = pkgs.writeShellApplication {\n"
@@ -18509,13 +18548,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: modules/configuration.org:6519
+#: modules/configuration.org:6540
 #, no-wrap
 msgid "Spotlight"
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6521
+#: modules/configuration.org:6542
 msgid ""
 "I don't use Spotlight search, yet its indexer (=mdworker=) keeps consuming "
 "CPU, disk I/O, and disk space in the background, so I turn indexing off by "
@@ -18525,7 +18564,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6532
+#: modules/configuration.org:6553
 #, no-wrap
 msgid ""
 "{ ... }:\n"
@@ -18540,7 +18579,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6542
+#: modules/configuration.org:6563
 #, no-wrap
 msgid ""
 "      <<spotlight-config>>\n"
@@ -18549,13 +18588,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:6549
+#: modules/configuration.org:6570
 #, no-wrap
 msgid "spotlight-options"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6551
+#: modules/configuration.org:6572
 #, no-wrap
 msgid ""
 "options.my.services.spotlight = {\n"
@@ -18569,7 +18608,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: modules/configuration.org:6562
+#: modules/configuration.org:6583
 msgid ""
 "=mdutil= targets all volumes with =-a= rather than just =/=: modern macOS "
 "splits the boot disk into a read-only System volume (=/=) and a writable "
@@ -18579,13 +18618,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: modules/configuration.org:6567
+#: modules/configuration.org:6588
 #, no-wrap
 msgid "spotlight-config"
 msgstr ""
 
 #. type: paragraph in src
-#: modules/configuration.org:6569
+#: modules/configuration.org:6590
 #, no-wrap
 msgid ""
 "config = {\n"

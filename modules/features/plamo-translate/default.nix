@@ -79,6 +79,9 @@
         rev = "355637cc04db67195ba87a97da85eaf1d52a22e8";
       };
 
+      maxModelLen = 4096;
+      kvBytesPerToken = 24 * 2 * 4 * 128 * 2;
+
       serve = pkgs.writeShellApplication {
         name = "plamo-translate-serve";
         runtimeInputs = [
@@ -109,8 +112,9 @@
             --host ${cfg.host} \
             --port ${toString cfg.port} \
             --served-model-name plamo-3-translate-2b \
-            --max-model-len 4096 \
-            --max-num-seqs ${toString cfg.maxNumSeqs}
+            --max-model-len ${toString maxModelLen} \
+            --max-num-seqs ${toString cfg.maxNumSeqs} \
+            --kv-cache-memory-bytes ${toString (cfg.maxNumSeqs * maxModelLen * kvBytesPerToken)}
         '';
       };
 
