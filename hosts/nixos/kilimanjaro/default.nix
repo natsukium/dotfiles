@@ -116,21 +116,7 @@
     max-jobs = 4;
   };
 
-  hardware.graphics = {
-    enable = true;
-    enable32Bit = true;
-  };
-
-  services.xserver.videoDrivers = [ "nvidia" ];
-
-  hardware.nvidia = {
-    modesetting.enable = true;
-    powerManagement.enable = true;
-    # open kernel module is too unstable and often incompatible with the runtime
-    open = false;
-    nvidiaSettings = true;
-    package = config.boot.kernelPackages.nvidiaPackages.stable;
-  };
+  my.devices.nvidia.enable = true;
 
   nixpkgs.config.cudaSupport = true;
 
