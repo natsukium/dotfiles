@@ -132,6 +132,8 @@ let
           };
         };
 
+        systemd.services.forgejo-runner-default.serviceConfig.PrivateTmp = true;
+
         virtualisation.docker.enable = true;
       };
     };

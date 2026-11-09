@@ -4315,6 +4315,15 @@ resolves the working directory to the real path, so the rule never matches and
 =git push= fails to authenticate. Setting =host.workdir_parent= to the real path
 keeps both sides on the same path.
 
+=DynamicUser= also implies =PrivateTmp=disconnected=, which gives the service a
+fresh tmpfs for =/tmp= and =/var/tmp= capped at a tenth of RAM. Host jobs share
+that tmpfs for as long as the runner process lives. Whatever a job leaves
+behind, such as temp directories of a cancelled build, stays until the runner
+restarts, so after enough runs every job fails with a full =/tmp=. I set
+=PrivateTmp= to ~true~ instead. The private directories then live on the host's
+disk-backed =/tmp=, which has plenty of room, and systemd still removes them when
+the service stops.
+
 #+NAME: forgejo-runner-wrapper-shared
 #+begin_src nix
 wrapperOptions =
@@ -4448,6 +4457,8 @@ nixosWrapper =
           ];
         };
       };
+
+      systemd.services.forgejo-runner-default.serviceConfig.PrivateTmp = true;
 
       virtualisation.docker.enable = true;
     };
