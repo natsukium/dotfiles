@@ -98,10 +98,11 @@ in
             set -eu
             [ "$COMIN_STATUS" = "done" ] || exit 0
 
+            # Not gated on /run/current-system: comin turns a switch into a boot when
+            # switch inhibitors differ, and that generation must still get an entry.
+            # A testing branch deploy never moves this profile, so re-promoting it
+            # after one is a no-op.
             toplevel=$(readlink -f /nix/var/nix/profiles/system-profiles/comin)
-            # A testing branch deploy leaves this profile behind, so promote it only
-            # when it is what actually runs.
-            [ "$toplevel" = "$(readlink -f /run/current-system)" ] || exit 0
 
             ${config.nix.package}/bin/nix-env -p /nix/var/nix/profiles/system --set "$toplevel"
             "$toplevel/bin/switch-to-configuration" boot

@@ -18,6 +18,12 @@
           # open kernel module is too unstable and often incompatible with the runtime
           open = false;
         };
+
+        # A loaded nvidia module cannot be replaced while the GPU is in use, so a live
+        # switch to a new driver leaves the old module under new userspace libraries.
+        # NVML then refuses with "Driver/library version mismatch" and every CUDA and
+        # GL client breaks until reboot. A driver change now only applies at boot.
+        system.switch.inhibitors.nvidia = config.hardware.nvidia.package.version;
       };
     };
 }
