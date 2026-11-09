@@ -6378,9 +6378,10 @@ colour grid preview; =Ctrl+x= kills marked sessions and =Alt+w= filters by OSC
 felis makes only OSC 8 hyperlinks clickable, leaving plain-text URLs and paths
 in terminal output to external tools via =pipe=. =felis-hints= (=Ctrl+Shift+o=)
 feeds the visible grid to [[https://git.natsukium.com/felis-terminal/pouncer][pouncer]] to overlay single-key labels on URLs and
-=.html=/=.pdf= paths, while =felis-nix-log= (=Ctrl+Shift+l=) extracts =nix log
-<drv>= lines from failed builds and pages the derivation's log (opening directly
-when there is only one).
+=.html=/=.pdf=/Markdown paths. Markdown opens in a new Emacs frame, and
+everything else goes to the system opener. =felis-nix-log= (=Ctrl+Shift+l=)
+extracts =nix log <drv>= lines from failed builds and pages the derivation's
+log (opening directly when there is only one).
 
 #+NAME: felis-helpers
 #+begin_src nix
@@ -6510,12 +6511,16 @@ felis-hints = pkgs.writeShellApplication {
   text = ''
     picked=$(pouncer \
       --preset url \
-      --regex '[\w.~/@+-]+\.(?i:html?|pdf)\b' \
+      --regex '[\w.~/@+-]+\.(?i:html?|pdf|md|markdown)\b' \
       "''${1:?no region file}") || exit 0
     [ -n "$picked" ] || exit 0
     # shellcheck disable=SC2088
     case $picked in
       "~/"*) picked=$HOME/''${picked#"~/"} ;;
+    esac
+    case ''${picked,,} in
+      *.md | *.markdown)
+        exec ${config.programs.emacs.finalPackage}/bin/emacsclient -c -n "$picked" ;;
     esac
     exec ${opener} "$picked"
   '';

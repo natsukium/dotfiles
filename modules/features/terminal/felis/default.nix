@@ -168,12 +168,16 @@ in
         text = ''
           picked=$(pouncer \
             --preset url \
-            --regex '[\w.~/@+-]+\.(?i:html?|pdf)\b' \
+            --regex '[\w.~/@+-]+\.(?i:html?|pdf|md|markdown)\b' \
             "''${1:?no region file}") || exit 0
           [ -n "$picked" ] || exit 0
           # shellcheck disable=SC2088
           case $picked in
             "~/"*) picked=$HOME/''${picked#"~/"} ;;
+          esac
+          case ''${picked,,} in
+            *.md | *.markdown)
+              exec ${config.programs.emacs.finalPackage}/bin/emacsclient -c -n "$picked" ;;
           esac
           exec ${opener} "$picked"
         '';
