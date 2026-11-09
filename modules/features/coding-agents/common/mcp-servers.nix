@@ -21,9 +21,6 @@
 
         programs.mcp.enable = true;
 
-        mcp-servers.programs = {
-          context7.enable = true;
-        };
       };
     };
 }
