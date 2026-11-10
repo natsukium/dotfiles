@@ -2,7 +2,7 @@
   lib,
   buildPythonPackage,
   fetchFromGitHub,
-  poetry-core,
+  hatchling,
   aiohttp,
   aiofiles,
   pycryptodome,
@@ -24,7 +24,7 @@ buildPythonPackage (finalAttrs: {
     hash = "sha256-Gpgtg+Mee1+Q+2B+kvNpCHMkD/7Ay7pvHbu+OzmkdLc=";
   };
 
-  build-system = [ poetry-core ];
+  build-system = [ hatchling ];
 
   pythonRelaxDeps = [ "aiofiles" ];
 
