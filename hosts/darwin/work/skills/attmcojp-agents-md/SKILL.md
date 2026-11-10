@@ -1,17 +1,17 @@
 ---
-name: attmcojp-claude-md
-description: Change the org-level CLAUDE.md that governs every attmcojp repository. Its source of truth is a sops-encrypted file in the dotfiles repository, not the read-only copy at `~/src/work/github.com/attmcojp/CLAUDE.md`, so it cannot be edited in place. Use when asked to add, change, or remove a rule that should apply across attmcojp checkouts — 「組織のCLAUDE.mdに追記」「attmcojpの共通ルールを更新」 — and whenever a write to that path fails because the file is not writable.
+name: attmcojp-agents-md
+description: Change the org-level AGENTS.md that governs every attmcojp repository. Its source of truth is a sops-encrypted file in the dotfiles repository, not the read-only copy at `~/src/work/github.com/attmcojp/AGENTS.md`, so it cannot be edited in place. Use when asked to add, change, or remove a rule that should apply across attmcojp checkouts — 「組織のAGENTS.md（CLAUDE.md）に追記」「attmcojpの共通ルールを更新」 — and whenever a write to that path fails because the file is not writable.
 ---
 
-# The attmcojp org-level CLAUDE.md
+# The attmcojp org-level AGENTS.md
 
-`~/src/work/github.com/attmcojp/CLAUDE.md` applies to every attmcojp checkout beneath it,
+`~/src/work/github.com/attmcojp/AGENTS.md` applies to every attmcojp checkout beneath it,
 and it is not editable. It is a symlink into the sops-nix secret store, mode `0400`,
 replaced wholesale at the next activation. A write there fails; forcing the write to
 succeed — `chmod`, replacing the symlink, writing through it — produces a change that the
 next activation discards without warning. **Never edit that path.**
 
-The source of truth is `hosts/darwin/work/attmcojp-claude.md` in the dotfiles repository,
+The source of truth is `hosts/darwin/work/attmcojp-agents.md` in the dotfiles repository,
 encrypted with sops. The rules are attmcojp-internal and that repository is public, which
 is why the file is encrypted rather than stored as text, and why the procedure below
 never lets the plaintext enter a working tree.
@@ -31,7 +31,7 @@ cd /Users/natsukium/src/private/github.com/natsukium/dotfiles
 **1. Decrypt.** The path to the plaintext copy is printed on stdout.
 
 ```
-nix develop --command make attmcojp-claude-md-open
+nix develop --command make attmcojp-agents-md-open
 ```
 
 **2. Edit that file** with the normal file tools. It sits under `~/.cache`, deliberately
@@ -41,7 +41,7 @@ into a commit message, PR, issue, or any other repository.
 **3. Re-encrypt**, which also deletes the plaintext copy.
 
 ```
-nix develop --command make attmcojp-claude-md-seal
+nix develop --command make attmcojp-agents-md-seal
 ```
 
 `File has not changed, exiting` (make exits 2) means the edit was a no-op. That is a
@@ -52,7 +52,7 @@ purpose, so an edit is never lost to a transient error; if the change is being a
 rather than retried, remove it by hand:
 
 ```
-rm -f ~/.cache/dotfiles/secrets/attmcojp-claude.md
+rm -f ~/.cache/dotfiles/secrets/attmcojp-agents.md
 ```
 
 **4. Normalize formatting.** sops writes compact JSON, but the repo's pre-commit
@@ -61,19 +61,19 @@ on the first attempt. Reformat it first — this only rewrites the whitespace of
 ciphertext JSON; decryption is unaffected:
 
 ```
-nix develop --command treefmt hosts/darwin/work/attmcojp-claude.md
+nix develop --command treefmt hosts/darwin/work/attmcojp-agents.md
 ```
 
 **5. Commit** in the dotfiles repository, on whatever branch it is currently on:
 
 ```
-git -C /Users/natsukium/src/private/github.com/natsukium/dotfiles commit hosts/darwin/work/attmcojp-claude.md
+git -C /Users/natsukium/src/private/github.com/natsukium/dotfiles commit hosts/darwin/work/attmcojp-agents.md
 ```
 
 Leave pushing to the user unless asked. See the next section for the message.
 
 **6. Hand the activation back to the user.** The decrypted copy at
-`~/src/work/github.com/attmcojp/CLAUDE.md` is stale until this machine's usual switch is
+`~/src/work/github.com/attmcojp/AGENTS.md` is stale until this machine's usual switch is
 run, which needs sudo and is the user's call. Say so explicitly when reporting done —
 otherwise the next session reads the old rules and nobody notices.
 
@@ -94,7 +94,7 @@ the body — this exception is deliberate, and a future reader should not "fix" 
 filling in detail.
 
 Reviewing the change means comparing plaintext, not reading `git diff`, which shows only
-ciphertext. Re-run `attmcojp-claude-md-open` after sealing and check the file against
+ciphertext. Re-run `attmcojp-agents-md-open` after sealing and check the file against
 what was intended.
 
 ## What belongs in this file
@@ -108,6 +108,6 @@ everyone but this machine. If it is unclear which of the two a rule belongs in, 
 
 - `~/.cache/dotfiles/secrets` is empty — no plaintext copy survives.
 - No repository has an untracked or staged file containing the rule text.
-- The commit touches only `hosts/darwin/work/attmcojp-claude.md`, and its message does
+- The commit touches only `hosts/darwin/work/attmcojp-agents.md`, and its message does
   not restate what changed.
 - The report tells the user that the rules take effect only after the next switch.
