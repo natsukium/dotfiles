@@ -126,10 +126,15 @@ For anything the script does not cover, the REST API under
 `/api/v1/repos/owner/repo/actions/` needs no token on a public repository:
 
 - `runs?head_sha=<sha>` returns `{"workflow_runs": [...]}`; `runs/<id>/jobs` returns a
-  bare array; `jobs/<job-id>/logs` returns plain text.
+  bare array; `jobs/<job-id>` returns one job with its `steps[].number`.
+- `jobs/<job-id>/logs` returns plain text. Narrow it with `step=<number>` (0 is "Set up
+  job"), `q=<substring>` plus `qi=true` for case-insensitive, `attempt=<n>`, or
+  `format=ndjson`. Prefer `q=` or `step=` to tailing a long log.
 - The `#N` that `fj actions tasks` prints is the run number, not the run `id` these
   endpoints take.
-- There is no rerun endpoint; rerun from the web UI or push a new commit.
+- `POST runs/<id>/rerun` reruns a run and `POST jobs/<job-id>/rerun` reruns a job with
+  its dependents; `POST runs/<id>/cancel` cancels. All need a token and return 204.
+  Rerun only accepts a finished run or job and returns 400 otherwise.
 
 ## Important differences from gh
 
