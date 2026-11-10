@@ -177,7 +177,7 @@ in
           GroupName = cfg.group;
           KeepAlive = true;
           RunAtLoad = true;
-          ProcessType = "Background";
+          ProcessType = "Standard";
           EnvironmentVariables = {
             HOME = instance.stateDir;
             PATH = "${

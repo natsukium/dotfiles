@@ -3993,6 +3993,11 @@ becomes a launchd job that registers, then execs the daemon. I record a hash of
 =token= plus =labels= in =.registration-state= so registration re-runs when
 either changes; the token is reusable, so re-registering is fine.
 
+The job runs as =ProcessType = "Standard"=, not =Background=. A background job
+and every child it spawns stay on the efficiency cores with throttled I/O, so
+CI jobs run several times slower. On mikumi's M1, a CPU-bound loop took 61 s
+under the background policy against 7 s without it.
+
 #+begin_src nix :tangle features/forgejo-runner/darwin-module.nix :exports none
 # This file is auto-generated from configuration.org.
 # Do not edit directly.
@@ -4234,7 +4239,7 @@ launchd.daemons = lib.mapAttrs' (
       GroupName = cfg.group;
       KeepAlive = true;
       RunAtLoad = true;
-      ProcessType = "Background";
+      ProcessType = "Standard";
       EnvironmentVariables = {
         HOME = instance.stateDir;
         PATH = "${
