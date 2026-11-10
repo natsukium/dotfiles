@@ -132,6 +132,20 @@
                 labels.severity = "warning";
                 annotations.summary = "HTTP probe failed for {{ $labels.instance }}";
               }
+              {
+                # Gated on the router so a LAN or manyara outage does not
+                # read as the ISP. The 10% floor sits above the isolated
+                # 2-in-40 losses the edge shows on a normal day.
+                alert = "IspPacketLoss";
+                expr = ''
+                  (1 - avg_over_time(probe_success{job="wan", instance="isp-edge"}[10m])) >= 0.1
+                  and on ()
+                  (1 - avg_over_time(probe_success{job="wan", instance="router"}[10m])) < 0.1
+                '';
+                for = "10m";
+                labels.severity = "warning";
+                annotations.summary = "ISP network is dropping {{ $value | humanizePercentage }} of packets at the ISP edge";
+              }
             ];
           }
         ];
