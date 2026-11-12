@@ -1,7 +1,6 @@
 { ... }:
 {
   my.programs.kitty.enable = true;
-  my.programs.qutebrowser.enable = true;
   my.programs.vscode.enable = true;
   my.programs.zotero.enable = true;
 

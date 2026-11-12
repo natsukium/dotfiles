@@ -11,7 +11,6 @@
       terraform' = pkgs.terraform.withPlugins (p: [
         p.carlpett_sops
         p.cloudflare_cloudflare
-        p.determinatesystems_hydra
         p.hashicorp_aws
         p.hashicorp_external
         p.hashicorp_null
