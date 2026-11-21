@@ -50,6 +50,16 @@
         '';
       }
     );
+    vimPlugins =
+      let
+        testsFail = prev.stdenv.hostPlatform.isDarwin || prev.stdenv.hostPlatform.system == "aarch64-linux";
+      in
+      prev.vimPlugins
+      // prev.lib.optionalAttrs testsFail {
+        rustaceanvim = final.neovimUtils.buildNeovimPlugin {
+          luaAttr = final.neovim-unwrapped.lua.pkgs.rustaceanvim.overrideAttrs { doCheck = false; };
+        };
+      };
   };
 
   pre-release = final: prev: { };
