@@ -13,7 +13,12 @@
           enable = true;
           lineLength = 100;
         };
-        shfmt.enable = true;
+        # Keep two-space indentation. treefmt-nix's default leaves it unset,
+        # so shfmt falls back to tabs.
+        shfmt = {
+          enable = true;
+          indent_size = 2;
+        };
         stylua.enable = true;
         taplo.enable = true;
         terraform.enable = true;

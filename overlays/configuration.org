@@ -115,6 +115,7 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 temporary-fix = final: prev: {
   <<afew>>
   <<toybox>>
+  <<rustaceanvim>>
 };
 #+end_src
 
@@ -159,6 +160,33 @@ toybox = prev.toybox.overrideAttrs (
     '';
   }
 );
+#+end_src
+
+** rustaceanvim
+
+rustaceanvim's integration tests fail on aarch64-linux and on the macOS CI
+runner. Buffers from one spec outlive its teardown, so the next spec hits =E95:
+Buffer with this name already exists=. The same check passes inside mikumi's
+sandbox, so the failure depends on the build environment. Hydra has not cached
+the plugin for either platform since mid-November 2026. I rebuild the plugin
+from the Lua package with its check disabled on darwin and aarch64-linux, so
+x86_64-linux keeps the cached build. Merging with =//= rather than
+=vimPlugins.extend= matters here. =extend= recomputes the set from nixpkgs and
+drops plugins that earlier overlays add. Drop this once Hydra builds
+=vimPlugins.rustaceanvim= on both platforms again.
+
+#+NAME: rustaceanvim
+#+begin_src nix
+vimPlugins =
+  let
+    testsFail = prev.stdenv.hostPlatform.isDarwin || prev.stdenv.hostPlatform.system == "aarch64-linux";
+  in
+  prev.vimPlugins
+  // prev.lib.optionalAttrs testsFail {
+    rustaceanvim = final.neovimUtils.buildNeovimPlugin {
+      luaAttr = final.neovim-unwrapped.lua.pkgs.rustaceanvim.overrideAttrs { doCheck = false; };
+    };
+  };
 #+end_src
 
 * pre-release

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-10 17:48+0900\n"
+"POT-Creation-Date: 2026-11-22 10:34+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -3523,7 +3523,6 @@ msgid ""
 "      terraform' = pkgs.terraform.withPlugins (p: [\n"
 "        p.carlpett_sops\n"
 "        p.cloudflare_cloudflare\n"
-"        p.determinatesystems_hydra\n"
 "        p.hashicorp_aws\n"
 "        p.hashicorp_external\n"
 "        p.hashicorp_null\n"
@@ -3552,7 +3551,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1843 .github/README.org:115
+#: configuration.org:1842 .github/README.org:114
 #, no-wrap
 msgid ""
 "      echo \"Syncing AGENTS.md...\"\n"
@@ -3562,7 +3561,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1848 .github/README.org:120
+#: configuration.org:1847 .github/README.org:119
 #, no-wrap
 msgid ""
 "  terraform = pkgs.mkShell {\n"
@@ -3572,7 +3571,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1853 .github/README.org:125
+#: configuration.org:1852 .github/README.org:124
 #, no-wrap
 msgid ""
 "      checks.devShell = config.devShells.default;\n"
@@ -3581,13 +3580,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1858 .github/README.org:129
+#: configuration.org:1857 .github/README.org:128
 #, no-wrap
 msgid "Pre-commit hooks"
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1860 .github/README.org:131
+#: configuration.org:1859 .github/README.org:130
 msgid ""
 "Hooks run by [[https://github.com/cachix/git-hooks.nix][git-hooks.nix]] on "
 "every commit. =prek= is used as the runner because it is the actively-"
@@ -3596,7 +3595,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:1864 .github/README.org:135
+#: configuration.org:1863 .github/README.org:134
 msgid ""
 "=check-org-tangle= is the only hook with =priority = 0= because it must run "
 "before everything else: if Org files are out of sync, formatters and linters "
@@ -3605,7 +3604,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1870 .github/README.org:141
+#: configuration.org:1869 .github/README.org:140
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3614,7 +3613,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1874 .github/README.org:145
+#: configuration.org:1873 .github/README.org:144
 #, no-wrap
 msgid ""
 "  perSystem =\n"
@@ -3731,14 +3730,14 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:1988 .github/README.org:258
+#: configuration.org:1987 .github/README.org:257
 #, fuzzy, no-wrap
 #| msgid "Core Settings"
 msgid "Formatting"
 msgstr "コア設定"
 
 #. type: paragraph
-#: configuration.org:1990 .github/README.org:260
+#: configuration.org:1989 .github/README.org:259
 msgid ""
 "Formatters are aggregated via [[https://github.com/numtide/treefmt-nix]"
 "[treefmt-nix]] and invoked from the =treefmt= pre-commit hook, so a single "
@@ -3746,7 +3745,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1995 .github/README.org:265
+#: configuration.org:1994 .github/README.org:264
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3755,7 +3754,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:1999 .github/README.org:269
+#: configuration.org:1998 .github/README.org:268
 #, no-wrap
 msgid ""
 "  perSystem = _: {\n"
@@ -3768,7 +3767,10 @@ msgid ""
 "          enable = true;\n"
 "          lineLength = 100;\n"
 "        };\n"
-"        shfmt.enable = true;\n"
+"        shfmt = {\n"
+"          enable = true;\n"
+"          indent_size = 2;\n"
+"        };\n"
 "        stylua.enable = true;\n"
 "        taplo.enable = true;\n"
 "        terraform.enable = true;\n"
@@ -3780,13 +3782,13 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: configuration.org:2021 .github/README.org:290
+#: configuration.org:2025 .github/README.org:294
 #, no-wrap
 msgid "MCP Servers"
 msgstr "MCPサーバー"
 
 #. type: paragraph
-#: configuration.org:2023 .github/README.org:292
+#: configuration.org:2027 .github/README.org:296
 msgid ""
 "Configuration for [[https://github.com/natsukium/mcp-servers-nix][mcp-"
 "servers-nix]], enabled in the development shell.  The =flavors.claude-code= "
@@ -3798,30 +3800,30 @@ msgstr ""
 "の期待するフォーマットと互換性のある =.mcp.json= ファイルが生成されます。"
 
 #. type: plain list -
-#: configuration.org:2029 .github/README.org:298
+#: configuration.org:2033 .github/README.org:302
 #, no-wrap
 msgid "=nixos=: NixOS package/option search and Home Manager documentation"
 msgstr "=nixos=: NixOSパッケージ/オプション検索とHome Managerのドキュメント"
 
 #. type: plain list -
-#: configuration.org:2030 .github/README.org:299
+#: configuration.org:2034 .github/README.org:303
 #, no-wrap
 msgid "=terraform=: Terraform registry lookup for providers, modules, and policies"
 msgstr "=terraform=: Terraformレジストリのプロバイダー、モジュール、ポリシー検索"
 
 #. type: plain list -
-#: configuration.org:2031 .github/README.org:300
+#: configuration.org:2035 .github/README.org:304
 #, no-wrap
 msgid "=grafana=: Query dashboards, datasources, and metrics from the home server's Grafana instance"
 msgstr "=grafana=: ホームサーバーのGrafanaインスタンスからダッシュボード、データソース、メトリクスを照会"
 
 #. type: paragraph
-#: configuration.org:2027 .github/README.org:296
+#: configuration.org:2031 .github/README.org:300
 msgid "Enabled servers:"
 msgstr "有効なサーバー："
 
 #. type: paragraph in src
-#: configuration.org:2033 .github/README.org:302
+#: configuration.org:2037 .github/README.org:306
 #, no-wrap
 msgid ""
 "{ inputs, ... }:\n"
@@ -3830,7 +3832,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:2037 .github/README.org:306
+#: configuration.org:2041 .github/README.org:310
 #, no-wrap
 msgid ""
 "  perSystem = _: {\n"
@@ -3852,35 +3854,35 @@ msgid ""
 msgstr ""
 
 #. type: heading *
-#: configuration.org:2055 .github/README.org:323 modules/configuration.org:5889
+#: configuration.org:2059 .github/README.org:327 modules/configuration.org:5889
 #, no-wrap
 msgid "Translation"
 msgstr "翻訳"
 
 #. type: paragraph
-#: configuration.org:2057 .github/README.org:325
+#: configuration.org:2061 .github/README.org:329
 msgid "This project uses po4a to manage translations."
 msgstr "このプロジェクトでは翻訳にpo4aを使っています。"
 
 #. type: heading ***
-#: configuration.org:2059 .github/README.org:326
+#: configuration.org:2063 .github/README.org:330
 #, no-wrap
 msgid "Requirements"
 msgstr "必要なソフトウェア"
 
 #. type: paragraph
-#: configuration.org:2061 .github/README.org:328
+#: configuration.org:2065 .github/README.org:332
 msgid "The required packages are included in the development shell."
 msgstr "必要なパッケージは開発シェルに含まれています。"
 
 #. type: keyword name
-#: configuration.org:2063 .github/README.org:330
+#: configuration.org:2067 .github/README.org:334
 #, no-wrap
 msgid "translation-packages"
 msgstr ""
 
 #. type: paragraph in src
-#: configuration.org:2065 .github/README.org:332
+#: configuration.org:2069 .github/README.org:336
 #, no-wrap
 msgid ""
 "gettext\n"
@@ -3888,31 +3890,31 @@ msgid ""
 msgstr ""
 
 #. type: plain list -
-#: configuration.org:2070 .github/README.org:337
+#: configuration.org:2074 .github/README.org:341
 #, no-wrap
 msgid "=gettext=: provides msgfmt and other internationalization utilities"
 msgstr "=gettext=: msgfmtやその他の国際化ユーティリティを提供"
 
 #. type: plain list -
-#: configuration.org:2071 .github/README.org:338
+#: configuration.org:2075 .github/README.org:342
 #, no-wrap
 msgid "=po4a=: po4a >= 0.74 is required for Org mode support."
 msgstr "=po4a=: Org modeサポートにはpo4a >= 0.74が必要です。"
 
 #. type: heading ***
-#: configuration.org:2072 .github/README.org:338
+#: configuration.org:2076 .github/README.org:342
 #, no-wrap
 msgid "Translation workflow"
 msgstr "翻訳作業"
 
 #. type: heading ****
-#: configuration.org:2074 .github/README.org:340
+#: configuration.org:2078 .github/README.org:344
 #, no-wrap
 msgid "Create po4a configuration"
 msgstr "po4aを設定する"
 
 #. type: paragraph
-#: configuration.org:2076 .github/README.org:342
+#: configuration.org:2080 .github/README.org:346
 msgid ""
 "Configure the target language, location for generated po files, and "
 "documents to translate as follows.  The =-k 0= option forces output of "
@@ -3925,7 +3927,7 @@ msgstr ""
 "いるときのみ出力されます。)"
 
 #. type: paragraph in src
-#: configuration.org:2085 .github/README.org:351
+#: configuration.org:2089 .github/README.org:355
 #, no-wrap
 msgid ""
 "[po4a_langs] ja\n"
@@ -3939,19 +3941,19 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: configuration.org:2095 .github/README.org:361
+#: configuration.org:2099 .github/README.org:365
 msgid ""
 "For detailed information about =po4a.cfg= configuration, see =man po4a=."
 msgstr "=po4a.cfg=について、詳しくは=man po4a=を参照してください。"
 
 #. type: heading ****
-#: configuration.org:2097 .github/README.org:362
+#: configuration.org:2101 .github/README.org:366
 #, no-wrap
 msgid "Create/Update po"
 msgstr "poを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:2099 .github/README.org:364
+#: configuration.org:2103 .github/README.org:368
 msgid ""
 "When documents are updated and you need to create/update po files, run the "
 "following command.  This generates template (pot) and po files for each "
@@ -3962,19 +3964,19 @@ msgstr ""
 "に生成します。"
 
 #. type: paragraph in src
-#: configuration.org:2105 .github/README.org:370
+#: configuration.org:2109 .github/README.org:374
 #, no-wrap
 msgid "po4a --no-translations po4a.cfg"
 msgstr ""
 
 #. type: heading ****
-#: configuration.org:2108 .github/README.org:372
+#: configuration.org:2112 .github/README.org:376
 #, no-wrap
 msgid "Translate"
 msgstr "翻訳する"
 
 #. type: paragraph
-#: configuration.org:2110 .github/README.org:374
+#: configuration.org:2114 .github/README.org:378
 msgid ""
 "Edit the target language po using a po editor.  Popular options include "
 "Emacs po-mode, poedit, GNOME's Gtranslator, and KDE's Lokalize."
@@ -3983,13 +3985,13 @@ msgstr ""
 "Gtranslator、KDEのLokalizeが有名です。"
 
 #. type: heading ****
-#: configuration.org:2117 .github/README.org:380
+#: configuration.org:2121 .github/README.org:384
 #, no-wrap
 msgid "Create/Update translation file"
 msgstr "翻訳ファイルを生成/更新する"
 
 #. type: paragraph
-#: configuration.org:2119 .github/README.org:382
+#: configuration.org:2123 .github/README.org:386
 msgid ""
 "After completing translations, generate files with the following command.  "
 "Since po files are also updated at this time, in practice you only need to "
@@ -3999,7 +4001,7 @@ msgstr ""
 "め、実運用上はこのコマンドを実行するだけで良いでしょう。"
 
 #. type: paragraph in src
-#: configuration.org:2125 .github/README.org:388
+#: configuration.org:2129 .github/README.org:392
 #, no-wrap
 msgid "po4a po4a.cfg"
 msgstr ""
@@ -7493,17 +7495,18 @@ msgid ""
 "temporary-fix = final: prev: {\n"
 "  <<afew>>\n"
 "  <<toybox>>\n"
+"  <<rustaceanvim>>\n"
 "};"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:121 overlays/configuration.org:132
+#: overlays/configuration.org:122 overlays/configuration.org:133
 #, no-wrap
 msgid "afew"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:123
+#: overlays/configuration.org:124
 msgid ""
 "afew now builds with =__structuredAttrs=, and two of its attributes break "
 "under it.  Each =makeWrapperArgs= element reaches makeWrapper as a single "
@@ -7519,7 +7522,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:134
+#: overlays/configuration.org:135
 #, no-wrap
 msgid ""
 "afew = prev.afew.overridePythonAttrs {\n"
@@ -7534,13 +7537,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:145 overlays/configuration.org:152
+#: overlays/configuration.org:146 overlays/configuration.org:153
 #, no-wrap
 msgid "toybox"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:147
+#: overlays/configuration.org:148
 msgid ""
 "toybox 0.8.15 implements =readahead= with =posix_fadvise=, which macOS "
 "lacks, so the darwin build fails to compile. =extraConfig= cannot switch the "
@@ -7550,7 +7553,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:154
+#: overlays/configuration.org:155
 #, no-wrap
 msgid ""
 "toybox = prev.toybox.overrideAttrs (\n"
@@ -7564,13 +7567,50 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:164 overlays/configuration.org:170
+#: overlays/configuration.org:165 overlays/configuration.org:178
+#, no-wrap
+msgid "rustaceanvim"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:167
+msgid ""
+"rustaceanvim's integration tests fail on aarch64-linux and on the macOS CI "
+"runner. Buffers from one spec outlive its teardown, so the next spec hits "
+"=E95: Buffer with this name already exists=. The same check passes inside "
+"mikumi's sandbox, so the failure depends on the build environment. Hydra has "
+"not cached the plugin for either platform since mid-November 2026. I rebuild "
+"the plugin from the Lua package with its check disabled on darwin and "
+"aarch64-linux, so x86_64-linux keeps the cached build. Merging with =//= "
+"rather than =vimPlugins.extend= matters here. =extend= recomputes the set "
+"from nixpkgs and drops plugins that earlier overlays add. Drop this once "
+"Hydra builds =vimPlugins.rustaceanvim= on both platforms again."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:180
+#, no-wrap
+msgid ""
+"vimPlugins =\n"
+"  let\n"
+"    testsFail = prev.stdenv.hostPlatform.isDarwin || prev.stdenv.hostPlatform.system == \"aarch64-linux\";\n"
+"  in\n"
+"  prev.vimPlugins\n"
+"  // prev.lib.optionalAttrs testsFail {\n"
+"    rustaceanvim = final.neovimUtils.buildNeovimPlugin {\n"
+"      luaAttr = final.neovim-unwrapped.lua.pkgs.rustaceanvim.overrideAttrs { doCheck = false; };\n"
+"    };\n"
+"  };"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:192 overlays/configuration.org:198
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:166
+#: overlays/configuration.org:194
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7583,24 +7623,24 @@ msgstr ""
 "除します。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:172
+#: overlays/configuration.org:200
 #, no-wrap
 msgid "pre-release = final: prev: { };"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:175 overlays/configuration.org:184
+#: overlays/configuration.org:203 overlays/configuration.org:212
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:177
+#: overlays/configuration.org:205
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr "アップストリームへの貢献に適さない回避策です。"
 
 #. type: paragraph
-#: overlays/configuration.org:179
+#: overlays/configuration.org:207
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7613,7 +7653,7 @@ msgstr ""
 "久的に残る想定です。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:186
+#: overlays/configuration.org:214
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7623,13 +7663,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:192 overlays/configuration.org:205
+#: overlays/configuration.org:220 overlays/configuration.org:233
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:194
+#: overlays/configuration.org:222
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7642,7 +7682,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:199
+#: overlays/configuration.org:227
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7655,7 +7695,7 @@ msgstr ""
 "います。"
 
 #. type: paragraph
-#: overlays/configuration.org:203
+#: overlays/configuration.org:231
 msgid ""
 "Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/"
 "gh-dash#316]]."
@@ -7664,7 +7704,7 @@ msgstr ""
 "gh-dash#316]]で報告済みです。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:207
+#: overlays/configuration.org:235
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7678,19 +7718,19 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:217
+#: overlays/configuration.org:245
 #, no-wrap
 msgid "mkShim"
 msgstr "mkShim"
 
 #. type: paragraph
-#: overlays/configuration.org:219
+#: overlays/configuration.org:247
 msgid ""
 "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr "macOS Command Line Toolsのスタブ実装を提供するshimユーティリティです。"
 
 #. type: paragraph
-#: overlays/configuration.org:221
+#: overlays/configuration.org:249
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7705,7 +7745,7 @@ msgstr ""
 "制し不要なビルド失敗を防ぎます。"
 
 #. type: paragraph
-#: overlays/configuration.org:226
+#: overlays/configuration.org:254
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
@@ -7714,13 +7754,13 @@ msgstr ""
 "mkShim]]を参照してください。"
 
 #. type: keyword NAME
-#: overlays/configuration.org:228
+#: overlays/configuration.org:256
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:230
+#: overlays/configuration.org:258
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""

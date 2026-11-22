@@ -7,13 +7,7 @@
 {
   services.hydra-dev = {
     enable = true;
-    # URI 5.36 ships URI::ws, which collides in hydra's perl-deps buildEnv with the
-    # separate URIws that Catalyst still propagates. An overlay cannot reach this
-    # package because hydra's flake builds it from nixpkgs.legacyPackages, so the
-    # alias goes in here. Drop once nixpkgs stops propagating URIws.
-    package = inputs.hydra.packages.${pkgs.stdenv.hostPlatform.system}.hydra.override {
-      perlPackages = pkgs.perlPackages.overrideScope (_: prev: { URIws = prev.URI; });
-    };
+    package = inputs.hydra.packages.${pkgs.stdenv.hostPlatform.system}.hydra;
     hydraURL = "http://hydra.home.natsukium.com";
     port = 3000;
     notificationSender = "";
