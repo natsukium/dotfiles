@@ -7243,50 +7243,18 @@ msgstr ""
 #, no-wrap
 msgid ""
 "temporary-fix = final: prev: {\n"
-"  <<toybox>>\n"
 "  <<rustaceanvim>>\n"
 "};"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:121 overlays/configuration.org:128
-#, no-wrap
-msgid "toybox"
-msgstr ""
-
-#. type: paragraph
-#: overlays/configuration.org:123
-msgid ""
-"toybox 0.8.15 implements =readahead= with =posix_fadvise=, which macOS "
-"lacks, so the darwin build fails to compile. =extraConfig= cannot switch the "
-"applet off because the package prepends it to the defconfig, which then "
-"wins. I disable it in =.config= right before the build instead. Drop this "
-"once toybox guards the applet on macOS."
-msgstr ""
-
-#. type: paragraph in src
-#: overlays/configuration.org:130
-#, no-wrap
-msgid ""
-"toybox = prev.toybox.overrideAttrs (\n"
-"  old:\n"
-"  prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {\n"
-"    preBuild = (old.preBuild or \"\") + ''\n"
-"      sed -i 's/^CONFIG_READAHEAD=y$/# CONFIG_READAHEAD is not set/' "
-".config\n"
-"    '';\n"
-"  }\n"
-");"
-msgstr ""
-
-#. type: keyword NAME
-#: overlays/configuration.org:140 overlays/configuration.org:153
+#: overlays/configuration.org:120 overlays/configuration.org:133
 #, no-wrap
 msgid "rustaceanvim"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:142
+#: overlays/configuration.org:122
 msgid ""
 "rustaceanvim's integration tests fail on aarch64-linux and on the macOS CI "
 "runner. Buffers from one spec outlive its teardown, so the next spec hits "
@@ -7301,7 +7269,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:155
+#: overlays/configuration.org:135
 #, no-wrap
 msgid ""
 "vimPlugins =\n"
@@ -7319,13 +7287,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:167 overlays/configuration.org:173
+#: overlays/configuration.org:147 overlays/configuration.org:153
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:169
+#: overlays/configuration.org:149
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7334,24 +7302,24 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:175
+#: overlays/configuration.org:155
 #, no-wrap
 msgid "pre-release = final: prev: { };"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:178 overlays/configuration.org:187
+#: overlays/configuration.org:158 overlays/configuration.org:167
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:180
+#: overlays/configuration.org:160
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:182
+#: overlays/configuration.org:162
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7360,7 +7328,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:189
+#: overlays/configuration.org:169
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7370,13 +7338,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:195 overlays/configuration.org:208
+#: overlays/configuration.org:175 overlays/configuration.org:188
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:197
+#: overlays/configuration.org:177
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7385,7 +7353,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:202
+#: overlays/configuration.org:182
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7394,14 +7362,14 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:206
+#: overlays/configuration.org:186
 msgid ""
 "Reported upstream in "
 "[[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/gh-dash#316]]."
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:210
+#: overlays/configuration.org:190
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7415,18 +7383,18 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:220
+#: overlays/configuration.org:200
 #, no-wrap
 msgid "mkShim"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:222
+#: overlays/configuration.org:202
 msgid "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:224
+#: overlays/configuration.org:204
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7436,20 +7404,20 @@ msgid ""
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:229
+#: overlays/configuration.org:209
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:231
+#: overlays/configuration.org:211
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:233
+#: overlays/configuration.org:213
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""

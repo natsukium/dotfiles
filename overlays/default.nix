@@ -33,14 +33,6 @@
     );
 
   temporary-fix = final: prev: {
-    toybox = prev.toybox.overrideAttrs (
-      old:
-      prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
-        preBuild = (old.preBuild or "") + ''
-          sed -i 's/^CONFIG_READAHEAD=y$/# CONFIG_READAHEAD is not set/' .config
-        '';
-      }
-    );
     vimPlugins =
       let
         testsFail = prev.stdenv.hostPlatform.isDarwin || prev.stdenv.hostPlatform.system == "aarch64-linux";
