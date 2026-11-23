@@ -33,15 +33,6 @@
     );
 
   temporary-fix = final: prev: {
-    afew = prev.afew.overridePythonAttrs {
-      sphinxBuilders = "html man";
-      makeWrapperArgs = [
-        "--prefix"
-        "PATH"
-        ":"
-        "${final.notmuch}/bin"
-      ];
-    };
     toybox = prev.toybox.overrideAttrs (
       old:
       prev.lib.optionalAttrs prev.stdenv.hostPlatform.isDarwin {
