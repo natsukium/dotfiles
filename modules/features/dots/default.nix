@@ -1,0 +1,63 @@
+# `dots`: the per-machine setup Nix cannot do declaratively — a private key to
+# create, an OAuth consent screen to click through.
+#
+# Each step is a plugin owned by the module whose configuration it completes, so
+# the Python sits beside the Nix that knows the paths and service names, and a
+# host only gets the subcommands for features it enables. A single script would
+# have to hard-code those paths and drift whenever a module changed them.
+{ ... }:
+{
+  flake.modules.homeManager.dots =
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
+    let
+      cfg = config.my.programs.dots;
+    in
+    {
+      options.my.programs.dots = {
+        plugins = lib.mkOption {
+          type = lib.types.attrsOf (
+            lib.types.submodule {
+              options = {
+                source = lib.mkOption {
+                  type = lib.types.path;
+                  description = "Python module providing HELP, new(), doctor() and optionally add_arguments().";
+                };
+                tests = lib.mkOption {
+                  type = lib.types.nullOr lib.types.path;
+                  default = null;
+                  description = "pytest file run when the package is built.";
+                };
+                settings = lib.mkOption {
+                  inherit (pkgs.formats.json { }) type;
+                  default = { };
+                  description = "Values passed to the plugin's new() and doctor().";
+                };
+              };
+            }
+          );
+          default = { };
+          description = "`dots new <name>` subcommands, keyed by name.";
+        };
+
+        package = lib.mkOption {
+          type = lib.types.package;
+          readOnly = true;
+          default = pkgs.callPackage ./package.nix { inherit (cfg) plugins; };
+        };
+      };
+
+      config = lib.mkIf (cfg.plugins != { }) {
+        assertions = map (name: {
+          assertion = builtins.match "[a-z_][a-z0-9_]*" name != null;
+          message = "my.programs.dots.plugins.${name}: the name becomes a Python module name";
+        }) (lib.attrNames cfg.plugins);
+
+        home.packages = [ cfg.package ];
+      };
+    };
+}

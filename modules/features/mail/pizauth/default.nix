@@ -142,6 +142,18 @@
           sops.templates."pizauth.conf" = {
             content = configContent;
           };
+
+          my.programs.dots.plugins.pizauth = {
+            source = ./dots_pizauth.py;
+            tests = ./test_dots_pizauth.py;
+            settings = {
+              pizauth = pizauthCmd;
+              configFile = configPath;
+              accounts = lib.attrNames cfg.accounts;
+              dumpFile = if cfg.persistence.enable then cfg.persistence.dumpFile else null;
+              service = "pizauth";
+            };
+          };
         }
 
         (mkIf pkgs.stdenv.hostPlatform.isDarwin {
