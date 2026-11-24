@@ -2,14 +2,21 @@ import re
 import webbrowser
 from pathlib import Path
 
-from dots.lib import Check, DotsError, info, restart_service, run, wait_until, warn
+from dotcli.lib import Check, DotcliError, info, restart_service, run, wait_until, warn
 
-HELP = "authorize pizauth accounts in the browser"
+HELP = "pizauth OAuth accounts"
 
 URL_RE = re.compile(r"https?://\S+")
 
 
-def add_arguments(parser):
+def register(parser, settings):
+    actions = parser.add_subparsers(dest="action", required=True)
+    p = actions.add_parser("login", help="authorize accounts in the browser")
+    add_login_arguments(p)
+    p.set_defaults(func=lambda args: login(args, settings))
+
+
+def add_login_arguments(parser):
     parser.add_argument(
         "accounts", nargs="*", help="accounts to authorize (default: all configured)"
     )
@@ -57,23 +64,23 @@ def authorize(settings, account, open_browser, timeout):
     return False
 
 
-def new(args, settings):
+def login(args, settings):
     if not Path(settings["configFile"]).exists():
-        raise DotsError(
-            f"{settings['configFile']} is missing; sops-nix has not rendered it (run `dots new age` first)"
+        raise DotcliError(
+            f"{settings['configFile']} is missing; sops-nix has not rendered it (run `dotcli age new` first)"
         )
 
     if not running(settings):
         info(f"starting {settings['service']}")
         restart_service(settings["service"])
         if not wait_until(lambda: running(settings), 30):
-            raise DotsError("pizauth did not come up; check its logs")
+            raise DotcliError("pizauth did not come up; check its logs")
 
     known = settings["accounts"]
     targets = args.accounts or known
     unknown = sorted(set(targets) - set(known))
     if unknown:
-        raise DotsError(
+        raise DotcliError(
             f"unknown account(s): {', '.join(unknown)} (configured: {', '.join(known)})"
         )
 
@@ -92,13 +99,13 @@ def doctor(settings):
     has_conf = Path(settings["configFile"]).exists()
     yield Check(f"pizauth config at {settings['configFile']}", has_conf, "rendered by sops-nix")
     is_running = running(settings)
-    yield Check("pizauth server running", is_running, "dots new pizauth")
+    yield Check("pizauth server running", is_running, "dotcli pizauth login")
     if is_running:
         for account in settings["accounts"]:
             yield Check(
                 f"pizauth account {account} authorized",
                 has_token(settings, account),
-                "dots new pizauth",
+                "dotcli pizauth login",
             )
     if settings["dumpFile"] is not None:
         yield Check(

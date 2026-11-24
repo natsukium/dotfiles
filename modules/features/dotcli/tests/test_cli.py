@@ -3,20 +3,23 @@ import sys
 import types
 
 import pytest
-from dots import cli
-from dots.lib import Check, DotsError, service_command
+from dotcli import cli
+from dotcli.lib import Check, DotcliError, service_command
 
 
 @pytest.fixture
 def fake_plugin(monkeypatch):
-    module = types.ModuleType("dots.plugins.fake")
+    module = types.ModuleType("dotcli.plugins.fake")
     module.HELP = "fake plugin"
     module.calls = []
 
-    def add_arguments(parser):
-        parser.add_argument("--flag", action="store_true")
+    def register(parser, settings):
+        actions = parser.add_subparsers(dest="action", required=True)
+        run = actions.add_parser("run")
+        run.add_argument("--flag", action="store_true")
+        run.set_defaults(func=lambda args: module.run(args, settings))
 
-    def new(args, settings):
+    def run(args, settings):
         module.calls.append((args.flag, settings))
         return settings.get("exit", 0)
 
@@ -24,10 +27,10 @@ def fake_plugin(monkeypatch):
         yield Check("first", True, "hint for first")
         yield Check("second", settings.get("healthy", True), "hint for second")
 
-    module.add_arguments = add_arguments
-    module.new = new
+    module.register = register
+    module.run = run
     module.doctor = doctor
-    monkeypatch.setitem(sys.modules, "dots.plugins.fake", module)
+    monkeypatch.setitem(sys.modules, "dotcli.plugins.fake", module)
     return module
 
 
@@ -37,24 +40,25 @@ def write_config(tmp_path, settings):
     return path
 
 
-def test_new_dispatches_to_plugin_with_its_settings_and_arguments(tmp_path, fake_plugin):
+def test_plugin_action_receives_its_settings_and_arguments(tmp_path, fake_plugin):
     config = write_config(tmp_path, {"key": "value"})
 
-    assert cli.main(config, ["new", "fake", "--flag"]) == 0
+    assert cli.main(config, ["fake", "run", "--flag"]) == 0
     assert fake_plugin.calls == [(True, {"key": "value"})]
 
 
-def test_new_propagates_plugin_exit_code(tmp_path, fake_plugin):
+def test_plugin_action_exit_code_is_propagated(tmp_path, fake_plugin):
     config = write_config(tmp_path, {"exit": 1})
 
-    assert cli.main(config, ["new", "fake"]) == 1
+    assert cli.main(config, ["fake", "run"]) == 1
 
 
-def test_unknown_plugin_is_a_usage_error(tmp_path, fake_plugin):
+@pytest.mark.parametrize("argv", [["missing"], ["fake"], ["fake", "missing"]])
+def test_unknown_plugin_or_missing_action_is_a_usage_error(tmp_path, fake_plugin, argv):
     config = write_config(tmp_path, {})
 
     with pytest.raises(SystemExit) as e:
-        cli.main(config, ["new", "missing"])
+        cli.main(config, argv)
     assert e.value.code == 2
 
 
@@ -77,14 +81,14 @@ def test_doctor_fails_and_shows_hint_only_for_failed_checks(tmp_path, fake_plugi
     assert "hint for first" not in out
 
 
-def test_dots_error_becomes_exit_code_one_with_message(tmp_path, fake_plugin, capsys):
-    def failing_new(args, settings):
-        raise DotsError("boom")
+def test_dotcli_error_becomes_exit_code_one_with_message(tmp_path, fake_plugin, capsys):
+    def failing_run(args, settings):
+        raise DotcliError("boom")
 
-    fake_plugin.new = failing_new
+    fake_plugin.run = failing_run
     config = write_config(tmp_path, {})
 
-    assert cli.main(config, ["new", "fake"]) == 1
+    assert cli.main(config, ["fake", "run"]) == 1
     assert "error: boom" in capsys.readouterr().err
 
 

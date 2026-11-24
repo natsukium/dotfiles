@@ -1,4 +1,4 @@
-# `dots`: the per-machine setup Nix cannot do declaratively — a private key to
+# `dotcli`: the per-machine setup Nix cannot do declaratively — a private key to
 # create, an OAuth consent screen to click through.
 #
 # Each step is a plugin owned by the module whose configuration it completes, so
@@ -7,7 +7,7 @@
 # have to hard-code those paths and drift whenever a module changed them.
 { ... }:
 {
-  flake.modules.homeManager.dots =
+  flake.modules.homeManager.dotcli =
     {
       config,
       lib,
@@ -15,17 +15,17 @@
       ...
     }:
     let
-      cfg = config.my.programs.dots;
+      cfg = config.my.programs.dotcli;
     in
     {
-      options.my.programs.dots = {
+      options.my.programs.dotcli = {
         plugins = lib.mkOption {
           type = lib.types.attrsOf (
             lib.types.submodule {
               options = {
                 source = lib.mkOption {
                   type = lib.types.path;
-                  description = "Python module providing HELP, new(), doctor() and optionally add_arguments().";
+                  description = "Python module providing HELP, register(parser, settings) and doctor(settings).";
                 };
                 tests = lib.mkOption {
                   type = lib.types.nullOr lib.types.path;
@@ -35,13 +35,13 @@
                 settings = lib.mkOption {
                   inherit (pkgs.formats.json { }) type;
                   default = { };
-                  description = "Values passed to the plugin's new() and doctor().";
+                  description = "Values passed to the plugin's register() and doctor().";
                 };
               };
             }
           );
           default = { };
-          description = "`dots new <name>` subcommands, keyed by name.";
+          description = "`dotcli <name> <action>` command groups, keyed by name.";
         };
 
         package = lib.mkOption {
@@ -52,10 +52,16 @@
       };
 
       config = lib.mkIf (cfg.plugins != { }) {
-        assertions = map (name: {
-          assertion = builtins.match "[a-z_][a-z0-9_]*" name != null;
-          message = "my.programs.dots.plugins.${name}: the name becomes a Python module name";
-        }) (lib.attrNames cfg.plugins);
+        assertions = lib.concatMap (name: [
+          {
+            assertion = builtins.match "[a-z_][a-z0-9_]*" name != null;
+            message = "my.programs.dotcli.plugins.${name}: the name becomes a Python module name";
+          }
+          {
+            assertion = name != "doctor";
+            message = "my.programs.dotcli.plugins.doctor: the name is taken by `dotcli doctor`";
+          }
+        ]) (lib.attrNames cfg.plugins);
 
         home.packages = [ cfg.package ];
       };

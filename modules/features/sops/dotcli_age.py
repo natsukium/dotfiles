@@ -6,12 +6,21 @@ import sys
 import tempfile
 from pathlib import Path
 
-from dots.lib import Check, DotsError, info, restart_service, run, wait_until, warn
+from dotcli.lib import Check, DotcliError, info, restart_service, run, wait_until, warn
 
-HELP = "create or import the age key sops-nix decrypts with"
+HELP = "the age key sops-nix decrypts with"
 
 
-def add_arguments(parser):
+def register(parser, settings):
+    actions = parser.add_subparsers(dest="action", required=True)
+    p = actions.add_parser(
+        "new", help="create or import the key; for a new key, re-encrypt the secrets for it"
+    )
+    add_new_arguments(p)
+    p.set_defaults(func=lambda args: new(args, settings))
+
+
+def add_new_arguments(parser):
     parser.add_argument(
         "--import", dest="import_from", metavar="FILE", help="import an existing key (- for stdin)"
     )
@@ -59,7 +68,7 @@ def stage_key(staged, import_from, age_keygen):
             try:
                 src = sys.stdin.read() if import_from == "-" else Path(import_from).read_text()
             except OSError as e:
-                raise DotsError(f"cannot read {import_from}: {e.strerror}") from e
+                raise DotcliError(f"cannot read {import_from}: {e.strerror}") from e
             fd = os.open(staged, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
             with os.fdopen(fd, "w") as f:
                 f.write(src if src.endswith("\n") else src + "\n")
@@ -67,7 +76,7 @@ def stage_key(staged, import_from, age_keygen):
             run([age_keygen, "-o", str(staged)])
         r = run([age_keygen, "-y", str(staged)], check=False)
         if r.returncode != 0 or not r.stdout.strip():
-            raise DotsError(f"not a valid age key: {r.stderr.strip()}")
+            raise DotcliError(f"not a valid age key: {r.stderr.strip()}")
         return r.stdout.strip()
     except BaseException:
         staged.unlink(missing_ok=True)
@@ -155,13 +164,13 @@ def backup_key(key_file):
         except FileExistsError:
             continue
         return backup
-    raise DotsError(f"too many backups next to {key_file}")
+    raise DotcliError(f"too many backups next to {key_file}")
 
 
 def new(args, settings):
     key_file = Path(settings["keyFile"])
     if key_file.exists() and not args.force:
-        raise DotsError(f"{key_file} already exists (use --force to replace it)")
+        raise DotcliError(f"{key_file} already exists (use --force to replace it)")
 
     key_file.parent.mkdir(parents=True, exist_ok=True)
     os.chmod(key_file.parent, 0o700)
@@ -217,13 +226,13 @@ def new(args, settings):
 def doctor(settings):
     key_file = Path(settings["keyFile"])
     has_key = key_file.exists()
-    yield Check(f"age key at {key_file}", has_key, "dots new age")
+    yield Check(f"age key at {key_file}", has_key, "dotcli age new")
 
     pub = None
     if has_key:
         r = run([settings["ageKeygen"], "-y", str(key_file)], check=False)
         pub = r.stdout.strip() if r.returncode == 0 else None
-        yield Check(f"age key at {key_file} is valid", pub is not None, "dots new age --force")
+        yield Check(f"age key at {key_file} is valid", pub is not None, "dotcli age new --force")
 
     root = repo_root()
     if pub is not None and root is not None:

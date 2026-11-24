@@ -6,9 +6,9 @@ import subprocess
 import sys
 
 import pytest
-from dots import lib
-from dots.lib import DotsError
-from dots.plugins import age
+from dotcli import lib
+from dotcli.lib import DotcliError
+from dotcli.plugins import age
 
 OLD_KEY = "age1" + "q" * 58
 OTHER_KEY = "age1" + "p" * 58
@@ -110,7 +110,7 @@ def public_key(settings):
 
 def parse(*argv):
     parser = argparse.ArgumentParser()
-    age.add_arguments(parser)
+    age.add_new_arguments(parser)
     return parser.parse_args(argv)
 
 
@@ -127,7 +127,7 @@ def test_new_generates_private_key_and_restarts_sops_nix(settings, restarted, tm
 def test_new_refuses_to_overwrite_existing_key(settings, restarted):
     age.new(parse(), settings)
 
-    with pytest.raises(DotsError, match="already exists"):
+    with pytest.raises(DotcliError, match="already exists"):
         age.new(parse(), settings)
 
 
@@ -188,7 +188,7 @@ def test_new_import_rejects_input_that_is_not_an_age_key(settings, restarted, tm
     source = tmp_path / "not-a-key.txt"
     source.write_text("AGE-SECRET-KEY-NOTREALLY\n")
 
-    with pytest.raises(DotsError, match="not a valid age key"):
+    with pytest.raises(DotcliError, match="not a valid age key"):
         age.new(parse("--import", str(source)), settings)
     assert list((tmp_path / "config/sops/age").iterdir()) == []
 
@@ -206,7 +206,7 @@ def test_new_force_import_of_bad_input_keeps_the_working_key(
     if content is not None:
         source.write_text(content)
 
-    with pytest.raises(DotsError):
+    with pytest.raises(DotcliError):
         age.new(parse("--force", "--import", str(source)), settings)
 
     assert (key_dir / "keys.txt").read_text() == working
@@ -346,7 +346,7 @@ def test_doctor_reports_missing_key(settings, monkeypatch):
     checks = list(age.doctor(settings))
 
     assert [c.ok for c in checks] == [False, False]
-    assert checks[0].hint == "dots new age"
+    assert checks[0].hint == "dotcli age new"
 
 
 def test_doctor_reports_malformed_key_instead_of_crashing(settings, tmp_path, monkeypatch):
@@ -371,3 +371,13 @@ def test_doctor_flags_key_that_differs_from_repository_anchor(
     checks = {c.label: c.ok for c in age.doctor(settings)}
 
     assert checks["age key matches &work-user in .sops.yaml"] is False
+
+
+def test_register_exposes_new_as_age_action(settings, restarted, tmp_path):
+    parser = argparse.ArgumentParser()
+    age.register(parser, settings)
+
+    args = parser.parse_args(["new", "--repo", str(tmp_path)])
+    args.func(args)
+
+    assert (tmp_path / "config/sops/age/keys.txt").exists()

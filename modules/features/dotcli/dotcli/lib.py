@@ -5,7 +5,7 @@ import time
 from dataclasses import dataclass
 
 
-class DotsError(Exception):
+class DotcliError(Exception):
     pass
 
 
@@ -46,4 +46,4 @@ def service_command(name, platform=sys.platform):
 def restart_service(name):
     r = run(service_command(name), check=False)
     if r.returncode != 0:
-        raise DotsError(f"failed to restart {name}: {r.stderr.strip()}")
+        raise DotcliError(f"failed to restart {name}: {r.stderr.strip()}")

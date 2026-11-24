@@ -4,32 +4,26 @@ import json
 import sys
 from pathlib import Path
 
-from dots.lib import DotsError
+from dotcli.lib import DotcliError
 
 
 def load_plugins(config_path):
     config = json.loads(Path(config_path).read_text())
     return {
-        name: (importlib.import_module(f"dots.plugins.{name}"), settings)
+        name: (importlib.import_module(f"dotcli.plugins.{name}"), settings)
         for name, settings in config.items()
     }
 
 
 def build_parser(plugins):
     parser = argparse.ArgumentParser(
-        prog="dots", description="Per-machine setup that Nix cannot do declaratively."
+        prog="dotcli",
+        description="Imperative operations this dotfiles configuration cannot declare.",
     )
     sub = parser.add_subparsers(dest="command", required=True)
 
-    new = sub.add_parser("new", help="set up a per-machine credential")
-    new_sub = new.add_subparsers(
-        dest="target", required=True, metavar="{" + ",".join(plugins) + "}"
-    )
     for name, (module, settings) in plugins.items():
-        p = new_sub.add_parser(name, help=module.HELP)
-        if hasattr(module, "add_arguments"):
-            module.add_arguments(p)
-        p.set_defaults(func=lambda args, m=module, s=settings: m.new(args, s))
+        module.register(sub.add_parser(name, help=module.HELP), settings)
 
     doctor = sub.add_parser("doctor", help="report what is still missing on this machine")
     doctor.set_defaults(func=lambda args: doctor_all(plugins))
@@ -52,6 +46,6 @@ def main(config_path, argv=None):
     args = build_parser(plugins).parse_args(argv)
     try:
         return args.func(args) or 0
-    except DotsError as e:
+    except DotcliError as e:
         print(f"error: {e}", file=sys.stderr)
         return 1

@@ -10,9 +10,9 @@
     {
       sops.age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
 
-      my.programs.dots.plugins.age = {
-        source = ./dots_age.py;
-        tests = ./test_dots_age.py;
+      my.programs.dotcli.plugins.age = {
+        source = ./dotcli_age.py;
+        tests = ./test_dotcli_age.py;
         settings = {
           inherit (config.sops.age) keyFile;
           secretsDir = config.sops.defaultSymlinkPath;

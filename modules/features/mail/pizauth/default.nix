@@ -143,9 +143,9 @@
             content = configContent;
           };
 
-          my.programs.dots.plugins.pizauth = {
-            source = ./dots_pizauth.py;
-            tests = ./test_dots_pizauth.py;
+          my.programs.dotcli.plugins.pizauth = {
+            source = ./dotcli_pizauth.py;
+            tests = ./test_dotcli_pizauth.py;
             settings = {
               pizauth = pizauthCmd;
               configFile = configPath;
