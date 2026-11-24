@@ -18,6 +18,7 @@
           secretsDir = config.sops.defaultSymlinkPath;
           service = "sops-nix";
           ageKeygen = lib.getExe' pkgs.age "age-keygen";
+          sops = lib.getExe pkgs.sops;
         };
       };
     };

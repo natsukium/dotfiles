@@ -1,6 +1,7 @@
 import os
 import re
 import shlex
+import subprocess
 import sys
 import tempfile
 from pathlib import Path
@@ -24,6 +25,11 @@ def add_arguments(parser):
     )
     parser.add_argument(
         "--repo", help="dotfiles checkout (default: the git repository containing the cwd)"
+    )
+    parser.add_argument(
+        "--no-updatekeys",
+        action="store_true",
+        help="print the sops updatekeys commands instead of running them",
     )
 
 
@@ -103,10 +109,42 @@ def replace_recipient(root, anchor, pub):
 SOPS_FORMATS = {".yaml", ".yml", ".json", ".ini", ".env"}
 
 
-def updatekeys_command(path):
+def updatekeys_argv(path, sops="sops"):
     # sops picks the store format from the extension; anything else is a binary secret.
-    binary = "" if Path(path).suffix in SOPS_FORMATS else " --input-type binary"
-    return f"sops updatekeys -y{binary} {shlex.quote(path)}"
+    binary = [] if Path(path).suffix in SOPS_FORMATS else ["--input-type", "binary"]
+    return [sops, "updatekeys", "-y", *binary, path]
+
+
+def updatekeys_command(path):
+    return shlex.join(updatekeys_argv(path))
+
+
+def card_present():
+    try:
+        return run(["gpg", "--card-status"], check=False).returncode == 0
+    except FileNotFoundError:
+        return False
+
+
+def wait_for_card():
+    """Return True once the smartcard holding the admin PGP key is readable."""
+    while not card_present():
+        if not sys.stdin.isatty():
+            return False
+        answer = input("Insert the YubiKey with the admin PGP key and press Enter (s to skip): ")
+        if answer.strip().lower() == "s":
+            return False
+    return True
+
+
+def reencrypt(root, files, sops):
+    """Run sops updatekeys per file and return the files that were not re-encrypted."""
+    for i, f in enumerate(files):
+        info(f"re-encrypting {f}")
+        if subprocess.run(updatekeys_argv(f, sops), check=False, cwd=root).returncode != 0:
+            warn(f"sops updatekeys failed for {f}")
+            return files[i:]
+    return []
 
 
 def backup_key(key_file):
@@ -150,11 +188,19 @@ def new(args, settings):
                 f"from the creation_rules this host should decrypt:\n\n  - &{anchor} {pub}"
             )
         elif files:
+            remaining = files
+            if not args.no_updatekeys and wait_for_card():
+                remaining = reencrypt(root, files, settings["sops"])
+            if remaining:
+                print(
+                    "\nRe-encrypt these files where the admin PGP key or a current recipient\n"
+                    "is available:\n\n"
+                    + f"  cd {shlex.quote(str(root))}\n"
+                    + "".join(f"  {updatekeys_command(f)}\n" for f in remaining)
+                )
             print(
-                "\nRe-encrypt these files on a machine that can already decrypt them,\n"
-                "commit, then pull and switch here:\n\n"
-                + f"  cd {shlex.quote(str(root))}\n"
-                + "".join(f"  {updatekeys_command(f)}\n" for f in files)
+                "\nThen commit .sops.yaml with the re-encrypted files and switch home-manager:\n"
+                "sops-nix decrypts the copies in the Nix store, not the checkout."
             )
 
     info(f"restarting {settings['service']}")

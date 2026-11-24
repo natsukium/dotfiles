@@ -1,7 +1,9 @@
 import argparse
+import json
 import shutil
 import stat
 import subprocess
+import sys
 
 import pytest
 from dots import lib
@@ -24,7 +26,39 @@ def settings(tmp_path):
         "secretsDir": str(tmp_path / "secrets"),
         "service": "sops-nix",
         "ageKeygen": shutil.which("age-keygen"),
+        "sops": str(fake_sops(tmp_path)),
     }
+
+
+FAKE_SOPS = """
+import json, os, sys
+from pathlib import Path
+
+here = Path(sys.argv[0]).parent
+with open(here / "sops-calls.jsonl", "a") as log:
+    log.write(json.dumps({"argv": sys.argv[1:], "cwd": os.getcwd()}) + "\\n")
+fail = here / "sops-fail-on"
+sys.exit(1 if fail.exists() and fail.read_text() == sys.argv[-1] else 0)
+"""
+
+
+def fake_sops(tmp_path):
+    exe = tmp_path / "sops"
+    exe.write_text(f"#!{sys.executable}\n" + FAKE_SOPS)
+    exe.chmod(0o755)
+    return exe
+
+
+def sops_calls(tmp_path):
+    log = tmp_path / "sops-calls.jsonl"
+    return [json.loads(line) for line in log.read_text().splitlines()] if log.exists() else []
+
+
+@pytest.fixture(autouse=True)
+def yubikey(monkeypatch):
+    state = {"present": False}
+    monkeypatch.setattr(age, "card_present", lambda: state["present"])
+    return state
 
 
 @pytest.fixture
@@ -221,6 +255,78 @@ def test_second_rotation_before_reencryption_still_lists_files_for_committed_key
 )
 def test_updatekeys_command_marks_non_structured_files_as_binary(path, command):
     assert age.updatekeys_command(path) == command
+
+
+def test_new_reencrypts_each_stale_file_from_repo_root_when_yubikey_is_present(
+    settings, restarted, repo, tmp_path, yubikey, capsys
+):
+    yubikey["present"] = True
+
+    age.new(parse("--repo", str(repo), "--host", "work"), settings)
+
+    calls = sops_calls(tmp_path)
+    assert sorted(c["argv"][-1] for c in calls) == ["secrets.yaml", "with space.yaml"]
+    assert all(c["argv"][:2] == ["updatekeys", "-y"] for c in calls)
+    assert all(c["cwd"] == str(repo) for c in calls)
+    out = capsys.readouterr().out
+    assert "sops updatekeys -y" not in out
+    assert "switch home-manager" in out
+
+
+def test_new_stops_at_failed_reencryption_and_prints_it_with_the_rest(
+    settings, restarted, repo, tmp_path, yubikey, capsys
+):
+    yubikey["present"] = True
+    (tmp_path / "sops-fail-on").write_text("secrets.yaml")
+
+    age.new(parse("--repo", str(repo), "--host", "work"), settings)
+
+    assert [c["argv"][-1] for c in sops_calls(tmp_path)] == ["secrets.yaml"]
+    out = capsys.readouterr().out
+    assert "  sops updatekeys -y secrets.yaml\n" in out
+    assert "  sops updatekeys -y 'with space.yaml'\n" in out
+
+
+def test_new_no_updatekeys_only_prints_commands(
+    settings, restarted, repo, tmp_path, yubikey, capsys
+):
+    yubikey["present"] = True
+
+    age.new(parse("--repo", str(repo), "--host", "work", "--no-updatekeys"), settings)
+
+    assert sops_calls(tmp_path) == []
+    assert "  sops updatekeys -y secrets.yaml\n" in capsys.readouterr().out
+
+
+def test_new_without_yubikey_on_non_interactive_stdin_prints_commands(
+    settings, restarted, repo, tmp_path, capsys
+):
+    age.new(parse("--repo", str(repo), "--host", "work"), settings)
+
+    assert sops_calls(tmp_path) == []
+    assert "  sops updatekeys -y secrets.yaml\n" in capsys.readouterr().out
+
+
+def test_wait_for_card_prompts_until_yubikey_is_inserted(monkeypatch, yubikey):
+    monkeypatch.setattr(age.sys.stdin, "isatty", lambda: True, raising=False)
+    prompts = []
+
+    def insert_on_second_prompt(prompt):
+        prompts.append(prompt)
+        yubikey["present"] = len(prompts) == 2
+        return ""
+
+    monkeypatch.setattr("builtins.input", insert_on_second_prompt)
+
+    assert age.wait_for_card() is True
+    assert len(prompts) == 2
+
+
+def test_wait_for_card_can_be_skipped(monkeypatch):
+    monkeypatch.setattr(age.sys.stdin, "isatty", lambda: True, raising=False)
+    monkeypatch.setattr("builtins.input", lambda prompt: "s")
+
+    assert age.wait_for_card() is False
 
 
 def test_replace_recipient_without_anchor_returns_none(repo):
