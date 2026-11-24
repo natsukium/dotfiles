@@ -112,10 +112,16 @@ in
     };
 
   flake.modules.darwin.comin =
-    { config, lib, ... }:
+    {
+      config,
+      lib,
+      pkgs,
+      ...
+    }:
     let
       cfg = config.my.services.comin;
       cominLog = config.launchd.daemons.comin.serviceConfig.StandardOutPath;
+      appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
     in
     {
       options.my.services.comin.enable = enableOption;
@@ -124,6 +130,13 @@ in
         services.comin = {
           enable = true;
           inherit remotes;
+          # Manual step on each host: grant Full Disk Access to comin.app, or
+          # activation fails to update /Applications/1Password.app. App Management
+          # is not enough; a root daemon is denied even with it granted.
+          package = appIdentity.mkAppBundle {
+            package = inputs.comin.packages.${pkgs.stdenv.hostPlatform.system}.comin;
+            identifier = "com.github.nlewo.comin";
+          };
         };
 
         # The activate-system daemon reactivates system.profile at boot, and comin
