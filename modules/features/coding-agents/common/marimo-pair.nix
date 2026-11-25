@@ -2,11 +2,11 @@
 
 let
   # renovate: datasource=github-releases depName=marimo-team/marimo-pair extractVersion=^v(?<version>.+)$
-  version = "0.0.20";
+  version = "0.1.0";
 in
 fetchFromGitHub {
   owner = "marimo-team";
   repo = "marimo-pair";
   tag = "v${version}";
-  hash = "sha256-8RvczH4eCr3eMgfy/NstKUmxDVJ7ad0Xp+l/l9W0r4U=";
+  hash = "sha256-cEmkL7EoAj5sB7Dediyv8nJH6jtWd+2AtCqZNzSrquY=";
 }
