@@ -122,6 +122,10 @@ in
       cfg = config.my.services.comin;
       cominLog = config.launchd.daemons.comin.serviceConfig.StandardOutPath;
       appIdentity = pkgs.callPackage inputs.nix-mac-app-identity { };
+      cominApp = appIdentity.mkAppBundle {
+        package = inputs.comin.packages.${pkgs.stdenv.hostPlatform.system}.comin;
+        identifier = "com.github.nlewo.comin";
+      };
     in
     {
       options.my.services.comin.enable = enableOption;
@@ -130,12 +134,16 @@ in
         services.comin = {
           enable = true;
           inherit remotes;
-          # Manual step on each host: grant Full Disk Access to comin.app, or
-          # activation fails to update /Applications/1Password.app. App Management
-          # is not enough; a root daemon is denied even with it granted.
-          package = appIdentity.mkAppBundle {
-            package = inputs.comin.packages.${pkgs.stdenv.hostPlatform.system}.comin;
-            identifier = "com.github.nlewo.comin";
+          package = cominApp;
+        };
+
+        # Without Full Disk Access, activation fails to update
+        # /Applications/1Password.app. App Management is not enough; a root daemon
+        # is denied even with it granted.
+        home-manager.users.${config.my.username} = lib.mkIf config.my.home.enable {
+          my.tcc.grants."com.github.nlewo.comin" = {
+            executable = lib.getExe cominApp;
+            services = [ "FullDiskAccess" ];
           };
         };
 

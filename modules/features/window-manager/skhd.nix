@@ -32,6 +32,11 @@
         };
 
         launchd.agents.skhd.config.ProgramArguments = lib.mkForce [ (lib.getExe app) ];
+
+        my.tcc.grants."com.koekeishiya.skhd" = {
+          executable = lib.getExe app;
+          services = [ "Accessibility" ];
+        };
       };
     };
 }

@@ -29,6 +29,11 @@
       config = lib.mkIf config.my.programs.paneru.enable {
         launchd.agents.paneru.config.Program = lib.mkForce (lib.getExe app);
 
+        my.tcc.grants."com.github.karinushka.paneru" = {
+          executable = lib.getExe app;
+          services = [ "Accessibility" ];
+        };
+
         services.paneru = {
           enable = true;
 
