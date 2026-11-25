@@ -1,6 +1,7 @@
 { config, ... }:
 let
   workRoot = "${config.home.homeDirectory}/src/work/";
+  ghWorkDir = "${config.xdg.configHome}/gh-work";
 in
 {
   programs.git.includes = [
@@ -24,16 +25,25 @@ in
         # personal helper stays ahead in the list and silently keeps answering.
         credential."https://github.com".helper = [
           ""
-          "!GH_CONFIG_DIR=${config.xdg.configHome}/gh-work gh auth git-credential"
+          "!GH_CONFIG_DIR=${ghWorkDir} gh auth git-credential"
         ];
       };
     }
   ];
 
+  my.programs.dotcli.plugins.gh.settings.accounts.work = {
+    configDir = ghWorkDir;
+    user = "natsukium-attm";
+    scopes = [
+      "read:packages"
+      "workflow"
+    ];
+  };
+
   my.programs.ghq."https://github.com/attmcojp".root = workRoot;
 
   home.file."src/work/.envrc".text = ''
-    export GH_CONFIG_DIR=${config.xdg.configHome}/gh-work
+    export GH_CONFIG_DIR=${ghWorkDir}
   '';
 
   programs.direnv.config.whitelist.prefix = [ workRoot ];

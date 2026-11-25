@@ -2285,9 +2285,26 @@ authenticate as the right GitHub user, one auth path is easier to reason about t
 two, and I dropped the rewrite. The work host narrows the same helper to a second =gh=
 config directory for repositories under its own root.
 
+Each config directory still needs one browser login per machine, which =dotcli gh login=
+runs for every account the host declares. It rejects a token issued to a different user,
+because the browser's GitHub session, not the config directory, decides which account
+gets authorized.
+
 #+NAME: git-gh
 #+begin_src nix
 programs.gh.enable = true;
+
+my.programs.dotcli.plugins.gh = {
+  source = ./dotcli;
+  settings = {
+    gh = lib.getExe config.programs.gh.package;
+    host = "github.com";
+    accounts.personal = {
+      configDir = "${config.xdg.configHome}/gh";
+      user = "natsukium";
+    };
+  };
+};
 #+end_src
 
 *** Delta

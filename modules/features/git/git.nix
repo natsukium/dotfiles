@@ -76,6 +76,18 @@
 
           programs.gh.enable = true;
 
+          my.programs.dotcli.plugins.gh = {
+            source = ./dotcli;
+            settings = {
+              gh = lib.getExe config.programs.gh.package;
+              host = "github.com";
+              accounts.personal = {
+                configDir = "${config.xdg.configHome}/gh";
+                user = "natsukium";
+              };
+            };
+          };
+
           programs.delta = {
             enable = true;
             enableGitIntegration = true;
