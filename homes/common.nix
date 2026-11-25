@@ -1,6 +1,5 @@
 {
   inputs,
-  config,
   ...
 }:
 let
@@ -28,8 +27,6 @@ in
   base16.enable = true;
 
   my.programs.neovim.enable = true;
-
-  sops.age.keyFile = "${config.xdg.configHome}/sops/age/keys.txt";
 
   imports = [
     nix-colors.homeManagerModule
