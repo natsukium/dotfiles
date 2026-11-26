@@ -5688,6 +5688,23 @@ let
       inherit org;
     };
 
+  # package-activate-all reads every package's autoloads file one by one
+  # at startup. A quickstart file is a single precompiled
+  # concatenation that Emacs loads instead whenever it exists in
+  # user-emacs-directory. Generating it here keeps it in sync with the package
+  # set, which a runtime package-quickstart-refresh would not.
+  quickstart =
+    pkgs:
+    pkgs.runCommand "emacs-package-quickstart" { nativeBuildInputs = [ (mkEmacs pkgs) ]; } ''
+      mkdir $out
+      HOME=$TMPDIR emacs --batch --eval \
+        "(progn
+          (setq package-user-dir \"$TMPDIR/elpa\"
+                package-quickstart-file \"$out/package-quickstart.el\")
+          (package-initialize)
+          (package-quickstart-refresh))"
+    '';
+
   mkEmacs =
     pkgs:
     (withEmacsOverlay pkgs).callPackage ./package.nix {
@@ -5716,6 +5733,8 @@ let
       mkdir -p "$dir"
       ln -sf ${tangleEl pkgs ./init.org} "$dir/init.el"
       ln -sf ${tangleEl pkgs ./early-init.org} "$dir/early-init.el"
+      ln -sf ${quickstart pkgs}/package-quickstart.el "$dir/package-quickstart.el"
+      ln -sf ${quickstart pkgs}/package-quickstart.elc "$dir/package-quickstart.elc"
       exec ${emacsBin} --init-directory "$dir" "$@"
     '';
 in
@@ -5745,6 +5764,8 @@ in
 
         xdg.configFile."emacs/init.el".source = tangleEl pkgs ./init.org;
         xdg.configFile."emacs/early-init.el".source = tangleEl pkgs ./early-init.org;
+        xdg.configFile."emacs/package-quickstart.el".source = "${quickstart pkgs}/package-quickstart.el";
+        xdg.configFile."emacs/package-quickstart.elc".source = "${quickstart pkgs}/package-quickstart.elc";
         home.file.".authinfo.age".source = ./authinfo.age;
 
         home.shellAliases = lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin {

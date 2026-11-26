@@ -1,5 +1,14 @@
 #+STARTUP: overview
 
+** garbage collection during startup
+
+#+begin_src emacs-lisp
+(let ((threshold gc-cons-threshold))
+  (setq gc-cons-threshold most-positive-fixnum)
+  (add-hook 'emacs-startup-hook
+            (lambda () (setq gc-cons-threshold threshold))))
+#+end_src
+
 ** disable some bars
 
 The tool bar duplicates functionality already accessible via keybindings and

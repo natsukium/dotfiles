@@ -343,6 +343,7 @@ The built-in savehist package keeps a record of user inputs and stores them acro
 
 (use-package diff-hl
   :ensure t
+  :defer 1
   :config
   (global-diff-hl-mode)
   (diff-hl-flydiff-mode)
@@ -1274,7 +1275,8 @@ making it suitable for running interactive CLI tools like Claude Code.
 
 #+begin_src emacs-lisp
 (use-package vterm
-  :ensure t)
+  :ensure t
+  :defer t)
 #+end_src
 
 * encryption
@@ -1321,6 +1323,7 @@ the token is cached under =.cache/gptel-openai/= in =user-emacs-directory=.
 #+begin_src emacs-lisp
 (use-package gptel
   :ensure t
+  :defer t
   :config
   (setq gptel-model 'gpt-6-luna
         gptel-backend (gptel-make-openai-oauth "ChatGPT")))
