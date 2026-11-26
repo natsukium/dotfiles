@@ -58,6 +58,7 @@
                   "secrets/default.yaml"
                   "hosts/nixos/tarangire/facter.json"
                   "systems/shared/hercules-ci/binary-caches.json"
+                  "hosts/darwin/work/attmcojp-agents.md"
                 ];
                 settings.configPath = "typos.toml";
               };
