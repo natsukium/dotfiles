@@ -106,6 +106,8 @@
   sops.secrets.forgejo-runner-token.sopsFile = ./secrets.yaml;
   sops.secrets.forgejo-runner-connection-token.sopsFile = ./secrets.yaml;
 
+  my.services.irodori-tts.enable = true;
+
   my.services.windows-vm = {
     enable = true;
     installerIso = "/data/Win11_25H2_English_x64.iso";
