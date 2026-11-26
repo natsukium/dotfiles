@@ -1,20 +1,45 @@
 {
   lib,
-  writeShellScriptBin,
+  writeTextFile,
+  runtimeShell,
+  coreutils,
   symlinkJoin,
 }:
 
 let
   mkShim =
     command: package:
-    writeShellScriptBin command ''
-      echo "Error: '${command}' command not found." >&2
-      echo "Please install ${package} by adding it to your Nix configuration:" >&2
-      echo "  environment.systemPackages = [ pkgs.${package} ];" >&2
-      echo "or" >&2
-      echo "  home.packages = [ pkgs.${package} ];" >&2
-      exit 127
-    '';
+    writeTextFile {
+      name = "${command}-shim";
+      destination = "/bin/${command}";
+      executable = true;
+      text = ''
+        #!${runtimeShell}
+        # /usr/bin holds the Command Line Tools stubs that raise the install
+        # popup. Matching on the store name, not on this file's own path, also
+        # skips a shim from another system generation, which would otherwise
+        # bounce the call back here forever.
+        IFS=: read -ra dirs <<< "$PATH"
+        for dir in "''${dirs[@]}"; do
+          [ "$dir" = /usr/bin ] && continue
+          candidate="$dir/${command}"
+          [ -x "$candidate" ] || continue
+          case "$(${coreutils}/bin/realpath "$candidate")" in
+            /nix/store/*-${command}-shim/bin/${command}) continue ;;
+          esac
+          exec "$candidate" "$@"
+        done
+
+        echo "Error: '${command}' command not found." >&2
+        echo "Please install ${package} by adding it to your Nix configuration:" >&2
+        echo "  environment.systemPackages = [ pkgs.${package} ];" >&2
+        echo "or" >&2
+        echo "  home.packages = [ pkgs.${package} ];" >&2
+        echo "To run it once without installing:" >&2
+        echo "  nix shell nixpkgs#${package} -c ${command} ..." >&2
+        exit 127
+      '';
+    };
 
   commandLineToolsShim = symlinkJoin {
     name = "command-line-tools-shim";
