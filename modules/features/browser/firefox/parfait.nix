@@ -5,11 +5,11 @@
 { fetchFromGitHub }:
 let
   # renovate: datasource=github-releases depName=reizumii/parfait extractVersion=^v(?<version>.+)$
-  version = "1.3";
+  version = "1.4";
 in
 fetchFromGitHub {
   owner = "reizumii";
   repo = "parfait";
   tag = "v${version}";
-  hash = "sha256-hd5u6ogZAzk5K1QZs/+wIzbBF6Ovpii/PW0+f/FhPIs=";
+  hash = "sha256-Y23lhRaFS2Y1xnmMPbv4pUvoAfRYczOi2RAPYSRDXu0=";
 }
