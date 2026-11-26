@@ -70,6 +70,10 @@
             IRODORI_HOST = "0.0.0.0";
             IRODORI_PORT = toString port;
             IRODORI_HF_CHECKPOINT = "Aratako/Irodori-TTS-v4.1-Small-MF";
+            # The checkpoint's default of 4 steps drops or garbles words in about
+            # one paragraph in six. 8 steps reads as accurately as the 40-step RF
+            # model at a fraction of its cost.
+            IRODORI_DEFAULT_NUM_STEPS = "8";
             IRODORI_MODEL_DEVICE = "cuda";
             IRODORI_CODEC_DEVICE = "cuda";
             IRODORI_MODEL_PRECISION = "bf16";
