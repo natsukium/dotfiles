@@ -12,6 +12,7 @@
       cfg = config.my.services.irodori-tts;
 
       port = 8088;
+      upstreamPort = 8089;
       stateDir = "/var/lib/irodori-tts";
 
       src = pkgs.fetchFromGitHub {
@@ -62,13 +63,11 @@
           inherit image;
           pull = "never";
           devices = [ "nvidia.com/gpu=all" ];
-          # Docker's published ports bypass the NixOS firewall and would reach the
-          # LAN. On the host network the firewall applies, so only tailscale0,
-          # which it trusts, can reach the port.
+          # Only the speed proxy talks to the server, so it binds loopback.
           extraOptions = [ "--network=host" ];
           environment = {
-            IRODORI_HOST = "0.0.0.0";
-            IRODORI_PORT = toString port;
+            IRODORI_HOST = "127.0.0.1";
+            IRODORI_PORT = toString upstreamPort;
             IRODORI_HF_CHECKPOINT = "Aratako/Irodori-TTS-v4.1-Small-MF";
             # The checkpoint's default of 4 steps drops or garbles words in about
             # one paragraph in six. 8 steps reads as accurately as the 40-step RF
@@ -101,8 +100,8 @@
             TimeoutStartSec = "1h";
           };
           script = ''
-            until curl -sf http://127.0.0.1:${toString port}/health >/dev/null; do sleep 5; done
-            curl -sf http://127.0.0.1:${toString port}/v1/audio/speech \
+            until curl -sf http://127.0.0.1:${toString upstreamPort}/health >/dev/null; do sleep 5; done
+            curl -sf http://127.0.0.1:${toString upstreamPort}/v1/audio/speech \
               -H 'Content-Type: application/json' \
               -o ${stateDir}/voices/narrator.wav.tmp \
               -d @${
@@ -118,6 +117,28 @@
               }
             mv ${stateDir}/voices/narrator.wav.tmp ${stateDir}/voices/narrator.wav
           '';
+        };
+
+        # Irodori honours the OpenAI `speed` field by shrinking the predicted
+        # duration, which garbles most sentences at 2x. BookOrbit sends its
+        # playback speed there instead of changing the playback rate, so the
+        # proxy synthesizes at 1x and time-stretches the result with ffmpeg,
+        # which stays intelligible up to 2x and beyond.
+        systemd.services.irodori-tts-speed-proxy = {
+          after = [ "docker-irodori-tts.service" ];
+          wants = [ "docker-irodori-tts.service" ];
+          wantedBy = [ "multi-user.target" ];
+          environment = {
+            LISTEN_HOST = "0.0.0.0";
+            LISTEN_PORT = toString port;
+            UPSTREAM = "http://127.0.0.1:${toString upstreamPort}";
+            FFMPEG = lib.getExe pkgs.ffmpeg-headless;
+          };
+          serviceConfig = {
+            ExecStart = "${lib.getExe pkgs.python3} -I ${./speed-proxy.py}";
+            DynamicUser = true;
+            Restart = "on-failure";
+          };
         };
 
         systemd.tmpfiles.settings.irodori-tts = {
