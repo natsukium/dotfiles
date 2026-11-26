@@ -9,6 +9,10 @@
     }:
     let
       cfg = config.my.programs.claude-code;
+      # Code Mode refuses to start while traces (CLAUDE_CODE_ENHANCED_TELEMETRY_BETA)
+      # are on, because it emits no per-tool spans yet. Flip to trade back.
+      codeMode = true;
+      flag = b: if b then "1" else "0";
     in
     {
       options.my.programs.claude-code = {
@@ -140,9 +144,10 @@
             };
 
             env = {
+              CLAUDE_CODE_EXPERIMENTAL_CODE_MODE = flag codeMode;
               CLAUDE_CODE_ENABLE_TELEMETRY = "1";
               # Traces are still beta and gated behind this flag.
-              CLAUDE_CODE_ENHANCED_TELEMETRY_BETA = "1";
+              CLAUDE_CODE_ENHANCED_TELEMETRY_BETA = flag (!codeMode);
 
               # Push all three signals over OTLP to the local Alloy receiver
               # (my.services.otel-collector) rather than exposing a Prometheus
