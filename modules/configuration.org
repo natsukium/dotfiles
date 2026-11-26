@@ -1070,29 +1070,75 @@ in
     {
       options.my.programs.fish.enable = lib.mkEnableOption "fish";
 
-      config = lib.mkIf config.my.programs.fish.enable {
-        programs.fish = {
-          enable = true;
+      config = lib.mkIf config.my.programs.fish.enable (
+        lib.mkMerge [
+          {
+            programs.fish = {
+              enable = true;
 
-          <<fish-interactive-shell-init>>
+              <<fish-interactive-shell-init>>
 
-          <<fish-abbreviations>>
+              <<fish-abbreviations>>
 
-          <<fish-functions>>
+              <<fish-functions>>
 
-          <<fish-plugins>>
+              <<fish-plugins>>
 
-          <<fish-launchctl-completion>>
-        };
+              <<fish-launchctl-completion>>
+            };
 
-        xdg.configFile = {
-          "fish/functions/nix.fish".source = anyNixShellFunction "nix";
-          "fish/functions/nix-shell.fish".source = anyNixShellFunction "nix-shell";
-        };
-      };
+            xdg.configFile = {
+              "fish/functions/nix.fish".source = anyNixShellFunction "nix";
+              "fish/functions/nix-shell.fish".source = anyNixShellFunction "nix-shell";
+            };
+          }
+
+          <<fish-prebuilt-init>>
+        ]
+      );
     };
 }
 #+end_src
+
+*** Startup Time
+
+I measure startup with
+=hyperfine --warmup 3 -N "fish --interactive -c 'fish_prompt; fish_title; exit 0'"=.
+Fish alone starts in about 6ms. Most of the rest comes from child processes that the
+configuration spawns, and the most common one is the =tool init fish | source= idiom:
+it runs the tool only to print a script that changes when the package does, not
+between shells. So for zoxide and direnv I disable Home Manager's integration and
+source the same script generated at build time.
+
+#+NAME: fish-prebuilt-init
+#+begin_src nix
+{
+  programs.zoxide.enableFishIntegration = false;
+  programs.direnv.enableFishIntegration = false;
+
+  programs.fish.interactiveShellInit =
+    let
+      zoxide = config.programs.zoxide;
+      direnv = config.programs.direnv;
+      zoxideInit = pkgs.runCommand "zoxide-init.fish" { } ''
+        ${lib.getExe zoxide.package} init fish ${lib.escapeShellArgs zoxide.options} > $out
+      '';
+      direnvHook = pkgs.runCommand "direnv-hook.fish" { } ''
+        ${lib.getExe direnv.package} hook fish > $out
+      '';
+    in
+    lib.mkMerge [
+      (lib.mkIf zoxide.enable "source ${zoxideInit}")
+      # Home Manager orders the direnv hook after other prompt changes.
+      (lib.mkIf direnv.enable (lib.mkAfter "source ${direnvHook}"))
+    ];
+}
+#+end_src
+
+Atuin's init has the same shape, but Home Manager already generates it at build time.
+What remains is =atuin uuid= for the session ID (about 6ms). I leave it, because atuin
+reads the session start time out of that UUIDv7, and fish has no clock to build one
+without spawning a process anyway.
 
 *** Interactive Shell Init
 
@@ -1264,7 +1310,15 @@ anyNixShellFunction =
 plugins = [
   {
     name = "done";
-    src = pkgs.fishPlugins.done.src;
+    src = pkgs.applyPatches {
+      name = "done-source";
+      src = pkgs.fishPlugins.done.src;
+      postPatch = ''
+        substituteInPlace conf.d/done.fish --replace-fail \
+          'and count (__done_get_focused_window_id) >/dev/null' \
+          'and begin; type -q lsappinfo; or count (__done_get_focused_window_id) >/dev/null; end'
+      '';
+    };
   }
   {
     name = "fzf-fish";
@@ -1278,6 +1332,11 @@ The threshold is set to 15 seconds — commands shorter than this are typically
 interactive and do not benefit from notifications, while longer commands (builds,
 test suites, large file operations) are often run in the background where a
 notification is valuable.
+
+At startup done checks that it can find the focused window, and on macOS that check
+runs =lsappinfo= twice, about 7ms of every shell launch. I patch the check to accept
+the mere presence of =lsappinfo= and fall back to the real probe on other systems. Over
+SSH done still disables itself through its separate =SSH_CLIENT= test.
 
 #+NAME: fish-done-config
 #+begin_src nix :noweb no
@@ -1832,15 +1891,18 @@ script is cherry-picked from
 [[https://gist.github.com/duament/bac0181935953b97ca71640727c9c029][duament's gist]], based on [[https://github.com/acomagu/fish-async-prompt][fish-async-prompt]].
 See also [[https://github.com/fish-shell/fish-shell/issues/8223][fish-shell#8223]] for upstream discussion on async prompt support.
 
+The script defines everything the prompt needs on its own, so I no longer source
+=starship init fish= in front of it. That init ran starship twice on every startup and
+left behind a synchronous =fish_right_prompt=, which spawned starship before every
+prompt only to print nothing, since I have no right prompt configured.
+
 #+NAME: starship-async-prompt-config
 #+begin_src nix
 (lib.mkIf cfg.enableFishAsyncPrompt {
-  # use my own script to ensure the execution order
   programs.starship.enableFishIntegration = lib.mkForce false;
 
   programs.fish.interactiveShellInit = ''
     if test "$TERM" != dumb
-        ${lib.getExe config.programs.starship.package} init fish | source
         source ${./async_prompt.fish}
     end
   '';
@@ -1866,7 +1928,7 @@ else if test -n "$TMPDIR"
 else
     set -g __starship_async_tmpdir /tmp/fish-async-prompt
 end
-mkdir -p "$__starship_async_tmpdir"
+test -d "$__starship_async_tmpdir"; or mkdir -p "$__starship_async_tmpdir"
 set -g __starship_async_signal SIGUSR1
 
 # Starship

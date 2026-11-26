@@ -12,7 +12,7 @@ else if test -n "$TMPDIR"
 else
     set -g __starship_async_tmpdir /tmp/fish-async-prompt
 end
-mkdir -p "$__starship_async_tmpdir"
+test -d "$__starship_async_tmpdir"; or mkdir -p "$__starship_async_tmpdir"
 set -g __starship_async_signal SIGUSR1
 
 # Starship

@@ -31,12 +31,10 @@
         })
 
         (lib.mkIf cfg.enableFishAsyncPrompt {
-          # use my own script to ensure the execution order
           programs.starship.enableFishIntegration = lib.mkForce false;
 
           programs.fish.interactiveShellInit = ''
             if test "$TERM" != dumb
-                ${lib.getExe config.programs.starship.package} init fish | source
                 source ${./async_prompt.fish}
             end
           '';
