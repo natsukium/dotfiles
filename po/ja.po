@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2026-11-27 08:02+0900\n"
+"POT-Creation-Date: 2026-11-28 12:46+0900\n"
 "PO-Revision-Date: 2026-03-01 14:13+0900\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -7515,17 +7515,18 @@ msgstr ""
 msgid ""
 "temporary-fix = final: prev: {\n"
 "  <<rustaceanvim>>\n"
+"  <<hadolint>>\n"
 "};"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:120 overlays/configuration.org:133
+#: overlays/configuration.org:121 overlays/configuration.org:134
 #, no-wrap
 msgid "rustaceanvim"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:122
+#: overlays/configuration.org:123
 msgid ""
 "rustaceanvim's integration tests fail on aarch64-linux and on the macOS CI "
 "runner. Buffers from one spec outlive its teardown, so the next spec hits "
@@ -7540,7 +7541,7 @@ msgid ""
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:135
+#: overlays/configuration.org:136
 #, no-wrap
 msgid ""
 "vimPlugins =\n"
@@ -7556,13 +7557,42 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:147 overlays/configuration.org:153
+#: overlays/configuration.org:148 overlays/configuration.org:156
+#, no-wrap
+msgid "hadolint"
+msgstr ""
+
+#. type: paragraph
+#: overlays/configuration.org:150
+msgid ""
+"The neovim package bundles hadolint. Since nixpkgs moved its default GHC "
+"from 9.10 to 9.12 in late November 2026, two of its dependencies fail to "
+"configure.  language-docker caps =time= below 1.14, and spdx rejects the "
+"=Cabal-syntax= that ships with GHC 9.12. Both build and work once those "
+"bounds are lifted, so I jailbreak them. Drop this once Hydra caches "
+"=hadolint= again."
+msgstr ""
+
+#. type: paragraph in src
+#: overlays/configuration.org:158
+#, no-wrap
+msgid ""
+"haskellPackages = prev.haskellPackages.extend (\n"
+"  hfinal: hprev: {\n"
+"    language-docker = final.haskell.lib.compose.doJailbreak hprev.language-docker;\n"
+"    spdx = final.haskell.lib.compose.doJailbreak hprev.spdx;\n"
+"  }\n"
+");"
+msgstr ""
+
+#. type: keyword NAME
+#: overlays/configuration.org:166 overlays/configuration.org:172
 #, no-wrap
 msgid "pre-release"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:149
+#: overlays/configuration.org:168
 msgid ""
 "Overlay for testing alpha, beta, or pre-release versions of packages before "
 "they land in nixpkgs. Useful for evaluating release candidates, nightly "
@@ -7575,24 +7605,24 @@ msgstr ""
 "除します。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:155
+#: overlays/configuration.org:174
 #, no-wrap
 msgid "pre-release = final: prev: { };"
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:158 overlays/configuration.org:167
+#: overlays/configuration.org:177 overlays/configuration.org:186
 #, no-wrap
 msgid "patches"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:160
+#: overlays/configuration.org:179
 msgid "Workarounds that are not suitable for upstream contribution."
 msgstr "アップストリームへの貢献に適さない回避策です。"
 
 #. type: paragraph
-#: overlays/configuration.org:162
+#: overlays/configuration.org:181
 msgid ""
 "These patches address issues that upstream would likely not accept—either "
 "because they are specific to this configuration (e.g., locale settings), "
@@ -7605,7 +7635,7 @@ msgstr ""
 "久的に残る想定です。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:169
+#: overlays/configuration.org:188
 #, no-wrap
 msgid ""
 "patches = final: prev: {\n"
@@ -7615,13 +7645,13 @@ msgid ""
 msgstr ""
 
 #. type: keyword NAME
-#: overlays/configuration.org:175 overlays/configuration.org:188
+#: overlays/configuration.org:194 overlays/configuration.org:207
 #, no-wrap
 msgid "gh-dash"
 msgstr ""
 
 #. type: paragraph
-#: overlays/configuration.org:177
+#: overlays/configuration.org:196
 msgid ""
 "The preview pane renders incorrectly when =LANG=ja_JP.UTF-8= is set. The "
 "issue stems from gh-dash's terminal width calculation, which miscounts the "
@@ -7634,7 +7664,7 @@ msgstr ""
 "す。"
 
 #. type: paragraph
-#: overlays/configuration.org:182
+#: overlays/configuration.org:201
 msgid ""
 "Setting =LANG=C.UTF-8= forces ASCII-compatible width calculations while "
 "preserving UTF-8 encoding support, which fixes the rendering issue. We use "
@@ -7647,7 +7677,7 @@ msgstr ""
 "います。"
 
 #. type: paragraph
-#: overlays/configuration.org:186
+#: overlays/configuration.org:205
 msgid ""
 "Reported upstream in [[https://github.com/dlvhdr/gh-dash/issues/316][dlvhdr/"
 "gh-dash#316]]."
@@ -7656,7 +7686,7 @@ msgstr ""
 "gh-dash#316]]で報告済みです。"
 
 #. type: paragraph in src
-#: overlays/configuration.org:190
+#: overlays/configuration.org:209
 #, no-wrap
 msgid ""
 "gh-dash =\n"
@@ -7670,19 +7700,19 @@ msgid ""
 msgstr ""
 
 #. type: heading **
-#: overlays/configuration.org:200
+#: overlays/configuration.org:219
 #, no-wrap
 msgid "mkShim"
 msgstr "mkShim"
 
 #. type: paragraph
-#: overlays/configuration.org:202
+#: overlays/configuration.org:221
 msgid ""
 "Shim utility for providing stub implementations of macOS Command Line Tools."
 msgstr "macOS Command Line Toolsのスタブ実装を提供するshimユーティリティです。"
 
 #. type: paragraph
-#: overlays/configuration.org:204
+#: overlays/configuration.org:223
 msgid ""
 "On darwin systems without Xcode Command Line Tools installed, invoking "
 "commands like =cc= or =python3= triggers an annoying system popup prompting "
@@ -7697,7 +7727,7 @@ msgstr ""
 "制し不要なビルド失敗を防ぎます。"
 
 #. type: paragraph
-#: overlays/configuration.org:209
+#: overlays/configuration.org:228
 msgid ""
 "See [[file:../pkgs/mkShim/][pkgs/mkShim]] for the implementation details and "
 "list of shimmed commands."
@@ -7706,13 +7736,13 @@ msgstr ""
 "mkShim]]を参照してください。"
 
 #. type: keyword NAME
-#: overlays/configuration.org:211
+#: overlays/configuration.org:230
 #, no-wrap
 msgid "command-line-tools-shim"
 msgstr ""
 
 #. type: paragraph in src
-#: overlays/configuration.org:213
+#: overlays/configuration.org:232
 #, no-wrap
 msgid "inherit (final.callPackage ../pkgs/mkShim { }) mkShim commandLineToolsShim;"
 msgstr ""
