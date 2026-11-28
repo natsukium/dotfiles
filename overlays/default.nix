@@ -43,6 +43,12 @@
           luaAttr = final.neovim-unwrapped.lua.pkgs.rustaceanvim.overrideAttrs { doCheck = false; };
         };
       };
+    haskellPackages = prev.haskellPackages.extend (
+      hfinal: hprev: {
+        language-docker = final.haskell.lib.compose.doJailbreak hprev.language-docker;
+        spdx = final.haskell.lib.compose.doJailbreak hprev.spdx;
+      }
+    );
   };
 
   pre-release = final: prev: { };

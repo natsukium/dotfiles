@@ -114,6 +114,7 @@ existing package, is enough. Remove these overrides once the issues are fixed up
 #+begin_src nix
 temporary-fix = final: prev: {
   <<rustaceanvim>>
+  <<hadolint>>
 };
 #+end_src
 
@@ -142,6 +143,24 @@ vimPlugins =
       luaAttr = final.neovim-unwrapped.lua.pkgs.rustaceanvim.overrideAttrs { doCheck = false; };
     };
   };
+#+end_src
+
+** hadolint
+
+The neovim package bundles hadolint. Since nixpkgs moved its default GHC from
+9.10 to 9.12 in late November 2026, two of its dependencies fail to configure.
+language-docker caps =time= below 1.14, and spdx rejects the =Cabal-syntax= that
+ships with GHC 9.12. Both build and work once those bounds are lifted, so I
+jailbreak them. Drop this once Hydra caches =hadolint= again.
+
+#+NAME: hadolint
+#+begin_src nix
+haskellPackages = prev.haskellPackages.extend (
+  hfinal: hprev: {
+    language-docker = final.haskell.lib.compose.doJailbreak hprev.language-docker;
+    spdx = final.haskell.lib.compose.doJailbreak hprev.spdx;
+  }
+);
 #+end_src
 
 * pre-release
